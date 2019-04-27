@@ -128,27 +128,27 @@ float Maxf(float a, float b)
 	return a > b ? a : b;
 }
 
-void Bound(float& value, sf::Vector2f min_max_values)
+void Bound(float& value, float min, float max)
 {
-	if (value < min_max_values.x)
+	if (value < min)
 	{
-		value = min_max_values.x;
+		value = min;
 	}
-	else if (value > min_max_values.y)
+	else if (value > max)
 	{
-		value = min_max_values.y;
+		value = max;
 	}
 }
 
-void Bound(int& value, sf::Vector2i min_max_values)
+void Bound(int& value, int min, int max)
 {
-	if (value < min_max_values.x)
+	if (value < min)
 	{
-		value = min_max_values.x;
+		value = min;
 	}
-	else if (value > min_max_values.y)
+	else if (value > max)
 	{
-		value = min_max_values.y;
+		value = max;
 	}
 }
 

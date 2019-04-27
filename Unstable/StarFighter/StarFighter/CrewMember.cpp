@@ -16,7 +16,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_healing_timer = HEALING_TIMER;
 	m_is_prisoner = prisoner;
 	m_tile = NULL;
-	m_clone = NULL;
+	m_crew_linked = NULL;
 	m_melee_opponent = NULL;
 	m_melee_rof_timer = 0;
 	m_melee_rof = CREWMEMBER_MELEE_ROF;
@@ -315,7 +315,7 @@ void CrewMember::UpdateLifeBar()
 	m_lifebar->m_shape.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
 
 	int health = m_health;
-	Bound(health, sf::Vector2i(0, m_health_max));
+	Bound(health, 0, m_health_max);
 
 	float life_ratio = 1.0f * health / m_health_max;
 

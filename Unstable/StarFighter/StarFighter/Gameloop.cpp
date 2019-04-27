@@ -977,6 +977,7 @@ void Gameloop::Update(sf::Time deltaTime)
 						//crew killed
 						if (reward->m_resources[i].second < 0)
 						{
+							//cannot kill more than unboarded
 							for (int k = 0; k < -reward->m_resources[i].second; k++)
 							{
 								if (m_warship->m_crew_unboarding.size() > k)
@@ -984,6 +985,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									m_warship->m_reward_interface.m_crew_killed.push_back(m_warship->m_crew_unboarding[k]);
 								}
 							}
+							reward->m_resources[i].second = -m_warship->m_reward_interface.m_crew_killed.size();
 						}
 						else//crew recruited
 						{
@@ -2258,16 +2260,16 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, int gauge, in
 		if (location->m_type == Location_SeaMonster)
 		{
 			int monster_strenght = (int)Lerp(location->m_depth, SEAMONSTER_DEPTH_MIN, SEAMONSTER_DEPTH_MAX, 0, gauge_max);
-			if (monster_strenght > gauge)
+			if (monster_strenght > gauge || RandomizeFloatBetweenValues(0, 1) < SEAMONSTER_LOSE_PROBABILITY)
 			{
 				//lose combat against monster
 				int delta = monster_strenght / gauge;
+				Bound(delta, 0, SEAMONTER_CREW_KILLS_MAX);
 
 				pair<ResourceType, int> resource;
 				resource.first = Resource_Crew;
 				resource.second = - delta;
 				reward->m_resources.push_back(resource);
-
 				reward->m_string = "The massive ojbect turns out to be a dangerous\nsea monster!\nAfter a fierce fight, your divers get torn apart.";
 
 				losing_reward = true;

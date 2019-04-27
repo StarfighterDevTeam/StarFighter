@@ -115,7 +115,7 @@ void Weapon::Update(Time deltaTime)
 	m_lifebar->m_shape.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
 
 	int health = m_health;
-	Bound(health, sf::Vector2i(0, m_health_max));
+	Bound(health, 0, m_health_max);
 
 	float life_ratio = 1.0f * health / m_health_max;
 	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
@@ -139,7 +139,7 @@ void Weapon::Update(Time deltaTime)
 	m_rofbar->m_shape.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
 
 	float rof = m_rof - m_rof_timer;
-	Bound(rof, sf::Vector2f(0, m_rof));
+	Bound(rof, 0, m_rof);
 
 	float rof_ratio = 1.0f * rof / m_rof;
 	m_rofbar->m_shape.setSize(sf::Vector2f(rof_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));

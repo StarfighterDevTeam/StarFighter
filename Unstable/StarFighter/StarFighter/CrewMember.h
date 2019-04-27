@@ -63,7 +63,7 @@ public:
 	string m_texture_name;
 	string m_texture_big_name;
 
-	CrewMember* m_clone;
+	CrewMember* m_crew_linked;
 	CrewMember* Clone();
 
 	int m_fidelity;

@@ -260,25 +260,19 @@ bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
 {
 	if (crew->m_is_prisoner == false && m_unboarded.size() < m_slots_avaible)
 	{
-		bool found = false;
 		for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 		{
-			if (crew == (*it)->m_clone)
+			if (crew == (*it)->m_crew_linked)
 			{
-				found = true;
-				break;
+				return false;
 			}
 		}
 
-		if (found == false)
-		{
-			CrewMember* clone = crew->Clone();
-			m_unboarded.push_back(clone);
-			clone->m_UI_type = UI_CrewMemberUnboarding;
-			clone->m_clone = crew;
-		}
-
-		return found == false;
+		CrewMember* clone = crew->Clone();
+		m_unboarded.push_back(clone);
+		clone->m_UI_type = UI_CrewMemberUnboarding;
+		clone->m_crew_linked = crew;
+		return true;
 	}
 	else
 	{
@@ -288,8 +282,6 @@ bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
 
 void CrewUnboardInterface::RemoveCrewFromInterface(CrewMember* crew)
 {
-	//crew->m_UI_type = UI_CrewMember;
-
 	//remove from interface
 	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 	{
@@ -304,26 +296,4 @@ void CrewUnboardInterface::RemoveCrewFromInterface(CrewMember* crew)
 			break;
 		}
 	}
-	/*
-	vector<CrewMember*> old_crew;
-	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
-	{
-		old_crew.push_back(*it);
-	}
-	m_unboarded.clear();
-	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-	{
-		if (*it != crew)
-		{
-			m_unboarded.push_back(*it);
-		}
-	}
-
-
-	if (m_crew_interface.m_crew == crew)
-	{
-		m_crew_interface.Destroy();
-	}
-	*/
-
 }

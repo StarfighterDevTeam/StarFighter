@@ -189,7 +189,7 @@ void CrewInterface::Update()
 
 	//life bar update
 	int health = m_crew->m_health;
-	Bound(health, sf::Vector2i(0, m_crew->m_health_max));
+	Bound(health, 0, m_crew->m_health_max);
 
 	float life_ratio = 1.0f * health / m_crew->m_health_max;
 
@@ -244,7 +244,7 @@ void CrewInterface::Update()
 	for (int i = 0; i < NB_CREW_SKILLS; i++)
 	{
 		int skill_value = m_crew->m_skills[i];
-		Bound(skill_value, sf::Vector2i(0, m_crew->m_skills_max[i]));
+		Bound(skill_value, 0, m_crew->m_skills_max[i]);
 
 		float skill_ratio = 1.0f * skill_value / m_crew->m_skills_max[i];
 		m_skillbars[i]->m_shape.setSize(sf::Vector2f(skill_ratio * CREWINTERFACE_SKILLBAR_SIZE_X, CREWINTERFACE_LIFEBAR_SIZE_Y));

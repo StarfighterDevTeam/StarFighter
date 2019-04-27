@@ -12,7 +12,8 @@
 #define WRECK_DEPTH_MAX							200
 #define FISH_DEPTH_MIN							5
 #define FISH_DEPTH_MAX							100
-#define SEAMONSTER_CREW_KILLRATIO_MIN			0.2
+#define SEAMONSTER_LOSE_PROBABILITY				0.2
+#define SEAMONTER_CREW_KILLS_MAX					4
 
 //forward declaration
 class WaterTile;

@@ -191,7 +191,7 @@ void CombatInterface::Update(int health, int health_max, int flood, int flood_ma
 	float threshold[3] = { 0.7, 0.5, 0.3 };
 
 	//size of life bar
-	Bound(health, sf::Vector2i(0, health_max));
+	Bound(health, 0, health_max);
 
 	float life_ratio = 1.0f * health / health_max;
 
@@ -217,10 +217,8 @@ void CombatInterface::Update(int health, int health_max, int flood, int flood_ma
 	m_lifebar->m_text.SetPosition(sf::Vector2f(m_lifebar->m_position.x, m_lifebar->m_position.y - 3.f));
 
 	//size of flood bar
-	Bound(flood, sf::Vector2i(0, flood_max));
-
+	Bound(flood, 0, flood_max);
 	float flood_ratio = 1.0f * flood / flood_max;
-
 	m_floodbar->m_shape.setSize(sf::Vector2f(flood_ratio * COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
 
 	//crew
@@ -228,7 +226,6 @@ void CombatInterface::Update(int health, int health_max, int flood, int flood_ma
 	ss_crew << nb_crew << "/" << nb_crew_max;
 	m_crewbar->m_text.setString(ss_crew.str());
 	
-
 	//distance
 	//float distance_ratio = m_enemy_ship->m_distance_combat / DISTANCE_COMBAT_INIT;
 	//m_distance_ships[1]->m_position = sf::Vector2f(COMBAT_DISTANCE_OFFSET_X + ((distance_ratio - 0.5f) * COMBAT_DISTANCE_SIZE_X), COMBAT_DISTANCE_OFFSET_Y);

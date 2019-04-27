@@ -2082,7 +2082,7 @@ bool Ship::AddResource(ResourceType resource, int value)
 			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
 			{
 				(*it)->m_fidelity += value;
-				Bound((*it)->m_fidelity, sf::Vector2i(0, 100));
+				Bound((*it)->m_fidelity, 0, 100);
 			}
 		}
 	}
