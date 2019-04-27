@@ -44,8 +44,8 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 
 		case Location_Fish:
 		{
-			m_choicesID[0] = 6;
-			m_choicesID[1] = 7;
+			m_choicesID[0] = 8;
+			m_choicesID[1] = 9;
 			m_choicesID[2] = -1;
 			m_choicesID[3] = -1;
 			m_depth = RandomizeIntBetweenValues(FISH_DEPTH_MIN, FISH_DEPTH_MAX);

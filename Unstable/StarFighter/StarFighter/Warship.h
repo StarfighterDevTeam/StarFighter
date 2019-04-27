@@ -31,6 +31,7 @@ public:
 	float m_angle_speed;
 	int m_upkeep_costs[NB_UPKEEP_COSTS];
 	bool m_can_open_new_menu;
+	int m_sonar;
 
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;
@@ -42,8 +43,6 @@ public:
 	void UpdateOLD(Time deltaTime, bool tactical_combat);
 
 	void UpdateUpkeepCosts();
-
-
 };
 
 #endif //WARSHIP_H_INCLUDED

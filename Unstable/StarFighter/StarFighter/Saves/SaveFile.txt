@@ -1,8 +1,8 @@
-DMS 0 10 0 8
-Gold 1000
-Fish 1000
+DMS 0 10 0 4
+Gold 990
+Fish 939
 Mech 100
-Fidelity 50
+Fidelity 55
 Days 10
 Crew Angela 1 0 20 20 8 14 14 20 15 10 0 0 1
 Crew Lucy 1 1 20 20 17 20 6 9 7 5 0 9 5
@@ -74,55 +74,55 @@ Island 0 0 40 49 0 0 38 49 2 3 Diamond_Island
 Island 0 0 31 29 0 0 28 29 3 3 Emerald_Island
 Island 0 0 35 28 0 0 34 27 2 3 Quartz_Island
 Ship 30  20 1 1 Medusa
-Ship 22  37 1 1 Le_Redoutable
-Ship 7  14 1 1 Ghost
-Ship 44  12 1 1 Calliope
-Ship 41  54 1 1 Genova
-Ship 44  21 1 1 Hispanola
-Ship 17  36 1 1 Genova
-Ship 24  46 1 1 Calliope
+Ship 22  37 1 1 Genova
+Ship 7  14 1 1 Hispanola
+Ship 44  12 1 1 Ghost
+Ship 41  54 1 1 Le_Redoutable
+Ship 44  21 1 1 Calliope
+Ship 17  36 1 1 Medusa
+Ship 24  46 1 1 Le_Redoutable
 Ship 14  19 1 1 Hispanola
-Ship 46  0 1 1 Ghost
+Ship 46  0 1 1 Genova
 Ship 46  43 2 1 Esmeralda
-Ship 12  29 2 1 Le_Redoutable
-Ship 35  2 2 1 Medusa
-Ship 33  9 2 1 Genova
-Ship 14  39 2 1 Esmeralda
-Ship 39  39 2 1 Calliope
-Ship 40  10 2 1 Medusa
+Ship 12  29 2 1 Ghost
+Ship 35  2 2 1 Calliope
+Ship 33  9 2 1 Medusa
+Ship 14  39 2 1 Genova
+Ship 39  39 2 1 Le_Redoutable
+Ship 40  10 2 1 Ghost
 Ship 59  13 2 1 Hispanola
-Ship 38  23 2 1 Le_Redoutable
-Ship 51  17 2 1 Ghost
-Ship 16  3 2 1 Hispanola
+Ship 38  23 2 1 Esmeralda
+Ship 51  17 2 1 Calliope
+Ship 16  3 2 1 Ghost
 Ship 15  26 2 1 Calliope
-Ship 5  26 2 1 Genova
-Ship 54  38 2 1 Medusa
-Ship 39  27 2 1 Ghost
-Ship 20  52 2 1 Le_Redoutable
-Ship 2  25 2 1 Esmeralda
+Ship 5  26 2 1 Le_Redoutable
+Ship 54  38 2 1 Esmeralda
+Ship 39  27 2 1 Genova
+Ship 20  52 2 1 Medusa
+Ship 2  25 2 1 Hispanola
 Ship 0  19 2 1 Genova
 Ship 42  5 2 1 Ghost
-Ship 59  55 2 1 Hispanola
+Ship 59  55 2 1 Medusa
 Ship 55  24 2 1 Le_Redoutable
-Ship 56  9 2 1 Medusa
-Ship 41  37 2 1 Calliope
-Ship 32  39 2 1 Esmeralda
-Ship 24  35 2 1 Le_Redoutable
-Ship 45  0 2 1 Calliope
+Ship 56  9 2 1 Esmeralda
+Ship 41  37 2 1 Hispanola
+Ship 32  39 2 1 Calliope
+Ship 24  35 2 1 Esmeralda
+Ship 45  0 2 1 Hispanola
 Ship 34  39 2 1 Ghost
-Ship 15  38 2 1 Esmeralda
-Ship 17  34 2 1 Hispanola
+Ship 15  38 2 1 Le_Redoutable
+Ship 17  34 2 1 Genova
 Ship 31  29 2 1 Medusa
-Ship 23  5 2 1 Genova
+Ship 23  5 2 1 Calliope
 Ship 12  57 2 1 Genova
-Ship 28  22 2 1 Esmeralda
-Ship 12  38 2 1 Medusa
-Ship 43  23 2 1 Le_Redoutable
-Ship 41  24 2 1 Ghost
-Ship 0  27 2 1 Calliope
-Ship 21  22 2 1 Hispanola
-Ship 53  59 2 1 Calliope
-Ship 53  43 2 1 Le_Redoutable
+Ship 28  22 2 1 Le_Redoutable
+Ship 12  38 2 1 Esmeralda
+Ship 43  23 2 1 Ghost
+Ship 41  24 2 1 Hispanola
+Ship 0  27 2 1 Medusa
+Ship 21  22 2 1 Calliope
+Ship 53  59 2 1 Esmeralda
+Ship 53  43 2 1 Genova
 Wreck 0 30 0 0 8 0 47
 Wreck 0 59 0 0 28 0 186
 Wreck 0 42 0 0 24 0 70

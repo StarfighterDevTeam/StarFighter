@@ -81,7 +81,12 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location)
 		case Location_SeaMonster:
 		case Location_Wreck:
 		{
-			ss_unboarders << "A massive object is detected by your sonar underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
+			ss_unboarders << "A massive object is detected by your sonar at " << location->m_depth << "m underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
+			break;
+		}
+		case Location_Fish:
+		{
+			ss_unboarders << "Your sonar detects something moving at " << location->m_depth << "m underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
 			break;
 		}
 	}

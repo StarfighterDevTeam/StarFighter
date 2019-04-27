@@ -13,6 +13,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 	m_can_be_seen = true;
 	m_can_open_new_menu = true;
+	m_sonar = 300;
 
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;

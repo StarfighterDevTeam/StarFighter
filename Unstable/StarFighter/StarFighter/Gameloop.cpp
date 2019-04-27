@@ -879,7 +879,8 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Arriving at destination => open a new contextual menu?
 	if (m_warship->m_can_open_new_menu == true)
 	{
-		if (m_warship->m_tile->m_location != NULL && (m_warship->m_tile->m_location->m_type == Location_Seaport || m_warship->m_tile->m_location->m_visited_countdown == 0) && m_warship->m_speed == sf::Vector2f(0, 0))
+		Location* location = m_warship->m_tile->m_location;
+		if (location != NULL && (location->m_type == Location_Seaport || location->m_visited_countdown == 0) && m_warship->m_speed == sf::Vector2f(0, 0) && m_warship->m_sonar >= location->m_depth)
 		{
 			//unboarding?
 			m_menu = Menu_CrewUnboard;
