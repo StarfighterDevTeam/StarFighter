@@ -29,6 +29,7 @@ public:
 	WaterZone* m_zone;
 	DMS_Coord m_DMS;//degree/min/sec
 	bool m_can_be_seen;
+	Location* m_location;
 
 	void UpdatePosition(DMS_Coord warship_DMS);
 	static DMS_Coord GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS);
@@ -39,8 +40,6 @@ public:
 	int m_movement_cost;
 	int m_G_value;
 	WaterTile* m_parent;
-
-	Location* m_location;
 
 	int m_cost;
 };

@@ -8,11 +8,8 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	m_coord_y = coord_y;
 	m_zone_coord_x = zone_coord_x;
 	m_zone_coord_y = zone_coord_y;
-	m_type = type;
-	m_visited_countdown = 0;
-
-	m_tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y];
 	m_tile->m_location = this;
+	m_known = true;
 
 	//UI
 	sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);

@@ -7,8 +7,8 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 	m_tile = tile;
 	m_type = type;
 	m_visited_countdown = 0;
+	m_known = true;//false
 
-	//Add scenariis (choices)
 	switch (type)
 	{
 		case Location_Seaport:
@@ -29,6 +29,11 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 			m_choicesID[2] = -1;
 			m_choicesID[3] = -1;
 			m_depth = RandomizeIntBetweenValues(WRECK_DEPTH_MIN, WRECK_DEPTH_MAX);
+
+			//UI
+			sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/location_wreck.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
+			setAnimation(texture, 1, 1);
+
 			break;
 		}
 
@@ -39,6 +44,11 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 			m_choicesID[2] = -1;
 			m_choicesID[3] = -1;
 			m_depth = RandomizeIntBetweenValues(SEAMONSTER_DEPTH_MIN, SEAMONSTER_DEPTH_MAX);
+
+			//UI
+			sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/location_seamonster.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
+			setAnimation(texture, 1, 1);
+
 			break;
 		}
 
@@ -49,6 +59,11 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 			m_choicesID[2] = -1;
 			m_choicesID[3] = -1;
 			m_depth = RandomizeIntBetweenValues(FISH_DEPTH_MIN, FISH_DEPTH_MAX);
+
+			//UI
+			sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/location_fish.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
+			setAnimation(texture, 1, 1);
+
 			break;
 		}
 	}

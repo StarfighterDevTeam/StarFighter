@@ -27,7 +27,6 @@ public:
 	int m_zone_coord_y;
 	SeaportType m_type;
 
-	WaterTile* m_tile;
 	Island* m_island;
 	vector<Ship*> m_ships;
 

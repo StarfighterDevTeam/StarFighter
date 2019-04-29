@@ -84,8 +84,6 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 		m_text_DMS_location.setStyle(sf::Text::Bold);
 		m_text_DMS_location.setString(ss_DMS.str());
 		m_text_DMS_location.setPosition(sf::Vector2f(m_panel->m_position.x - m_text_DMS_location.getGlobalBounds().width * 0.5, m_panel->m_position.y - m_text_DMS_location.getGlobalBounds().height * 0.65 + 4));
-
-		reward->m_DMS_location = NULL;
 	}
 
 	for (int i = 0; i < size; i++)

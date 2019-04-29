@@ -66,6 +66,7 @@ public:
 	LocationType m_type;
 	int m_choicesID[NB_CHOICES_MAX];
 	int m_depth;
+	bool m_known;
 };
 
 #endif //LOCATION_H_INCLUDED

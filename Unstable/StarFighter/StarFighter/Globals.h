@@ -59,9 +59,9 @@ std::string StringCut(std::string str, const size_t length);
 #define FLOOD_MIN_VALUE_FOR_TRANSFER		20
 #define FLOOD_EVAPORATION_TIME				1.f
 
-#define WATERTILE_SIZE						64.f
-#define WATERTILE_OFFSET_X					1100.f
-#define WATERTILE_OFFSET_Y					150.f
+#define WATERTILE_SIZE						64
+#define WATERTILE_OFFSET_X					1100
+#define WATERTILE_OFFSET_Y					150
 #define NB_WATERTILE_X						60
 #define NB_WATERTILE_Y						60
 #define NB_WATERTILE_SUBDIVISION			60

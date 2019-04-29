@@ -21,8 +21,6 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_parent = NULL;
 
 	//locations
-	//m_island = NULL;
-	//m_seaport = NULL;
 	m_location = NULL;
 
 	//UI

@@ -160,6 +160,17 @@ void Gameloop::Update(sf::Time deltaTime)
 
 					//position on "radar"
 					(*it2)->UpdatePosition(m_warship->m_DMS);
+					if ((*it2)->m_location != NULL)
+					{
+						(*it2)->m_location->m_position = (*it2)->m_position;
+						(*it2)->m_location->UpdatePosition();
+
+						if ((*it2)->m_location->m_type == Location_Seaport)
+						{
+							Seaport* seaport = (Seaport*)(*it2)->m_location;
+							seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
+						}
+					}
 
 					//selection
 					if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
@@ -196,14 +207,14 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Islands
-	for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
-	{
-		//position on "radar"
-		(*it)->m_position = (*it)->m_tile->m_position;
-		(*it)->UpdatePosition();
-		(*it)->m_text.setPosition(sf::Vector2f((*it)->m_text.getPosition().x, (*it)->m_text.getPosition().y - (*it)->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
-	}
+	////Islands
+	//for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
+	//{
+	//	//position on "radar"
+	//	(*it)->m_position = (*it)->m_tile->m_position;
+	//	(*it)->UpdatePosition();
+	//	(*it)->m_text.setPosition(sf::Vector2f((*it)->m_text.getPosition().x, (*it)->m_text.getPosition().y - (*it)->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
+	//}
 
 	//Canceling weapon target
 	if (selection != NULL && selection->m_UI_type == UI_Weapon && hovered == NULL)
@@ -1030,6 +1041,14 @@ void Gameloop::Update(sf::Time deltaTime)
 				m_warship->AddResource((*it).first, (*it).second);
 			}
 
+			//secret location revealed
+			if (m_warship->m_reward_interface.m_reward->m_DMS_location != NULL)
+			{
+				DMS_Coord& dms = *m_warship->m_reward_interface.m_reward->m_DMS_location;
+				(*CurrentGame).m_waterzones[dms.m_degree_x][dms.m_degree_y]->m_watertiles[dms.m_minute_x][dms.m_minute_y]->m_location->m_known = true;
+				printf("");
+			}
+
 			//crew recruited
 			for (vector<CrewMember*>::iterator it = m_warship->m_reward_interface.m_crew_recruited.begin(); it != m_warship->m_reward_interface.m_crew_recruited.end(); it++)
 			{
@@ -1088,6 +1107,12 @@ void Gameloop::Draw()
 			else
 			{
 				(*it)->Draw((*CurrentGame).m_mainScreen);
+
+				//secret locations (if known)
+				if ((*it)->m_location != NULL && (*it)->m_location->m_type != Location_Seaport && (*it)->m_location->m_known == true)
+				{
+					(*it)->m_location->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 		if (focused_water_tile != NULL)
@@ -1105,6 +1130,15 @@ void Gameloop::Draw()
 				(*it)->m_island->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
+		
+		////locations
+		//for (vector<Location*>::iterator it = m_secret_locations[2].begin(); it != m_secret_locations[2].end(); it++)
+		//{
+		//	if ((*it)->m_tile->m_can_be_seen == true)
+		//	{
+		//		(*it)->Draw((*CurrentGame).m_mainScreen);
+		//	}
+		//}
 	}
 
 	//ships
@@ -2157,25 +2191,6 @@ void Gameloop::GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y)
 			Location* location = new Location((LocationType)i, tile);
 			tile->m_location = location;
 			m_secret_locations[i].push_back(location);
-
-			switch (i)//for debug only
-			{
-				case Location_Wreck:
-				{
-					(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
-					break;
-				}
-				case Location_SeaMonster:
-				{
-					(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_EngineCharged]);
-					break;
-				}
-				case Location_Fish:
-				{
-					(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Prisoner]);
-					break;
-				}
-			}
 		}
 	}
 }
