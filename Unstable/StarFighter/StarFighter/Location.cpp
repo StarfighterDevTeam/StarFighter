@@ -13,12 +13,8 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 	{
 		case Location_Seaport:
 		{
-			m_choicesID[0] = 1;
-			m_choicesID[1] = 2;
-			m_choicesID[2] = 3;
-			m_choicesID[3] = -1;
+			//see choices in class Seaport
 			m_depth = 0;
-
 			break;
 		}
 

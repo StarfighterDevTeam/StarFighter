@@ -12,6 +12,8 @@ class Warship;//forward declaration
 enum SeaportType
 {
 	Seaport_Small,
+	Seaport_Medium,
+	Seaport_Large,
 	NB_SEAPORT_TYPES,
 };
 
