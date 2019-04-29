@@ -1097,7 +1097,7 @@ void Gameloop::Draw()
 	if (m_scale == Scale_Strategic)
 	{
 		//water tiles
-		GameEntity* focused_water_tile = NULL;
+		WaterTile* focused_water_tile = NULL;
 		for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
 		{
 			if (((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui == *it) || ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui == *it))
@@ -1107,7 +1107,6 @@ void Gameloop::Draw()
 			else
 			{
 				(*it)->Draw((*CurrentGame).m_mainScreen);
-
 				//secret locations (if known)
 				if ((*it)->m_location != NULL && (*it)->m_location->m_type != Location_Seaport && (*it)->m_location->m_known == true)
 				{
@@ -1118,6 +1117,11 @@ void Gameloop::Draw()
 		if (focused_water_tile != NULL)
 		{
 			focused_water_tile->Draw((*CurrentGame).m_mainScreen);
+			//secret locations (if known)
+			if (focused_water_tile->m_location != NULL && focused_water_tile->m_location->m_type != Location_Seaport && focused_water_tile->m_location->m_known == true)
+			{
+				focused_water_tile->m_location->Draw((*CurrentGame).m_mainScreen);
+			}
 		}
 
 		//islands and ports
@@ -1130,15 +1134,6 @@ void Gameloop::Draw()
 				(*it)->m_island->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
-		
-		////locations
-		//for (vector<Location*>::iterator it = m_secret_locations[2].begin(); it != m_secret_locations[2].end(); it++)
-		//{
-		//	if ((*it)->m_tile->m_can_be_seen == true)
-		//	{
-		//		(*it)->Draw((*CurrentGame).m_mainScreen);
-		//	}
-		//}
 	}
 
 	//ships
