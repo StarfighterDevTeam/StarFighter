@@ -37,8 +37,11 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(m_textureName, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
-
 	setAnimation(texture, 1, 2);
+	
+	//sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/ship_icon.png", 192, 768);
+	//setAnimation(texture, 3, 12);
+	//setAnimationLine(AnimationDirection_Right + (NB_ANIMATION_DIRECTIONS * m_alliance));
 
 	m_can_be_seen = false;
 

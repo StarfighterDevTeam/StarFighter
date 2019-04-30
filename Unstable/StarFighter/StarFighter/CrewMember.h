@@ -13,6 +13,15 @@
 #define CREWMEMBER_MELEE_DAMAGE					1
 #define PRISONER_HEALTH_MIN_TO_ESCAPE			5
 
+enum AnimationDirection
+{
+	AnimationDirection_Down,
+	AnimationDirection_Left,
+	AnimationDirection_Right,
+	AnimationDirection_Up,
+	NB_ANIMATION_DIRECTIONS,
+};
+
 class CrewMember : public GameEntity
 {
 public:
@@ -22,6 +31,7 @@ public:
 	CrewMemberType m_type;
 	ShipAlliance m_alliance;
 	CrewMemberRace m_race;
+	int m_skin;
 
 	int m_skills[NB_CREW_SKILLS];
 	int m_skills_max[NB_CREW_SKILLS];

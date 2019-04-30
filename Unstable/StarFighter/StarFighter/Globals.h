@@ -45,9 +45,9 @@ std::string StringCut(std::string str, const size_t length);
 #define RECTANGLE_INSIDE_ALPHA							100
 
 //PIRATES
-#define ROOMTILE_SIZE				48.f
-#define ROOMTILE_OFFSET_X			500.f
-#define ROOMTILE_OFFSET_Y			550.f
+#define ROOMTILE_SIZE				48
+#define ROOMTILE_OFFSET_X			500
+#define ROOMTILE_OFFSET_Y			550
 
 #define ROOMTILE_ENEMY_OFFSET_X		(REF_WINDOW_RESOLUTION_X - ROOMTILE_OFFSET_X);//1500.f
 #define ROOMTILE_ENEMY_OFFSET_Y		ROOMTILE_OFFSET_Y

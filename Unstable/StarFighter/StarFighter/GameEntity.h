@@ -26,6 +26,7 @@ enum ShipAlliance
 {
 	Alliance_Player,
 	Alliance_Enemy,
+	Alliance_Ally,
 };
 
 class GameEntity : public AnimatedSprite

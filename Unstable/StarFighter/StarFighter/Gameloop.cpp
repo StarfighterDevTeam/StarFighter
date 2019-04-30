@@ -1630,7 +1630,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 		{
 			for (vector<CrewMember*>::iterator it = warship->m_crew[j].begin(); it != warship->m_crew[j].end(); it++)
 			{
-				data << "Crew " << (*it)->m_display_name << " " << (*it)->m_type << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
+				data << "Crew " << (*it)->m_display_name << " " << (*it)->m_type << " " << (*it)->m_skin << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
 				for (int i = 0; i < NB_CREW_SKILLS; i++)
 				{
 					data << " " << (*it)->m_skills[i];
@@ -1747,15 +1747,20 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			if (t.compare("Crew") == 0)
 			{
 				string name;
-				int type, race;
+				int type, race, skin;
 				
 				int skills[NB_CREW_SKILLS];
 				bool prisoner;
 				int health, health_max, coord_x, coord_y;
-				std::istringstream(line) >> t >> name >> type >> race >> health >> health_max >> skills[Skill_Gunner] >> skills[Skill_Fishing] >> skills[Skill_Combat] >> skills[Skill_Navigation] >> skills[Skill_Engine] >> skills[Skill_Diving] >> (bool)prisoner >> coord_x >> coord_y;
+				std::istringstream(line) >> t >> name >> type >> skin >> race >> health >> health_max >> skills[Skill_Gunner] >> skills[Skill_Fishing] >> skills[Skill_Combat] >> skills[Skill_Navigation] >> skills[Skill_Engine] >> skills[Skill_Diving] >> (bool)prisoner >> coord_x >> coord_y;
 				
 				CrewMember* crew = new CrewMember((CrewMemberType)type, Alliance_Player, (CrewMemberRace)race, prisoner);
 				
+				crew->m_skin = skin;
+				if (crew->m_type == Crew_Civilian)
+				{
+					crew->setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * crew->m_skin));
+				}
 				crew->m_display_name = name;
 				crew->m_health_max = health_max;
 				crew->m_health = health;
@@ -1806,19 +1811,16 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				{
 					location = new Location(Location_Wreck, tile);
 					m_secret_locations[Location_Wreck].push_back(location);
-					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
 				}
 				else if (t.compare("SeaMonster") == 0)
 				{
 					location = new Location(Location_SeaMonster, tile);
 					m_secret_locations[Location_SeaMonster].push_back(location);
-					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_EngineCharged]);
 				}
 				else if (t.compare("Fish") == 0)
 				{
 					location = new Location(Location_Fish, tile);
 					m_secret_locations[Location_Fish].push_back(location);
-					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Prisoner]);
 				}
 
 				location->m_depth = depth;

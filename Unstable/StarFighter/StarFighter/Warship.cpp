@@ -29,7 +29,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(m_textureName, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
-
 	setAnimation(texture, 1, 2);
 
 	//water tile outline

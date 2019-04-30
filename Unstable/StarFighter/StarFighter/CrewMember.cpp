@@ -27,51 +27,68 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_prisoner_roaming_timer = RandomizeFloatBetweenValues(PRISONER_ROAM_TIMER_MIN, PRISONER_ROAM_TIMER_MAX);
 
 	//UI
-	m_shape_container.setSize(sf::Vector2f(m_size));
-	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
-	m_shape_container.setOutlineThickness(1.f);
-	m_shape_container.setOutlineColor(sf::Color::White);
+	//m_shape_container.setSize(sf::Vector2f(m_size));
+	//m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
+	//m_shape_container.setOutlineThickness(1.f);
+	//m_shape_container.setOutlineColor(sf::Color::White);
 
 	m_texture_name = (*CurrentGame).m_dico_resources_textures[Resource_Crew];
-	m_texture_big_name = "2D/icon_crew_big.png";
 
 	for (int i = 0; i < 3; i++)
 	{
 		m_upkeep_cost[i] = 0;
 	}
 
+	int nb_skins[NB_CREW_TYPES] = { 2, 6, 1, 1 };
 	int skill_max_value = 0;
+	Texture* texture;
 	switch (type)
 	{
 		case Crew_Pirate:
 		{
-			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
+			//m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 20;
 			m_upkeep_cost[Resource_Gold] = 1;
 			m_upkeep_cost[Resource_Fish] = 2;
+
+			texture = TextureLoader::getInstance()->loadTexture("2D/crew_pirate.png", 96, 256);
+			m_texture_big_name = "2D/crew_pirate_big.png";
 			break;
 		}
 		case Crew_Civilian:
 		{
-			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
+			//m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 10;
 			m_upkeep_cost[Resource_Fish] = 2;
+
+			texture = TextureLoader::getInstance()->loadTexture("2D/crew_civilian.png", 96, 768);
+			m_texture_big_name = "2D/crew_civilian_big.png";
 			break;
 		}
 		case Crew_Slave:
 		{
-			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
+			//m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 5;
 			m_upkeep_cost[Resource_Fish] = 1;
+
+			texture = TextureLoader::getInstance()->loadTexture("2D/crew_slave.png", 96, 128);
+			m_texture_big_name = "2D/crew_slave_big.png";
 			break;
 		}
 		case Crew_Undead:
 		{
 			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 15;
+
+			texture = TextureLoader::getInstance()->loadTexture("2D/crew_undead.png", 96, 128);
+			m_texture_big_name = "2D/crew_undead_big.png";
 			break;
 		}
 	}
+
+	setAnimation(texture, 3, NB_ANIMATION_DIRECTIONS * nb_skins[type]);
+	m_skin = RandomizeIntBetweenValues(0, nb_skins[type] - 1);
+	setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * m_skin));
 
 	if (prisoner == true)
 	{
@@ -291,6 +308,32 @@ void CrewMember::Update(Time deltaTime)
 			m_healing_timer += HEALING_TIMER;
 
 			m_health++;
+		}
+	
+		//walk animation
+		if (m_speed.x == 0 && m_speed.y == 0)
+		{
+			setFrame(1);
+		}
+		else if (m_speed.x > 0)
+		{
+			int animationIndex = AnimationDirection_Right + (NB_ANIMATION_DIRECTIONS * m_skin);
+			setAnimationLine(animationIndex, animationIndex == m_currentAnimationIndex ? true : false);
+		}
+		else if (m_speed.x < 0)
+		{
+			int animationIndex = AnimationDirection_Left + (NB_ANIMATION_DIRECTIONS * m_skin);
+			setAnimationLine(animationIndex, animationIndex == m_currentAnimationIndex ? true : false);
+		}
+		else if (m_speed.y > 0)
+		{
+			int animationIndex = AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * m_skin);
+			setAnimationLine(animationIndex, animationIndex == m_currentAnimationIndex ? true : false);
+		}
+		else if (m_speed.y < 0)
+		{
+			int animationIndex = AnimationDirection_Up + (NB_ANIMATION_DIRECTIONS * m_skin);
+			setAnimationLine(animationIndex, animationIndex == m_currentAnimationIndex ? true : false);
 		}
 	}
 

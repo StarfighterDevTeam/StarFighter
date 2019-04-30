@@ -4,17 +4,17 @@ Fish 939
 Mech 100
 Fidelity 55
 Days 10
-Crew Angela 1 0 20 20 8 14 14 20 15 10 0 0 1
-Crew Lucy 1 1 20 20 17 20 6 9 7 5 0 9 5
-Crew Serena 2 2 20 20 7 9 6 7 5 5 0 9 6
-Crew Lucy 2 2 20 20 8 6 9 3 2 5 0 3 7
-Crew Serena 2 0 20 20 7 6 4 6 10 5 0 7 7
-Crew Daniel 2 1 20 20 2 9 7 2 9 5 0 3 2
-Crew Angela 2 2 20 20 4 9 2 10 9 5 0 4 2
-Crew Serena 2 2 20 20 6 9 6 7 4 5 1 0 5
-Crew Thomas 2 2 20 20 2 2 3 8 3 5 1 0 6
-Crew Leandra 2 0 20 20 4 4 5 3 6 5 1 0 7
-Crew Bill 2 2 20 20 10 10 7 3 3 5 1 0 8
+Crew Angela 0 0 0 20 20 8 14 14 20 15 10 0 0 1
+Crew Lucy 0 1 1 20 20 17 20 6 9 7 5 0 9 5
+Crew Serena 1 0 2 20 20 7 9 6 7 5 5 0 9 6
+Crew Lucy 1 1 2 20 20 8 6 9 3 2 5 0 3 7
+Crew Serena 2 0 0 20 20 7 6 4 6 10 5 0 7 7
+Crew Daniel 3 0 1 20 20 2 9 7 2 9 5 0 3 2
+Crew Angela 1 2 2 20 20 4 9 2 10 9 5 0 4 2
+Crew Serena 1 3 2 20 20 6 9 6 7 4 5 1 0 5
+Crew Thomas 1 4 2 20 20 2 2 3 8 3 5 1 0 6
+Crew Leandra 1 5 0 20 20 4 4 5 3 6 5 1 0 7
+Crew Bill 0 1 0 20 20 10 10 7 3 3 5 1 0 8
 Island 0 0 16 4 0 0 14 6 3 2 Snake_Island
 Island 0 0 10 25 1 0 9 27 2 2 Stone_Island
 Island 0 0 56 39 2 0 57 40 3 2 Quartz_Island

@@ -120,12 +120,12 @@ enum RoomType
 
 enum CrewMemberType
 {
-	Crew_All,
 	Crew_Pirate,
 	Crew_Civilian,
 	Crew_Slave,
 	Crew_Undead,
 	NB_CREW_TYPES,
+	Crew_All,
 };
 
 enum Input_Status
