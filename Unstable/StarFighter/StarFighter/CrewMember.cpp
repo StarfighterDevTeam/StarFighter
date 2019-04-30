@@ -310,7 +310,50 @@ void CrewMember::Update(Time deltaTime)
 			m_health++;
 		}
 	
-		//walk animation
+		//move/fire animation
+		UpdateAnimation();
+	}
+
+	//player's crew can be selected, not enemy's
+	if (m_alliance == Alliance_Player)
+	{
+		GameEntity::Update(deltaTime);
+	}
+	else
+	{
+		GameEntity::UpdatePosition();
+	}
+
+	UpdateLifeBar();
+}
+
+void CrewMember::UpdateAnimation()
+{
+	//operating a system?
+	if (m_tile->m_system_tile != NULL && m_tile->m_system_tile->m_operator_tile == m_tile && m_speed.x == 0 && m_speed.y == 0)
+	{
+		if (m_tile->m_system_tile->m_coord_x > m_tile->m_coord_x)
+		{
+			setAnimationLine(AnimationDirection_Right);
+		}
+		else if (m_tile->m_system_tile->m_coord_x < m_tile->m_coord_x)
+		{
+			setAnimationLine(AnimationDirection_Left);
+		}
+		else if (m_tile->m_system_tile->m_coord_y > m_tile->m_coord_y)
+		{
+			setAnimationLine(AnimationDirection_Down);
+		}
+		else if (m_tile->m_system_tile->m_coord_y < m_tile->m_coord_y)
+		{
+			setAnimationLine(AnimationDirection_Up);
+		}
+
+		setFrame(1);
+	}
+	else
+	{
+		//walking
 		if (m_speed.x == 0 && m_speed.y == 0)
 		{
 			setFrame(1);
@@ -336,18 +379,6 @@ void CrewMember::Update(Time deltaTime)
 			setAnimationLine(animationIndex, animationIndex == m_currentAnimationIndex ? true : false);
 		}
 	}
-
-	//player's crew can be selected, not enemy's
-	if (m_alliance == Alliance_Player)
-	{
-		GameEntity::Update(deltaTime);
-	}
-	else
-	{
-		GameEntity::UpdatePosition();
-	}
-
-	UpdateLifeBar();
 }
 
 void CrewMember::UpdateLifeBar()

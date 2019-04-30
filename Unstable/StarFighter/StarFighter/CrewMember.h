@@ -46,6 +46,7 @@ public:
 	bool Imprison(RoomTile* prison_cell);
 	void UpdateMelee(sf::Time deltaTime);
 	float UpdateAndGetMeleeRof();
+	void UpdateAnimation();
 
 	sf::Vector2f m_speed;
 	float m_ref_speed;
@@ -68,6 +69,8 @@ public:
 	float m_melee_rof;
 	int m_melee_damage;
 
+	int m_fidelity;
+
 	GameEntity* m_lifebar;
 	string m_display_name;
 	string m_texture_name;
@@ -75,8 +78,6 @@ public:
 
 	CrewMember* m_crew_linked;
 	CrewMember* Clone();
-
-	int m_fidelity;
 
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);
