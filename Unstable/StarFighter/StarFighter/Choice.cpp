@@ -46,6 +46,10 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	//Init values
 	int skill = -1;
 	int value_max = 0;
+	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+	{
+		m_cost[i] = 0;
+	}
 
 	//Load from an ID?
 	if (choiceID > 0)

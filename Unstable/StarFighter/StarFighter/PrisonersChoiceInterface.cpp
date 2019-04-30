@@ -132,7 +132,7 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 
 void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < NB_CHOICES_MAX - 1; i++)
 	{
 		if (m_choices[i].Update(0) == false)//is choice hovered?
 		{

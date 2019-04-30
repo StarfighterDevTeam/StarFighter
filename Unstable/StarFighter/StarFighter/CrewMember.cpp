@@ -658,6 +658,8 @@ void CrewMember::UpdateMelee(sf::Time deltaTime)
 CrewMember* CrewMember::Clone()
 {
 	CrewMember* clone = new CrewMember(m_type, m_alliance, m_race, m_is_prisoner);
+	clone->m_skin = m_skin;
+	clone->setAnimationLine(m_currentAnimationIndex + (NB_ANIMATION_DIRECTIONS * m_skin));
 
 	for (int i = 0; i < NB_CREW_SKILLS; i++)
 	{

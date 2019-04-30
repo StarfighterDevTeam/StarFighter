@@ -1647,7 +1647,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 		{
 			ostringstream island_name;
 			island_name << StringReplace((*it)->m_display_name, " ", "_");
-			data << "Island " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << (*it)->m_coord_x << " " << (*it)->m_coord_y << " " << (int)((*it)->m_type) << " " << (*it)->m_visited_countdown;
+			data << "Island " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << (*it)->m_coord_x << " " << (*it)->m_coord_y << " " << (int)((*it)->m_seaport_type) << " " << (*it)->m_visited_countdown;
 			data << " " << (*it)->m_island->m_upcorner_x << " " << (*it)->m_island->m_upcorner_y << " " << (*it)->m_island->m_width << " " << (*it)->m_island->m_height << " " << island_name.str();
 			data << endl;
 		}

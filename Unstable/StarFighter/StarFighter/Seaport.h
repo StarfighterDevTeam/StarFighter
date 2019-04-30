@@ -20,14 +20,14 @@ enum SeaportType
 class Seaport : public Location
 {
 public:
-	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type);
+	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType seaport_type);
 	~Seaport();
 
 	int m_coord_x;
 	int m_coord_y;
 	int m_zone_coord_x;
 	int m_zone_coord_y;
-	SeaportType m_type;
+	SeaportType m_seaport_type;
 
 	Island* m_island;
 	vector<Ship*> m_ships;

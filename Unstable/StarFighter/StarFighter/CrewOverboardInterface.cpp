@@ -57,6 +57,7 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 				(*it)->m_destination = NULL;
 				(*it)->m_speed = sf::Vector2f(0, 0);
 				(*it)->m_melee_opponent = NULL;
+				(*it)->setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * (*it)->m_skin));
 				crew_size++;
 			}
 		}

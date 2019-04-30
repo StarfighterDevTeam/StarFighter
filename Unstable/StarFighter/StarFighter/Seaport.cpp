@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type) : Location(Location_Seaport, (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y])
+Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType seaport_type) : Location(Location_Seaport, (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y])
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
@@ -10,9 +10,10 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	m_zone_coord_y = zone_coord_y;
 	m_tile->m_location = this;
 	m_known = true;
+	m_seaport_type = seaport_type;
 
 	sf::Texture* texture;
-	switch (type)
+	switch (seaport_type)
 	{
 		case Seaport_Small:
 		{
