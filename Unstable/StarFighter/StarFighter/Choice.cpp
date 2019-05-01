@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 Reward::Reward()
 {
 	m_DMS_location = NULL;
+	m_combat_ship = NULL;
 }
 
 Reward::~Reward()
@@ -17,6 +18,8 @@ Choice::Choice()
 	m_panel = NULL;
 	m_picture = NULL;
 	m_gauge = NULL;
+
+	m_ID = -1;
 }
 
 Choice::~Choice()
@@ -43,6 +46,8 @@ void Choice::Destroy()
 
 void Choice::Init(int index, int choiceID, string text, string portrait_filename)
 {
+	m_ID = choiceID;
+
 	//Init values
 	int skill = -1;
 	int value_max = 0;

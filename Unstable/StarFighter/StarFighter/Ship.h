@@ -79,6 +79,8 @@ public:
 	sf::Vector2i m_rooms_size;
 	string m_textureName;
 
+	int m_choicesID[NB_CHOICES_MAX];
+
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
 	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);

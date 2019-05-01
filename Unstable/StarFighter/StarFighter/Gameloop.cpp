@@ -886,15 +886,19 @@ void Gameloop::Update(sf::Time deltaTime)
 	m_resources_interface.Update();
 
 	//MENUS
-	//Arriving at destination => open a new contextual menu?
-	if (m_warship->m_can_open_new_menu == true)
+	//Open a new contextual menu?
+	if (m_warship->m_can_open_new_menu == true && m_warship->m_speed == sf::Vector2f(0, 0))
 	{
 		Location* location = m_warship->m_tile->m_location;
-		if (location != NULL && (location->m_type == Location_Seaport || location->m_visited_countdown == 0) && m_warship->m_speed == sf::Vector2f(0, 0) && m_warship->m_sonar >= location->m_depth)
+		Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
+		
+		//Arriving on a special location?
+		if (ship_in_combat_range != NULL 
+			|| (location != NULL && (location->m_type == Location_Seaport || location->m_visited_countdown == 0) && m_warship->m_sonar >= location->m_depth))
 		{
 			//unboarding?
 			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location);
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, ship_in_combat_range);
 			m_warship->m_can_open_new_menu = false;
 		}
 	}
@@ -956,8 +960,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		//choice made?
 		if (choice != NULL)
 		{
-			m_warship->m_crew_unboard_interface.Destroy();
-
 			//pay costs
 			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 			{
@@ -973,7 +975,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 			//get reward
 			int rewardID = choice->RandomizeRewardID();
-			Reward* reward = GenerateReward(rewardID, m_warship->m_tile->m_location, choice->m_gauge_value, choice->m_gauge_value_max);
+			Reward* reward = GenerateReward(rewardID, m_warship->m_crew_unboard_interface.m_location, m_warship->m_crew_unboard_interface.m_other_ship, choice->m_gauge_value, choice->m_gauge_value_max);
 
 			//reward is not empty? open the reward interface.
 			if (reward->m_string.empty() == false)
@@ -1026,7 +1028,8 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 
-			//Clean unboarding crew
+			//Clean unboarding interface and crew
+			m_warship->m_crew_unboard_interface.Destroy();
 			m_warship->m_crew_unboarding.clear();
 		}
 	}
@@ -1074,6 +1077,13 @@ void Gameloop::Update(sf::Time deltaTime)
 						m_warship->m_crew[0].push_back(*it2);
 					}
 				}
+			}
+
+			//init combat?
+			if (m_warship->m_crew_unboard_interface.m_other_ship != NULL)
+			{
+				m_scale = Scale_Tactical;
+				StartCombatWithShip(m_warship->m_crew_unboard_interface.m_other_ship);
 			}
 
 			//close interface
@@ -1422,48 +1432,34 @@ bool Gameloop::UpdateTacticalScale()
 		return true;
 	}
 
-	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
-	{
-		if ((*it) == m_warship || (*it)->m_can_be_seen == false || (*it)->m_alliance != Alliance_Enemy)
-		{
-			continue;
-		}
-
-		m_tactical_ship = IsDMSInCombatRange(m_warship->m_DMS, false);
-
-		if (m_tactical_ship != NULL)
-		{
-			m_scale = Scale_Tactical;
-			break;
-		}
-	}
-
-	if (m_scale == Scale_Tactical)
-	{
-		//stop strategic movement
-		m_warship->m_destination = NULL;
-		m_warship->m_speed = sf::Vector2f(0, 0);
-		m_warship->m_current_path.clear();
-
-		m_warship->InitCombat();//init cooldowns
-		m_tactical_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
-		m_tactical_ship->InitCombat();//init cooldowns
-		m_tactical_ship->m_combat_interface.Init(m_tactical_ship, m_tactical_ship->m_alliance, m_tactical_ship->m_display_name, m_tactical_ship->m_type);//init enemy interface
-
-		//fill enemy ship room tiles for pathfind
-		(*CurrentGame).m_enemy_tiles.clear();
-		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
-		{
-			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-			{
-				(*CurrentGame).m_enemy_tiles.push_back(*it2);
-			}
-		}
-
-		(*CurrentGame).PlayMusic(Music_Combat);
-	}
-
 	return (m_scale == Scale_Tactical);
+}
+
+void Gameloop::StartCombatWithShip(Ship* enemy_ship)
+{
+	m_tactical_ship = enemy_ship;
+
+	//stop strategic movement
+	m_warship->m_destination = NULL;
+	m_warship->m_speed = sf::Vector2f(0, 0);
+	m_warship->m_current_path.clear();
+
+	m_warship->InitCombat();//init cooldowns
+	enemy_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
+	enemy_ship->InitCombat();//init cooldowns
+	enemy_ship->m_combat_interface.Init(enemy_ship, enemy_ship->m_alliance, enemy_ship->m_display_name, enemy_ship->m_type);//init enemy interface
+
+	//fill enemy ship room tiles for pathfind
+	(*CurrentGame).m_enemy_tiles.clear();
+	for (vector<Room*>::iterator it = enemy_ship->m_rooms.begin(); it != enemy_ship->m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			(*CurrentGame).m_enemy_tiles.push_back(*it2);
+		}
+	}
+
+	(*CurrentGame).PlayMusic(Music_Combat);
 }
 
 void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship)
@@ -2048,24 +2044,6 @@ void Gameloop::UpdateAITargetRoom(Weapon* weapon)
 	}
 }
 
-bool Gameloop::UpdateUnboarding()
-{
-	if (m_warship->m_seaport != NULL && m_menu != Menu_CrewUnboard)
-	{
-		m_menu = Menu_CrewUnboard;
-
-		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport);
-	}
-	else if (m_warship->m_seaport == NULL && m_menu == Menu_CrewUnboard)
-	{
-		m_menu = Menu_None;
-
-		m_warship->m_crew_unboard_interface.Destroy();
-	}
-
-	return true;
-}
-
 void Gameloop::SpendDays(int days, bool skip_time)
 {
 	m_warship->PayUpkeepCost(days);
@@ -2202,12 +2180,12 @@ void Gameloop::GenerateRandomShips(int zone_coord_x, int zone_coord_y)
 			{
 				case Ship_FirstClass:
 				{
-					r = 10;
+					r = a == Alliance_Enemy ? 10 : 0;
 					break;
 				}
 				case Ship_SecondClass:
 				{
-					r = 40;
+					r = a == Alliance_Enemy ? 40 : 50;
 					break;
 				}
 			}
@@ -2262,7 +2240,7 @@ bool Gameloop::CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int widt
 	return is_on_grid && is_free;
 }
 
-Reward* Gameloop::GenerateReward(int rewardID, Location* location, int gauge, int gauge_max)
+Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max)
 {
 	if (rewardID > 0)
 	{
@@ -2271,7 +2249,7 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, int gauge, in
 
 		//chance of failing?
 		bool losing_reward = false;
-		if (location->m_type == Location_SeaMonster)
+		if (location != NULL && location->m_type == Location_SeaMonster)
 		{
 			int monster_strenght = (int)Lerp(location->m_depth, SEAMONSTER_DEPTH_MIN, SEAMONSTER_DEPTH_MAX, 0, gauge_max);
 			if (monster_strenght > gauge || RandomizeFloatBetweenValues(0, 1) < SEAMONSTER_LOSE_PROBABILITY)
@@ -2337,6 +2315,13 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, int gauge, in
 					reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
 					k++;
 				}
+			}
+
+			//combat
+			int combat = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Combat]);
+			if (combat == 1)
+			{
+				reward->m_combat_ship = other_ship;
 			}
 
 			//reward text

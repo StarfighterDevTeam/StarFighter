@@ -44,11 +44,21 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 		case Alliance_Enemy:
 		{
 			m_textureName = "2D/enemy_icon.png";
+
+			m_choicesID[0] = 10;
+			m_choicesID[1] = 11;
+			m_choicesID[2] = -1;
+			m_choicesID[3] = -1;
 			break;
 		}
 		case Alliance_Ally:
 		{
 			m_textureName = "2D/ship_neutral_icon.png";
+
+			m_choicesID[0] = 12;
+			m_choicesID[1] = 13;
+			m_choicesID[2] = -1;
+			m_choicesID[3] = -1;
 			break;
 		}
 	}

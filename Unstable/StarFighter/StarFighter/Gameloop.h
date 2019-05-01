@@ -49,7 +49,6 @@ public:
 
 	void InitWaterZones();
 	bool UpdateTacticalScale();
-	bool UpdateUnboarding();
 	void UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship);
 
 	ContextualOrder* m_contextual_order;
@@ -57,6 +56,7 @@ public:
 	struct ResourcesInterface m_resources_interface;
 
 	Ship* IsDMSInCombatRange(DMS_Coord DMS_hovered, bool ally_included);
+	void StartCombatWithShip(Ship* enemy_ship);
 
 	int SavePlayerData(Warship* warship);
 	int LoadPlayerData(Warship* warship);
@@ -74,7 +74,7 @@ public:
 	void SpendDays(int days, bool skip_time);
 	bool CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y);
 
-	Reward* GenerateReward(int rewardID, Location* location, int gauge, int gauge_max);
+	Reward* GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
 
 private:
 	sf::RenderWindow* mainWindow;

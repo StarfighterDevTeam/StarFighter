@@ -17,7 +17,7 @@ struct CrewUnboardInterface
 	CrewUnboardInterface();
 	~CrewUnboardInterface();
 
-	void Init(Ship* ship, Location* location);
+	void Init(Ship* ship, Location* location, Ship* other_ship);
 	void Destroy();
 
 	Choice* Update(sf::Time deltaTime);
@@ -30,6 +30,7 @@ struct CrewUnboardInterface
 	vector<CrewMember*> m_unboarded;
 	vector<GameEntity*> m_crew_slots;
 	Ship* m_ship;
+	Ship* m_other_ship;
 	Location* m_location;
 
 	CrewMember* m_hovered;

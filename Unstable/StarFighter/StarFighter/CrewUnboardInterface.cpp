@@ -48,14 +48,10 @@ void CrewUnboardInterface::Destroy()
 	}
 }
 
-void CrewUnboardInterface::Init(Ship* ship, Location* location)
+void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship)
 {
-	if (ship == NULL || location == NULL)
-	{
-		return;
-	}
-
 	m_ship = ship;
+	m_other_ship = other_ship;
 	m_location = location;
 	m_slots_avaible = ship->m_lifeboats;
 
@@ -70,24 +66,38 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location)
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
 	
 	//narrative text
-	ostringstream ss_unboarders;
-	switch (location->m_type)
+	ostringstream ss_narrative;
+	if (location != NULL)
 	{
-		case Location_Seaport:
+		switch (location->m_type)
 		{
-			ss_unboarders << "Your lifeboats allow for " << m_slots_avaible << " crew members to unboard.\nRight click on crew members to select them for the mission.";
-			break;
+			case Location_Seaport:
+			{
+				ss_narrative << "Your lifeboats allow for " << m_slots_avaible << " crew members to unboard.\nRight click on crew members to select them for the mission.";
+				break;
+			}
+			case Location_SeaMonster:
+			case Location_Wreck:
+			{
+				ss_narrative << "A massive object is detected by your sonar at " << location->m_depth << "m underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
+				break;
+			}
+			case Location_Fish:
+			{
+				ss_narrative << "Your sonar detects something moving at " << location->m_depth << "m underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
+				break;
+			}
 		}
-		case Location_SeaMonster:
-		case Location_Wreck:
+	}
+	else if (other_ship != NULL)
+	{
+		if (other_ship->m_alliance == Alliance_Enemy)
 		{
-			ss_unboarders << "A massive object is detected by your sonar at " << location->m_depth << "m underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
-			break;
+			ss_narrative << "You approach a " << (*CurrentGame).m_dico_ship_class[other_ship->m_type] << " ship belonging to the Royal Navy.\nThe '" << other_ship->m_display_name.c_str() << "' shows aggressive intentions towards you.";
 		}
-		case Location_Fish:
+		else if (other_ship->m_alliance == Alliance_Ally)
 		{
-			ss_unboarders << "Your sonar detects something moving at " << location->m_depth << "m underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
-			break;
+			ss_narrative << "You approach a commercial ship that doesn't seem like a threat.\nOn the hull, you can read the name '" << other_ship->m_display_name.c_str() << "'.";
 		}
 	}
 	
@@ -97,51 +107,71 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location)
 	m_narrative_text.setCharacterSize(18);
 	m_narrative_text.setStyle(sf::Text::Bold);
 	m_narrative_text.setColor(sf::Color::White);
-	m_narrative_text.setString(ss_unboarders.str());
+	m_narrative_text.setString(ss_narrative.str());
 	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5 + 20, offset_y));
 
-	offset_y += 90;
-	ostringstream ss_slots;
-	ss_slots << 0 << " / " << m_slots_avaible;
-	m_crew_slot_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_crew_slot_text.setCharacterSize(18);
-	m_crew_slot_text.setStyle(sf::Text::Bold);
-	m_crew_slot_text.setColor(sf::Color::White);
-	m_crew_slot_text.setString(ss_slots.str());
-	m_crew_slot_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20, offset_y - m_crew_slot_text.getCharacterSize() * 0.5f));
-
-	//unboarders
-	offset_y += m_crew_slot_text.getCharacterSize() + 20;
-
-	int crew_per_line = 10;
 	float prisoners_offset_x = m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20;
-	for (int i = 0; i < m_slots_avaible; i++)
-	{
-		float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5) + ((i % crew_per_line) * (CREWMEMBER_SIZE + 10));
-		float pos_y = offset_y + ((i / crew_per_line) * (CREWMEMBER_SIZE + 10));
-		offset_y = Maxf(offset_y, pos_y);
+	offset_y += 90;
 	
-		GameEntity* crew_slot = new GameEntity(UI_None);
-		crew_slot->m_shape_container.setSize(sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE));
-		crew_slot->m_shape_container.setOrigin(sf::Vector2f(CREWMEMBER_SIZE * 0.5, CREWMEMBER_SIZE * 0.5));
-		crew_slot->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
-		crew_slot->m_shape_container.setOutlineThickness(2);
-		crew_slot->m_shape_container.setOutlineColor(sf::Color::Black);
-		crew_slot->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
-		crew_slot->m_position = crew_slot->m_shape_container.getPosition();
-		m_crew_slots.push_back(crew_slot);
+	//crew unboarding
+	if (location != NULL)
+	{
+		//crew slots / slots available
+		
+		ostringstream ss_slots;
+		ss_slots << 0 << " / " << m_slots_avaible;
+		m_crew_slot_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_crew_slot_text.setCharacterSize(18);
+		m_crew_slot_text.setStyle(sf::Text::Bold);
+		m_crew_slot_text.setColor(sf::Color::White);
+		m_crew_slot_text.setString(ss_slots.str());
+		m_crew_slot_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20, offset_y - m_crew_slot_text.getCharacterSize() * 0.5f));
+
+		//crew slots
+		offset_y += m_crew_slot_text.getCharacterSize() + 20;
+		int crew_per_line = 10;
+		
+		for (int i = 0; i < m_slots_avaible; i++)
+		{
+			float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5) + ((i % crew_per_line) * (CREWMEMBER_SIZE + 10));
+			float pos_y = offset_y + ((i / crew_per_line) * (CREWMEMBER_SIZE + 10));
+			offset_y = Maxf(offset_y, pos_y);
+
+			GameEntity* crew_slot = new GameEntity(UI_None);
+			crew_slot->m_shape_container.setSize(sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE));
+			crew_slot->m_shape_container.setOrigin(sf::Vector2f(CREWMEMBER_SIZE * 0.5, CREWMEMBER_SIZE * 0.5));
+			crew_slot->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
+			crew_slot->m_shape_container.setOutlineThickness(2);
+			crew_slot->m_shape_container.setOutlineColor(sf::Color::Black);
+			crew_slot->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
+			crew_slot->m_position = crew_slot->m_shape_container.getPosition();
+			m_crew_slots.push_back(crew_slot);
+		}
 	}
 
 	//choices
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
+	int choicesID[NB_CHOICES_MAX];
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_location->m_choicesID[i] < 0)
+		if (location != NULL)
+		{
+			choicesID[i] = location->m_choicesID[i];
+		}
+		else if (other_ship != NULL)
+		{
+			choicesID[i] = other_ship->m_choicesID[i];
+		}
+	}
+
+	for (int i = 0; i < NB_CHOICES_MAX; i++)
+	{
+		if (choicesID[i] < 0)
 		{
 			break;
 		}
-		
-		m_choices[i].Init(i, m_location->m_choicesID[i]);
+
+		m_choices[i].Init(i, choicesID[i]);
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
 }
@@ -183,7 +213,7 @@ Choice* CrewUnboardInterface::Update(sf::Time deltaTime)
 	//choices
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_location->m_choicesID[i] < 0)
+		if (m_choices[i].m_ID < 0)
 		{
 			break;
 		}
@@ -242,7 +272,7 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_location->m_choicesID[i] < 0)
+		if (m_choices[i].m_ID < 0)
 		{
 			break;
 		}

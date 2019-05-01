@@ -65,6 +65,7 @@ enum RewardData
 	Reward_Fidelity,
 	Reward_Crew,
 	Reward_SecretWreck,
+	Reward_Combat,
 	Reward_Text,
 	NB_REWARD_DATA,
 };
@@ -79,6 +80,7 @@ public:
 	vector<pair<ResourceType, int> > m_resources;
 	string m_string;
 	DMS_Coord* m_DMS_location;
+	Ship* m_combat_ship;
 };
 
 struct Choice
@@ -108,6 +110,7 @@ public:
 	int m_gauge_value;
 	int m_skill;
 	int m_cost[NB_RESOURCES_TYPES];
+	int m_ID;
 
 	vector<GameEntity*> m_costs_displayed;
 	pair<int, int> m_rewardsID[NB_CHOICE_REWARDS_MAX];
