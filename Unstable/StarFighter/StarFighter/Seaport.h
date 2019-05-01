@@ -23,20 +23,10 @@ public:
 	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType seaport_type);
 	~Seaport();
 
-	int m_coord_x;
-	int m_coord_y;
-	int m_zone_coord_x;
-	int m_zone_coord_y;
 	SeaportType m_seaport_type;
-
 	Island* m_island;
 	vector<Ship*> m_ships;
-
 	void RemoveShip(Ship* ship);
-
-	string m_display_name;
-	int m_visited_countdown;
-
 	Island* AddIsland(int upcorner_x, int upcorner_y, int width, int height);
 };
 

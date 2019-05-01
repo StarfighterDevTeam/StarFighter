@@ -71,19 +71,28 @@ void GameEntity::Update(Time deltaTime)
 	//apply color feedback
 	m_shape_container.setOutlineColor(m_default_color);
 	m_shape_container.setOutlineThickness(-1.f);
-	setColor(sf::Color::White);
-
+	if (m_UI_type == UI_CrewMember || m_UI_type == UI_CrewMemberUnboarding)
+	{
+		setColor(sf::Color::White);
+	}
+	
 	if (m_hovered)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Red);
 		m_shape_container.setOutlineThickness(2.f);
-		setColor(sf::Color::Red);
+		if (m_UI_type == UI_CrewMember || m_UI_type == UI_CrewMemberUnboarding)
+		{
+			setColor(sf::Color::Red);
+		}
 	}
 	if (m_selected)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Green);
 		m_shape_container.setOutlineThickness(2.f);
-		setColor(sf::Color::Green);
+		if (m_UI_type == UI_CrewMember || m_UI_type == UI_CrewMemberUnboarding)
+		{
+			setColor(sf::Color::Green);
+		}
 	}
 
 	AnimatedSprite::update(deltaTime);

@@ -135,6 +135,7 @@ private:
 	int m_rooms_max_offset_y;
 
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
+	void FindShortestPathWithoutDiagonals(WaterTile* tileA, WaterTile* tileB);
 	void IteratePathFinding(WaterTile* tileA, WaterTile* tileB);
 	list<WaterTile*> m_closed_list_pathfind;
 	list<WaterTile*> m_open_list_pathfind;

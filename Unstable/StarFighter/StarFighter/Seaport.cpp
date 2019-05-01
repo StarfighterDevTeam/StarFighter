@@ -4,10 +4,6 @@ extern Game* CurrentGame;
 
 Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType seaport_type) : Location(Location_Seaport, (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y])
 {
-	m_coord_x = coord_x;
-	m_coord_y = coord_y;
-	m_zone_coord_x = zone_coord_x;
-	m_zone_coord_y = zone_coord_y;
 	m_tile->m_location = this;
 	m_known = true;
 	m_seaport_type = seaport_type;
@@ -85,7 +81,7 @@ void Seaport::RemoveShip(Ship* ship)
 
 Island* Seaport::AddIsland(int upcorner_x, int upcorner_y, int width, int height)
 {
-	m_island = new Island(upcorner_x, upcorner_y, width, height, m_zone_coord_x, m_zone_coord_y, this);
+	m_island = new Island(upcorner_x, upcorner_y, width, height, m_tile->m_DMS.m_degree_x, m_tile->m_DMS.m_degree_y, this);
 
 	return m_island;
 }

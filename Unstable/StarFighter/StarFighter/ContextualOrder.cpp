@@ -58,6 +58,13 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 				textureName = "2D/order_melee.png";
 				break;
 			}
+			case Order_Interact:
+			{
+				ss_order << "Interact: " << value << " days";
+				textureName = "2D/order_sail.png";
+				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
+				break;
+			}
 			case Order_Dock:
 			{
 				ss_order << "Dock: " << value << " days";

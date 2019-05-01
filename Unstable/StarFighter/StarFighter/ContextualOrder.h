@@ -19,6 +19,7 @@ enum ContextualOrderType
 	Order_Sail,
 	Order_Dock,
 	Order_Engage,
+	Order_Interact,
 	Order_OpenRoomConnexion,
 	Order_CloseRoomConnexion,
 };

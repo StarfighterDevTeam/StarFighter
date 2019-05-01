@@ -33,10 +33,26 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	SetDMSCoord(coord);
 
 	//shape for water tiles
-	m_textureName = "2D/enemy_icon.png";
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(m_textureName, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
+	Texture* texture;
+	switch (alliance)
+	{
+		case Alliance_Player:
+		{
+			m_textureName = "2D/warship_icon.png";
+			break;
+		}
+		case Alliance_Enemy:
+		{
+			m_textureName = "2D/enemy_icon.png";
+			break;
+		}
+		case Alliance_Ally:
+		{
+			m_textureName = "2D/ship_neutral_icon.png";
+			break;
+		}
+	}
+	texture = TextureLoader::getInstance()->loadTexture(m_textureName, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
 	setAnimation(texture, 1, 2);
 	
 	//sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/ship_icon.png", 192, 768);
@@ -148,7 +164,7 @@ void Ship::UpdateStrategical(Time deltaTime)
 		WaterTile* waypoint = m_current_path.back();
 
 		//arrived at waypoint?
-		if (GetDistanceSquaredInSecondsDMS(waypoint) < 1.f)
+		if (GetDistanceSquaredInSecondsDMS(waypoint) < 2)
 		{
 			m_DMS = waypoint->m_DMS;//snap boat to position
 			waypoint->UpdatePosition(m_DMS);//snap tile to boat 
