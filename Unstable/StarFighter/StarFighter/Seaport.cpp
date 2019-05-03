@@ -79,9 +79,9 @@ void Seaport::RemoveShip(Ship* ship)
 	}
 }
 
-Island* Seaport::AddIsland(int upcorner_x, int upcorner_y, int width, int height)
+Island* Seaport::AddIsland(int upcorner_x, int upcorner_y, int width, int height, int skin)
 {
-	m_island = new Island(upcorner_x, upcorner_y, width, height, m_tile->m_DMS.m_degree_x, m_tile->m_DMS.m_degree_y, this);
+	m_island = new Island(upcorner_x, upcorner_y, width, height, m_tile->m_DMS.m_degree_x, m_tile->m_DMS.m_degree_y, skin, this);
 
 	return m_island;
 }

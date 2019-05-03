@@ -2,20 +2,19 @@
 
 extern Game* CurrentGame;
 
-Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y, Seaport* seaport) : GameEntity(sf::Vector2f(width * WATERTILE_SIZE, height * WATERTILE_SIZE), UI_WaterTile)
+Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y, int skin, Seaport* seaport) : GameEntity(sf::Vector2f(width * WATERTILE_SIZE, height * WATERTILE_SIZE), UI_WaterTile)
 {
 	m_upcorner_x = upcorner_x;
 	m_upcorner_y = upcorner_y;
 	m_width = width;
 	m_height = height;
-	m_zone_coord_x = zone_coord_x;
-	m_zone_coord_y = zone_coord_y;
 	m_seaport = NULL;
 	m_seaport = seaport;
 
 	//texture
+	m_skin = skin;
 	Texture* texture;
-	texture = TextureLoader::getInstance()->loadTexture("2D/island_" + std::to_string(width) + "x" + std::to_string(height) + ".png", width * WATERTILE_SIZE, height * WATERTILE_SIZE);
+	texture = TextureLoader::getInstance()->loadTexture("2D/island_" + std::to_string(width) + "x" + std::to_string(height) + "_" + std::to_string(skin) + ".png", width * WATERTILE_SIZE, height * WATERTILE_SIZE);
 
 	//associating island tiles to island
 	for (int y = upcorner_y; y > upcorner_y - height; y--)//y : from top to bottom

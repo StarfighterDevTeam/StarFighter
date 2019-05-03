@@ -27,7 +27,7 @@ public:
 	Island* m_island;
 	vector<Ship*> m_ships;
 	void RemoveShip(Ship* ship);
-	Island* AddIsland(int upcorner_x, int upcorner_y, int width, int height);
+	Island* AddIsland(int upcorner_x, int upcorner_y, int width, int height, int skin);
 };
 
 #endif //SEAPORT_H_INCLUDED

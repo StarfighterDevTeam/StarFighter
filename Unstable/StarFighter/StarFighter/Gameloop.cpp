@@ -1643,7 +1643,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 			ostringstream island_name;
 			island_name << StringReplace((*it)->m_display_name, " ", "_");
 			data << "Island " << (*it)->m_tile->m_DMS.m_degree_x << " " << (*it)->m_tile->m_DMS.m_degree_y << " " << (*it)->m_tile->m_DMS.m_minute_x << " " << (*it)->m_tile->m_DMS.m_minute_y << " " << (int)((*it)->m_seaport_type) << " " << (*it)->m_visited_countdown;
-			data << " " << (*it)->m_island->m_upcorner_x << " " << (*it)->m_island->m_upcorner_y << " " << (*it)->m_island->m_width << " " << (*it)->m_island->m_height << " " << island_name.str();
+			data << " " << (*it)->m_island->m_upcorner_x << " " << (*it)->m_island->m_upcorner_y << " " << (*it)->m_island->m_width << " " << (*it)->m_island->m_height << " " << (*it)->m_island->m_skin << " " << island_name.str();
 			data << endl;
 		}
 
@@ -1771,15 +1771,15 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			}
 			else if (t.compare("Island") == 0)
 			{
-				int seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown, island_upcorner_x, island_upcorner_y, island_width, island_height, zone_coord_x, zone_coord_y;
+				int seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown, island_upcorner_x, island_upcorner_y, island_width, island_height, island_skin, zone_coord_x, zone_coord_y;
 				string name;
-				std::istringstream(line) >> t >> zone_coord_x >> zone_coord_y >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown >> island_upcorner_x >> island_upcorner_y >> island_width >> island_height >> name;
+				std::istringstream(line) >> t >> zone_coord_x >> zone_coord_y >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown >> island_upcorner_x >> island_upcorner_y >> island_width >> island_height >> island_skin >> name;
 				name = StringReplace(name, "_", " ");
 
 				Seaport* seaport = new Seaport(seaport_coord_x, seaport_coord_y, zone_coord_x, zone_coord_y, (SeaportType)seaport_type);
 				seaport->m_display_name = name;
 				seaport->m_text.setString(name);
-				seaport->AddIsland(island_upcorner_x, island_upcorner_y, island_width, island_height);
+				Island* island = seaport->AddIsland(island_upcorner_x, island_upcorner_y, island_width, island_height, island_skin);
 				m_seaports.push_back(seaport);
 			}
 			else if (t.compare("Ship") == 0)
@@ -2124,7 +2124,7 @@ void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 			Seaport* seaport = new Seaport(x, y, zone_coord_x, zone_coord_y, (SeaportType)t);
 			(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location = seaport;
 			m_seaports.push_back(seaport);
-			seaport->AddIsland(candidate_tile->m_coord_x, candidate_tile->m_coord_y, width, height);
+			seaport->AddIsland(candidate_tile->m_coord_x, candidate_tile->m_coord_y, width, height, RandomizeIntBetweenValues(0, NB_ISLAND_SKINS - 1));
 		}
 	}
 }
