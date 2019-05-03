@@ -24,7 +24,7 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 		{
 			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
 			tile->m_type = Water_Island;
-			tile->m_shape_container.setFillColor(sf::Color(201, 180, 95, 255));
+			//tile->m_shape_container.setFillColor(sf::Color(201, 180, 95, 255));
 			
 			//the whole island corresponds to one texture, which is used as a spritesheet (1 tile = 1 frame). We're now associating the correct frame to each tile composing the island.
 			tile->setAnimation(texture, width, height);
