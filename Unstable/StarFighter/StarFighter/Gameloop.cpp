@@ -2066,65 +2066,106 @@ void Gameloop::SpendDays(int days, bool skip_time)
 void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 {
 	//init islands
-	int r = RandomizeIntBetweenValues(60, 80);
-	for (int i = 0; i < r; i++)
+	for (int t = 0; t < NB_SEAPORT_TYPES; t++)
 	{
-		int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
-		int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
-
-		WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
-		while (tile->m_type != Water_Empty || tile->m_location != NULL)
+		int r = 0;
+		switch (t)
 		{
-			x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
-			y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
-			tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
-		}
-
-		//island size
-		int width = RandomizeIntBetweenValues(2, 3);
-		int height = RandomizeIntBetweenValues(2, 3);
-
-		//randomize the position of the island around the seaport
-		vector<WaterTile*> possible_candidates;
-
-		for (int j = 0; j < width; j++)
-		{
-			for (int k = 0; k < 2; k++)
+			case Seaport_Small://1x1
 			{
-				//check offgrid && not adjacent to island/port
-				int y_ = k == 0 ? -1 : height;
-				if (CanIslandBeCreatedInArea(x - j, y + y_, width, height, zone_coord_x, zone_coord_y) == true)
-				{
-					tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x - j][y + y_];
-					possible_candidates.push_back(tile);
-				}
+				r = RandomizeIntBetweenValues(25, 30);
+				break;
+			}
+			case Seaport_Medium://1x2, 2x1, 2x2
+			{
+				r = RandomizeIntBetweenValues(20, 25);
+				break;
+			}
+			case Seaport_Large://2x3, 3x2, 3x3
+			{
+				r = RandomizeIntBetweenValues(15, 20);
+				break;
 			}
 		}
 
-		for (int j = 0; j < height; j++)
+		for (int i = 0; i < r; i++)
 		{
-			for (int k = 0; k < 2; k++)
-			{
-				//check offgrid && not adjacent to island/port
-				int x_ = k == 0 ? 1 : -width;
-				if (CanIslandBeCreatedInArea(x + x_, y + j, width, height, zone_coord_x, zone_coord_y) == true)
-				{
-					tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x + x_][y + j];
-					possible_candidates.push_back(tile);
-				}
-			}
-		}
+			int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+			int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 
-		//create seaport and island
-		int candidates_size = possible_candidates.size();
-		if (candidates_size > 0)
-		{
-			WaterTile* candidate_tile = possible_candidates[RandomizeIntBetweenValues(0, candidates_size - 1)];
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
+			while (tile->m_type != Water_Empty || tile->m_location != NULL)
+			{
+				x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+				y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+				tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
+			}
+
+			//island size
 			int t = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
-			Seaport* seaport = new Seaport(x, y, zone_coord_x, zone_coord_y, (SeaportType)t);
-			(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location = seaport;
-			m_seaports.push_back(seaport);
-			seaport->AddIsland(candidate_tile->m_coord_x, candidate_tile->m_coord_y, width, height, RandomizeIntBetweenValues(0, NB_ISLAND_SKINS - 1));
+			int width, height;
+			switch (t)
+			{
+			case Seaport_Small://1x1
+			{
+				width = 1;
+				height = 1;
+				break;
+			}
+			case Seaport_Medium://1x2, 2x1, 2x2
+			{
+				width = RandomizeIntBetweenValues(1, 2);
+				height = width == 1 ? 2 : RandomizeIntBetweenValues(1, 2);
+				break;
+			}
+			case Seaport_Large://2x3, 3x2, 3x3
+			{
+				width = RandomizeIntBetweenValues(2, 3);
+				height = width == 2 ? 3 : RandomizeIntBetweenValues(2, 3);
+				break;
+			}
+			}
+
+			//randomize the position of the island around the seaport
+			vector<WaterTile*> possible_candidates;
+			for (int j = 0; j < width; j++)
+			{
+				for (int k = 0; k < 2; k++)
+				{
+					//check offgrid && not adjacent to island/port
+					int y_ = k == 0 ? -1 : height;
+					if (CanIslandBeCreatedInArea(x - j, y + y_, width, height, zone_coord_x, zone_coord_y) == true)
+					{
+						tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x - j][y + y_];
+						possible_candidates.push_back(tile);
+					}
+				}
+			}
+
+			//check offgrid && not adjacent to island/port
+			for (int j = 0; j < height; j++)
+			{
+				for (int k = 0; k < 2; k++)
+				{
+					int x_ = k == 0 ? 1 : -width;
+					if (CanIslandBeCreatedInArea(x + x_, y + j, width, height, zone_coord_x, zone_coord_y) == true)
+					{
+						tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x + x_][y + j];
+						possible_candidates.push_back(tile);
+					}
+				}
+			}
+
+			//create seaport and island
+			int candidates_size = possible_candidates.size();
+			if (candidates_size > 0)
+			{
+				WaterTile* candidate_tile = possible_candidates[RandomizeIntBetweenValues(0, candidates_size - 1)];
+				Seaport* seaport = new Seaport(x, y, zone_coord_x, zone_coord_y, (SeaportType)t);
+				(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location = seaport;
+				m_seaports.push_back(seaport);
+				seaport->AddIsland(candidate_tile->m_coord_x, candidate_tile->m_coord_y, width, height, RandomizeIntBetweenValues(0, NB_ISLAND_SKINS - 1));
+			}
 		}
 	}
 }

@@ -16,7 +16,7 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 			m_choicesID[0] = 1;
 			m_choicesID[1] = 2;
 			m_choicesID[2] = 3;
-			m_choicesID[3] = -1;
+			m_choicesID[3] = 13;
 
 			texture = TextureLoader::getInstance()->loadTexture("2D/seaportS_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 			break;
@@ -26,7 +26,7 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 			m_choicesID[0] = 1;
 			m_choicesID[1] = 2;
 			m_choicesID[2] = 3;
-			m_choicesID[3] = -1;
+			m_choicesID[3] = 13;
 
 			texture = TextureLoader::getInstance()->loadTexture("2D/seaportM_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 			break;
@@ -36,7 +36,7 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 			m_choicesID[0] = 1;
 			m_choicesID[1] = 2;
 			m_choicesID[2] = 3;
-			m_choicesID[3] = -1;
+			m_choicesID[3] = 13;
 
 			texture = TextureLoader::getInstance()->loadTexture("2D/seaportL_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 			break;
