@@ -32,7 +32,7 @@ public:
 
 	void UpdatePosition(DMS_Coord warship_DMS);
 	void UpdateTactical(Time deltaTime);
-	void UpdateStrategical(Time deltaTime);
+	void UpdateStrategical(Time deltaTime, DMS_Coord warship_DMS);
 
 	bool SetDMSCoord(DMS_Coord coord);
 

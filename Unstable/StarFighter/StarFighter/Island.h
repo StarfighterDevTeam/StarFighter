@@ -9,6 +9,7 @@ class Warship;//forward declaration
 class Seaport;
 
 #define NB_ISLAND_SKINS				2
+#define ISLAND_SIZE_MAX				3
 
 class Island : public GameEntity
 {

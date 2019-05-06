@@ -166,18 +166,24 @@ void Ship::UpdateTactical(Time deltaTime)
 	}
 }
 
-void Ship::UpdateStrategical(Time deltaTime)
+void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 {
 	//travel management (needs to be refreshed? arrived?)
 	if (m_current_path.empty() == false)
 	{
 		WaterTile* waypoint = m_current_path.back();
 
+		//update position of waypoints that are out of sight but are still used by AI pathfind
+		if (waypoint->m_can_be_seen == false)
+		{
+			waypoint->UpdatePosition(warshipDMS);
+		}
+
 		//arrived at waypoint?
 		if (GetDistanceSquaredInSecondsDMS(waypoint) < 2)
 		{
 			m_DMS = waypoint->m_DMS;//snap boat to position
-			waypoint->UpdatePosition(m_DMS);//snap tile to boat 
+			//waypoint->UpdatePosition(m_DMS);//snap tile to boat - 06.05.2019: doesn't seem necessary anymore
 			m_current_path.pop_back();
 
 			//arrived at final destination
@@ -191,7 +197,12 @@ void Ship::UpdateStrategical(Time deltaTime)
 			else
 			{
 				waypoint = m_current_path.back();
-				waypoint->UpdatePosition(m_DMS);//update waypoint position (because of the previous snap)
+				//update position of waypoints that are out of sight but are still used by AI pathfind
+				if (waypoint->m_can_be_seen == false)
+				{
+					waypoint->UpdatePosition(warshipDMS);
+				}
+				//waypoint->UpdatePosition(m_DMS);//update waypoint position (because of the previous snap)
 				sf::Vector2f vec = waypoint->m_position - m_position;
 				ScaleVector(&vec, CRUISE_SPEED);
 				m_speed = vec;

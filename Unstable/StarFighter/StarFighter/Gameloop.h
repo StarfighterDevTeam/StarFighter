@@ -76,6 +76,9 @@ public:
 
 	Reward* GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
 
+	//IA
+	void SetAIStrategicalDestination(Ship* ship);
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
