@@ -285,11 +285,22 @@ void Gameloop::Update(sf::Time deltaTime)
 							}
 						}
 
-						//Contextual orders' feedback
-						if (m_menu == Menu_None && m_warship->m_speed == sf::Vector2f(0, 0))
+						//Sail orders
+						bool ship_moving = false;
+						for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
+						{
+							if ((*it3)->m_speed != sf::Vector2f(0, 0))
+							{
+								ship_moving = true;
+								break;
+							}
+						}
+
+						if (m_menu == Menu_None && ship_moving == false)// m_warship->m_speed == sf::Vector2f(0, 0))
 						{
 							int cost = m_warship->GetShortestPathLength(m_warship->m_tile, tile_hovered);
 							
+							//Contextual orders' feedback
 							if (ship_in_combat_range == NULL)
 							{
 								if (tile_hovered->m_location == NULL || tile_hovered->m_location->m_type != Location_Seaport)
@@ -1615,14 +1626,16 @@ Ship* Gameloop::IsDMSInCombatRange(DMS_Coord DMS_hovered, bool ally_included)
 		//in range for combat?
 		float posxA = DMS_hovered.m_minute_x * 60.f + DMS_hovered.m_second_x;
 		float posxB = (*it)->m_DMS.m_minute_x * 60.f + (*it)->m_DMS.m_second_x;
-		if (abs(posxA - posxB) > 1.f * NB_WATERTILE_SUBDIVISION)
+		if (abs(posxA - posxB) > 0.f * NB_WATERTILE_SUBDIVISION)
+		//if (abs(posxA - posxB) > 1.f * NB_WATERTILE_SUBDIVISION)
 		{
 			continue;
 		}
 
 		float posyA = DMS_hovered.m_minute_y * 60.f + DMS_hovered.m_second_y;
 		float posyB = (*it)->m_DMS.m_minute_y * 60.f + (*it)->m_DMS.m_second_y;
-		if (abs(posyA - posyB) > 1.f * NB_WATERTILE_SUBDIVISION)
+		if (abs(posyA - posyB) > 0.f * NB_WATERTILE_SUBDIVISION)
+		//if (abs(posyA - posyB) > 1.f * NB_WATERTILE_SUBDIVISION)
 		{
 			continue;
 		}
@@ -2415,8 +2428,8 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 		return;
 	}
 
-	//already has a final destination?
-	if (ship->m_destination_long == NULL)
+	//already has a final destination? (+ wait for the player to finish his move before chosing a new destination)
+	if (ship->m_destination_long == NULL && m_warship->m_speed == sf::Vector2f(0, 0))
 	{
 		//we want to select the 3 closest seaports, and then we'll randomize one destination among the 3.
 		vector<Seaport*> possible_candidates;
@@ -2506,24 +2519,11 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 				ship->m_tiles_can_be_seen.push_back(ship->m_tile->m_zone->m_watertiles[i][j]);
 			}
 		}
-
-		//for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
-		//{
-		//	for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-		//	{
-		//		//can be seen? no need to update other tiles because they won't be drawn anyway
-		//		if (ship->GetDistanceToWaterTile(*it2))
-		//		{
-		//			ship->m_tiles_can_be_seen.push_back(*it2);
-		//		}
-		//	}
-		//}
 	}
 
-	//give order to sail to destination
-	if (ship->m_destination_long != NULL)
+	//give order to sail to destination (wait for the player decision to move)
+	if (ship->m_destination_long != NULL && m_warship->m_speed != sf::Vector2f(0, 0))
 	{
 		ship->SetSailsToWaterTile(ship->m_destination_long, m_warship->m_DMS);
-		printf("GO: %d, %d\n", ship->m_destination_long->m_coord_x, ship->m_destination_long->m_coord_y);
 	}
 }
