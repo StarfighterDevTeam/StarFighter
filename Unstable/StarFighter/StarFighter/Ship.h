@@ -13,6 +13,7 @@
 #define ANGLE_SPEED						30.f
 
 #define NB_UPKEEP_COSTS					(Resource_Fish + 1)
+#define NB_MOVES_PER_DAY					5
 
 class Ship : public GameEntity
 {
@@ -70,6 +71,7 @@ public:
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;
+	WaterTile* m_destination_long;//destination composed of several sub-travels
 	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<WaterTile*> m_current_path;
 	Seaport* m_seaport;
@@ -80,6 +82,8 @@ public:
 	string m_textureName;
 
 	int m_choicesID[NB_CHOICES_MAX];
+
+	int m_moves_remaining;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);

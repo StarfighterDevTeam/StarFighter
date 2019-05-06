@@ -294,24 +294,24 @@ void Gameloop::Update(sf::Time deltaTime)
 							{
 								if (tile_hovered->m_location == NULL || tile_hovered->m_location->m_type != Location_Seaport)
 								{
-									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, true, cost);
+									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
 								}
 								else
 								{
-									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, true, cost);
+									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
 								}
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Enemy)
 							{
-								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, true, cost);
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Ally)
 							{
-								m_contextual_order->SetContextualOrder(Order_Interact, tile_hovered->m_position, true, cost);
+								m_contextual_order->SetContextualOrder(Order_Interact, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
 							}
 
 							//Sail order
-							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty)
+							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty && cost <= NB_MOVES_PER_DAY)
 							{
 								if (m_warship->SetSailsToWaterTile(tile_hovered, m_warship->m_DMS) == true)
 								{
@@ -2409,113 +2409,121 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_s
 
 void Gameloop::SetAIStrategicalDestination(Ship* ship)
 {
-	//already has a destination?
+	//already has a path?
 	if (ship->m_current_path.empty() == false)
 	{
 		return;
 	}
 
-	vector<Seaport*> possible_candidates;
-
-	//we want to select the 3 closest seaports, and then we'll randomize one destination among the 3.
-	for (int i = 0; i < 3; i++)
+	//already has a final destination?
+	if (ship->m_destination_long == NULL)
 	{
-		int distance_min = -1;
-		Seaport* candidate = NULL;
-		for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
+		//we want to select the 3 closest seaports, and then we'll randomize one destination among the 3.
+		vector<Seaport*> possible_candidates;
+		for (int i = 0; i < 3; i++)
 		{
-			//AI ships only navigate to medium or large seaports
-			if ((*it)->m_seaport_type == Seaport_Small || ship->m_seaport == (*it))
+			int distance_min = -1;
+			Seaport* candidate = NULL;
+			for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 			{
-				continue;
-			}
-
-			bool found = false;
-			for (vector<Seaport*>::iterator it2 = possible_candidates.begin(); it2 != possible_candidates.end(); it2++)
-			{
-				if (*it == *it2)
+				//AI ships only navigate to medium or large seaports
+				if ((*it)->m_seaport_type == Seaport_Small || ship->m_seaport == (*it))
 				{
-					found = true;
-					break;
+					continue;
+				}
+
+				bool found = false;
+				for (vector<Seaport*>::iterator it2 = possible_candidates.begin(); it2 != possible_candidates.end(); it2++)
+				{
+					if (*it == *it2)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (found == true)
+				{
+					continue;
+				}
+
+				int dist = ship->GetDistanceToWaterTile((*it)->m_tile);
+				if (distance_min < 0 || dist < distance_min)
+				{
+					distance_min = dist;
+					candidate = *it;
 				}
 			}
-			if (found == true)
-			{
-				continue;
-			}
 
-			int dist = ship->GetDistanceToWaterTile((*it)->m_tile);
-			if (distance_min < 0 || dist < distance_min)
+			if (candidate != NULL)
 			{
-				distance_min = dist;
-				candidate = *it;
+				possible_candidates.push_back(candidate);
 			}
 		}
 
-		if (candidate != NULL)
+		//randomize destination
+		if (possible_candidates.empty() == true)
 		{
-			possible_candidates.push_back(candidate);
+			return;
 		}
-	}
-	
-	//randomize destination
-	if (possible_candidates.empty() == true)
-	{
-		return;
-	}
-	int r = RandomizeIntBetweenValues(0, possible_candidates.size() - 1);
-	Seaport* selected = possible_candidates[r];
+		int r = RandomizeIntBetweenValues(0, possible_candidates.size() - 1);
+		Seaport* selected = possible_candidates[r];
+		ship->m_destination_long = selected->m_tile;
 
-	//optimize the tiles that need to be scanned for pathfinding
-	ship->m_tiles_can_be_seen.clear();
-	
-	int dist_x = selected->m_tile->m_DMS.m_minute_x - ship->m_DMS.m_minute_x;
-	int dist_y = selected->m_tile->m_DMS.m_minute_y - ship->m_DMS.m_minute_y;
-	int min_x = dist_x > 0 ? ship->m_DMS.m_minute_x - ISLAND_SIZE_MAX : ship->m_DMS.m_minute_x + ISLAND_SIZE_MAX;
-	int max_x = dist_x > 0 ? selected->m_tile->m_DMS.m_minute_x + ISLAND_SIZE_MAX : selected->m_tile->m_DMS.m_minute_x - ISLAND_SIZE_MAX;
-	if (min_x > max_x)
-	{
-		int min_x_ = min_x;
-		min_x = max_x;
-		max_x = min_x_;
-	}
-	Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
-	Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
-	
-	int min_y = dist_y > 0 ? ship->m_DMS.m_minute_y - ISLAND_SIZE_MAX : ship->m_DMS.m_minute_y + ISLAND_SIZE_MAX;
-	int max_y = dist_y > 0 ? selected->m_tile->m_DMS.m_minute_y + ISLAND_SIZE_MAX : selected->m_tile->m_DMS.m_minute_y - ISLAND_SIZE_MAX;
-	if (min_y > max_y)
-	{
-		int min_y_ = min_y;
-		min_y = max_y;
-		max_y = min_y_;
-	}
+		//optimize the tiles that need to be scanned for pathfinding
+		ship->m_tiles_can_be_seen.clear();
 
-	Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-	Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-
-	//printf("Position: %d, %d | New destination: destination: %d, %d\n", ship->m_DMS.m_minute_x, ship->m_DMS.m_minute_y, selected->m_tile->m_coord_x, selected->m_tile->m_coord_y);
-
-	for (int i = min_x; i < max_x; i++)
-	{
-		for (int j = min_y; j < max_y; j++)
+		int dist_x = selected->m_tile->m_DMS.m_minute_x - ship->m_DMS.m_minute_x;
+		int dist_y = selected->m_tile->m_DMS.m_minute_y - ship->m_DMS.m_minute_y;
+		int min_x = dist_x > 0 ? ship->m_DMS.m_minute_x - ISLAND_SIZE_MAX : ship->m_DMS.m_minute_x + ISLAND_SIZE_MAX;
+		int max_x = dist_x > 0 ? selected->m_tile->m_DMS.m_minute_x + ISLAND_SIZE_MAX : selected->m_tile->m_DMS.m_minute_x - ISLAND_SIZE_MAX;
+		if (min_x > max_x)
 		{
-			ship->m_tiles_can_be_seen.push_back(ship->m_tile->m_zone->m_watertiles[i][j]);
+			int min_x_ = min_x;
+			min_x = max_x;
+			max_x = min_x_;
 		}
+		Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+		Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+		int min_y = dist_y > 0 ? ship->m_DMS.m_minute_y - ISLAND_SIZE_MAX : ship->m_DMS.m_minute_y + ISLAND_SIZE_MAX;
+		int max_y = dist_y > 0 ? selected->m_tile->m_DMS.m_minute_y + ISLAND_SIZE_MAX : selected->m_tile->m_DMS.m_minute_y - ISLAND_SIZE_MAX;
+		if (min_y > max_y)
+		{
+			int min_y_ = min_y;
+			min_y = max_y;
+			max_y = min_y_;
+		}
+
+		Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+		Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+		//printf("Position: %d, %d | New destination: destination: %d, %d\n", ship->m_DMS.m_minute_x, ship->m_DMS.m_minute_y, selected->m_tile->m_coord_x, selected->m_tile->m_coord_y);
+
+		for (int i = min_x; i < max_x; i++)
+		{
+			for (int j = min_y; j < max_y; j++)
+			{
+				ship->m_tiles_can_be_seen.push_back(ship->m_tile->m_zone->m_watertiles[i][j]);
+			}
+		}
+
+		//for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
+		//{
+		//	for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		//	{
+		//		//can be seen? no need to update other tiles because they won't be drawn anyway
+		//		if (ship->GetDistanceToWaterTile(*it2))
+		//		{
+		//			ship->m_tiles_can_be_seen.push_back(*it2);
+		//		}
+		//	}
+		//}
 	}
 
-	//for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
-	//{
-	//	for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-	//	{
-	//		//can be seen? no need to update other tiles because they won't be drawn anyway
-	//		if (ship->GetDistanceToWaterTile(*it2))
-	//		{
-	//			ship->m_tiles_can_be_seen.push_back(*it2);
-	//		}
-	//	}
-	//}
-
-	//give order
-	ship->SetSailsToWaterTile(selected->m_tile, m_warship->m_DMS);
+	//give order to sail to destination
+	if (ship->m_destination_long != NULL)
+	{
+		ship->SetSailsToWaterTile(ship->m_destination_long, m_warship->m_DMS);
+		printf("GO: %d, %d\n", ship->m_destination_long->m_coord_x, ship->m_destination_long->m_coord_y);
+	}
 }

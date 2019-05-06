@@ -7,6 +7,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	m_type = type;
 	m_alliance = alliance;
 	m_destination = NULL;
+	m_destination_long = NULL;
 	m_seaport = NULL;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
 	m_lifeboats = 0;
@@ -196,6 +197,10 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 			if (m_current_path.empty() == true)
 			{
 				m_speed = sf::Vector2f(0, 0);
+				if (m_destination == m_destination_long)
+				{
+					m_destination_long = NULL;
+				}
 				m_destination = NULL;
 				SetDMSCoord(m_DMS);//allows to assign a seaport if this is the final tile
 			}
@@ -1458,16 +1463,16 @@ void Ship::Reset()
 
 bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 {
-	sf::Vector2f move_vector = tile->m_position - m_position;
-	ScaleVector(&move_vector, CRUISE_SPEED);
-	m_speed = move_vector;
-
-	m_destination = tile;
+	//sf::Vector2f move_vector = tile->m_position - m_position;
+	//ScaleVector(&move_vector, CRUISE_SPEED);
+	//m_speed = move_vector;
+	m_moves_remaining = NB_MOVES_PER_DAY;
 
 	//Find path and set speed
-	FindShortestPath(m_tile, m_destination);
+	FindShortestPath(m_tile, tile);
 	if (m_current_path.empty() == false)
 	{
+		m_destination = m_current_path.front();
 		WaterTile* waypoint = m_current_path.back();
 		//update position of waypoints that are out of sight but are still used by AI pathfind
 		if (waypoint->m_can_be_seen == false)
@@ -1603,6 +1608,22 @@ void Ship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	{
 		temp_path.push_back(way_point);
 		way_point = way_point->m_parent;
+	}
+
+	//constrain to moves remaining
+	int constraint = temp_path.size() - m_moves_remaining;
+	if (constraint > 0)
+	{
+		vector<WaterTile*> constrained_path;
+		for (vector<WaterTile*>::iterator it = temp_path.begin() + constraint; it != temp_path.end(); it++)
+		{
+			constrained_path.push_back(*it);
+		}
+		temp_path.clear();
+		for (vector<WaterTile*>::iterator it = constrained_path.begin(); it != constrained_path.end(); it++)
+		{
+			temp_path.push_back(*it);
+		}
 	}
 
 	//clear data

@@ -50,26 +50,28 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 			{
 				ss_order << "Sail: " << value << " days";
 				textureName = "2D/order_sail.png";
+				text_color = is_possible == true ? text_color : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Engage:
 			{
 				ss_order << "Engage ship: " << value << " days";
 				textureName = "2D/order_melee.png";
+				text_color = is_possible == true ? text_color : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Interact:
 			{
 				ss_order << "Interact: " << value << " days";
 				textureName = "2D/order_sail.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
+				text_color = is_possible == true ? (*CurrentGame).m_dico_colors[Color_Green_System] : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Dock:
 			{
 				ss_order << "Dock: " << value << " days";
 				textureName = "2D/order_sail.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
+				text_color = is_possible == true ? (*CurrentGame).m_dico_colors[Color_Green_System] : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Move:
