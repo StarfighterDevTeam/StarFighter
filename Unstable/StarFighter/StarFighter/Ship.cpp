@@ -33,6 +33,26 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	//get on tile
 	SetDMSCoord(coord);
 
+	//stats
+	switch (type)
+	{
+		case Ship_Warship:
+		{
+			m_moves_max = NB_MOVES_PER_DAY;
+			break;
+		}
+		case Ship_FirstClass:
+		{
+			m_moves_max = NB_MOVES_PER_DAY - 1;
+			break;
+		}
+		case Ship_SecondClass:
+		{
+			m_moves_max = NB_MOVES_PER_DAY - 2;
+			break;
+		}
+	}
+
 	//shape for water tiles
 	Texture* texture;
 	switch (alliance)
@@ -1466,10 +1486,9 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 	//sf::Vector2f move_vector = tile->m_position - m_position;
 	//ScaleVector(&move_vector, CRUISE_SPEED);
 	//m_speed = move_vector;
-	m_moves_remaining = NB_MOVES_PER_DAY;
-
 	//Find path and set speed
 	FindShortestPath(m_tile, tile);
+
 	if (m_current_path.empty() == false)
 	{
 		m_destination = m_current_path.front();
@@ -1611,7 +1630,7 @@ void Ship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	}
 
 	//constrain to moves remaining
-	int constraint = temp_path.size() - m_moves_remaining;
+	int constraint = temp_path.size() - m_moves_max;
 	if (constraint > 0)
 	{
 		vector<WaterTile*> constrained_path;

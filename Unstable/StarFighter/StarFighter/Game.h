@@ -62,10 +62,10 @@ enum MouseAction
 
 enum ShipType
 {
-	Ship_Warship,
 	Ship_FirstClass,
 	Ship_SecondClass,
 	NB_SHIP_TYPES,
+	Ship_Warship,
 };
 
 enum CrewSkills

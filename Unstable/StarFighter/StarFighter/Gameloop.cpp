@@ -305,24 +305,24 @@ void Gameloop::Update(sf::Time deltaTime)
 							{
 								if (tile_hovered->m_location == NULL || tile_hovered->m_location->m_type != Location_Seaport)
 								{
-									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
+									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
 								}
 								else
 								{
-									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
+									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
 								}
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Enemy)
 							{
-								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Ally)
 							{
-								m_contextual_order->SetContextualOrder(Order_Interact, tile_hovered->m_position, cost <= NB_MOVES_PER_DAY, cost);
+								m_contextual_order->SetContextualOrder(Order_Interact, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
 							}
 
 							//Sail order
-							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty && cost <= NB_MOVES_PER_DAY)
+							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty && cost <= m_warship->m_moves_max)
 							{
 								if (m_warship->SetSailsToWaterTile(tile_hovered, m_warship->m_DMS) == true)
 								{
@@ -344,7 +344,6 @@ void Gameloop::Update(sf::Time deltaTime)
 				ship->UpdatePosition(m_warship->m_DMS);
 
 				//AI strategical movement
-
 				if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE * 2)
 				//if (ship->m_can_be_seen == true)
 				{
@@ -2262,12 +2261,12 @@ void Gameloop::GenerateRandomShips(int zone_coord_x, int zone_coord_y)
 			{
 				case Ship_FirstClass:
 				{
-					r = a == Alliance_Enemy ? 10 : 0;
+					r = a == Alliance_Enemy ? 5 : 0;
 					break;
 				}
 				case Ship_SecondClass:
 				{
-					r = a == Alliance_Enemy ? 40 : 50;
+					r = a == Alliance_Enemy ? 30 : 30;
 					break;
 				}
 			}
@@ -2521,9 +2520,15 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 		}
 	}
 
-	//give order to sail to destination (wait for the player decision to move)
-	if (ship->m_destination_long != NULL && m_warship->m_speed != sf::Vector2f(0, 0))
+	//get sub-destination from long destination
+	if (ship->m_destination == NULL && ship->m_destination_long != NULL && m_warship->m_speed == sf::Vector2f(0, 0))
 	{
-		ship->SetSailsToWaterTile(ship->m_destination_long, m_warship->m_DMS);
+		ship->m_destination = ship->m_destination_long;
+	}
+
+	//give order to sail to destination (when the player starts to move too)
+	if (ship->m_destination != NULL && m_warship->m_speed != sf::Vector2f(0, 0))
+	{
+		ship->SetSailsToWaterTile(ship->m_destination, m_warship->m_DMS);
 	}
 }

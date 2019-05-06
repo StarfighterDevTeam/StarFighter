@@ -13,7 +13,7 @@
 #define ANGLE_SPEED						30.f
 
 #define NB_UPKEEP_COSTS					(Resource_Fish + 1)
-#define NB_MOVES_PER_DAY					5
+#define NB_MOVES_PER_DAY					NB_WATERTILE_VIEW_RANGE //5
 
 class Ship : public GameEntity
 {
@@ -83,7 +83,7 @@ public:
 
 	int m_choicesID[NB_CHOICES_MAX];
 
-	int m_moves_remaining;
+	int m_moves_max;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
