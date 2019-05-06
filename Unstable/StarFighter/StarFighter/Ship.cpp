@@ -183,6 +183,12 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 		if (GetDistanceSquaredInSecondsDMS(waypoint) < 2)
 		{
 			m_DMS = waypoint->m_DMS;//snap boat to position
+			//snap AI boats' position to tile position for clean movements
+			if (m_alliance != Alliance_Player)
+			{
+				m_position = waypoint->m_position;
+				GameEntity::UpdatePosition();
+			}
 			//waypoint->UpdatePosition(m_DMS);//snap tile to boat - 06.05.2019: doesn't seem necessary anymore
 			m_current_path.pop_back();
 
@@ -1450,7 +1456,7 @@ void Ship::Reset()
 	m_speed = sf::Vector2f(0, 0);
 }
 
-bool Ship::SetSailsToWaterTile(WaterTile* tile)
+bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 {
 	sf::Vector2f move_vector = tile->m_position - m_position;
 	ScaleVector(&move_vector, CRUISE_SPEED);
@@ -1463,6 +1469,11 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile)
 	if (m_current_path.empty() == false)
 	{
 		WaterTile* waypoint = m_current_path.back();
+		//update position of waypoints that are out of sight but are still used by AI pathfind
+		if (waypoint->m_can_be_seen == false)
+		{
+			waypoint->UpdatePosition(warshipDMS);
+		}
 		sf::Vector2f vec = waypoint->m_position - m_position;
 		ScaleVector(&vec, CRUISE_SPEED);
 		m_speed = vec;

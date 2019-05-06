@@ -1,8 +1,8 @@
-DMS 0 17 0 8
-Gold 993
-Fish 986
+DMS 0 17 0 11
+Gold 980
+Fish 960
 Mech 100
-Fidelity 57
+Fidelity 63
 Days 10
 Crew Jane 0 1 2 20 20 9 8 12 13 18 13 0 0 1
 Island 0 0 1 8 2 0 2 10 3 3 0 Snake_Island
@@ -61,7 +61,7 @@ Island 0 0 38 43 2 0 37 42 3 3 1 Emerald_Island
 Island 0 0 32 43 0 0 33 43 1 1 1 Sapphire_Island
 Island 0 0 24 46 2 0 23 48 3 2 1 Shark_Island
 Island 0 0 1 17 2 0 1 19 3 2 1 White_Island
-Ship 17 10 2 2 Le_Redoutable
+Ship 21 12 2 2 Calliope
 Wreck 0 30 0 0 37 0 101
 Wreck 0 1 0 0 35 0 66
 Wreck 0 32 0 0 36 0 168

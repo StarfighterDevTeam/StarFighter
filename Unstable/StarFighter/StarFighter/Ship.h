@@ -123,7 +123,7 @@ public:
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
-	bool SetSailsToWaterTile(WaterTile* tile);
+	bool SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
 	int GetShortestPathLength(WaterTile* tileA, WaterTile* tileB);

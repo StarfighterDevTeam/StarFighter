@@ -100,6 +100,7 @@ bool Gameloop::GetSaveOrLoadInputs()
 	}
 	else if (m_resources_interface.m_load_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
 	{
+		//todo: clean current game
 		LoadPlayerData(m_warship);
 		return true;
 	}
@@ -294,7 +295,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							//Sail order
 							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty)
 							{
-								if (m_warship->SetSailsToWaterTile(tile_hovered) == true)
+								if (m_warship->SetSailsToWaterTile(tile_hovered, m_warship->m_DMS) == true)
 								{
 									SpendDays(cost, false);
 									m_warship->m_can_open_new_menu = true;
@@ -307,11 +308,16 @@ void Gameloop::Update(sf::Time deltaTime)
 			else
 			{
 				//other ships update their position and visibility respect to player ship
-				ship->m_can_be_seen = ship->m_tile->m_can_be_seen;
+				//TODO: finalize round up/down
+				int x = ship->m_tile->m_DMS.m_minute_x;//+ (ship->m_speed.x < 0 && ship->m_DMS.m_second_x > 0 ? 0 : 0);
+				int y = ship->m_tile->m_DMS.m_minute_y + (ship->m_speed.y > 0 && ship->m_DMS.m_second_y > 0 ? 1 : 0);
+				ship->m_can_be_seen = ship->m_tile->m_zone->m_watertiles[x][y]->m_can_be_seen;
 				ship->UpdatePosition(m_warship->m_DMS);
 
 				//AI strategical movement
-				if (ship->m_can_be_seen == true)
+
+				if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE * 2)
+				//if (ship->m_can_be_seen == true)
 				{
 					SetAIStrategicalDestination(ship);
 				}
@@ -2440,7 +2446,7 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 		return;
 	}
 	int r = RandomizeIntBetweenValues(0, possible_candidates.size() - 1);
-	Seaport* selected = possible_candidates[0];
+	Seaport* selected = possible_candidates[r];
 
 	//optimize the tiles that need to be scanned for pathfinding
 	ship->m_tiles_can_be_seen.clear();
@@ -2470,7 +2476,7 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 	Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
 	Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
 
-	printf("Position: %d, %d | New destination: destination: %d, %d\n", ship->m_DMS.m_minute_x, ship->m_DMS.m_minute_y, selected->m_tile->m_coord_x, selected->m_tile->m_coord_y);
+	//printf("Position: %d, %d | New destination: destination: %d, %d\n", ship->m_DMS.m_minute_x, ship->m_DMS.m_minute_y, selected->m_tile->m_coord_x, selected->m_tile->m_coord_y);
 
 	for (int i = min_x; i < max_x; i++)
 	{
@@ -2493,6 +2499,5 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 	//}
 
 	//give order
-	ship->SetSailsToWaterTile(selected->m_tile);
-	printf("");
+	ship->SetSailsToWaterTile(selected->m_tile, m_warship->m_DMS);
 }
