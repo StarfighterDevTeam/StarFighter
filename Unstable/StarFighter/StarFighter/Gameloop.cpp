@@ -146,63 +146,78 @@ void Gameloop::Update(sf::Time deltaTime)
 	UpdateTacticalScale();
 
 	//Water tiles
-	m_warship->m_tiles_can_be_seen.clear();
 	if (m_scale == Scale_Strategic)
 	{
-		for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
+		//reset previous list
+		for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
 		{
-			for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			(*it)->m_can_be_seen = false;
+		}
+		m_warship->m_tiles_can_be_seen.clear();
+
+		//reduce the range of tiles that are likely to be the right candidates for being seen
+		int min_x = m_warship->m_DMS.m_minute_x - (NB_WATERTILE_VIEW_RANGE + 1);
+		int max_x = m_warship->m_DMS.m_minute_x + (NB_WATERTILE_VIEW_RANGE + 1);
+		Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+		Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+		int min_y = m_warship->m_DMS.m_minute_y - (NB_WATERTILE_VIEW_RANGE + 1);
+		int max_y = m_warship->m_DMS.m_minute_y + (NB_WATERTILE_VIEW_RANGE + 1);
+		Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+		Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+		
+		for (int i = min_x; i < max_x; i++)
+		{
+			for (int j = min_y; j < max_y; j++)
 			{
+				WaterTile* tile = m_warship->m_tile->m_zone->m_watertiles[i][j];
+
 				//can be seen? no need to update other tiles because they won't be drawn anyway
-				if (m_warship->CanViewWaterTile(*it2))
+				if (m_warship->CanViewWaterTile(tile))
 				{
-					(*it2)->m_can_be_seen = true;
-					m_warship->m_tiles_can_be_seen.push_back(*it2);
+					tile->m_can_be_seen = true;
+					m_warship->m_tiles_can_be_seen.push_back(tile);
 
 					//position on "radar"
-					(*it2)->UpdatePosition(m_warship->m_DMS);
-					if ((*it2)->m_location != NULL)
+					(tile)->UpdatePosition(m_warship->m_DMS);
+					if ((tile)->m_location != NULL)
 					{
-						(*it2)->m_location->m_position = (*it2)->m_position;
-						(*it2)->m_location->UpdatePosition();
+						(tile)->m_location->m_position = (tile)->m_position;
+						(tile)->m_location->UpdatePosition();
 
-						if ((*it2)->m_location->m_type == Location_Seaport)
+						if ((tile)->m_location->m_type == Location_Seaport)
 						{
-							Seaport* seaport = (Seaport*)(*it2)->m_location;
+							Seaport* seaport = (Seaport*)(tile)->m_location;
 							seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
 						}
 					}
 
 					//selection
-					if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
+					if (selection == m_warship && (tile)->m_type == Water_Empty)// && m_warship->m_destination == NULL
 					{
 						//display tile coords
 						//ostringstream ss;
-						//ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
-						//(*it2)->m_text.setString(ss.str());
-						(*it2)->GameEntity::Update(deltaTime);
+						//ss << (tile)->m_coord_x << ", " << (tile)->m_coord_y;
+						//(tile)->m_text.setString(ss.str());
+						(tile)->GameEntity::Update(deltaTime);
 					}
 					else
 					{
-						(*it2)->GameEntity::UpdatePosition();
+						(tile)->GameEntity::UpdatePosition();
 
-						if ((*it2)->m_type == Water_Empty)
+						if ((tile)->m_type == Water_Empty)
 						{
-							(*it2)->m_text.setString("");
+							(tile)->m_text.setString("");
 
 							//selection of water tiles is forbidden
-							if ((*it2)->m_selected == true)
+							if ((tile)->m_selected == true)
 							{
-								(*it2)->m_selected = false;
-								(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+								(tile)->m_selected = false;
+								(tile)->m_shape_container.setOutlineColor((tile)->m_default_color);
 								(*CurrentGame).m_selected_ui = NULL;
 							}
 						}
 					}
-				}
-				else
-				{
-					(*it2)->m_can_be_seen = false;
 				}
 			}
 		}
@@ -236,7 +251,10 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Strategical scale update
 		if (m_scale == Scale_Strategic)
 		{
-			ship->UpdateStrategical(deltaTime, m_warship->m_DMS);
+			if ((*CurrentGame).m_pause == false && m_menu == Menu_None)
+			{
+				ship->UpdateStrategical(deltaTime, m_warship->m_DMS);
+			}
 
 			if (ship == m_warship)
 			{
