@@ -84,6 +84,7 @@ public:
 	int m_choicesID[NB_CHOICES_MAX];
 
 	int m_moves_max;
+	bool m_has_played;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
@@ -133,6 +134,9 @@ public:
 	int GetShortestPathLength(WaterTile* tileA, WaterTile* tileB);
 	bool AddResource(ResourceType resource, int value);
 	void PayUpkeepCost(int days);
+
+	//AI
+	void UpdateAITilesCanBeSeen();
 
 private:
 	int m_rooms_min_upcorner_x;

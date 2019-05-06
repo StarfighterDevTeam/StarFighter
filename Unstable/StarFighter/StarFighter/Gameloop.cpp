@@ -16,6 +16,7 @@ Gameloop::Gameloop()
 	InitWaterZones();
 
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
+	m_ships.push_back(m_warship);
 	if (LoadPlayerData(m_warship) == 0)
 	{
 		//No saved game loaded => create a new save from scratch
@@ -31,7 +32,6 @@ Gameloop::Gameloop()
 	
 	m_resources_interface.Init(m_warship);
 
-	m_ships.push_back(m_warship);
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
 	m_tactical_ship = NULL;
@@ -179,41 +179,41 @@ void Gameloop::Update(sf::Time deltaTime)
 					m_warship->m_tiles_can_be_seen.push_back(tile);
 
 					//position on "radar"
-					(tile)->UpdatePosition(m_warship->m_DMS);
-					if ((tile)->m_location != NULL)
+					tile->UpdatePosition(m_warship->m_DMS);
+					if (tile->m_location != NULL)
 					{
-						(tile)->m_location->m_position = (tile)->m_position;
-						(tile)->m_location->UpdatePosition();
+						tile->m_location->m_position = tile->m_position;
+						tile->m_location->UpdatePosition();
 
-						if ((tile)->m_location->m_type == Location_Seaport)
+						if (tile->m_location->m_type == Location_Seaport)
 						{
-							Seaport* seaport = (Seaport*)(tile)->m_location;
+							Seaport* seaport = (Seaport*)tile->m_location;
 							seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
 						}
 					}
 
 					//selection
-					if (selection == m_warship && (tile)->m_type == Water_Empty)// && m_warship->m_destination == NULL
+					if (selection == m_warship && tile->m_type == Water_Empty)// && m_warship->m_destination == NULL
 					{
 						//display tile coords
 						//ostringstream ss;
-						//ss << (tile)->m_coord_x << ", " << (tile)->m_coord_y;
-						//(tile)->m_text.setString(ss.str());
-						(tile)->GameEntity::Update(deltaTime);
+						//ss << tile->m_coord_x << ", " << tile->m_coord_y;
+						//tile->m_text.setString(ss.str());
+						tile->GameEntity::Update(deltaTime);
 					}
 					else
 					{
-						(tile)->GameEntity::UpdatePosition();
+						tile->GameEntity::UpdatePosition();
 
-						if ((tile)->m_type == Water_Empty)
+						if (tile->m_type == Water_Empty)
 						{
-							(tile)->m_text.setString("");
+							tile->m_text.setString("");
 
 							//selection of water tiles is forbidden
-							if ((tile)->m_selected == true)
+							if (tile->m_selected == true)
 							{
-								(tile)->m_selected = false;
-								(tile)->m_shape_container.setOutlineColor((tile)->m_default_color);
+								tile->m_selected = false;
+								tile->m_shape_container.setOutlineColor(tile->m_default_color);
 								(*CurrentGame).m_selected_ui = NULL;
 							}
 						}
@@ -252,6 +252,14 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			ship_moving = true;
 			break;
+		}
+	}
+
+	if (m_scale == Scale_Strategic && ship_moving == false && (*CurrentGame).m_pause == false && m_menu == Menu_None)
+	{
+		for (int i = 0; i < shipsVectorSize; i++)
+		{
+			m_ships[i]->m_has_played = false;
 		}
 	}
 
@@ -334,6 +342,8 @@ void Gameloop::Update(sf::Time deltaTime)
 						}
 					}
 				}
+
+				ship->GameEntity::Update(deltaTime);
 			}
 			else
 			{
@@ -346,13 +356,12 @@ void Gameloop::Update(sf::Time deltaTime)
 
 				//AI strategical movement
 				if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE * 2)
-				//if (ship->m_can_be_seen == true)
 				{
 					SetAIStrategicalDestination(ship);
 				}
-			}
 
-			ship->GameEntity::Update(deltaTime);
+				ship->AnimatedSprite::update(deltaTime);
+			}
 		}
 
 		//Tactical scale update (and player)
@@ -1186,7 +1195,7 @@ void Gameloop::Draw()
 
 	//ships
 	int shipsVectorSize = m_ships.size();
-	for (int i = 0; i < shipsVectorSize; i++)
+	for (int i = shipsVectorSize - 1; i >= 0; i--)
 	{
 		Ship* ship = m_ships[i];
 		if (m_scale == Scale_Strategic && ship->m_can_be_seen == true)
@@ -2481,53 +2490,32 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 		int r = RandomizeIntBetweenValues(0, possible_candidates.size() - 1);
 		Seaport* selected = possible_candidates[r];
 		ship->m_destination_long = selected->m_tile;
-
-		//optimize the tiles that need to be scanned for pathfinding
-		ship->m_tiles_can_be_seen.clear();
-
-		int dist_x = selected->m_tile->m_DMS.m_minute_x - ship->m_DMS.m_minute_x;
-		int dist_y = selected->m_tile->m_DMS.m_minute_y - ship->m_DMS.m_minute_y;
-		int min_x = dist_x > 0 ? ship->m_DMS.m_minute_x - ISLAND_SIZE_MAX : ship->m_DMS.m_minute_x + ISLAND_SIZE_MAX;
-		int max_x = dist_x > 0 ? selected->m_tile->m_DMS.m_minute_x + ISLAND_SIZE_MAX : selected->m_tile->m_DMS.m_minute_x - ISLAND_SIZE_MAX;
-		if (min_x > max_x)
-		{
-			int min_x_ = min_x;
-			min_x = max_x;
-			max_x = min_x_;
-		}
-		Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
-		Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
-
-		int min_y = dist_y > 0 ? ship->m_DMS.m_minute_y - ISLAND_SIZE_MAX : ship->m_DMS.m_minute_y + ISLAND_SIZE_MAX;
-		int max_y = dist_y > 0 ? selected->m_tile->m_DMS.m_minute_y + ISLAND_SIZE_MAX : selected->m_tile->m_DMS.m_minute_y - ISLAND_SIZE_MAX;
-		if (min_y > max_y)
-		{
-			int min_y_ = min_y;
-			min_y = max_y;
-			max_y = min_y_;
-		}
-
-		Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-		Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-
-		for (int i = min_x; i < max_x; i++)
-		{
-			for (int j = min_y; j < max_y; j++)
-			{
-				ship->m_tiles_can_be_seen.push_back(ship->m_tile->m_zone->m_watertiles[i][j]);
-			}
-		}
 	}
 
+	//enemy aggro?
+	bool aggro = false;
+	if (ship->m_alliance == Alliance_Enemy && ship->m_tile->m_can_be_seen == true && m_warship->m_has_played == true && ship->m_has_played == false)
+	{
+		float dist = ship->GetDistanceFloatToWaterTile(m_warship->m_tile);
+		float proba_aggro = (1.f * ship->m_moves_max - dist + 1) / ship->m_moves_max;
+		Boundf(proba_aggro, 0.f, 0.95f);
+		aggro = proba_aggro >= RandomizeFloatBetweenValues(0, 1);
+	}
+	
+	if (aggro == true)
+	{
+		ship->m_destination = m_warship->m_destination != NULL ? m_warship->m_destination : m_warship->m_tile;
+	}
 	//get sub-destination from long destination
-	if (ship->m_destination == NULL && ship->m_destination_long != NULL && m_warship->m_speed == sf::Vector2f(0, 0))
+	else if (ship->m_destination == NULL && ship->m_destination_long != NULL && m_warship->m_has_played == false)
 	{
 		ship->m_destination = ship->m_destination_long;
 	}
 
 	//give order to sail to destination (when the player starts to move too)
-	if (ship->m_destination != NULL && m_warship->m_speed != sf::Vector2f(0, 0))
+	if (ship->m_destination != NULL && m_warship->m_has_played == true)
 	{
+		ship->UpdateAITilesCanBeSeen();
 		ship->SetSailsToWaterTile(ship->m_destination, m_warship->m_DMS);
 	}
 }

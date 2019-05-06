@@ -128,7 +128,7 @@ float Maxf(float a, float b)
 	return a > b ? a : b;
 }
 
-void Bound(float& value, float min, float max)
+void Boundf(float& value, float min, float max)
 {
 	if (value < min)
 	{

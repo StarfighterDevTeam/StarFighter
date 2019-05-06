@@ -30,6 +30,8 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 
 	m_sinking_timer = 0.f;
 
+	m_has_played = false;
+
 	//get on tile
 	SetDMSCoord(coord);
 
@@ -1514,6 +1516,8 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 		m_seaport = NULL;
 	}
 
+	m_has_played = true;
+
 	return true;
 }
 
@@ -2223,6 +2227,51 @@ void Ship::PayUpkeepCost(int days)
 					(*it)->m_fidelity = Min(100, (*it)->m_fidelity + 1);
 				}
 			}
+		}
+	}
+}
+
+
+void Ship::UpdateAITilesCanBeSeen()
+{
+	//optimize the tiles that need to be scanned for pathfinding
+	m_tiles_can_be_seen.clear();
+
+	if (m_destination == NULL)
+	{
+		return;
+	}
+
+	int dist_x = m_destination->m_DMS.m_minute_x - m_DMS.m_minute_x;
+	int dist_y = m_destination->m_DMS.m_minute_y - m_DMS.m_minute_y;
+	int min_x = dist_x > 0 ? m_DMS.m_minute_x - ISLAND_SIZE_MAX : m_DMS.m_minute_x + ISLAND_SIZE_MAX;
+	int max_x = dist_x > 0 ? m_destination->m_DMS.m_minute_x + ISLAND_SIZE_MAX : m_destination->m_DMS.m_minute_x - ISLAND_SIZE_MAX;
+	if (min_x > max_x)
+	{
+		int min_x_ = min_x;
+		min_x = max_x;
+		max_x = min_x_;
+	}
+	Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+	Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+	int min_y = dist_y > 0 ? m_DMS.m_minute_y - ISLAND_SIZE_MAX : m_DMS.m_minute_y + ISLAND_SIZE_MAX;
+	int max_y = dist_y > 0 ? m_destination->m_DMS.m_minute_y + ISLAND_SIZE_MAX : m_destination->m_DMS.m_minute_y - ISLAND_SIZE_MAX;
+	if (min_y > max_y)
+	{
+		int min_y_ = min_y;
+		min_y = max_y;
+		max_y = min_y_;
+	}
+
+	Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+	Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+	for (int i = min_x; i < max_x; i++)
+	{
+		for (int j = min_y; j < max_y; j++)
+		{
+			m_tiles_can_be_seen.push_back(m_tile->m_zone->m_watertiles[i][j]);
 		}
 	}
 }

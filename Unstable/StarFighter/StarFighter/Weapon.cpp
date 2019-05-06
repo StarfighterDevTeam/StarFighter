@@ -139,7 +139,7 @@ void Weapon::Update(Time deltaTime)
 	m_rofbar->m_shape.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
 
 	float rof = m_rof - m_rof_timer;
-	Bound(rof, 0, m_rof);
+	Boundf(rof, 0, m_rof);
 
 	float rof_ratio = 1.0f * rof / m_rof;
 	m_rofbar->m_shape.setSize(sf::Vector2f(rof_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));

@@ -136,7 +136,7 @@ int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(float min, float max);
 int RandomizeSign();
-void Bound(float& value, float min, float max);
+void Boundf(float& value, float min, float max);
 void Bound(int& value, int min, int max);
 int Min(int a, int b);
 int Max(int a, int b);
