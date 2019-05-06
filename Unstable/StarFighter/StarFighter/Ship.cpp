@@ -1502,6 +1502,10 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 		ScaleVector(&vec, CRUISE_SPEED);
 		m_speed = vec;
 	}
+	else
+	{
+		return false;
+	}
 
 	//leaving port?
 	if (m_seaport != NULL && m_destination != (WaterTile*)m_seaport)

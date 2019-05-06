@@ -244,6 +244,17 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//Ships update
 	int shipsVectorSize = m_ships.size();
+
+	bool ship_moving = false;
+	for (int i = 0; i < shipsVectorSize; i++)
+	{
+		if (m_ships[i]->m_speed != sf::Vector2f(0, 0))
+		{
+			ship_moving = true;
+			break;
+		}
+	}
+
 	for (int i = 0; i < shipsVectorSize; i++)
 	{
 		Ship* ship = m_ships[i];
@@ -286,16 +297,6 @@ void Gameloop::Update(sf::Time deltaTime)
 						}
 
 						//Sail orders
-						bool ship_moving = false;
-						for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
-						{
-							if ((*it3)->m_speed != sf::Vector2f(0, 0))
-							{
-								ship_moving = true;
-								break;
-							}
-						}
-
 						if (m_menu == Menu_None && ship_moving == false)// m_warship->m_speed == sf::Vector2f(0, 0))
 						{
 							int cost = m_warship->GetShortestPathLength(m_warship->m_tile, tile_hovered);
@@ -2427,8 +2428,8 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 		return;
 	}
 
-	//already has a final destination? (+ wait for the player to finish his move before chosing a new destination)
-	if (ship->m_destination_long == NULL && m_warship->m_speed == sf::Vector2f(0, 0))
+	//set a final destination (generally, a medium or large seaport)
+	if (ship->m_destination_long == NULL)
 	{
 		//we want to select the 3 closest seaports, and then we'll randomize one destination among the 3.
 		vector<Seaport*> possible_candidates;
@@ -2508,8 +2509,6 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 
 		Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
 		Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-
-		//printf("Position: %d, %d | New destination: destination: %d, %d\n", ship->m_DMS.m_minute_x, ship->m_DMS.m_minute_y, selected->m_tile->m_coord_x, selected->m_tile->m_coord_y);
 
 		for (int i = min_x; i < max_x; i++)
 		{
