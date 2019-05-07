@@ -1806,10 +1806,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				CrewMember* crew = new CrewMember((CrewMemberType)type, Alliance_Player, (CrewMemberRace)race, prisoner);
 				
 				crew->m_skin = skin;
-				if (crew->m_type == Crew_Civilian)
-				{
-					crew->setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * crew->m_skin));
-				}
+				crew->setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * crew->m_skin));
 				crew->m_display_name = name;
 				crew->m_health_max = health_max;
 				crew->m_health = health;

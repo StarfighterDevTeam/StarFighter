@@ -187,7 +187,9 @@ Choice* CrewUnboardInterface::Update(sf::Time deltaTime)
 	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 	{
 		(*it)->m_position = m_crew_slots[k]->m_shape_container.getPosition();
-		(*it)->Update(deltaTime);
+		(*it)->setFrame(1);
+		(*it)->GameEntity::Update(deltaTime);
+		(*it)->m_crew_linked->setColor(sf::Color(255, 255, 255, 120));
 		k++;
 
 		if ((*it)->IsHoveredByMouse() == true && m_crew_interface.m_crew != *it)
@@ -299,6 +301,7 @@ bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
 		}
 
 		CrewMember* clone = crew->Clone();
+		clone->setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * clone->m_skin));
 		m_unboarded.push_back(clone);
 		clone->m_UI_type = UI_CrewMemberUnboarding;
 		clone->m_crew_linked = crew;
