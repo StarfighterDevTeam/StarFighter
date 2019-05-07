@@ -128,6 +128,12 @@ std::string StringCut(std::string str, const size_t length);
 //CSV DATA
 #define CHOICES_CSV_FILE							"Scripts/Generated/Choices.csv"
 #define REWARDS_CSV_FILE							"Scripts/Generated/Rewards.csv"
+#define PIRATE_NAMES_MALE_CSV						"Scripts/Generated/PirateNamesMale.csv"
+#define PIRATE_NAMES_FEMALE_CSV						"Scripts/Generated/PirateNamesFemale.csv"
+#define PIRATE_SURNAMES_CSV							"Scripts/Generated/PirateSurnames.csv"
+#define ISLAND_NAMES_CSV							"Scripts/Generated/IslandNames.csv"
+#define SHIP_NAMES_FIRSTCLASS_CSV					"Scripts/Generated/ShipNamesFirstClass.csv"
+#define SHIP_NAMES_SECONDCLASS_CSV					"Scripts/Generated/ShipNamesSecondClass.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

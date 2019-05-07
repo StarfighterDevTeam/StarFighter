@@ -1,407 +1,401 @@
-DMS 0 9 0 10
-Gold 1000
-Fish 1000
+DMS 0 7 0 18
+Gold 992
+Fish 958
 Mech 100
-Fidelity 50
+Fidelity 52
 Days 10
-Crew Jamie 0 1 2 20 20 5 16 13 11 14 16 0 0 1
-Crew Lucy 0 1 1 20 20 17 20 6 9 7 5 0 9 5
-Crew Serena 1 0 2 20 20 7 9 6 7 5 5 0 9 6
-Crew Lucy 1 1 2 20 20 8 6 9 3 2 5 0 3 7
-Crew Serena 2 0 0 20 20 7 6 4 6 10 5 0 7 7
-Crew Daniel 3 0 1 20 20 2 9 7 2 9 5 0 9 7
-Crew Serena 1 3 2 20 20 6 9 6 7 4 5 1 0 5
-Crew Thomas 1 4 2 20 20 2 2 3 8 3 5 1 0 6
-Island 0 0 26 22 0 0 25 22 1 1 1 Quartz_Island
-Island 0 0 24 9 0 0 24 8 1 1 0 Dolphin_Island
-Island 0 0 10 5 0 0 9 5 1 1 1 Turtle_Island
-Island 0 0 7 34 0 0 8 34 1 1 0 Sapphire_Island
-Island 0 0 51 57 0 0 51 56 1 1 1 Lagoon_Island
-Island 0 0 36 15 0 0 36 16 1 1 1 Shark_Island
-Island 0 0 2 37 2 0 1 40 2 3 1 White_Island
-Island 0 0 35 5 0 0 34 5 1 1 0 Angels_Island
-Island 0 0 41 20 2 0 41 23 2 3 0 Emerald_Island
-Island 0 0 39 51 2 0 36 53 3 3 1 Rock_Island
-Island 0 0 26 8 2 0 27 10 3 3 0 Ruby_Island
-Island 0 0 56 9 0 0 55 9 1 1 0 Diamond_Island
-Island 0 0 19 1 1 0 18 1 1 2 1 Death_Island
-Island 0 0 57 50 0 0 57 49 1 1 1 Onyx_Island
-Island 0 0 48 47 2 0 48 50 2 3 0 Topaz_Island
-Island 0 0 14 41 2 0 15 42 3 3 1 Snake_Island
-Island 0 0 34 32 2 0 35 33 3 2 0 Stone_Island
-Island 0 0 9 47 0 0 9 48 1 1 0 Giants_Island
-Island 0 0 13 58 2 0 14 58 3 2 1 Paradise_Island
-Island 0 0 15 0 2 0 14 3 2 3 1 Angels_Island
-Island 0 0 33 30 1 0 33 29 1 2 1 Turtle_Island
-Island 0 0 58 8 0 0 59 8 1 1 1 Sapphire_Island
-Island 0 0 23 57 2 0 21 57 2 3 0 Stone_Island
-Island 0 0 49 29 2 0 47 28 3 2 1 Onyx_Island
-Island 0 0 35 22 2 0 33 24 2 3 0 Death_Island
-Island 0 0 53 20 2 0 51 19 3 3 0 Giants_Island
-Island 0 0 46 7 2 0 45 6 2 3 1 Paradise_Island
-Island 0 0 12 11 1 0 11 12 1 2 1 White_Island
-Island 0 0 33 40 0 0 33 39 1 1 1 Ruby_Island
-Island 0 0 5 56 0 0 5 55 1 1 0 Lagoon_Island
-Island 0 0 8 21 1 0 8 23 1 2 1 Emerald_Island
-Island 0 0 29 38 1 0 27 38 2 2 1 Shark_Island
-Island 0 0 58 36 2 0 57 39 2 3 0 Dolphin_Island
-Island 0 0 2 8 1 0 1 8 1 2 0 Diamond_Island
-Island 0 0 45 40 1 0 44 41 1 2 1 Rock_Island
-Island 0 0 43 0 2 0 40 2 3 3 1 Snake_Island
-Island 0 0 29 33 0 0 28 33 1 1 1 Quartz_Island
-Island 0 0 38 19 0 0 37 19 1 1 0 Topaz_Island
-Island 0 0 41 51 2 0 42 53 2 3 0 Paradise_Island
-Island 0 0 34 58 0 0 34 57 1 1 1 Death_Island
-Island 0 0 8 12 2 0 5 13 3 2 1 Diamond_Island
-Island 0 0 17 34 0 0 17 35 1 1 0 Ruby_Island
-Island 0 0 3 47 0 0 4 47 1 1 0 Rock_Island
-Island 0 0 8 31 1 0 8 30 1 2 1 Stone_Island
-Island 0 0 44 19 2 0 45 21 2 3 0 Sapphire_Island
-Island 0 0 29 49 1 0 28 48 2 1 0 Shark_Island
-Island 0 0 58 26 2 0 55 27 3 3 1 Dolphin_Island
-Island 0 0 38 42 2 0 39 43 3 3 0 Onyx_Island
-Island 0 0 26 1 0 0 26 2 1 1 0 Emerald_Island
-Island 0 0 5 37 1 0 5 39 2 2 0 Topaz_Island
-Island 0 0 56 33 1 0 56 32 1 2 1 Snake_Island
-Island 0 0 49 15 0 0 49 14 1 1 0 Turtle_Island
-Island 0 0 0 52 0 0 0 51 1 1 0 Quartz_Island
-Island 0 0 2 2 0 0 2 1 1 1 0 Angels_Island
-Island 0 0 0 57 1 0 0 59 1 2 1 Giants_Island
-Island 0 0 6 28 0 0 5 28 1 1 1 Lagoon_Island
-Island 0 0 16 14 0 0 16 13 1 1 1 White_Island
-Island 0 0 32 8 1 0 33 9 2 2 0 Sapphire_Island
-Ship 5 41 0 1 Le_Redoutable
-Ship 52 31 0 1 Ghost
-Ship 31 34 0 1 Calliope
-Ship 15 55 0 1 Hispanola
-Ship 54 1 0 1 Medusa
-Ship 23 30 1 1 Genova
-Ship 25 17 1 1 Ghost
-Ship 14 37 1 1 Esmeralda
-Ship 57 13 1 1 Medusa
-Ship 24 54 1 1 Genova
-Ship 53 37 1 1 Calliope
-Ship 1 57 1 1 Le_Redoutable
-Ship 10 16 1 1 Hispanola
-Ship 16 50 1 1 Genova
-Ship 12 22 1 1 Le_Redoutable
-Ship 34 10 1 1 Esmeralda
-Ship 0 42 1 1 Hispanola
-Ship 48 1 1 1 Calliope
-Ship 25 26 1 1 Ghost
-Ship 18 18 1 1 Medusa
-Ship 49 41 1 1 Ghost
-Ship 42 16 1 1 Medusa
-Ship 4 36 1 1 Genova
-Ship 29 45 1 1 Esmeralda
-Ship 14 45 1 1 Calliope
-Ship 48 34 1 1 Hispanola
-Ship 25 26 1 1 Le_Redoutable
-Ship 55 43 1 1 Medusa
-Ship 56 21 1 1 Le_Redoutable
-Ship 16 52 1 1 Hispanola
-Ship 19 7 1 1 Ghost
-Ship 49 6 1 1 Esmeralda
-Ship 17 46 1 1 Calliope
-Ship 54 26 1 1 Genova
-Ship 47 13 1 1 Calliope
-Ship 54 30 1 2 Le_Redoutable
-Ship 4 2 1 2 Ghost
-Ship 28 27 1 2 Hispanola
-Ship 21 26 1 2 Genova
-Ship 45 12 1 2 Esmeralda
-Ship 14 53 1 2 Medusa
-Ship 43 3 1 2 Hispanola
-Ship 27 47 1 2 Ghost
-Ship 41 18 1 2 Medusa
-Ship 6 6 1 2 Genova
-Ship 16 20 1 2 Calliope
-Ship 30 36 1 2 Le_Redoutable
-Ship 24 26 1 2 Esmeralda
-Ship 59 44 1 2 Esmeralda
-Ship 39 50 1 2 Genova
-Ship 11 41 1 2 Medusa
-Ship 12 6 1 2 Le_Redoutable
-Ship 40 57 1 2 Hispanola
-Ship 8 37 1 2 Ghost
-Ship 41 25 1 2 Calliope
-Ship 6 26 1 2 Genova
-Ship 17 9 1 2 Calliope
-Ship 4 30 1 2 Le_Redoutable
-Ship 14 59 1 2 Medusa
-Ship 45 50 1 2 Ghost
-Ship 26 41 1 2 Esmeralda
-Ship 34 14 1 2 Hispanola
-Ship 43 23 1 2 Esmeralda
-Ship 29 15 1 2 Hispanola
-Ship 49 1 1 2 Medusa
-Wreck 0 5 0 0 0 0 102
-Wreck 0 50 0 0 48 0 73
-Wreck 0 21 0 0 38 0 93
-Wreck 0 34 0 0 12 0 169
-Wreck 0 3 0 0 39 0 152
-Wreck 0 38 0 0 31 0 147
-Wreck 0 33 0 0 2 0 198
-Wreck 0 42 0 0 18 0 155
-Wreck 0 13 0 0 31 0 189
-Wreck 0 51 0 0 10 0 59
-SeaMonster 0 29 0 0 51 0 159
-SeaMonster 0 23 0 0 10 0 93
-SeaMonster 0 6 0 0 25 0 131
-SeaMonster 0 38 0 0 24 0 30
-SeaMonster 0 6 0 0 10 0 99
-SeaMonster 0 0 0 0 8 0 67
-SeaMonster 0 47 0 0 21 0 168
-SeaMonster 0 52 0 0 50 0 171
-SeaMonster 0 9 0 0 13 0 149
-SeaMonster 0 35 0 0 53 0 175
-Fish 0 56 0 0 34 0 17
-Fish 0 49 0 0 17 0 63
-Fish 0 52 0 0 20 0 37
-Fish 0 47 0 0 45 0 38
-Fish 0 31 0 0 57 0 92
-Fish 0 29 0 0 0 0 91
-Fish 0 47 0 0 48 0 43
-Fish 0 58 0 0 41 0 97
-Fish 0 37 0 0 30 0 100
-Fish 0 22 0 0 48 0 35
-Fish 0 27 0 0 21 0 89
-Fish 0 59 0 0 29 0 72
-Fish 0 36 0 0 6 0 5
-Fish 0 19 0 0 3 0 23
-Fish 0 32 0 0 13 0 26
-Fish 0 45 0 0 17 0 57
-Fish 0 49 0 0 34 0 78
-Fish 0 42 0 0 56 0 59
-Fish 0 1 0 0 49 0 36
-Fish 0 52 0 0 2 0 55
-Fish 0 42 0 0 50 0 63
-Fish 0 41 0 0 48 0 79
-Fish 0 2 0 0 45 0 71
-Fish 0 59 0 0 0 0 22
-Fish 0 8 0 0 35 0 81
-Fish 0 52 0 0 32 0 69
-Fish 0 21 0 0 16 0 17
-Fish 0 35 0 0 58 0 42
-Fish 0 34 0 0 46 0 31
-Fish 0 12 0 0 18 0 53
-Fish 0 25 0 0 58 0 27
-Fish 0 55 0 0 0 0 58
-Fish 0 56 0 0 16 0 51
-Fish 0 51 0 0 21 0 80
-Fish 0 44 0 0 12 0 26
-Fish 0 34 0 0 17 0 74
-Fish 0 59 0 0 42 0 47
-Fish 0 5 0 0 42 0 62
-Fish 0 38 0 0 43 0 41
-Fish 0 4 0 0 18 0 59
-Fish 0 58 0 0 32 0 28
-Fish 0 56 0 0 24 0 89
-Fish 0 44 0 0 18 0 53
-Fish 0 58 0 0 1 0 60
-Fish 0 30 0 0 1 0 56
-Fish 0 45 0 0 51 0 26
-Fish 0 20 0 0 20 0 56
-Fish 0 59 0 0 54 0 34
-Fish 0 28 0 0 20 0 88
-Fish 0 20 0 0 49 0 91
-Fish 0 1 0 0 2 0 94
-Fish 0 9 0 0 57 0 60
-Fish 0 55 0 0 1 0 84
-Fish 0 52 0 0 6 0 42
-Fish 0 53 0 0 36 0 41
-Fish 0 38 0 0 26 0 18
-Fish 0 47 0 0 53 0 29
-Fish 0 12 0 0 35 0 62
-Fish 0 21 0 0 46 0 30
-Fish 0 29 0 0 22 0 93
-Fish 0 28 0 0 22 0 10
-Fish 0 53 0 0 38 0 85
-Fish 0 28 0 0 58 0 100
-Fish 0 13 0 0 50 0 32
-Fish 0 30 0 0 19 0 78
-Fish 0 20 0 0 35 0 19
-Fish 0 18 0 0 23 0 45
-Fish 0 56 0 0 4 0 88
-Fish 0 32 0 0 41 0 22
-Fish 0 22 0 0 42 0 6
-Fish 0 5 0 0 35 0 42
-Fish 0 10 0 0 30 0 96
-Fish 0 59 0 0 22 0 36
-Fish 0 1 0 0 59 0 22
-Fish 0 12 0 0 29 0 9
-Fish 0 54 0 0 37 0 24
-Fish 0 11 0 0 52 0 52
-Fish 0 43 0 0 39 0 68
-Fish 0 47 0 0 2 0 92
-Fish 0 52 0 0 56 0 23
-Fish 0 23 0 0 25 0 100
-Fish 0 15 0 0 13 0 33
-Fish 0 56 0 0 7 0 44
-Fish 0 59 0 0 36 0 16
-Fish 0 20 0 0 44 0 6
-Fish 0 50 0 0 51 0 15
-Fish 0 26 0 0 21 0 61
-Fish 0 31 0 0 0 0 9
-Fish 0 28 0 0 1 0 72
-Fish 0 6 0 0 41 0 63
-Fish 0 26 0 0 33 0 37
-Fish 0 31 0 0 43 0 96
-Fish 0 50 0 0 20 0 91
-Fish 0 33 0 0 47 0 93
-Fish 0 45 0 0 22 0 50
-Fish 0 3 0 0 11 0 90
-Fish 0 54 0 0 21 0 30
-Fish 0 7 0 0 50 0 56
-Fish 0 16 0 0 26 0 63
-Fish 0 5 0 0 47 0 75
-Fish 0 21 0 0 12 0 32
-Fish 0 22 0 0 2 0 7
-Fish 0 52 0 0 26 0 56
-Fish 0 55 0 0 22 0 92
-Fish 0 5 0 0 16 0 7
-Fish 0 37 0 0 43 0 50
-Fish 0 28 0 0 31 0 94
-Fish 0 15 0 0 35 0 46
-Fish 0 7 0 0 2 0 58
-Fish 0 24 0 0 48 0 87
-Fish 0 19 0 0 33 0 95
-Fish 0 47 0 0 18 0 64
-Fish 0 46 0 0 25 0 50
-Fish 0 37 0 0 47 0 45
-Fish 0 49 0 0 35 0 13
-Fish 0 36 0 0 2 0 15
-Fish 0 32 0 0 43 0 5
-Fish 0 21 0 0 2 0 74
-Fish 0 9 0 0 27 0 20
-Fish 0 45 0 0 47 0 76
-Fish 0 42 0 0 59 0 72
-Fish 0 7 0 0 46 0 90
-Fish 0 15 0 0 52 0 53
-Fish 0 21 0 0 53 0 28
-Fish 0 34 0 0 18 0 73
-Fish 0 31 0 0 14 0 12
-Fish 0 28 0 0 5 0 91
-Fish 0 50 0 0 13 0 96
-Fish 0 56 0 0 39 0 36
-Fish 0 17 0 0 18 0 16
-Fish 0 0 0 0 26 0 63
-Fish 0 24 0 0 13 0 65
-Fish 0 24 0 0 36 0 100
-Fish 0 24 0 0 59 0 19
-Fish 0 53 0 0 9 0 39
-Fish 0 31 0 0 34 0 37
-Fish 0 0 0 0 15 0 58
-Fish 0 50 0 0 49 0 66
-Fish 0 55 0 0 39 0 58
-Fish 0 20 0 0 59 0 12
-Fish 0 35 0 0 24 0 90
-Fish 0 17 0 0 51 0 85
-Fish 0 19 0 0 29 0 53
-Fish 0 17 0 0 19 0 10
-Fish 0 17 0 0 11 0 40
-Fish 0 44 0 0 1 0 80
-Fish 0 33 0 0 27 0 49
-Fish 0 40 0 0 3 0 42
-Fish 0 6 0 0 8 0 72
-Fish 0 48 0 0 21 0 33
-Fish 0 6 0 0 53 0 82
-Fish 0 12 0 0 27 0 42
-Fish 0 42 0 0 31 0 40
-Fish 0 52 0 0 9 0 46
-Fish 0 0 0 0 4 0 29
-Fish 0 55 0 0 12 0 15
-Fish 0 14 0 0 47 0 35
-Fish 0 17 0 0 17 0 18
-Fish 0 36 0 0 44 0 18
-Fish 0 27 0 0 7 0 90
-Fish 0 18 0 0 45 0 42
-Fish 0 8 0 0 9 0 36
-Fish 0 55 0 0 15 0 51
-Fish 0 53 0 0 56 0 28
-Fish 0 47 0 0 43 0 84
-Fish 0 43 0 0 6 0 91
-Fish 0 43 0 0 25 0 95
-Fish 0 51 0 0 26 0 27
-Fish 0 55 0 0 55 0 96
-Fish 0 42 0 0 43 0 67
-Fish 0 17 0 0 53 0 42
-Fish 0 34 0 0 52 0 38
-Fish 0 27 0 0 44 0 62
-Fish 0 25 0 0 34 0 83
-Fish 0 46 0 0 57 0 10
-Fish 0 38 0 0 30 0 42
-Fish 0 33 0 0 11 0 95
-Fish 0 38 0 0 3 0 90
-Fish 0 32 0 0 17 0 90
-Fish 0 54 0 0 13 0 87
-Fish 0 18 0 0 19 0 58
-Fish 0 22 0 0 28 0 72
-Fish 0 45 0 0 16 0 14
-Fish 0 2 0 0 12 0 25
-Fish 0 38 0 0 56 0 12
-Fish 0 29 0 0 13 0 87
-Fish 0 33 0 0 17 0 86
-Fish 0 37 0 0 39 0 52
-Fish 0 50 0 0 11 0 16
-Fish 0 51 0 0 23 0 10
-Fish 0 10 0 0 52 0 65
-Fish 0 24 0 0 25 0 33
-Fish 0 56 0 0 28 0 14
-Fish 0 5 0 0 41 0 23
-Fish 0 22 0 0 52 0 28
-Fish 0 34 0 0 43 0 83
-Fish 0 25 0 0 37 0 58
-Fish 0 22 0 0 43 0 68
-Fish 0 19 0 0 58 0 96
-Fish 0 28 0 0 51 0 86
-Fish 0 8 0 0 10 0 70
-Fish 0 30 0 0 23 0 60
-Fish 0 57 0 0 42 0 32
-Fish 0 23 0 0 2 0 85
-Fish 0 34 0 0 10 0 27
-Fish 0 4 0 0 54 0 57
-Fish 0 20 0 0 57 0 49
-Fish 0 23 0 0 18 0 81
-Fish 0 42 0 0 44 0 32
-Fish 0 59 0 0 5 0 87
-Fish 0 3 0 0 45 0 27
-Fish 0 14 0 0 8 0 68
-Fish 0 12 0 0 26 0 53
-Fish 0 27 0 0 22 0 36
-Fish 0 31 0 0 37 0 99
-Fish 0 14 0 0 16 0 87
-Fish 0 43 0 0 3 0 43
-Fish 0 35 0 0 46 0 5
-Fish 0 14 0 0 18 0 14
-Fish 0 16 0 0 46 0 18
-Fish 0 22 0 0 46 0 26
-Fish 0 56 0 0 18 0 84
-Fish 0 10 0 0 56 0 44
-Fish 0 57 0 0 48 0 37
-Fish 0 59 0 0 43 0 99
-Fish 0 9 0 0 12 0 20
-Fish 0 12 0 0 38 0 80
-Fish 0 44 0 0 16 0 7
-Fish 0 2 0 0 59 0 71
-Fish 0 13 0 0 9 0 86
-Fish 0 37 0 0 0 0 91
-Fish 0 47 0 0 0 0 63
-Fish 0 42 0 0 41 0 25
-Fish 0 6 0 0 11 0 100
-Fish 0 10 0 0 39 0 96
-Fish 0 49 0 0 41 0 87
-Fish 0 37 0 0 31 0 72
-Fish 0 0 0 0 32 0 64
-Fish 0 25 0 0 0 0 69
-Fish 0 34 0 0 7 0 58
-Fish 0 21 0 0 34 0 14
-Fish 0 39 0 0 49 0 37
-Fish 0 44 0 0 44 0 71
-Fish 0 22 0 0 17 0 26
-Fish 0 1 0 0 16 0 85
-Fish 0 46 0 0 15 0 82
-Fish 0 23 0 0 21 0 43
-Fish 0 1 0 0 0 0 66
-Fish 0 12 0 0 19 0 35
-Fish 0 31 0 0 24 0 59
+Crew Mabel_Hamington 0 0 1 20 20 5 14 7 20 20 14 0 9 5
+Crew Anthony_Hayward 1 3 2 20 20 8 2 4 2 3 3 0 3 7
+Crew Sybil_Stinger 1 2 1 20 20 8 8 7 5 2 8 0 7 7
+Crew Bob_Fisher 1 3 2 20 20 3 4 4 7 4 6 0 5 1
+Crew Alexander_Judge 1 1 0 20 20 4 6 3 10 7 3 0 9 7
+Island 0 0 5 47 1 0 4 46 2 1 1 Octopus_Island
+Island 0 0 55 7 2 0 55 6 3 2 0 Diamond_Island
+Island 0 0 16 37 0 0 16 38 1 1 1 Flamingo_Island
+Island 0 0 9 46 2 0 10 47 3 3 1 Seagrass_Island
+Island 0 0 50 4 2 0 47 4 3 2 1 Holystone_Island
+Island 0 0 15 13 0 0 16 13 1 1 1 Angels_Island
+Island 0 0 5 5 0 0 5 4 1 1 1 Robwood_Island
+Island 0 0 11 51 1 0 12 51 2 1 0 Smoking_Island
+Island 0 0 59 55 2 0 56 57 3 3 0 Turtle_Island
+Island 0 0 2 31 2 0 0 33 2 3 0 Lobster_Island
+Island 0 0 7 19 2 0 5 21 2 3 0 Snake_Island
+Island 0 0 23 14 2 0 21 15 2 3 1 Onyx_Island
+Island 0 0 23 55 2 0 24 56 3 2 0 Squid_Island
+Island 0 0 38 42 0 0 39 42 1 1 0 Ventstone_Island
+Island 0 0 44 57 0 0 44 56 1 1 0 Chanting_Island
+Island 0 0 52 27 1 0 51 26 2 2 0 Death_Island
+Island 0 0 18 50 2 0 18 53 3 3 1 Grande_Island
+Island 0 0 5 41 1 0 4 40 2 2 0 Burning_Island
+Island 0 0 58 11 2 0 58 14 2 3 0 Whale_Island
+Island 0 0 9 22 1 0 9 23 2 1 1 Shark_Island
+Island 0 0 54 42 1 0 54 44 2 2 0 Thessea_Island
+Island 0 0 11 58 0 0 10 58 1 1 1 Lagoon_Island
+Island 0 0 34 46 0 0 34 47 1 1 0 Dreadful_Island
+Island 0 0 37 22 2 0 38 22 2 3 0 Boiling_Island
+Island 0 0 4 31 0 0 5 31 1 1 1 Piranha_Island
+Island 0 0 48 38 0 0 47 38 1 1 1 Ruby_Island
+Island 0 0 40 29 1 0 39 30 2 1 1 Giants_Island
+Island 0 0 33 56 2 0 34 56 2 3 1 White_Island
+Island 0 0 43 31 0 0 43 32 1 1 0 Paradise_Island
+Island 0 0 17 6 2 0 16 9 2 3 1 Quartz_Island
+Island 0 0 31 7 1 0 30 8 1 2 0 Scarlet_Island
+Island 0 0 49 50 0 0 49 49 1 1 1 Scuba_Island
+Island 0 0 59 2 0 0 58 2 1 1 1 Coral_Island
+Island 0 0 27 46 2 0 27 49 3 3 1 Ivory_Island
+Island 0 0 22 0 1 0 22 2 1 2 0 Topaz_Island
+Island 0 0 5 54 1 0 4 54 1 2 1 Haunter_Island
+Island 0 0 1 47 0 0 1 46 1 1 1 Chirood_Island
+Island 0 0 1 59 1 0 1 58 1 2 1 Crystal_Island
+Island 0 0 24 10 0 0 24 9 1 1 0 Sapphire_Island
+Island 0 0 49 55 2 0 50 57 2 3 0 Dolphin_Island
+Island 0 0 42 26 1 0 43 26 2 2 0 Yelling_Island
+Island 0 0 15 31 1 0 14 30 2 1 0 Learock_Island
+Island 0 0 43 13 0 0 43 12 1 1 0 Stone_Island
+Island 0 0 24 52 1 0 24 51 1 2 1 Rock_Island
+Island 0 0 17 34 0 0 16 34 1 1 0 Topaz_Island
+Island 0 0 58 34 2 0 56 36 2 3 0 Scarlet_Island
+Island 0 0 26 25 2 0 27 26 3 2 0 Thessea_Island
+Island 0 0 20 7 2 0 20 10 2 3 0 Rock_Island
+Island 0 0 18 37 1 0 19 38 1 2 0 Whale_Island
+Island 0 0 24 3 0 0 25 3 1 1 1 Turtle_Island
+Island 0 0 9 37 0 0 9 38 1 1 1 Crystal_Island
+Island 0 0 30 37 1 0 28 37 2 2 1 White_Island
+Island 0 0 46 44 2 0 45 43 2 3 0 Ventstone_Island
+Island 0 0 35 37 2 0 34 40 2 3 0 Robwood_Island
+Island 0 0 18 23 1 0 19 23 2 1 0 Paradise_Island
+Island 0 0 2 10 2 0 2 9 3 2 0 Piranha_Island
+Ship 32 46 0 1 The_Victorious
+Ship 22 4 0 1 The_Halifax
+Ship 9 46 0 1 Esmeralda
+Ship 11 57 0 1 Hydra
+Ship 41 11 0 1 Piranha
+Ship 42 49 1 1 The_Eclipse
+Ship 36 9 1 1 Medusa
+Ship 20 54 1 1 Margaret
+Ship 51 50 1 1 Bathgate
+Ship 32 32 1 1 The_Andromeda
+Ship 41 21 1 1 Prosperity
+Ship 17 55 1 1 Alouette
+Ship 25 30 1 1 Newbark
+Ship 33 18 1 1 Vulcan
+Ship 17 6 1 1 Ghost
+Ship 51 44 1 1 Aurora
+Ship 58 39 1 1 Zephyr
+Ship 11 30 1 1 The_Auriga
+Ship 47 58 1 1 Faithful
+Ship 2 23 1 1 Modeste
+Ship 42 26 1 1 Longbow
+Ship 51 29 1 1 Discovery
+Ship 50 35 1 1 Sea_Turtle
+Ship 41 7 1 1 Rose_des_Vents
+Ship 28 16 1 1 Albatros
+Ship 18 23 1 1 El_Capitan
+Ship 25 44 1 1 Capilano
+Ship 18 34 1 1 Gryhound
+Ship 16 23 1 1 Newbark
+Ship 47 30 1 1 Alouette
+Ship 12 40 1 1 Medusa
+Ship 58 52 1 1 The_Eclipse
+Ship 24 15 1 1 Albatros
+Ship 10 29 1 1 Longbow
+Ship 44 37 1 2 Faithful
+Ship 3 29 1 2 El_Capitan
+Ship 0 55 1 2 The_Auriga
+Ship 4 51 1 2 Bathgate
+Ship 8 20 1 2 Discovery
+Ship 29 33 1 2 Rose_des_Vents
+Ship 2 10 1 2 Aurora
+Ship 23 59 1 2 Capilano
+Ship 3 58 1 2 Sea_Turtle
+Ship 50 36 1 2 The_Andromeda
+Ship 48 15 1 2 Gryhound
+Ship 31 36 1 2 Margaret
+Ship 5 27 1 2 Vulcan
+Ship 18 6 1 2 Zephyr
+Ship 46 4 1 2 Ghost
+Ship 41 58 1 2 Modeste
+Ship 57 0 1 2 Prosperity
+Ship 37 50 1 2 Alouette
+Ship 54 32 1 2 Margaret
+Ship 14 33 1 2 Gryhound
+Ship 39 3 1 2 Albatros
+Ship 49 0 1 2 Longbow
+Ship 17 44 1 2 Modeste
+Ship 58 8 1 2 El_Capitan
+Ship 31 26 1 2 Faithful
+Ship 36 22 1 2 Capilano
+Ship 48 19 1 2 The_Auriga
+Ship 9 22 1 2 The_Andromeda
+Ship 21 42 1 2 Sea_Turtle
+Ship 8 33 1 2 Newbark
+Wreck 0 27 0 0 42 0 124
+Wreck 0 20 0 0 0 0 69
+Wreck 0 7 0 0 45 0 54
+Wreck 0 38 0 0 11 0 89
+Wreck 0 18 0 0 2 0 134
+Wreck 0 14 0 0 13 0 113
+Wreck 0 55 0 0 32 0 115
+Wreck 0 28 0 0 9 0 188
+Wreck 0 8 0 0 32 0 107
+Wreck 0 28 0 0 17 0 147
+SeaMonster 0 40 0 0 17 0 153
+SeaMonster 0 44 0 0 29 0 44
+SeaMonster 0 3 0 0 40 0 56
+SeaMonster 0 6 0 0 46 0 60
+SeaMonster 0 12 0 0 37 0 164
+SeaMonster 0 8 0 0 36 0 64
+SeaMonster 0 19 0 0 46 0 40
+SeaMonster 0 47 0 0 20 0 166
+SeaMonster 0 37 0 0 44 0 92
+SeaMonster 0 24 0 0 39 0 107
+Fish 0 23 0 0 20 0 60
+Fish 0 29 0 0 35 0 48
+Fish 0 59 0 0 50 0 92
+Fish 0 23 0 0 1 0 31
+Fish 0 30 0 0 19 0 74
+Fish 0 18 0 0 43 0 92
+Fish 0 26 0 0 15 0 5
+Fish 0 21 0 0 2 0 20
+Fish 0 33 0 0 14 0 46
+Fish 0 25 0 0 18 0 99
+Fish 0 38 0 0 50 0 14
+Fish 0 37 0 0 26 0 47
+Fish 0 51 0 0 11 0 17
+Fish 0 31 0 0 17 0 42
+Fish 0 12 0 0 35 0 9
+Fish 0 41 0 0 36 0 40
+Fish 0 53 0 0 35 0 65
+Fish 0 41 0 0 35 0 21
+Fish 0 52 0 0 32 0 76
+Fish 0 32 0 0 48 0 98
+Fish 0 51 0 0 2 0 89
+Fish 0 52 0 0 41 0 55
+Fish 0 13 0 0 3 0 12
+Fish 0 33 0 0 41 0 38
+Fish 0 45 0 0 55 0 75
+Fish 0 2 0 0 19 0 99
+Fish 0 37 0 0 56 0 83
+Fish 0 13 0 0 27 0 6
+Fish 0 54 0 0 55 0 71
+Fish 0 28 0 0 31 0 66
+Fish 0 55 0 0 10 0 36
+Fish 0 8 0 0 30 0 82
+Fish 0 40 0 0 20 0 74
+Fish 0 11 0 0 1 0 54
+Fish 0 16 0 0 39 0 33
+Fish 0 52 0 0 48 0 13
+Fish 0 3 0 0 53 0 66
+Fish 0 10 0 0 49 0 43
+Fish 0 51 0 0 45 0 36
+Fish 0 50 0 0 50 0 48
+Fish 0 50 0 0 2 0 23
+Fish 0 37 0 0 30 0 17
+Fish 0 28 0 0 39 0 45
+Fish 0 19 0 0 56 0 100
+Fish 0 16 0 0 10 0 12
+Fish 0 33 0 0 31 0 52
+Fish 0 2 0 0 12 0 85
+Fish 0 36 0 0 25 0 59
+Fish 0 43 0 0 53 0 10
+Fish 0 31 0 0 2 0 22
+Fish 0 20 0 0 29 0 93
+Fish 0 38 0 0 54 0 29
+Fish 0 35 0 0 46 0 60
+Fish 0 16 0 0 51 0 56
+Fish 0 6 0 0 49 0 46
+Fish 0 21 0 0 59 0 34
+Fish 0 41 0 0 19 0 42
+Fish 0 31 0 0 39 0 24
+Fish 0 26 0 0 11 0 35
+Fish 0 42 0 0 50 0 58
+Fish 0 8 0 0 35 0 27
+Fish 0 59 0 0 42 0 93
+Fish 0 8 0 0 27 0 30
+Fish 0 1 0 0 19 0 24
+Fish 0 13 0 0 32 0 39
+Fish 0 54 0 0 34 0 12
+Fish 0 14 0 0 49 0 84
+Fish 0 31 0 0 21 0 42
+Fish 0 53 0 0 44 0 53
+Fish 0 8 0 0 58 0 38
+Fish 0 24 0 0 58 0 59
+Fish 0 53 0 0 16 0 38
+Fish 0 37 0 0 11 0 40
+Fish 0 13 0 0 21 0 98
+Fish 0 10 0 0 19 0 6
+Fish 0 41 0 0 51 0 40
+Fish 0 10 0 0 37 0 32
+Fish 0 46 0 0 35 0 95
+Fish 0 44 0 0 33 0 84
+Fish 0 0 0 0 54 0 68
+Fish 0 43 0 0 57 0 47
+Fish 0 11 0 0 18 0 77
+Fish 0 52 0 0 1 0 61
+Fish 0 31 0 0 29 0 27
+Fish 0 48 0 0 35 0 46
+Fish 0 52 0 0 18 0 88
+Fish 0 0 0 0 26 0 89
+Fish 0 43 0 0 7 0 16
+Fish 0 1 0 0 10 0 39
+Fish 0 32 0 0 0 0 19
+Fish 0 11 0 0 57 0 95
+Fish 0 54 0 0 53 0 42
+Fish 0 6 0 0 43 0 28
+Fish 0 7 0 0 11 0 74
+Fish 0 48 0 0 52 0 75
+Fish 0 24 0 0 0 0 74
+Fish 0 36 0 0 41 0 38
+Fish 0 46 0 0 31 0 20
+Fish 0 17 0 0 12 0 22
+Fish 0 58 0 0 17 0 100
+Fish 0 42 0 0 51 0 58
+Fish 0 3 0 0 49 0 21
+Fish 0 46 0 0 18 0 72
+Fish 0 42 0 0 42 0 88
+Fish 0 4 0 0 59 0 48
+Fish 0 7 0 0 32 0 10
+Fish 0 3 0 0 47 0 86
+Fish 0 55 0 0 29 0 26
+Fish 0 50 0 0 42 0 7
+Fish 0 23 0 0 10 0 55
+Fish 0 15 0 0 12 0 29
+Fish 0 47 0 0 42 0 39
+Fish 0 43 0 0 8 0 47
+Fish 0 30 0 0 11 0 77
+Fish 0 29 0 0 2 0 35
+Fish 0 39 0 0 8 0 46
+Fish 0 32 0 0 21 0 89
+Fish 0 0 0 0 59 0 67
+Fish 0 29 0 0 51 0 43
+Fish 0 37 0 0 20 0 67
+Fish 0 3 0 0 42 0 6
+Fish 0 13 0 0 35 0 15
+Fish 0 37 0 0 9 0 50
+Fish 0 45 0 0 4 0 14
+Fish 0 34 0 0 15 0 91
+Fish 0 27 0 0 0 0 38
+Fish 0 2 0 0 24 0 25
+Fish 0 10 0 0 36 0 76
+Fish 0 6 0 0 22 0 16
+Fish 0 12 0 0 43 0 52
+Fish 0 18 0 0 36 0 21
+Fish 0 26 0 0 13 0 39
+Fish 0 21 0 0 27 0 63
+Fish 0 41 0 0 23 0 55
+Fish 0 9 0 0 57 0 84
+Fish 0 57 0 0 59 0 21
+Fish 0 36 0 0 48 0 11
+Fish 0 42 0 0 36 0 97
+Fish 0 49 0 0 22 0 50
+Fish 0 27 0 0 1 0 15
+Fish 0 17 0 0 1 0 8
+Fish 0 45 0 0 46 0 49
+Fish 0 44 0 0 4 0 87
+Fish 0 31 0 0 14 0 71
+Fish 0 58 0 0 0 0 63
+Fish 0 17 0 0 45 0 8
+Fish 0 48 0 0 26 0 84
+Fish 0 48 0 0 15 0 15
+Fish 0 29 0 0 59 0 35
+Fish 0 22 0 0 27 0 16
+Fish 0 50 0 0 33 0 33
+Fish 0 13 0 0 13 0 53
+Fish 0 56 0 0 9 0 63
+Fish 0 53 0 0 8 0 26
+Fish 0 6 0 0 26 0 43
+Fish 0 32 0 0 31 0 33
+Fish 0 30 0 0 47 0 66
+Fish 0 23 0 0 46 0 46
+Fish 0 40 0 0 1 0 52
+Fish 0 55 0 0 59 0 58
+Fish 0 5 0 0 34 0 68
+Fish 0 6 0 0 52 0 63
+Fish 0 28 0 0 27 0 14
+Fish 0 45 0 0 57 0 20
+Fish 0 9 0 0 50 0 58
+Fish 0 0 0 0 55 0 5
+Fish 0 48 0 0 17 0 86
+Fish 0 32 0 0 33 0 38
+Fish 0 39 0 0 26 0 54
+Fish 0 26 0 0 14 0 63
+Fish 0 57 0 0 8 0 34
+Fish 0 28 0 0 6 0 95
+Fish 0 51 0 0 20 0 33
+Fish 0 33 0 0 59 0 33
+Fish 0 23 0 0 53 0 44
+Fish 0 37 0 0 21 0 61
+Fish 0 44 0 0 24 0 44
+Fish 0 7 0 0 48 0 22
+Fish 0 14 0 0 29 0 52
+Fish 0 16 0 0 42 0 73
+Fish 0 19 0 0 45 0 32
+Fish 0 5 0 0 12 0 6
+Fish 0 32 0 0 30 0 15
+Fish 0 2 0 0 21 0 60
+Fish 0 15 0 0 0 0 51
+Fish 0 13 0 0 10 0 58
+Fish 0 51 0 0 10 0 52
+Fish 0 41 0 0 40 0 85
+Fish 0 5 0 0 38 0 76
+Fish 0 21 0 0 6 0 89
+Fish 0 40 0 0 16 0 26
+Fish 0 56 0 0 19 0 62
+Fish 0 30 0 0 12 0 81
+Fish 0 5 0 0 10 0 34
+Fish 0 22 0 0 54 0 37
+Fish 0 50 0 0 52 0 94
+Fish 0 43 0 0 37 0 6
+Fish 0 21 0 0 38 0 25
+Fish 0 12 0 0 3 0 9
+Fish 0 37 0 0 51 0 18
+Fish 0 45 0 0 44 0 10
+Fish 0 18 0 0 3 0 60
+Fish 0 57 0 0 21 0 62
+Fish 0 14 0 0 0 0 29
+Fish 0 58 0 0 8 0 17
+Fish 0 51 0 0 18 0 22
+Fish 0 4 0 0 22 0 73
+Fish 0 7 0 0 6 0 68
+Fish 0 48 0 0 46 0 62
+Fish 0 36 0 0 50 0 29
+Fish 0 28 0 0 19 0 10
+Fish 0 35 0 0 23 0 32
+Fish 0 44 0 0 42 0 27
+Fish 0 13 0 0 14 0 10
+Fish 0 52 0 0 55 0 58
+Fish 0 33 0 0 21 0 84
+Fish 0 40 0 0 24 0 38
+Fish 0 58 0 0 50 0 13
+Fish 0 33 0 0 11 0 73
+Fish 0 18 0 0 4 0 57
+Fish 0 38 0 0 31 0 6
+Fish 0 52 0 0 57 0 52
+Fish 0 0 0 0 56 0 69
+Fish 0 23 0 0 31 0 8
+Fish 0 8 0 0 26 0 78
+Fish 0 54 0 0 29 0 98
+Fish 0 45 0 0 33 0 76
+Fish 0 54 0 0 22 0 22
+Fish 0 12 0 0 29 0 71
+Fish 0 21 0 0 16 0 77
+Fish 0 5 0 0 58 0 43
+Fish 0 35 0 0 16 0 77
+Fish 0 6 0 0 47 0 98
+Fish 0 9 0 0 15 0 49
+Fish 0 7 0 0 29 0 94
+Fish 0 20 0 0 39 0 45
+Fish 0 17 0 0 40 0 16
+Fish 0 44 0 0 51 0 41
+Fish 0 33 0 0 24 0 75
+Fish 0 31 0 0 57 0 38
+Fish 0 10 0 0 0 0 23
+Fish 0 9 0 0 6 0 64
+Fish 0 31 0 0 59 0 53
+Fish 0 0 0 0 23 0 64
+Fish 0 38 0 0 18 0 57
+Fish 0 36 0 0 33 0 80
+Fish 0 59 0 0 43 0 25
+Fish 0 58 0 0 31 0 88
+Fish 0 48 0 0 33 0 90
+Fish 0 37 0 0 31 0 65

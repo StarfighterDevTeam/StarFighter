@@ -3,6 +3,7 @@
 
 #include "Game.h"
 #include "GameEntity.h"
+#include "Reward.h"
 
 #define CHOICE_PANEL_SIZE_X			600
 #define CHOICE_PANEL_SIZE_Y			150
@@ -55,33 +56,7 @@ enum ChoicesData
 	NB_CHOICE_DATA,
 };
 
-enum RewardData
-{
-	Reward_ID,
-	Reward_Gold,
-	Reward_Fish,
-	Reward_Mech,
-	Reward_Days,
-	Reward_Fidelity,
-	Reward_Crew,
-	Reward_SecretWreck,
-	Reward_Combat,
-	Reward_Text,
-	NB_REWARD_DATA,
-};
-
 #define NB_CHOICE_REWARDS_MAX				((NB_CHOICE_DATA - Choice_Reward1) / 2)
-
-struct Reward
-{
-public:
-	Reward();
-	~Reward();
-	vector<pair<ResourceType, int> > m_resources;
-	string m_string;
-	DMS_Coord* m_DMS_location;
-	Ship* m_combat_ship;
-};
 
 struct Choice
 {

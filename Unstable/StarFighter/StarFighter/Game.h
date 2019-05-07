@@ -128,6 +128,14 @@ enum CrewMemberType
 	Crew_All,
 };
 
+enum CommodityType
+{
+	Commodity_Skull,
+	Commodity_Gem,
+	Commodity_Amulet,
+	NB_COMMODITY_TYPES,
+};
+
 enum Input_Status
 {
 	Input_Tap,
@@ -251,17 +259,20 @@ public:
 	string m_dico_room_types[NB_ROOM_TYPES];
 	vector<string> m_dico_crew_names[2];
 	vector<string> m_dico_crew_names_used[2];
+	vector<string> m_dico_crew_surnames;
+	vector<string> m_dico_crew_surnames_used;
 	vector<string> m_dico_islands_names;
 	vector<string> m_dico_islands_names_used;
-	vector<string> m_dico_ships_names;
-	vector<string> m_dico_ships_names_used;
+	vector<string> m_dico_ships_names[NB_SHIP_TYPES];
+	vector<string> m_dico_ships_names_used [NB_SHIP_TYPES];
 	string m_dico_crew_types[NB_CREW_TYPES];
 	string m_dico_crew_skills[NB_CREW_SKILLS];
 	string m_dico_crew_races[NB_CREW_RACES];
 	string m_dico_resources_textures[NB_RESOURCES_TYPES_TOTAL];
 	string GetRandomCrewMemberName(int gender);
+	string GetRandomCrewMemberSurname();
 	string GetRandomIslandName();
-	string GetRandomShipName();
+	string GetRandomShipName(ShipType type);
 	sf::Color m_dico_colors[NB_COLOR_CHART];
 
 private:

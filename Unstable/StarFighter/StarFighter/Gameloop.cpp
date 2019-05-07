@@ -939,7 +939,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//MENUS
 	//Open a new contextual menu?
-	if (m_warship->m_can_open_new_menu == true && m_warship->m_speed == sf::Vector2f(0, 0))
+	if (m_warship->m_can_open_new_menu == true && m_warship->m_has_played == false)
 	{
 		Location* location = m_warship->m_tile->m_location;
 		Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
@@ -1679,7 +1679,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 		{
 			for (vector<CrewMember*>::iterator it = warship->m_crew[j].begin(); it != warship->m_crew[j].end(); it++)
 			{
-				data << "Crew " << (*it)->m_display_name << " " << (*it)->m_type << " " << (*it)->m_skin << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
+				data << "Crew " << StringReplace((*it)->m_display_name, " ", "_") << " " << (*it)->m_type << " " << (*it)->m_skin << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
 				for (int i = 0; i < NB_CREW_SKILLS; i++)
 				{
 					data << " " << (*it)->m_skills[i];
@@ -1807,7 +1807,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				
 				crew->m_skin = skin;
 				crew->setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * crew->m_skin));
-				crew->m_display_name = name;
+				crew->m_display_name = StringReplace(name, "_", " ");
 				crew->m_health_max = health_max;
 				crew->m_health = health;
 				for (int i = 0; i < NB_CREW_SKILLS; i++)

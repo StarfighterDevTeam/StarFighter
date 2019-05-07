@@ -11,8 +11,11 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	m_seaport = NULL;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
 	m_lifeboats = 0;
-	m_display_name = (*CurrentGame).GetRandomShipName();
-
+	if (type < NB_SHIP_TYPES)
+	{
+		m_display_name = (*CurrentGame).GetRandomShipName(type);
+	}
+	
 	m_rooms_min_upcorner_x = 0;
 	m_rooms_min_upcorner_y = 0;
 	m_rooms_max_offset_x = 0;

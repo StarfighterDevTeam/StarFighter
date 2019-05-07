@@ -17,7 +17,6 @@ public:
 		std::string line;
 		while(std::getline(data,line))
 		{
-
 			std::stringstream  lineStream(line);
 			std::string        cell;
 

@@ -92,6 +92,7 @@
     <ClCompile Include="Choice.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CombatInterface.cpp" />
+    <ClCompile Include="Commodity.cpp" />
     <ClCompile Include="Compass.cpp" />
     <ClCompile Include="ContextualOrder.cpp" />
     <ClCompile Include="CrewInterface.cpp" />
@@ -109,6 +110,7 @@
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="PrisonersChoiceInterface.cpp" />
     <ClCompile Include="ResourcesInterface.cpp" />
+    <ClCompile Include="Reward.cpp" />
     <ClCompile Include="RewardInterface.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomConnexion.cpp" />
@@ -133,6 +135,7 @@
     <ClInclude Include="Choice.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="CombatInterface.h" />
+    <ClInclude Include="Commodity.h" />
     <ClInclude Include="Compass.h" />
     <ClInclude Include="ContextualOrder.h" />
     <ClInclude Include="CrewInterface.h" />
@@ -153,6 +156,7 @@
     <ClInclude Include="PrisonersChoiceInterface.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourcesInterface.h" />
+    <ClInclude Include="Reward.h" />
     <ClInclude Include="RewardInterface.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomConnexion.h" />

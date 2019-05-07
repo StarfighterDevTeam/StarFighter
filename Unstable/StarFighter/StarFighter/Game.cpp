@@ -99,54 +99,44 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_races[Race_Fishman] = "Fishman";
 	m_dico_crew_races[Race_Mecha] = "Mechanoid";
 
-	m_dico_crew_names[0].push_back("Joe");
-	m_dico_crew_names[0].push_back("John");
-	m_dico_crew_names[0].push_back("Bill");
-	m_dico_crew_names[0].push_back("Daniel");
-	m_dico_crew_names[0].push_back("Thomas");
-	m_dico_crew_names[0].push_back("Roger");
-	m_dico_crew_names[0].push_back("Robert");
-	m_dico_crew_names[0].push_back("Bob");
-	m_dico_crew_names[0].push_back("Peter");
-	m_dico_crew_names[0].push_back("Jamie");
+	
 
-	m_dico_crew_names[1].push_back("Leandra");
-	m_dico_crew_names[1].push_back("Serena");
-	m_dico_crew_names[1].push_back("Lucy");
-	m_dico_crew_names[1].push_back("Angela");
-	m_dico_crew_names[1].push_back("Maria");
-	m_dico_crew_names[1].push_back("Anna");
-	m_dico_crew_names[1].push_back("Sophie");
-	m_dico_crew_names[1].push_back("Jane");
-	m_dico_crew_names[1].push_back("Zoe");
+	//load pirate names
+	vector<vector<string> > names_male = *(FileLoaderUtils::FileLoader(PIRATE_NAMES_MALE_CSV));
+	for (vector<vector< string> >::iterator it = names_male.begin(); it != names_male.end(); it++)
+	{
+		m_dico_crew_names[0].push_back((*it).front());
+	}
 
-	m_dico_islands_names.push_back("Turtle Island");
-	m_dico_islands_names.push_back("Dolphin Island");
-	m_dico_islands_names.push_back("Shark Island");
-	m_dico_islands_names.push_back("Snake Island");
-	m_dico_islands_names.push_back("Sapphire Island");
-	m_dico_islands_names.push_back("Emerald Island");
-	m_dico_islands_names.push_back("Quartz Island");
-	m_dico_islands_names.push_back("Onyx Island");
-	m_dico_islands_names.push_back("Ruby Island");
-	m_dico_islands_names.push_back("Diamond Island");
-	m_dico_islands_names.push_back("Topaz Island");
-	m_dico_islands_names.push_back("Stone Island");
-	m_dico_islands_names.push_back("Rock Island");
-	m_dico_islands_names.push_back("Death Island");
-	m_dico_islands_names.push_back("White Island");
-	m_dico_islands_names.push_back("Giants Island");
-	m_dico_islands_names.push_back("Lagoon Island");
-	m_dico_islands_names.push_back("Angels Island");
-	m_dico_islands_names.push_back("Paradise Island");
+	vector<vector<string> > names_female = *(FileLoaderUtils::FileLoader(PIRATE_NAMES_FEMALE_CSV));
+	for (vector<vector< string> >::iterator it = names_female.begin(); it != names_female.end(); it++)
+	{
+		m_dico_crew_names[1].push_back((*it).front());
+	}
 
-	m_dico_ships_names.push_back("Hispanola");
-	m_dico_ships_names.push_back("Esmeralda");
-	m_dico_ships_names.push_back("Genova");
-	m_dico_ships_names.push_back("Ghost");
-	m_dico_ships_names.push_back("Le Redoutable");
-	m_dico_ships_names.push_back("Calliope");
-	m_dico_ships_names.push_back("Medusa");
+	vector<vector<string> > surnames = *(FileLoaderUtils::FileLoader(PIRATE_SURNAMES_CSV));
+	for (vector<vector< string> >::iterator it = surnames.begin(); it != surnames.end(); it++)
+	{
+		m_dico_crew_surnames.push_back((*it).front());
+	}
+
+	vector<vector<string> > island_names = *(FileLoaderUtils::FileLoader(ISLAND_NAMES_CSV));
+	for (vector<vector< string> >::iterator it = island_names.begin(); it != island_names.end(); it++)
+	{
+		m_dico_islands_names.push_back((*it).front() + " Island");
+	}
+
+	vector<vector<string> > ship_names_first_class = *(FileLoaderUtils::FileLoader(SHIP_NAMES_FIRSTCLASS_CSV));
+	for (vector<vector< string> >::iterator it = ship_names_first_class.begin(); it != ship_names_first_class.end(); it++)
+	{
+		m_dico_ships_names[Ship_FirstClass].push_back(StringReplace((*it).front(), "_", " "));
+	}
+
+	vector<vector<string> > ship_names_second_class = *(FileLoaderUtils::FileLoader(SHIP_NAMES_SECONDCLASS_CSV));
+	for (vector<vector< string> >::iterator it = ship_names_second_class.begin(); it != ship_names_second_class.end(); it++)
+	{
+		m_dico_ships_names[Ship_SecondClass].push_back(StringReplace((*it).front(), "_", " "));
+	}
 
 	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
 	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";
@@ -205,6 +195,29 @@ string Game::GetRandomCrewMemberName(int gender)
 	return name;
 }
 
+string Game::GetRandomCrewMemberSurname()
+{
+	//get a name at random in the list
+	int r = RandomizeIntBetweenValues(0, m_dico_crew_surnames.size() - 1);
+	string name = m_dico_crew_surnames[r];
+
+	//remove from the list and keep it stored in the "used" list
+	m_dico_crew_surnames_used.push_back(m_dico_crew_surnames[r]);
+	m_dico_crew_surnames.erase(m_dico_crew_surnames.begin() + r);
+
+	//all names are alreay used? recycle the list
+	if (m_dico_crew_surnames.empty() == true)
+	{
+		for (vector<string>::iterator it = m_dico_crew_surnames_used.begin(); it != m_dico_crew_surnames_used.end(); it++)
+		{
+			m_dico_crew_surnames.push_back(*it);
+		}
+		m_dico_crew_surnames.clear();
+	}
+
+	return name;
+}
+
 string Game::GetRandomIslandName()
 {
 	//get a name at random in the list
@@ -228,24 +241,24 @@ string Game::GetRandomIslandName()
 	return name;
 }
 
-string Game::GetRandomShipName()
+string Game::GetRandomShipName(ShipType type)
 {
 	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, m_dico_ships_names.size() - 1);
-	string name = m_dico_ships_names[r];
+	int r = RandomizeIntBetweenValues(0, m_dico_ships_names[type].size() - 1);
+	string name = m_dico_ships_names[type][r];
 
 	//remove from the list and keep it stored in the "used" list
-	m_dico_ships_names_used.push_back(m_dico_ships_names[r]);
-	m_dico_ships_names.erase(m_dico_ships_names.begin() + r);
+	m_dico_ships_names_used[type].push_back(m_dico_ships_names[type][r]);
+	m_dico_ships_names[type].erase(m_dico_ships_names[type].begin() + r);
 
 	//all names are alreay used? recycle the list
-	if (m_dico_ships_names.empty() == true)
+	if (m_dico_ships_names[type].empty() == true)
 	{
-		for (vector<string>::iterator it = m_dico_ships_names_used.begin(); it != m_dico_ships_names_used.end(); it++)
+		for (vector<string>::iterator it = m_dico_ships_names_used[type].begin(); it != m_dico_ships_names_used[type].end(); it++)
 		{
-			m_dico_ships_names.push_back(*it);
+			m_dico_ships_names[type].push_back(*it);
 		}
-		m_dico_ships_names_used.clear();
+		m_dico_ships_names_used[type].clear();
 	}
 
 	return name;

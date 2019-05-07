@@ -78,7 +78,7 @@ void CrewInterface::Init(CrewMember* crew)
 	//name
 	float offset_y = 4.f;
 	m_display_name.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_display_name.setCharacterSize(18);
+	m_display_name.setCharacterSize(14);
 	m_display_name.setStyle(sf::Text::Bold);
 	m_display_name.setColor(sf::Color::Black);
 	m_display_name.setString(m_crew->m_display_name);
