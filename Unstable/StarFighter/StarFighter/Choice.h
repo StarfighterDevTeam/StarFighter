@@ -38,8 +38,10 @@ enum ChoicesData
 	Choice_CostMech,
 	Choice_CostFidelity,
 	Choice_CostDays,
+	Choice_CostCommodity,
 	Choice_Skill,
 	Choice_ValueMax,
+	Choice_CommodityRequired,
 	Choice_Reward1,
 	Choice_Reward1_Proba,
 	Choice_Reward2,
@@ -86,6 +88,8 @@ public:
 	int m_skill;
 	int m_cost[NB_RESOURCES_TYPES];
 	int m_ID;
+	CommodityType m_cost_commodity;
+	CommodityType m_commodity_required;
 
 	vector<GameEntity*> m_costs_displayed;
 	pair<int, int> m_rewardsID[NB_CHOICE_REWARDS_MAX];

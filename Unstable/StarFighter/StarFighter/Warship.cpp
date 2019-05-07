@@ -163,7 +163,10 @@ void Warship::Init()
 
 Warship::~Warship()
 {
-	printf("warship\n");
+	for (vector<Commodity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
@@ -313,6 +316,47 @@ void Warship::UpdateUpkeepCosts()
 			{
 				m_upkeep_costs[i] += (*it)->m_upkeep_cost[i];
 			}
+		}
+	}
+}
+
+bool Warship::HasCommodity(CommodityType commodity)
+{
+	if (commodity == Commodity_None)
+	{
+		return true;
+	}
+
+	for (vector<Commodity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	{
+		if ((*it)->m_type == commodity)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void Warship::PayCommodity(CommodityType commodity)
+{
+	vector<Commodity*> old_holds;
+	for (vector<Commodity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	{
+		old_holds.push_back(*it);
+	}
+	m_holds.clear();
+
+	bool paid = false;
+	for (vector<Commodity*>::iterator it = old_holds.begin(); it != old_holds.end(); it++)
+	{
+		if (paid == true || (*it)->m_type != commodity)
+		{
+			m_holds.push_back(*it);
+		}
+		else
+		{
+			paid = true; 
 		}
 	}
 }

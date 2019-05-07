@@ -28,10 +28,11 @@ enum CommodityRarity
 struct Commodity
 {
 public:
-	Commodity(CommodityType type, int quantity = 1);
+	Commodity(CommodityType type);
 	~Commodity();
+
+	Commodity* Clone();
 	
-	int m_quantity;
 	CommodityType m_type;
 	CommodityRarity m_rarity;
 	int m_value;

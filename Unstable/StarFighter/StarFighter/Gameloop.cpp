@@ -938,19 +938,28 @@ void Gameloop::Update(sf::Time deltaTime)
 	m_resources_interface.Update();
 
 	//MENUS
+	Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
 	//Open a new contextual menu?
 	if (m_warship->m_can_open_new_menu == true && m_warship->m_has_played == false)
 	{
 		Location* location = m_warship->m_tile->m_location;
-		Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
-		
 		//Arriving on a special location?
-		if (ship_in_combat_range != NULL 
-			|| (location != NULL && (location->m_type == Location_Seaport || location->m_visited_countdown == 0) && m_warship->m_sonar >= location->m_depth))
+		if (location != NULL && location->m_type == Location_Seaport)
 		{
-			//unboarding?
 			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, ship_in_combat_range);
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
+			m_warship->m_can_open_new_menu = false;
+		}
+		else if (ship_in_combat_range != NULL)
+		{
+			m_menu = Menu_CrewUnboard;
+			m_warship->m_crew_unboard_interface.Init(m_warship, NULL, ship_in_combat_range);
+			m_warship->m_can_open_new_menu = false;
+		}
+		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->m_sonar >= location->m_depth)
+		{
+			m_menu = Menu_CrewUnboard;
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
 			m_warship->m_can_open_new_menu = false;
 		}
 	}
@@ -1023,6 +1032,11 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					SpendDays(choice->m_cost[j], true);
 				}
+			}
+
+			if (choice->m_cost_commodity != NULL)
+			{
+				m_warship->PayCommodity(choice->m_cost_commodity);
 			}
 
 			//get reward
@@ -1101,6 +1115,12 @@ void Gameloop::Update(sf::Time deltaTime)
 				DMS_Coord& dms = *m_warship->m_reward_interface.m_reward->m_DMS_location;
 				(*CurrentGame).m_waterzones[dms.m_degree_x][dms.m_degree_y]->m_watertiles[dms.m_minute_x][dms.m_minute_y]->m_location->m_known = true;
 				printf("");
+			}
+
+			//commodity
+			if (m_warship->m_reward_interface.m_reward->m_commodity != NULL)
+			{
+				m_warship->m_holds.push_back(m_warship->m_reward_interface.m_reward->m_commodity->Clone());
 			}
 
 			//crew recruited
@@ -2097,6 +2117,11 @@ void Gameloop::UpdateAITargetRoom(Weapon* weapon)
 
 void Gameloop::SpendDays(int days, bool skip_time)
 {
+	if (days == 0)
+	{
+		return;
+	}
+
 	m_warship->PayUpkeepCost(days);
 
 	//refresh seaports resources
@@ -2407,6 +2432,13 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_s
 					reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
 					k++;
 				}
+			}
+
+			//commodity
+			CommodityType commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Commodity]);
+			if (commodity != Commodity_None)
+			{
+				reward->m_commodity = new Commodity(commodity);
 			}
 
 			//combat

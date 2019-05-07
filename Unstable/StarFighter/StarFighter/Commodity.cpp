@@ -2,9 +2,8 @@
 
 extern Game* CurrentGame;
 
-Commodity::Commodity(CommodityType type, int quantity)
+Commodity::Commodity(CommodityType type)
 {
-	m_quantity = quantity;
 	m_type = type;
 
 	m_rarity = Rarity_Common;
@@ -14,4 +13,13 @@ Commodity::Commodity(CommodityType type, int quantity)
 Commodity::~Commodity()
 {
 	
+}
+
+Commodity* Commodity::Clone()
+{
+	Commodity* clone = new Commodity(m_type);
+	clone->m_rarity = m_rarity;
+	clone->m_value = m_value;
+
+	return clone;
 }

@@ -2278,3 +2278,14 @@ void Ship::UpdateAITilesCanBeSeen()
 		}
 	}
 }
+
+bool Ship::HasCommodity(CommodityType commodity)
+{
+	//see override in class Warship
+	return false;
+}
+
+void Ship::PayCommodity(CommodityType commodity)
+{
+	//see override in class Warship
+}

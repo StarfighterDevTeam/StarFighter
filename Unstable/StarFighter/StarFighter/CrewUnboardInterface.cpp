@@ -51,8 +51,8 @@ void CrewUnboardInterface::Destroy()
 void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship)
 {
 	m_ship = ship;
-	m_other_ship = other_ship;
 	m_location = location;
+	m_other_ship = other_ship;
 	m_slots_avaible = ship->m_lifeboats;
 
 	//background panel
@@ -164,15 +164,23 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 		}
 	}
 
+	int k = 0;
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
+		//has a valid choice ID?
 		if (choicesID[i] < 0)
 		{
 			break;
 		}
+		else if (ship->HasCommodity((CommodityType)stoi((*CurrentGame).m_choices_config[choicesID[i] - 1][Choice_CommodityRequired])) == false)
+		{
+			//player doesn't have the required commodities in holds for this choice to appear
+			continue;
+		}
 
-		m_choices[i].Init(i, choicesID[i]);
-		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
+		m_choices[k].Init(k, choicesID[i]);
+		m_choices[k].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (k * CHOICE_PANEL_SIZE_Y)));
+		k++;
 	}
 }
 
@@ -238,7 +246,9 @@ Choice* CrewUnboardInterface::Update(sf::Time deltaTime)
 		}
 		
 		//checking conditions
-		if (m_choices[i].m_skill > 0 && m_choices[i].m_gauge_value == 0)
+		bool skill_missing = m_choices[i].m_skill > 0 && m_choices[i].m_gauge_value == 0;
+		bool commodity_missing = m_choices[i].m_cost_commodity != Commodity_None && m_ship->HasCommodity(m_choices[i].m_cost_commodity) == false;
+		if (skill_missing == true || commodity_missing == true)
 		{
 			m_choices[i].m_picture->setAnimationLine(1);
 			continue;

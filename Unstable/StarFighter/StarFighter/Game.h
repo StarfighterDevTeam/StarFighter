@@ -130,6 +130,7 @@ enum CrewMemberType
 
 enum CommodityType
 {
+	Commodity_None,
 	Commodity_Skull,
 	Commodity_Gem,
 	Commodity_Amulet,

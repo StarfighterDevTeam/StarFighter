@@ -31,6 +31,8 @@ void Choice::Destroy()
 	m_panel = NULL;
 	m_picture = NULL;
 	m_gauge = NULL;
+
+	m_ID = -1;
 }
 
 void Choice::Init(int index, int choiceID, string text, string portrait_filename)
@@ -38,12 +40,14 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	m_ID = choiceID;
 
 	//Init values
-	int skill = -1;
-	int value_max = 0;
+	m_skill = -1;
+	m_gauge_value_max = 0;
+	m_gauge_value = 0;
 	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 	{
 		m_cost[i] = 0;
 	}
+	m_cost_commodity = Commodity_None;
 
 	//Load from an ID?
 	if (choiceID > 0)
@@ -58,14 +62,16 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 		{
 			m_cost[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_CostGold + i]);
 		}
-		skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
-		value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
+		m_skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
+		m_gauge_value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
 
 		for (int i = 0; i < NB_CHOICE_REWARDS_MAX; i++)
 		{
 			m_rewardsID[i].first = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Reward1 + (i * 2)]);
 			m_rewardsID[i].second = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Reward1_Proba + (i * 2)]);
 		}
+
+		m_cost_commodity = (CommodityType)stoi((*CurrentGame).m_choices_config[choiceID][Choice_CostCommodity]);
 	}
 
 	//Start building interface
@@ -113,10 +119,7 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 
 	//gauge (required skill + gauge)
 	m_gauge = new GameEntity(UI_None);
-	m_gauge_value_max = value_max;
-	m_gauge_value = 0;
-	m_skill = skill;
-	if (value_max > 0)
+	if (m_gauge_value_max > 0)
 	{
 		m_gauge->m_shape_container.setSize(sf::Vector2f(CHOICE_GAUGE_SIZE_X, CHOICE_GAUGE_SIZE_Y));
 		m_gauge->m_shape_container.setOrigin(sf::Vector2f(CHOICE_GAUGE_SIZE_X * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
@@ -132,12 +135,12 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 		m_gauge->m_shape.setOutlineColor(sf::Color::Black);
 		m_gauge->m_shape.setPosition(sf::Vector2f(m_gauge->m_shape_container.getPosition().x - CHOICE_GAUGE_SIZE_X * 0.5 + m_gauge->m_shape.getSize().x * 0.5, m_gauge->m_shape_container.getPosition().y));
 	
-		if (skill >= 0 && skill < NB_CREW_SKILLS)
+		if (m_skill >= 0 && m_skill < NB_CREW_SKILLS)
 		{
 			m_gauge->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 			m_gauge->m_text.setCharacterSize(20);
 			m_gauge->m_text.setColor(sf::Color::Black);
-			m_gauge->m_text.setString((*CurrentGame).m_dico_crew_skills[skill]);
+			m_gauge->m_text.setString((*CurrentGame).m_dico_crew_skills[m_skill]);
 			m_gauge->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, m_gauge->m_shape_container.getPosition().y - CHOICE_GAUGE_SIZE_Y * 0.5 - m_gauge->m_text.getCharacterSize() - 14);
 			m_gauge_string = m_gauge->m_text.getString();
 		}
