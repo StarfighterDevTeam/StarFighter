@@ -243,8 +243,8 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Ships update
+	DMS_Coord warship_DMS = m_warship->m_DMS;
 	int shipsVectorSize = m_ships.size();
-
 	bool ship_moving = false;
 	for (int i = 0; i < shipsVectorSize; i++)
 	{
@@ -270,28 +270,15 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Strategical scale update
 		if (m_scale == Scale_Strategic)
 		{
-			if ((*CurrentGame).m_pause == false && m_menu == Menu_None)
-			{
-				ship->UpdateStrategical(deltaTime, m_warship->m_DMS);
-			}
-
 			if (ship == m_warship)
 			{
-				//Player ship UI
-				ostringstream ss;
-				ss << "\n\n\n";
-				ss << ship->m_DMS.m_degree_y << "°" << ship->m_DMS.m_minute_y << "' " << (int)ship->m_DMS.m_second_y << "\"\N";
-				ss << "\n";
-				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"\E";
-				ship->m_text.setString(ss.str());
-	
 				//Orders
 				if (ship->m_selected == true && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 				{
 					WaterTile* tile_hovered = (WaterTile*)hovered;
 
 					//Hovering a water tile that is not our current tile?
-					if (WaterTile::SameDMS(m_warship->m_DMS, tile_hovered->m_DMS) == false)
+					if (WaterTile::SameDMS(warship_DMS, tile_hovered->m_DMS) == false)
 					{
 						//Scan all enemy ships to see if we're in range for combat with anyone
 						Ship* ship_in_combat_range = NULL;
@@ -333,7 +320,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							//Sail order
 							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty && cost <= m_warship->m_moves_max)
 							{
-								if (m_warship->SetSailsToWaterTile(tile_hovered, m_warship->m_DMS) == true)
+								if (m_warship->SetSailsToWaterTile(tile_hovered, warship_DMS) == true)
 								{
 									SpendDays(cost, false);
 									m_warship->m_can_open_new_menu = true;
@@ -345,22 +332,39 @@ void Gameloop::Update(sf::Time deltaTime)
 
 				ship->GameEntity::Update(deltaTime);
 			}
-			else
+			else//AI
 			{
 				//other ships update their position and visibility respect to player ship
-				//TODO: finalize round up/down
+				//TODO: finalize round up/down for visibility
 				int x = ship->m_tile->m_DMS.m_minute_x;//+ (ship->m_speed.x < 0 && ship->m_DMS.m_second_x > 0 ? 0 : 0);
 				int y = ship->m_tile->m_DMS.m_minute_y + (ship->m_speed.y > 0 && ship->m_DMS.m_second_y > 0 ? 1 : 0);
 				ship->m_can_be_seen = ship->m_tile->m_zone->m_watertiles[x][y]->m_can_be_seen;
-				ship->UpdatePosition(m_warship->m_DMS);
+				ship->UpdatePosition(warship_DMS);
 
 				//AI strategical movement
-				if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE * 2)
+				if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE + m_warship->m_moves_max)
 				{
-					SetAIStrategicalDestination(ship);
+					SetAIStrategicalDestination(ship, warship_DMS);
 				}
 
 				ship->AnimatedSprite::update(deltaTime);
+			}
+
+			//apply orders (pathfind, speed...)
+			if ((*CurrentGame).m_pause == false && m_menu == Menu_None)
+			{
+				ship->UpdateStrategical(deltaTime, warship_DMS);
+			}
+
+			//Player ship UI
+			if (ship == m_warship)
+			{
+				ostringstream ss;
+				ss << "\n\n\n";
+				ss << ship->m_DMS.m_degree_y << "°" << ship->m_DMS.m_minute_y << "' " << (int)ship->m_DMS.m_second_y << "\"\N";
+				ss << "\n";
+				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"\E";
+				ship->m_text.setString(ss.str());
 			}
 		}
 
@@ -2429,7 +2433,7 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_s
 	}
 }
 
-void Gameloop::SetAIStrategicalDestination(Ship* ship)
+void Gameloop::SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS)
 {
 	//already has a path?
 	if (ship->m_current_path.empty() == false)
@@ -2516,6 +2520,6 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship)
 	if (ship->m_destination != NULL && m_warship->m_has_played == true)
 	{
 		ship->UpdateAITilesCanBeSeen();
-		ship->SetSailsToWaterTile(ship->m_destination, m_warship->m_DMS);
+		ship->SetSailsToWaterTile(ship->m_destination, warship_DMS);
 	}
 }

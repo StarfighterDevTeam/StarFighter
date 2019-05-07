@@ -77,7 +77,7 @@ public:
 	Reward* GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
 
 	//IA
-	void SetAIStrategicalDestination(Ship* ship);
+	void SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS);
 
 private:
 	sf::RenderWindow* mainWindow;
