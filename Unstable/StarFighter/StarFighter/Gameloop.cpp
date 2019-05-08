@@ -1085,13 +1085,9 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Update resources cooldown
-			if (m_warship->m_tile->m_location != NULL)
+			if (m_warship->m_crew_unboard_interface.m_location != NULL)
 			{
-				m_warship->m_tile->m_location->m_visited_countdown = 1;
-				if (m_warship->m_tile->m_location->m_type != Location_Seaport)
-				{
-					m_warship->m_tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Water]);
-				}
+				m_warship->m_crew_unboard_interface.m_location->m_visited_countdown = 1;
 			}
 
 			//Clean unboarding interface and crew
