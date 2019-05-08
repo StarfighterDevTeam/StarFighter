@@ -1034,7 +1034,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 
-			if (choice->m_cost_commodity != NULL)
+			if (choice->m_cost_commodity != Commodity_None)
 			{
 				m_warship->PayCommodity(choice->m_cost_commodity);
 			}
@@ -1118,9 +1118,9 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//commodity
-			if (m_warship->m_reward_interface.m_reward->m_commodity != NULL)
+			if (m_warship->m_reward_interface.m_reward->m_commodity != Commodity_None)
 			{
-				m_warship->m_holds.push_back(m_warship->m_reward_interface.m_reward->m_commodity->Clone());
+				m_warship->m_holds.push_back(new Commodity(m_warship->m_reward_interface.m_reward->m_commodity));
 			}
 
 			//crew recruited
@@ -2435,11 +2435,7 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_s
 			}
 
 			//commodity
-			CommodityType commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Commodity]);
-			if (commodity != Commodity_None)
-			{
-				reward->m_commodity = new Commodity(commodity);
-			}
+			reward->m_commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Commodity]);
 
 			//combat
 			int combat = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Combat]);

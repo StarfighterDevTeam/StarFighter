@@ -69,9 +69,9 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 	float centering_offset = size * CHOICES_REWARDS_OFFSET_X;
 	centering_offset *= 0.25f;
 
+	//secret location coordinates reveal
 	if (reward->m_DMS_location != NULL)
 	{
-		//secret location coordinates reveal
 		ostringstream ss_DMS;
 		DMS_Coord& dms = *reward->m_DMS_location;
 		ss_DMS << dms.m_degree_y << "° " << dms.m_minute_y << "' " << (int)dms.m_second_y << " \"\N";
@@ -86,9 +86,9 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 		m_text_DMS_location.setPosition(sf::Vector2f(m_panel->m_position.x - m_text_DMS_location.getGlobalBounds().width * 0.5, m_panel->m_position.y - m_text_DMS_location.getGlobalBounds().height * 0.65 + 4));
 	}
 
+	//resources
 	for (int i = 0; i < size; i++)
 	{
-		//resources
 		GameEntity* resources_displayed = new GameEntity(UI_None);
 		float pos_x = m_panel->m_position.x - centering_offset + (CHOICES_REWARDS_OFFSET_X * i);// m_panel->m_shape_container.getSize().x * 0.5 + RESOURCES_ICON_SIZE * 0.5 + REWARD_INTERFACE_OFFSET_X + (CHOICES_REWARDS_OFFSET_X * i);
 
@@ -109,6 +109,32 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 		resources_displayed->m_text.setString(ss_resource.str());
 		resources_displayed->m_text.setPosition(sf::Vector2f(resources_displayed->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, resources_displayed->m_shape.getPosition().y - resources_displayed->m_text.getCharacterSize() * 0.65));
 		
+		m_resources_displayed.push_back(resources_displayed);
+	}
+
+	//commodity
+	if (reward->m_commodity != Commodity_None)
+	{
+		GameEntity* resources_displayed = new GameEntity(UI_None);
+		float pos_x = m_panel->m_position.x - centering_offset + (CHOICES_REWARDS_OFFSET_X * m_resources_displayed.size());// m_panel->m_shape_container.getSize().x * 0.5 + RESOURCES_ICON_SIZE * 0.5 + REWARD_INTERFACE_OFFSET_X + (CHOICES_REWARDS_OFFSET_X * i);
+
+		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_commodities_config[(int)(reward->m_commodity) - 1][Commodity_Texture], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+		resources_displayed->setAnimation(texture, 1, 1);
+		resources_displayed->setPosition(sf::Vector2f(pos_x, m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5 - RESOURCES_ICON_SIZE * 0.5 - 60));
+
+		resources_displayed->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
+		resources_displayed->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
+		resources_displayed->m_shape.setFillColor(sf::Color::Black);
+		resources_displayed->m_shape.setPosition(resources_displayed->getPosition());
+
+		//ostringstream ss_resource;
+		//ss_resource << reward->m_resources[i].second;
+		//resources_displayed->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		//resources_displayed->m_text.setCharacterSize(20);
+		//resources_displayed->m_text.setColor(sf::Color::White);
+		//resources_displayed->m_text.setString(ss_resource.str());
+		//resources_displayed->m_text.setPosition(sf::Vector2f(resources_displayed->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, resources_displayed->m_shape.getPosition().y - resources_displayed->m_text.getCharacterSize() * 0.65));
+
 		m_resources_displayed.push_back(resources_displayed);
 	}
 

@@ -31,6 +31,8 @@ class SFTextPop;
 #define SFTEXTPOP_OFFSET_2			30.f
 #define SFTEXTPOP_OFFSET_2_BIS		50.f
 
+#define RESOURCES_ICON_SIZE			30
+
 enum SFX_Bank
 {
 	SFX_Laser,
@@ -251,6 +253,7 @@ public:
 
 	vector<vector<string> > m_choices_config;
 	vector<vector<string> > m_rewards_config;
+	vector<vector<string> > m_commodities_config;
 
 	//void CreateSFTextPop(const Font& font, unsigned int size, Uint32 style, const Color& color, string text_string, float distance_not_faded, float distance_faded, float total_pop_time, GameEntity* target, float offset_positionY);
 

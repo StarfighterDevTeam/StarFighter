@@ -1,0 +1,4 @@
+#commodityID,rarity,value,texture,name,description
+1,0,100,2D/icon_skull.png,Whales_skull,A_large_whales_skull.
+2,1,500,2D/icon_gem.png,Gem,A_rare_gem.
+3,2,1000,2D/icon_amulet.png,Amulet,A_mysterious_amulet.

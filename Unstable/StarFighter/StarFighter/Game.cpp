@@ -170,6 +170,7 @@ Game::Game(RenderWindow& window)
 	//load database files
 	m_choices_config = *(FileLoaderUtils::FileLoader(CHOICES_CSV_FILE));
 	m_rewards_config = *(FileLoaderUtils::FileLoader(REWARDS_CSV_FILE));
+	m_commodities_config = *(FileLoaderUtils::FileLoader(COMMODITY_CSV_FILE));
 }
 
 string Game::GetRandomCrewMemberName(int gender)

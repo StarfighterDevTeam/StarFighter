@@ -32,7 +32,7 @@ public:
 	string m_string;
 	DMS_Coord* m_DMS_location;
 	Ship* m_combat_ship;
-	Commodity* m_commodity;
+	CommodityType m_commodity;
 };
 
 #endif //REWARD_H_INCLUDED

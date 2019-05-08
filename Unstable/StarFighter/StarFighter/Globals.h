@@ -128,6 +128,7 @@ std::string StringCut(std::string str, const size_t length);
 //CSV DATA
 #define CHOICES_CSV_FILE							"Scripts/Generated/Choices.csv"
 #define REWARDS_CSV_FILE							"Scripts/Generated/Rewards.csv"
+#define COMMODITY_CSV_FILE							"Scripts/Generated/Commodity.csv"
 #define PIRATE_NAMES_MALE_CSV						"Scripts/Generated/PirateNamesMale.csv"
 #define PIRATE_NAMES_FEMALE_CSV						"Scripts/Generated/PirateNamesFemale.csv"
 #define PIRATE_SURNAMES_CSV							"Scripts/Generated/PirateSurnames.csv"

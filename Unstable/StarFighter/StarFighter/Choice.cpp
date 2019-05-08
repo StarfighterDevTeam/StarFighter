@@ -173,6 +173,30 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 			m_costs_displayed.push_back(cost_displayed);
 		}
 	}
+
+	if (m_cost_commodity != Commodity_None)
+	{
+		GameEntity* cost_displayed = new GameEntity(UI_None);
+		float pos_x = m_picture->m_text.getPosition().x + RESOURCES_ICON_SIZE * 0.5 + (m_costs_displayed.size() * CHOICES_COSTS_OFFSET_X);
+		sf::Texture* texture_cost = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_commodities_config[(int)(m_cost_commodity) - 1][Commodity_Texture], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+		cost_displayed->setAnimation(texture_cost, 1, 1);
+		cost_displayed->setPosition(sf::Vector2f(pos_x, -RESOURCES_ICON_SIZE * 0.5));
+
+		cost_displayed->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
+		cost_displayed->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
+		cost_displayed->m_shape.setFillColor(sf::Color::Black);
+		cost_displayed->m_shape.setPosition(cost_displayed->getPosition());
+
+		//ostringstream ss_resource;
+		//ss_resource << m_cost[i];
+		//cost_displayed->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		//cost_displayed->m_text.setCharacterSize(20);
+		//cost_displayed->m_text.setColor(sf::Color::Black);
+		//cost_displayed->m_text.setString(ss_resource.str());
+		//cost_displayed->m_text.setPosition(sf::Vector2f(cost_displayed->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, cost_displayed->m_shape.getPosition().y - cost_displayed->m_text.getCharacterSize() * 0.65));
+
+		m_costs_displayed.push_back(cost_displayed);
+	}
 }
 
 void Choice::SetPosition(sf::Vector2f position)
