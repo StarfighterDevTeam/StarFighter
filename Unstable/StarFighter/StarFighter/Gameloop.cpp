@@ -635,7 +635,7 @@ void Gameloop::Update(sf::Time deltaTime)
 						Ship* enemy_ship = ship == m_warship ? m_tactical_ship : m_warship;
 						if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
 						{
-							if ((*it)->m_target_room == NULL && i == 1)
+							if ((*it)->m_target_room == NULL && ship != m_warship)
 							{
 								//AI choosing a target for each weapon
 								UpdateAITargetRoom(*it);
@@ -643,7 +643,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 							if ((*it)->CanFire() == true && (*it)->m_target_room != NULL && (*CurrentGame).m_pause == false)
 							{
-								if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && i == 1)
+								if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && ship != m_warship)
 								{
 									//After firing, it's the AI, randomly reset the target at random to change target next frame
 									if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
@@ -689,7 +689,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							(*it)->m_shape_container.setOutlineThickness(-1.f);
 						}
 					}
-					else if (i == 1)
+					else if (ship != m_warship)
 					{
 						//IA fleeing (todo)
 					}
