@@ -1708,6 +1708,12 @@ int Gameloop::SavePlayerData(Warship* warship)
 			}
 		}
 
+		for (vector<Commodity*>::iterator it = warship->m_holds.begin(); it != warship->m_holds.end(); it++)
+		{
+			data << "Holds " << (*it)->m_type;
+			data << endl;
+		}
+
 		for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 		{
 			ostringstream island_name;
@@ -1835,6 +1841,12 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				crew->m_position = crew->m_tile->m_position;//sf::Vector2f(coord_x, coord_y);
 
 				warship->m_crew[(int)crew->m_is_prisoner].push_back(crew);
+			}
+			else if (t.compare("Holds") == 0)
+			{
+				int commodity_type;
+				std::istringstream(line) >> t >> commodity_type;
+				warship->m_holds.push_back(new Commodity((CommodityType)commodity_type));
 			}
 			else if (t.compare("Island") == 0)
 			{
