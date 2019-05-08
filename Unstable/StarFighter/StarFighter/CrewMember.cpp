@@ -132,7 +132,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 
 	//randomization of gender and name
 	int gender = RandomizeIntBetweenValues(0, 1);
-	m_display_name = (*CurrentGame).GetRandomCrewMemberName(gender) + " " + (*CurrentGame).GetRandomCrewMemberSurname();
+	m_display_name = (*CurrentGame).GetRandomNameFromDico((*CurrentGame).m_dico_crew_names[gender], (*CurrentGame).m_dico_crew_names_used[gender]) + " " + (*CurrentGame).GetRandomNameFromDico((*CurrentGame).m_dico_crew_surnames, (*CurrentGame).m_dico_crew_surnames_used);
 }
 
 CrewMember::~CrewMember()

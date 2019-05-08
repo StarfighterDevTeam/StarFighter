@@ -173,93 +173,24 @@ Game::Game(RenderWindow& window)
 	m_commodities_config = *(FileLoaderUtils::FileLoader(COMMODITY_CSV_FILE));
 }
 
-string Game::GetRandomCrewMemberName(int gender)
+string Game::GetRandomNameFromDico(vector<string>& dico, vector<string>& dico_used)
 {
 	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, m_dico_crew_names[gender].size() - 1);
-	string name = m_dico_crew_names[gender][r];
+	int r = RandomizeIntBetweenValues(0, dico.size() - 1);
+	string name = dico[r];
 
 	//remove from the list and keep it stored in the "used" list
-	m_dico_crew_names_used[gender].push_back(m_dico_crew_names[gender][r]);
-	m_dico_crew_names[gender].erase(m_dico_crew_names[gender].begin() + r);
+	dico_used.push_back(dico[r]);
+	dico.erase(dico.begin() + r);
 
 	//all names are alreay used? recycle the list
-	if (m_dico_crew_names[gender].empty() == true)
+	if (dico.empty() == true)
 	{
-		for (vector<string>::iterator it = m_dico_crew_names_used[gender].begin(); it != m_dico_crew_names_used[gender].end(); it++)
+		for (vector<string>::iterator it = dico_used.begin(); it != dico_used.end(); it++)
 		{
-			m_dico_crew_names[gender].push_back(*it);
+			dico.push_back(*it);
 		}
-		m_dico_crew_names_used[gender].clear();
-	}
-
-	return name;
-}
-
-string Game::GetRandomCrewMemberSurname()
-{
-	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, m_dico_crew_surnames.size() - 1);
-	string name = m_dico_crew_surnames[r];
-
-	//remove from the list and keep it stored in the "used" list
-	m_dico_crew_surnames_used.push_back(m_dico_crew_surnames[r]);
-	m_dico_crew_surnames.erase(m_dico_crew_surnames.begin() + r);
-
-	//all names are alreay used? recycle the list
-	if (m_dico_crew_surnames.empty() == true)
-	{
-		for (vector<string>::iterator it = m_dico_crew_surnames_used.begin(); it != m_dico_crew_surnames_used.end(); it++)
-		{
-			m_dico_crew_surnames.push_back(*it);
-		}
-		m_dico_crew_surnames.clear();
-	}
-
-	return name;
-}
-
-string Game::GetRandomIslandName()
-{
-	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, m_dico_islands_names.size() - 1);
-	string name = m_dico_islands_names[r];
-
-	//remove from the list and keep it stored in the "used" list
-	m_dico_islands_names_used.push_back(m_dico_islands_names[r]);
-	m_dico_islands_names.erase(m_dico_islands_names.begin() + r);
-
-	//all names are alreay used? recycle the list
-	if (m_dico_islands_names.empty() == true)
-	{
-		for (vector<string>::iterator it = m_dico_islands_names_used.begin(); it != m_dico_islands_names_used.end(); it++)
-		{
-			m_dico_islands_names.push_back(*it);
-		}
-		m_dico_islands_names_used.clear();
-	}
-
-	return name;
-}
-
-string Game::GetRandomShipName(ShipType type)
-{
-	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, m_dico_ships_names[type].size() - 1);
-	string name = m_dico_ships_names[type][r];
-
-	//remove from the list and keep it stored in the "used" list
-	m_dico_ships_names_used[type].push_back(m_dico_ships_names[type][r]);
-	m_dico_ships_names[type].erase(m_dico_ships_names[type].begin() + r);
-
-	//all names are alreay used? recycle the list
-	if (m_dico_ships_names[type].empty() == true)
-	{
-		for (vector<string>::iterator it = m_dico_ships_names_used[type].begin(); it != m_dico_ships_names_used[type].end(); it++)
-		{
-			m_dico_ships_names[type].push_back(*it);
-		}
-		m_dico_ships_names_used[type].clear();
+		dico_used.clear();
 	}
 
 	return name;

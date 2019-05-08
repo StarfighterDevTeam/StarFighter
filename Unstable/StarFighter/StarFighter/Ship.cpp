@@ -13,7 +13,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	m_lifeboats = 0;
 	if (type < NB_SHIP_TYPES)
 	{
-		m_display_name = (*CurrentGame).GetRandomShipName(type);
+		m_display_name = (*CurrentGame).GetRandomNameFromDico((*CurrentGame).m_dico_ships_names[type], (*CurrentGame).m_dico_ships_names_used[type]);
 	}
 	
 	m_rooms_min_upcorner_x = 0;

@@ -50,7 +50,7 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	m_text.setColor(sf::Color::Black);
 
 	//get a name at random in the list
-	m_display_name = (*CurrentGame).GetRandomIslandName();
+	m_display_name = (*CurrentGame).GetRandomNameFromDico((*CurrentGame).m_dico_islands_names, (*CurrentGame).m_dico_islands_names_used);
 	m_text.setString(m_display_name);
 }
 
