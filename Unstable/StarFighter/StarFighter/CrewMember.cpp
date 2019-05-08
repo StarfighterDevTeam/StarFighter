@@ -334,19 +334,19 @@ void CrewMember::UpdateAnimation()
 	{
 		if (m_tile->m_system_tile->m_coord_x > m_tile->m_coord_x)
 		{
-			setAnimationLine(AnimationDirection_Right);
+			setAnimationLine(AnimationDirection_Right + (NB_ANIMATION_DIRECTIONS * m_skin));
 		}
 		else if (m_tile->m_system_tile->m_coord_x < m_tile->m_coord_x)
 		{
-			setAnimationLine(AnimationDirection_Left);
+			setAnimationLine(AnimationDirection_Left + (NB_ANIMATION_DIRECTIONS * m_skin));
 		}
 		else if (m_tile->m_system_tile->m_coord_y > m_tile->m_coord_y)
 		{
-			setAnimationLine(AnimationDirection_Down);
+			setAnimationLine(AnimationDirection_Down + (NB_ANIMATION_DIRECTIONS * m_skin));
 		}
 		else if (m_tile->m_system_tile->m_coord_y < m_tile->m_coord_y)
 		{
-			setAnimationLine(AnimationDirection_Up);
+			setAnimationLine(AnimationDirection_Up + (NB_ANIMATION_DIRECTIONS * m_skin));
 		}
 
 		setFrame(1);
