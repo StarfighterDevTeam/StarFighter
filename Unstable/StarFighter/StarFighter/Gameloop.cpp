@@ -964,6 +964,43 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
+	//Help interface
+	if (hovered != NULL && hovered->m_UI_type == UI_Commodity)
+	{
+		Commodity* commodity = (Commodity*)hovered;
+		m_help_interface.Init(commodity->m_display_name, commodity->m_description, sf::Vector2f(commodity->m_position.x - RESOURCES_ICON_SIZE * 0.5, commodity->m_position.y + RESOURCES_ICON_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Resource)
+	{
+		Resource* resource = (Resource*)hovered;
+		
+		if (resource->m_type == Resource_Fidelity)
+		{
+			string description = "Crew fidelity is important, as low fidelity will sometimes occasion mutiny.";
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
+		}
+		else if (resource->m_type == Resource_Days)
+		{
+			string description = "Days are passing, and the Royal Navy might just be closing on you very soon.";
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
+		}
+		else
+		{
+			string description = "Your holds of resources.";
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
+		}
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_ResourceUpkeep)
+	{
+		Resource* resource = (Resource*)hovered;
+		string description = "Crew upkeep costs resources every day.\nEach day passed with the upkeep paid increase crew fidelity.\nUpkeep costs unpaid decrease crew fidelity.";
+		m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
+	}
+	else if (m_help_interface.m_panel != NULL)
+	{
+		m_help_interface.Destroy();
+	}
+
 	//Crew overboard menu
 	if (m_menu == Menu_CrewOverboard)
 	{
@@ -1385,6 +1422,12 @@ void Gameloop::Draw()
 	if (m_contextual_order->m_type != Order_None && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer <= 0)
 	{
 		m_contextual_order->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//HUD - help interface
+	if (m_help_interface.m_panel != NULL)
+	{
+		m_help_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 	
 	//PAUSE

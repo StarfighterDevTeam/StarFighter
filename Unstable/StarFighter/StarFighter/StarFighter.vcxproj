@@ -104,12 +104,14 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="HelpInterface.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Island.cpp" />
     <ClCompile Include="Gameloop.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="PrisonersChoiceInterface.cpp" />
     <ClCompile Include="ResourcesInterface.cpp" />
+    <ClCompile Include="ResourceStock.cpp" />
     <ClCompile Include="Reward.cpp" />
     <ClCompile Include="RewardInterface.cpp" />
     <ClCompile Include="Room.cpp" />
@@ -148,6 +150,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="HelpInterface.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Island.h" />
@@ -156,6 +159,7 @@
     <ClInclude Include="PrisonersChoiceInterface.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourcesInterface.h" />
+    <ClInclude Include="ResourceStock.h" />
     <ClInclude Include="Reward.h" />
     <ClInclude Include="RewardInterface.h" />
     <ClInclude Include="Room.h" />

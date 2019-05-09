@@ -14,13 +14,15 @@ struct ResourcesInterface
 	Warship* m_warship;
 
 	GameEntity* m_panel;
-	GameEntity* m_resources[NB_RESOURCES_TYPES];
+	Resource* m_resources[NB_RESOURCES_TYPES];
+	GameEntity* m_resources_container[NB_RESOURCES_TYPES];
 	sf::Text m_text_royalnavy;
 
 	GameEntity* m_save_button;
 	GameEntity* m_load_button;
 
-	GameEntity* m_upkeep[NB_UPKEEP_COSTS];
+	Resource* m_upkeep[NB_UPKEEP_COSTS];
+	GameEntity* m_upkeep_container[NB_UPKEEP_COSTS];
 	sf::Text m_text_upkeep;
 
 	sf::Text m_text_holds;

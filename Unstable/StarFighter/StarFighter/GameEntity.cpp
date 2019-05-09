@@ -24,15 +24,8 @@ void GameEntity::UpdatePosition()
 	setPosition(m_position + m_ship_offset);
 }
 
-void GameEntity::Update(Time deltaTime)
+void GameEntity::GetHoveredState()
 {
-	//update position
-	UpdatePosition();
-
-	//get inputs
-	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
-
-	//get hovered state
 	if (IsHoveredByMouse() == true)
 	{
 		if ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui != this)
@@ -47,6 +40,18 @@ void GameEntity::Update(Time deltaTime)
 	{
 		m_hovered = false;
 	}
+}
+
+void GameEntity::Update(Time deltaTime)
+{
+	//update position
+	UpdatePosition();
+
+	//get inputs
+	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
+	//get hovered state
+	GetHoveredState();
 
 	//get selected state
 	if (mouse_click == Mouse_LeftClick)

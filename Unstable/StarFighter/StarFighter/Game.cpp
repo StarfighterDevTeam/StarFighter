@@ -99,7 +99,12 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_races[Race_Fishman] = "Fishman";
 	m_dico_crew_races[Race_Mecha] = "Mechanoid";
 
-	
+	m_dico_resources_names[Resource_Gold] = "Gold";
+	m_dico_resources_names[Resource_Fish] = "Fish";
+	m_dico_resources_names[Resource_Mech] = "Mech";
+	m_dico_resources_names[Resource_Fidelity] = "Crew fidelity";
+	m_dico_resources_names[Resource_Days] = "Days";
+	m_dico_resources_names[Resource_Crew] = "Crew members";
 
 	//load pirate names
 	vector<vector<string> > names_male = *(FileLoaderUtils::FileLoader(PIRATE_NAMES_MALE_CSV));

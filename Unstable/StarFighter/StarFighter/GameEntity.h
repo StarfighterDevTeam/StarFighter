@@ -6,21 +6,23 @@
 enum UI_Type
 {
 	UI_None,
+	UI_Commodity,
+	UI_Compass,
+	UI_Connexion,
 	UI_CrewMember,
 	UI_CrewMemberUnboarding,
-	UI_Room,
-	UI_RoomTile,
-	UI_Connexion,
 	UI_EnemyShip,
-	UI_Warship,
-	UI_WaterTile,
+	UI_Engine,
 	UI_Island,
 	UI_Location,
-	UI_Compass,
-	UI_Weapon,
-	UI_Engine,
+	UI_Resource,
+	UI_ResourceUpkeep,
+	UI_Room,
+	UI_RoomTile,
 	UI_Rudder,
-	UI_Commodity,
+	UI_Warship,
+	UI_WaterTile,
+	UI_Weapon,
 };
 
 enum ShipAlliance
@@ -52,6 +54,7 @@ public:
 
 	void Update(Time deltaTime);
 	void UpdatePosition();
+	void GetHoveredState();
 	void Draw(sf::RenderTexture& screen);
 
 	bool IsHoveredByMouse();

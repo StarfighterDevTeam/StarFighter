@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameEntity.h"
 #include "Commodity.h"
+#include "ResourceStock.h"
 
 struct DMS_Coord;
 
