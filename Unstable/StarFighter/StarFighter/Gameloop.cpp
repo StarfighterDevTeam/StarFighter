@@ -990,6 +990,43 @@ void Gameloop::Update(sf::Time deltaTime)
 			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
 		}
 	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Rudder)
+	{
+		Rudder* rudder = (Rudder*)hovered;
+		string display_name = (*CurrentGame).m_dico_ship_systems[rudder->m_tile->m_system];
+		string activated = m_warship->IsSystemOperational(System_Navigation, rudder->m_tile) == true ? "operated" : "not operated";
+		string description = "Status: " + activated + "\n+" + std::to_string((int)(100 * NAVIGATION_DODGE_CHANCE)) + "% dodge chance (if operated by a crew member).\nThe operating crew also adds his Nagivation skill % to dodge chances.";
+		m_help_interface.Init(display_name, description, sf::Vector2f(rudder->m_position.x - ROOMTILE_SIZE * 0.5, rudder->m_position.y + ROOMTILE_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Engine)
+	{
+		Engine* engine = (Engine*)hovered;
+		string display_name = (*CurrentGame).m_dico_ship_systems[engine->m_tile->m_system];
+		string activated = m_warship->IsSystemOperational(System_Engine, engine->m_tile) == true ? "operated" : "not operated";
+		string description = "Status: " + activated + "\nCharges the Flee thrusters (if operated by a crew member).\nWhen fully charged, right-click on the Engine to flee an ungoing combat.\n\n+" + std::to_string((int)(100 * ENGINE_DODGE_CHANCE)) + "% dodge chance per engine (if operated by a crew member).\nThe operating crew also adds his Engine skill % to dodge chances.";
+		m_help_interface.Init(display_name, description, sf::Vector2f(engine->m_position.x - ROOMTILE_SIZE * 0.5, engine->m_position.y + ROOMTILE_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Weapon)
+	{
+		Weapon* weapon = (Weapon*)hovered;
+		string display_name = (*CurrentGame).m_dico_ship_weapons[weapon->m_type];
+		string activated = m_warship->IsSystemOperational(System_Weapon, weapon->m_tile) == true ? "operated" : "not operated";
+		string description = "Status: " + activated + "\nLoads and fire on enemy ships during combat (as long as operated by a crew member).\nSelect it with left-click and right-click to assign a target during combat.";
+		if (weapon->m_type == Weapon_Cannon)
+		{
+			description += "\n\nCannons aims at random into a target room, dealing great damage to the hull and crew members.";
+		}
+		else if (weapon->m_type == Weapon_Torpedo)
+		{
+			description += "\n\nTorpedo aims at random onto a target hull, piercing it and causing flooding into the enemy ship.";
+		}
+		else if (weapon->m_type == Weapon_Shrapnel)
+		{
+			description += "\n\nShrapnel aims at random into a target room, dealing spread damage to crew members, but not to the hull.";
+		}
+
+		m_help_interface.Init(display_name, description, sf::Vector2f(weapon->m_position.x - ROOMTILE_SIZE * 0.5, weapon->m_position.y + ROOMTILE_SIZE * 0.5));
+	}
 	else if (hovered != NULL && hovered->m_UI_type == UI_ResourceUpkeep)
 	{
 		Resource* resource = (Resource*)hovered;

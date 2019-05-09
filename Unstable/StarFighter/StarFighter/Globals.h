@@ -75,12 +75,12 @@ std::string StringCut(std::string str, const size_t length);
 #define DROWNING_TIMER						1.f
 #define HEALING_TIMER						1.f
 
-#define AI_CHANGE_TARGETROOM_PERCENTAGE		0.15f
+#define AI_CHANGE_TARGETROOM_PERCENTAGE		0.15
 
-#define NAVIGATION_DODGE_CHANCE				0.1f
-#define DODGE_CHANCE_HARDCAP				0.75f
+#define NAVIGATION_DODGE_CHANCE				0.1
+#define DODGE_CHANCE_HARDCAP				0.75
 
-#define ENGINE_DODGE_CHANCE					0.05f
+#define ENGINE_DODGE_CHANCE					0.05
 #define ENGINE_ROTATION_SPEED				10.f
 #define ENGINE_FLEE_ROTATION_SPEED			20.f
 #define ENGINE_FLEE_COUNT					10.f

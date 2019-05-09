@@ -187,6 +187,14 @@ enum ShipSystem
 	NB_SHIP_SYSTEMS,
 };
 
+enum WeaponType
+{
+	Weapon_Cannon,
+	Weapon_Torpedo,
+	Weapon_Shrapnel,
+	NB_WEAPON_TYPES,
+};
+
 struct Game
 {
 public:
@@ -274,6 +282,8 @@ public:
 	string m_dico_crew_races[NB_CREW_RACES];
 	string m_dico_resources_textures[NB_RESOURCES_TYPES_TOTAL];
 	string m_dico_resources_names[NB_RESOURCES_TYPES_TOTAL];
+	string m_dico_ship_systems[NB_SHIP_SYSTEMS];
+	string m_dico_ship_weapons[NB_WEAPON_TYPES];
 	string GetRandomNameFromDico(vector<string>& dico, vector<string>& dico_used);
 	sf::Color m_dico_colors[NB_COLOR_CHART];
 

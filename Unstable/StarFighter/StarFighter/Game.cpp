@@ -106,6 +106,14 @@ Game::Game(RenderWindow& window)
 	m_dico_resources_names[Resource_Days] = "Days";
 	m_dico_resources_names[Resource_Crew] = "Crew members";
 
+	m_dico_ship_systems[System_Weapon] = "Weapon";
+	m_dico_ship_systems[System_Navigation] = "Rudder";
+	m_dico_ship_systems[System_Engine] = "Engine";
+
+	m_dico_ship_weapons[Weapon_Cannon] = "Cannon";
+	m_dico_ship_weapons[Weapon_Torpedo] = "Torpedo";
+	m_dico_ship_weapons[Weapon_Cannon] = "Shrapnel";
+
 	//load pirate names
 	vector<vector<string> > names_male = *(FileLoaderUtils::FileLoader(PIRATE_NAMES_MALE_CSV));
 	for (vector<vector< string> >::iterator it = names_male.begin(); it != names_male.end(); it++)
