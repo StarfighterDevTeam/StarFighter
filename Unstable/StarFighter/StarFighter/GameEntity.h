@@ -20,6 +20,7 @@ enum UI_Type
 	UI_Weapon,
 	UI_Engine,
 	UI_Rudder,
+	UI_Commodity,
 };
 
 enum ShipAlliance

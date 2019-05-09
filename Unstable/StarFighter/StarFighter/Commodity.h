@@ -26,10 +26,10 @@ enum CommodityRarity
 	NB_RARITY,
 };
 
-struct Commodity
+struct Commodity : GameEntity
 {
 public:
-	Commodity(CommodityType type, GameEntity* interface_icon);
+	Commodity(CommodityType type);
 	~Commodity();
 	
 	CommodityType m_type;
@@ -38,7 +38,6 @@ public:
 	string m_display_name;
 	string m_description;
 	string m_texture_name;
-	GameEntity* m_interface_icon;
 };
 
 #endif //COMMODITY_H_INCLUDED

@@ -2564,22 +2564,16 @@ bool Gameloop::AddCommodityToHolds(CommodityType commodity_type)
 		return false;
 	}
 
-	GameEntity* holds_interface = new GameEntity(UI_Commodity);
-
 	Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_commodities_config[commodity_type - 1][Commodity_Texture], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-	holds_interface->setAnimation(texture, 1, 1);
-	m_resources_interface.m_holds.push_back(holds_interface);
-
-	m_warship->m_holds.push_back(new Commodity((CommodityType)commodity_type, holds_interface));
+	Commodity* commodity = new Commodity(commodity_type);
+	commodity->setAnimation(texture, 1, 1);
+	m_warship->m_holds.push_back(commodity);
 
 	return true;
 }
 
 void Gameloop::RemoveCommodity(CommodityType commodity_type)
 {
-	GameEntity* interface_icon;
-	Commodity* commodity;
-
 	vector<Commodity*> old_holds;
 	for (vector<Commodity*>::iterator it = m_warship->m_holds.begin(); it != m_warship->m_holds.end(); it++)
 	{
@@ -2587,43 +2581,17 @@ void Gameloop::RemoveCommodity(CommodityType commodity_type)
 	}
 	m_warship->m_holds.clear();
 
-	bool paid = false;
+	bool removed = false;
 	for (vector<Commodity*>::iterator it = old_holds.begin(); it != old_holds.end(); it++)
 	{
-		if (paid == true || (*it)->m_type != commodity_type)
+		if (removed == true || (*it)->m_type != commodity_type)
 		{
 			m_warship->m_holds.push_back(*it);
 		}
 		else
 		{
-			commodity = *it;
-			paid = true;
-			interface_icon = (*it)->m_interface_icon;
-		}
-	}
-
-	//interface
-	vector<GameEntity*> old_holds_interface;
-	for (vector<GameEntity*>::iterator it = m_resources_interface.m_holds.begin(); it != m_resources_interface.m_holds.end(); it++)
-	{
-		old_holds_interface.push_back(*it);
-	}
-	m_resources_interface.m_holds.clear();
-
-	paid = false;
-	for (vector<GameEntity*>::iterator it = old_holds_interface.begin(); it != old_holds_interface.end(); it++)
-	{
-		if (paid == true || (*it) != interface_icon)
-		{
-			m_resources_interface.m_holds.push_back(*it);
-		}
-		else
-		{
-			paid = true;
+			removed = true;
 			delete *it;
-			commodity->m_interface_icon = NULL;
 		}
 	}
-
-	delete commodity;
 }

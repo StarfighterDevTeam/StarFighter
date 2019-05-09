@@ -24,7 +24,6 @@ struct ResourcesInterface
 	sf::Text m_text_upkeep;
 
 	sf::Text m_text_holds;
-	vector<GameEntity*> m_holds;
 
 	void Init(Warship* ship);
 	void Destroy();

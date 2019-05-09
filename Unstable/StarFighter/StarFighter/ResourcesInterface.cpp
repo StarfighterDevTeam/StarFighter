@@ -268,7 +268,7 @@ void ResourcesInterface::Update()
 
 	//holds
 	int k = 0;
-	for (vector<GameEntity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	for (vector<Commodity*>::iterator it = m_warship->m_holds.begin(); it != m_warship->m_holds.end(); it++)
 	{
 		(*it)->setPosition(m_text_holds.getPosition().x + m_text_holds.getGlobalBounds().width + 10 + RESOURCES_ICON_SIZE * 0.5 + (k * (RESOURCES_ICON_SIZE + 8)), RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y + (RESOURCES_INTERFACE_PANEL_SIZE_Y - RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y) * 0.5);
 		k++;
@@ -316,7 +316,7 @@ void ResourcesInterface::Draw(sf::RenderTexture& screen)
 
 	screen.draw(m_text_holds);
 
-	for (vector<GameEntity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	for (vector<Commodity*>::iterator it = m_warship->m_holds.begin(); it != m_warship->m_holds.end(); it++)
 	{
 		(*it)->Draw(screen);
 	}
