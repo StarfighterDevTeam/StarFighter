@@ -112,7 +112,7 @@ Game::Game(RenderWindow& window)
 
 	m_dico_ship_weapons[Weapon_Cannon] = "Cannon";
 	m_dico_ship_weapons[Weapon_Torpedo] = "Torpedo";
-	m_dico_ship_weapons[Weapon_Cannon] = "Shrapnel";
+	m_dico_ship_weapons[Weapon_Shrapnel] = "Shrapnel";
 
 	//load pirate names
 	vector<vector<string> > names_male = *(FileLoaderUtils::FileLoader(PIRATE_NAMES_MALE_CSV));
