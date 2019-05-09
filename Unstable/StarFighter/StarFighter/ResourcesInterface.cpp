@@ -82,17 +82,17 @@ void ResourcesInterface::Init(Warship* warship)
 		m_resources[i]->m_shape_container.setFillColor(sf::Color::Black);
 		m_resources[i]->m_shape_container.setOutlineThickness(2);
 		m_resources[i]->m_shape_container.setOutlineColor(sf::Color::White);
-		m_resources[i]->m_shape_container.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + RESOURCES_INTERFACE_STOCK_SIZE_X * 0.5 + i * RESOURCES_INTERFACE_STOCK_SIZE_X, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
+		m_resources[i]->m_shape_container.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + RESOURCES_INTERFACE_STOCK_SIZE_X * 0.5 + i * RESOURCES_INTERFACE_STOCK_SIZE_X, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5));
 		m_resources[i]->m_position = m_resources[i]->m_shape_container.getPosition();
 
 		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[i], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
 		m_resources[i]->setAnimation(texture, 1, 1);
-		m_resources[i]->setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_STOCK_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
+		m_resources[i]->setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_STOCK_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5));
 
 		m_resources[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
 		m_resources[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
 		m_resources[i]->m_shape.setFillColor(sf::Color::Black);
-		m_resources[i]->m_shape.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_STOCK_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
+		m_resources[i]->m_shape.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_STOCK_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5));
 		
 		m_resources[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_resources[i]->m_text.setCharacterSize(16);
@@ -131,7 +131,7 @@ void ResourcesInterface::Init(Warship* warship)
 	m_resources[Resource_Days]->m_text.setCharacterSize(28);
 	m_resources[Resource_Days]->m_text.setStyle(sf::Text::Bold);
 	m_resources[Resource_Days]->m_text.setColor(sf::Color::White);
-	m_resources[Resource_Days]->m_text.setPosition(sf::Vector2f(m_text_royalnavy.getPosition().x + m_text_royalnavy.getGlobalBounds().width + 8, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5f - m_resources[Resource_Days]->m_text.getCharacterSize() * 0.6));
+	m_resources[Resource_Days]->m_text.setPosition(sf::Vector2f(m_text_royalnavy.getPosition().x + m_text_royalnavy.getGlobalBounds().width + 8, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5f - m_resources[Resource_Days]->m_text.getCharacterSize() * 0.6));
 
 	//upkeep
 	m_text_upkeep.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -139,7 +139,7 @@ void ResourcesInterface::Init(Warship* warship)
 	//m_text_upkeep.setStyle(sf::Text::Italic);
 	m_text_upkeep.setColor(sf::Color::White);
 	m_text_upkeep.setString("Daily crew upkeep");
-	m_text_upkeep.setPosition(sf::Vector2f(m_text_royalnavy.getPosition().x + m_text_royalnavy.getGlobalBounds().width + 8 + m_text_upkeep.getGlobalBounds().width + 40, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5f - m_text_upkeep.getCharacterSize() * 0.6));
+	m_text_upkeep.setPosition(sf::Vector2f(m_text_royalnavy.getPosition().x + m_text_royalnavy.getGlobalBounds().width + 8 + m_text_upkeep.getGlobalBounds().width + 40, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5f - m_text_upkeep.getCharacterSize() * 0.6));
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -149,12 +149,12 @@ void ResourcesInterface::Init(Warship* warship)
 		m_upkeep[i]->m_shape_container.setFillColor(sf::Color::Black);
 		m_upkeep[i]->m_shape_container.setOutlineThickness(2);
 		m_upkeep[i]->m_shape_container.setOutlineColor(sf::Color::White);
-		m_upkeep[i]->m_shape_container.setPosition(sf::Vector2f(sf::Vector2f(m_text_upkeep.getPosition().x + m_text_upkeep.getGlobalBounds().width + RESOURCES_INTERFACE_STOCK_SIZE_X * 0.5 + i * RESOURCES_INTERFACE_STOCK_SIZE_X + 16, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5)));
+		m_upkeep[i]->m_shape_container.setPosition(sf::Vector2f(sf::Vector2f(m_text_upkeep.getPosition().x + m_text_upkeep.getGlobalBounds().width + RESOURCES_INTERFACE_STOCK_SIZE_X * 0.5 + i * RESOURCES_INTERFACE_STOCK_SIZE_X + 16, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5)));
 		m_upkeep[i]->m_position = m_upkeep[i]->m_shape_container.getPosition();
 
 		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[i], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
 		m_upkeep[i]->setAnimation(texture, 1, 1);
-		m_upkeep[i]->setPosition(sf::Vector2f(sf::Vector2f(m_text_upkeep.getPosition().x + m_text_upkeep.getGlobalBounds().width + RESOURCES_ICON_SIZE * 0.5 + i * RESOURCES_INTERFACE_STOCK_SIZE_X + 16, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5)));
+		m_upkeep[i]->setPosition(sf::Vector2f(sf::Vector2f(m_text_upkeep.getPosition().x + m_text_upkeep.getGlobalBounds().width + RESOURCES_ICON_SIZE * 0.5 + i * RESOURCES_INTERFACE_STOCK_SIZE_X + 16, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5)));
 
 		m_upkeep[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
 		m_upkeep[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
@@ -169,6 +169,14 @@ void ResourcesInterface::Init(Warship* warship)
 		m_upkeep[i]->m_text.setPosition(sf::Vector2f(m_upkeep[i]->m_shape_container.getPosition().x - RESOURCES_INTERFACE_STOCK_SIZE_X * 0.5 + RESOURCES_ICON_SIZE + 8, m_resources[i]->m_shape_container.getPosition().y - m_resources[i]->m_text.getCharacterSize() * 0.60));
 	}
 
+	//holds
+	m_text_holds.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_text_holds.setCharacterSize(16);
+	m_text_holds.setStyle(sf::Text::Bold);
+	m_text_holds.setColor(sf::Color::White);
+	m_text_holds.setString("Holds:");
+	m_text_holds.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y + (RESOURCES_INTERFACE_PANEL_SIZE_Y - RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y) * 0.5 - m_text_holds.getCharacterSize() * 0.65));
+
 	//save & load buttons
 	m_save_button = new GameEntity(UI_None);
 	m_save_button->m_shape_container.setSize(sf::Vector2f(RESOURCES_BUTTON_SIZE_X, RESOURCES_BUTTON_SIZE_Y));
@@ -176,14 +184,14 @@ void ResourcesInterface::Init(Warship* warship)
 	m_save_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
 	m_save_button->m_shape_container.setOutlineThickness(2);
 	m_save_button->m_shape_container.setOutlineColor(sf::Color::White);
-	m_save_button->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - (2 * (RESOURCES_BUTTON_SIZE_X + 8)), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
+	m_save_button->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - (2 * (RESOURCES_BUTTON_SIZE_X + 8)), RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5));
 
 	m_save_button->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_save_button->m_text.setCharacterSize(16);
 	m_save_button->m_text.setStyle(sf::Text::Bold);
 	m_save_button->m_text.setColor(sf::Color::White);
 	m_save_button->m_text.setString("Save (F4)");
-	m_save_button->m_text.setPosition(sf::Vector2f(m_save_button->m_shape_container.getPosition().x - m_save_button->m_text.getGlobalBounds().width * 0.5, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5 - m_save_button->m_text.getCharacterSize() * 0.6));
+	m_save_button->m_text.setPosition(sf::Vector2f(m_save_button->m_shape_container.getPosition().x - m_save_button->m_text.getGlobalBounds().width * 0.5, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5 - m_save_button->m_text.getCharacterSize() * 0.6));
 
 	m_load_button = new GameEntity(UI_None);
 	m_load_button->m_shape_container.setSize(sf::Vector2f(RESOURCES_BUTTON_SIZE_X, RESOURCES_BUTTON_SIZE_Y));
@@ -191,14 +199,14 @@ void ResourcesInterface::Init(Warship* warship)
 	m_load_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
 	m_load_button->m_shape_container.setOutlineThickness(2);
 	m_load_button->m_shape_container.setOutlineColor(sf::Color::White);
-	m_load_button->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - (RESOURCES_BUTTON_SIZE_X + 8), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
+	m_load_button->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - (RESOURCES_BUTTON_SIZE_X + 8), RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5));
 
 	m_load_button->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_load_button->m_text.setCharacterSize(16);
 	m_load_button->m_text.setStyle(sf::Text::Bold);
 	m_load_button->m_text.setColor(sf::Color::White);
 	m_load_button->m_text.setString("Reload");
-	m_load_button->m_text.setPosition(sf::Vector2f(m_load_button->m_shape_container.getPosition().x - m_load_button->m_text.getGlobalBounds().width * 0.5, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5 - m_load_button->m_text.getCharacterSize() * 0.6));
+	m_load_button->m_text.setPosition(sf::Vector2f(m_load_button->m_shape_container.getPosition().x - m_load_button->m_text.getGlobalBounds().width * 0.5, RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y * 0.5 - m_load_button->m_text.getCharacterSize() * 0.6));
 }
 
 void ResourcesInterface::Update()
@@ -258,6 +266,14 @@ void ResourcesInterface::Update()
 		m_upkeep[i]->m_text.setString(ss_resource.str());
 	}
 
+	//holds
+	int k = 0;
+	for (vector<GameEntity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	{
+		(*it)->setPosition(m_text_holds.getPosition().x + m_text_holds.getGlobalBounds().width + 10 + RESOURCES_ICON_SIZE * 0.5 + (k * (RESOURCES_ICON_SIZE + 8)), RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y + (RESOURCES_INTERFACE_PANEL_SIZE_Y - RESOURCES_INTERFACE_UPPER_PANEL_SIZE_Y) * 0.5);
+		k++;
+	}
+
 	//save & load hovering buttons
 	if (m_save_button->IsHoveredByMouse() == true && (*CurrentGame).m_window_has_focus == true)
 	{
@@ -297,4 +313,11 @@ void ResourcesInterface::Draw(sf::RenderTexture& screen)
 
 	m_save_button->Draw(screen);
 	m_load_button->Draw(screen);
+
+	screen.draw(m_text_holds);
+
+	for (vector<GameEntity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
+	{
+		(*it)->Draw(screen);
+	}
 }

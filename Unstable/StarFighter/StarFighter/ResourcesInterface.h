@@ -23,6 +23,9 @@ struct ResourcesInterface
 	GameEntity* m_upkeep[NB_UPKEEP_COSTS];
 	sf::Text m_text_upkeep;
 
+	sf::Text m_text_holds;
+	vector<GameEntity*> m_holds;
+
 	void Init(Warship* ship);
 	void Destroy();
 

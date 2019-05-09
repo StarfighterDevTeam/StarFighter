@@ -29,10 +29,8 @@ enum CommodityRarity
 struct Commodity
 {
 public:
-	Commodity(CommodityType type);
+	Commodity(CommodityType type, GameEntity* interface_icon);
 	~Commodity();
-
-	Commodity* Clone();
 	
 	CommodityType m_type;
 	CommodityRarity m_rarity;
@@ -40,6 +38,7 @@ public:
 	string m_display_name;
 	string m_description;
 	string m_texture_name;
+	GameEntity* m_interface_icon;
 };
 
 #endif //COMMODITY_H_INCLUDED

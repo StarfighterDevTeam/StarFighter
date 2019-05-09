@@ -1,14 +1,17 @@
-DMS 0 7 0 18
-Gold 992
-Fish 958
+DMS 0 7 0 19
+Gold 990
+Fish 938
 Mech 100
-Fidelity 52
+Fidelity 72
 Days 10
 Crew Mabel_Hamington 0 0 1 20 20 5 14 7 20 20 14 0 9 5
 Crew Anthony_Hayward 1 3 2 20 20 8 2 4 2 3 3 0 3 7
 Crew Sybil_Stinger 1 2 1 20 20 8 8 7 5 2 8 0 7 7
 Crew Bob_Fisher 1 3 2 20 20 3 4 4 7 4 6 0 5 1
 Crew Alexander_Judge 1 1 0 20 20 4 6 3 10 7 3 0 9 7
+Holds 3
+Holds 2
+Holds 1
 Island 0 0 5 47 1 0 4 46 2 1 1 Octopus_Island
 Island 0 0 55 7 2 0 55 6 3 2 0 Diamond_Island
 Island 0 0 16 37 0 0 16 38 1 1 1 Flamingo_Island
@@ -19,7 +22,7 @@ Island 0 0 5 5 0 0 5 4 1 1 1 Robwood_Island
 Island 0 0 11 51 1 0 12 51 2 1 0 Smoking_Island
 Island 0 0 59 55 2 0 56 57 3 3 0 Turtle_Island
 Island 0 0 2 31 2 0 0 33 2 3 0 Lobster_Island
-Island 0 0 7 19 2 0 5 21 2 3 0 Snake_Island
+Island 0 0 7 19 2 1 5 21 2 3 0 Snake_Island
 Island 0 0 23 14 2 0 21 15 2 3 1 Onyx_Island
 Island 0 0 23 55 2 0 24 56 3 2 0 Squid_Island
 Island 0 0 38 42 0 0 39 42 1 1 0 Ventstone_Island
@@ -65,70 +68,70 @@ Island 0 0 46 44 2 0 45 43 2 3 0 Ventstone_Island
 Island 0 0 35 37 2 0 34 40 2 3 0 Robwood_Island
 Island 0 0 18 23 1 0 19 23 2 1 0 Paradise_Island
 Island 0 0 2 10 2 0 2 9 3 2 0 Piranha_Island
-Ship 32 46 0 1 The_Victorious
-Ship 22 4 0 1 The_Halifax
-Ship 9 46 0 1 Esmeralda
-Ship 11 57 0 1 Hydra
-Ship 41 11 0 1 Piranha
-Ship 42 49 1 1 The_Eclipse
-Ship 36 9 1 1 Medusa
-Ship 20 54 1 1 Margaret
-Ship 51 50 1 1 Bathgate
-Ship 32 32 1 1 The_Andromeda
-Ship 41 21 1 1 Prosperity
-Ship 17 55 1 1 Alouette
-Ship 25 30 1 1 Newbark
-Ship 33 18 1 1 Vulcan
-Ship 17 6 1 1 Ghost
-Ship 51 44 1 1 Aurora
+Ship 32 46 0 1 Conquerant
+Ship 22 4 0 1 Peacemaker
+Ship 9 46 0 1 Octopus
+Ship 11 57 0 1 Nighthawk
+Ship 41 11 0 1 Hydra
+Ship 42 49 1 1 The_Auriga
+Ship 36 9 1 1 Modeste
+Ship 20 54 1 1 Capilano
+Ship 51 50 1 1 Aurora
+Ship 32 32 1 1 Prosperity
+Ship 41 21 1 1 Sea_Turtle
+Ship 17 55 1 1 Margaret
+Ship 25 30 1 1 Albatros
+Ship 33 18 1 1 Alouette
+Ship 17 6 1 1 Discovery
+Ship 51 44 1 1 Rose_des_Vents
 Ship 58 39 1 1 Zephyr
-Ship 11 30 1 1 The_Auriga
-Ship 47 58 1 1 Faithful
-Ship 2 23 1 1 Modeste
+Ship 11 30 1 1 Newbark
+Ship 47 58 1 1 Medusa
+Ship 2 26 1 1 The_Eclipse
 Ship 42 26 1 1 Longbow
-Ship 51 29 1 1 Discovery
-Ship 50 35 1 1 Sea_Turtle
-Ship 41 7 1 1 Rose_des_Vents
-Ship 28 16 1 1 Albatros
-Ship 18 23 1 1 El_Capitan
-Ship 25 44 1 1 Capilano
-Ship 18 34 1 1 Gryhound
-Ship 16 23 1 1 Newbark
-Ship 47 30 1 1 Alouette
-Ship 12 40 1 1 Medusa
-Ship 58 52 1 1 The_Eclipse
-Ship 24 15 1 1 Albatros
-Ship 10 29 1 1 Longbow
-Ship 44 37 1 2 Faithful
-Ship 3 29 1 2 El_Capitan
-Ship 0 55 1 2 The_Auriga
-Ship 4 51 1 2 Bathgate
-Ship 8 20 1 2 Discovery
-Ship 29 33 1 2 Rose_des_Vents
-Ship 2 10 1 2 Aurora
-Ship 23 59 1 2 Capilano
-Ship 3 58 1 2 Sea_Turtle
-Ship 50 36 1 2 The_Andromeda
-Ship 48 15 1 2 Gryhound
-Ship 31 36 1 2 Margaret
-Ship 5 27 1 2 Vulcan
-Ship 18 6 1 2 Zephyr
-Ship 46 4 1 2 Ghost
-Ship 41 58 1 2 Modeste
-Ship 57 0 1 2 Prosperity
-Ship 37 50 1 2 Alouette
-Ship 54 32 1 2 Margaret
-Ship 14 33 1 2 Gryhound
-Ship 39 3 1 2 Albatros
-Ship 49 0 1 2 Longbow
-Ship 17 44 1 2 Modeste
-Ship 58 8 1 2 El_Capitan
-Ship 31 26 1 2 Faithful
-Ship 36 22 1 2 Capilano
-Ship 48 19 1 2 The_Auriga
-Ship 9 22 1 2 The_Andromeda
-Ship 21 42 1 2 Sea_Turtle
-Ship 8 33 1 2 Newbark
+Ship 51 29 1 1 The_Andromeda
+Ship 50 35 1 1 El_Capitan
+Ship 41 7 1 1 Faithful
+Ship 28 16 1 1 Ghost
+Ship 18 23 1 1 Gryhound
+Ship 25 44 1 1 Bathgate
+Ship 18 34 1 1 Vulcan
+Ship 16 23 1 1 Rose_des_Vents
+Ship 47 30 1 1 Albatros
+Ship 12 40 1 1 Margaret
+Ship 58 52 1 1 Newbark
+Ship 24 15 1 1 Alouette
+Ship 10 29 1 1 Discovery
+Ship 44 37 1 2 Capilano
+Ship 3 29 1 2 Ghost
+Ship 0 55 1 2 Vulcan
+Ship 4 51 1 2 El_Capitan
+Ship 7 19 1 2 Bathgate
+Ship 29 33 1 2 The_Andromeda
+Ship 2 10 1 2 The_Auriga
+Ship 23 59 1 2 Gryhound
+Ship 3 58 1 2 Modeste
+Ship 50 36 1 2 The_Eclipse
+Ship 48 15 1 2 Sea_Turtle
+Ship 31 36 1 2 Zephyr
+Ship 5 27 1 2 Medusa
+Ship 18 6 1 2 Aurora
+Ship 46 4 1 2 Longbow
+Ship 41 58 1 2 Prosperity
+Ship 57 0 1 2 Faithful
+Ship 37 50 1 2 Zephyr
+Ship 54 32 1 2 Vulcan
+Ship 14 33 1 2 Albatros
+Ship 39 3 1 2 Discovery
+Ship 49 0 1 2 Alouette
+Ship 17 44 1 2 The_Andromeda
+Ship 58 8 1 2 Ghost
+Ship 31 26 1 2 Capilano
+Ship 36 22 1 2 Newbark
+Ship 48 19 1 2 Margaret
+Ship 7 21 1 2 The_Auriga
+Ship 21 42 1 2 Modeste
+Ship 8 33 1 2 Longbow
 Wreck 0 27 0 0 42 0 124
 Wreck 0 20 0 0 0 0 69
 Wreck 0 7 0 0 45 0 54

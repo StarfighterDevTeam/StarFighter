@@ -74,6 +74,9 @@ public:
 	void SpendDays(int days, bool skip_time);
 	bool CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y);
 
+	bool AddCommodityToHolds(CommodityType commodity_type);
+	void RemoveCommodity(CommodityType commodity_type);
+
 	Reward* GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
 
 	//IA

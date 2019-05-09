@@ -17,6 +17,8 @@ Gameloop::Gameloop()
 
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
 	m_ships.push_back(m_warship);
+	m_resources_interface.Init(m_warship);
+
 	if (LoadPlayerData(m_warship) == 0)
 	{
 		//No saved game loaded => create a new save from scratch
@@ -29,8 +31,6 @@ Gameloop::Gameloop()
 		//create a new save file
 		SavePlayerData(m_warship);
 	}
-	
-	m_resources_interface.Init(m_warship);
 
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
@@ -1036,7 +1036,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 			if (choice->m_cost_commodity != Commodity_None)
 			{
-				m_warship->PayCommodity(choice->m_cost_commodity);
+				RemoveCommodity(choice->m_cost_commodity);
 			}
 
 			//get reward
@@ -1116,7 +1116,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			//commodity
 			if (m_warship->m_reward_interface.m_reward->m_commodity != Commodity_None)
 			{
-				m_warship->m_holds.push_back(new Commodity(m_warship->m_reward_interface.m_reward->m_commodity));
+				AddCommodityToHolds(m_warship->m_reward_interface.m_reward->m_commodity);
 			}
 
 			//crew recruited
@@ -1846,7 +1846,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			{
 				int commodity_type;
 				std::istringstream(line) >> t >> commodity_type;
-				warship->m_holds.push_back(new Commodity((CommodityType)commodity_type));
+				AddCommodityToHolds((CommodityType)commodity_type);
 			}
 			else if (t.compare("Island") == 0)
 			{
@@ -2555,4 +2555,75 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS)
 		ship->UpdateAITilesCanBeSeen();
 		ship->SetSailsToWaterTile(ship->m_destination, warship_DMS);
 	}
+}
+
+bool Gameloop::AddCommodityToHolds(CommodityType commodity_type)
+{
+	if (m_warship->m_holds.size() == m_warship->m_holds_capacity)
+	{
+		return false;
+	}
+
+	GameEntity* holds_interface = new GameEntity(UI_Commodity);
+
+	Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_commodities_config[commodity_type - 1][Commodity_Texture], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+	holds_interface->setAnimation(texture, 1, 1);
+	m_resources_interface.m_holds.push_back(holds_interface);
+
+	m_warship->m_holds.push_back(new Commodity((CommodityType)commodity_type, holds_interface));
+
+	return true;
+}
+
+void Gameloop::RemoveCommodity(CommodityType commodity_type)
+{
+	GameEntity* interface_icon;
+	Commodity* commodity;
+
+	vector<Commodity*> old_holds;
+	for (vector<Commodity*>::iterator it = m_warship->m_holds.begin(); it != m_warship->m_holds.end(); it++)
+	{
+		old_holds.push_back(*it);
+	}
+	m_warship->m_holds.clear();
+
+	bool paid = false;
+	for (vector<Commodity*>::iterator it = old_holds.begin(); it != old_holds.end(); it++)
+	{
+		if (paid == true || (*it)->m_type != commodity_type)
+		{
+			m_warship->m_holds.push_back(*it);
+		}
+		else
+		{
+			commodity = *it;
+			paid = true;
+			interface_icon = (*it)->m_interface_icon;
+		}
+	}
+
+	//interface
+	vector<GameEntity*> old_holds_interface;
+	for (vector<GameEntity*>::iterator it = m_resources_interface.m_holds.begin(); it != m_resources_interface.m_holds.end(); it++)
+	{
+		old_holds_interface.push_back(*it);
+	}
+	m_resources_interface.m_holds.clear();
+
+	paid = false;
+	for (vector<GameEntity*>::iterator it = old_holds_interface.begin(); it != old_holds_interface.end(); it++)
+	{
+		if (paid == true || (*it) != interface_icon)
+		{
+			m_resources_interface.m_holds.push_back(*it);
+		}
+		else
+		{
+			paid = true;
+			delete *it;
+			commodity->m_interface_icon = NULL;
+		}
+	}
+
+	delete commodity;
 }

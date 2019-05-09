@@ -32,6 +32,7 @@ public:
 	int m_sonar;
 	vector<CrewMember*> m_crew_unboarding;
 	vector<Commodity*> m_holds;
+	int m_holds_capacity;
 
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;
@@ -44,7 +45,6 @@ public:
 
 	void UpdateUpkeepCosts();
 	bool HasCommodity(CommodityType commodity) override;
-	void PayCommodity(CommodityType commodity) override;
 };
 
 #endif //WARSHIP_H_INCLUDED

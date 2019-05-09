@@ -14,6 +14,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_can_be_seen = true;
 	m_can_open_new_menu = false;
 	m_sonar = 300;
+	m_holds_capacity = 4;
 
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;
@@ -336,27 +337,4 @@ bool Warship::HasCommodity(CommodityType commodity)
 	}
 
 	return false;
-}
-
-void Warship::PayCommodity(CommodityType commodity)
-{
-	vector<Commodity*> old_holds;
-	for (vector<Commodity*>::iterator it = m_holds.begin(); it != m_holds.end(); it++)
-	{
-		old_holds.push_back(*it);
-	}
-	m_holds.clear();
-
-	bool paid = false;
-	for (vector<Commodity*>::iterator it = old_holds.begin(); it != old_holds.end(); it++)
-	{
-		if (paid == true || (*it)->m_type != commodity)
-		{
-			m_holds.push_back(*it);
-		}
-		else
-		{
-			paid = true; 
-		}
-	}
 }

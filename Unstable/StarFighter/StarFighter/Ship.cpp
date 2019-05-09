@@ -2234,7 +2234,6 @@ void Ship::PayUpkeepCost(int days)
 	}
 }
 
-
 void Ship::UpdateAITilesCanBeSeen()
 {
 	//optimize the tiles that need to be scanned for pathfinding
@@ -2283,9 +2282,4 @@ bool Ship::HasCommodity(CommodityType commodity)
 {
 	//see override in class Warship
 	return false;
-}
-
-void Ship::PayCommodity(CommodityType commodity)
-{
-	//see override in class Warship
 }
