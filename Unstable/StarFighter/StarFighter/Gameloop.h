@@ -25,6 +25,7 @@ enum ContextualMenu
 	Menu_PrisonersChoice,
 	Menu_CrewUnboard,
 	Menu_Reward,
+	Menu_Dockyard,
 };
 
 class Gameloop

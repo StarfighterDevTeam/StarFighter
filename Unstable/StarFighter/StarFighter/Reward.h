@@ -8,6 +8,8 @@
 
 struct DMS_Coord;
 
+class Location;
+
 enum RewardData
 {
 	Reward_ID,
@@ -20,6 +22,7 @@ enum RewardData
 	Reward_SecretWreck,
 	Reward_Commodity,
 	Reward_Combat,
+	Reward_Dockyard,
 	Reward_Text,
 	NB_REWARD_DATA,
 };
@@ -33,6 +36,7 @@ public:
 	string m_string;
 	DMS_Coord* m_DMS_location;
 	Ship* m_combat_ship;
+	Location* m_dockyard;
 	CommodityType m_commodity;
 };
 

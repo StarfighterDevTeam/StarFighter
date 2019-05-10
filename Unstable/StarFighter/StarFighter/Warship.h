@@ -8,10 +8,11 @@
 #include "Island.h"
 #include "Compass.h"
 #include "CrewInterface.h"
+#include "RewardInterface.h"
 #include "PrisonersChoiceInterface.h"
+#include "DockyardInterface.h"
 #include "CrewOverboardInterface.h"
 #include "CrewUnboardInterface.h"
-#include "RewardInterface.h"
 #include "Ship.h"
 
 #include <fstream>

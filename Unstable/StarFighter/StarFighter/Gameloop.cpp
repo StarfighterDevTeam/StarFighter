@@ -1118,7 +1118,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			Reward* reward = GenerateReward(rewardID, m_warship->m_crew_unboard_interface.m_location, m_warship->m_crew_unboard_interface.m_other_ship, choice->m_gauge_value, choice->m_gauge_value_max);
 
 			//reward is not empty? open the reward interface.
-			if (reward->m_string.empty() == false)
+			if (reward->m_string.empty() == false && reward->m_string.compare("[SKIP]") != 0)
 			{
 				//crew killed or recruited?
 				int size = reward->m_resources.size();
@@ -1151,6 +1151,11 @@ void Gameloop::Update(sf::Time deltaTime)
 
 				m_warship->m_reward_interface.Init(m_warship, reward);
 				m_menu = Menu_Reward;
+			}
+			else if (reward->m_string.empty() == false)
+			{
+				delete reward;
+				m_menu = Menu_Dockyard;
 			}
 			else
 			{
@@ -2530,6 +2535,13 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_s
 			if (combat == 1)
 			{
 				reward->m_combat_ship = other_ship;
+			}
+
+			//dockyard
+			int dockyard = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Dockyard]);
+			if (dockyard == 1)
+			{
+				reward->m_dockyard = location;
 			}
 
 			//reward text

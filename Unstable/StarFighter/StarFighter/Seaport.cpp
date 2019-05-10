@@ -34,7 +34,7 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 		case Seaport_Large:
 		{
 			m_choicesID[0] = 1;
-			m_choicesID[1] = 2;
+			m_choicesID[1] = 14;
 			m_choicesID[2] = 3;
 			m_choicesID[3] = 13;
 
