@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 DockyardInterface::DockyardInterface()
 {
 	m_panel = NULL;
+	m_leave_button = NULL;
 }
 
 DockyardInterface::~DockyardInterface()
@@ -19,6 +20,9 @@ void DockyardInterface::Destroy()
 {
 	delete m_panel;
 	m_panel = NULL;
+
+	delete m_leave_button;
+	m_leave_button = NULL;
 }
 
 void DockyardInterface::Init(Ship* ship, Location* location)
@@ -48,18 +52,34 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	m_narrative_text.setString(ss_narrative);
 	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5 + 20, offset_y));
 
-	float prisoners_offset_x = m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20;
-	offset_y += 90;
-	
+	//leave button
+	offset_y += m_narrative_text.getGlobalBounds().height + m_narrative_text.getCharacterSize() + 30;
+	m_leave_button = new GameEntity(UI_None);
+	m_leave_button->m_shape_container.setSize(sf::Vector2f(RESOURCES_BUTTON_SIZE_X, RESOURCES_BUTTON_SIZE_Y));
+	m_leave_button->m_shape_container.setOrigin(sf::Vector2f(RESOURCES_BUTTON_SIZE_X * 0.5, RESOURCES_BUTTON_SIZE_Y * 0.5));
+	m_leave_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
+	m_leave_button->m_shape_container.setOutlineThickness(2);
+	m_leave_button->m_shape_container.setOutlineColor(sf::Color::White);
+	m_leave_button->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x, offset_y));
+
+	m_leave_button->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_leave_button->m_text.setCharacterSize(16);
+	m_leave_button->m_text.setStyle(sf::Text::Bold);
+	m_leave_button->m_text.setColor(sf::Color::White);
+	m_leave_button->m_text.setString("Leave");
+	m_leave_button->m_text.setPosition(sf::Vector2f(m_leave_button->m_shape_container.getPosition().x - m_leave_button->m_text.getGlobalBounds().width * 0.5, offset_y - m_leave_button->m_text.getCharacterSize() * 0.65));
 }
 
 void DockyardInterface::Update(sf::Time deltaTime)
 {
-	
+	//leave button's hovering feedback
+	m_leave_button->ButtonUpdate();
 }
 
 void DockyardInterface::Draw(sf::RenderTexture& screen)
 {
 	m_panel->Draw(screen);
 	screen.draw(m_narrative_text);
+
+	m_leave_button->Draw(screen);
 }

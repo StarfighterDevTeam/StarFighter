@@ -1156,6 +1156,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				delete reward;
 				m_menu = Menu_Dockyard;
+				m_warship->m_dockyard_interface.Init(m_warship, reward->m_dockyard);
 			}
 			else
 			{
@@ -1235,6 +1236,17 @@ void Gameloop::Update(sf::Time deltaTime)
 
 			//close interface
 			m_warship->m_reward_interface.Destroy();
+			m_menu = Menu_None;
+		}
+	}
+	else if (m_menu == Menu_Dockyard)
+	{
+		m_warship->m_dockyard_interface.Update(deltaTime);
+
+		if (m_warship->m_dockyard_interface.m_leave_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
+		{
+			//close interface
+			m_warship->m_dockyard_interface.Destroy();
 			m_menu = Menu_None;
 		}
 	}
@@ -1455,6 +1467,10 @@ void Gameloop::Draw()
 	else if (m_menu == Menu_Reward)
 	{
 		m_warship->m_reward_interface.Draw((*CurrentGame).m_mainScreen);
+	}
+	else if (m_menu == Menu_Dockyard)
+	{
+		m_warship->m_dockyard_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//HUD - resources interface

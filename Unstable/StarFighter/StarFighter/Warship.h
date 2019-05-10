@@ -41,6 +41,7 @@ public:
 	struct CrewOverboardInterface m_crew_overboard_interface;
 	struct CrewUnboardInterface m_crew_unboard_interface;
 	struct RewardInterface m_reward_interface;
+	struct DockyardInterface m_dockyard_interface;
 
 	void UpdateOLD(Time deltaTime, bool tactical_combat);
 

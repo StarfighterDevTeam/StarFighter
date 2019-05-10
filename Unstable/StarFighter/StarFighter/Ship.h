@@ -9,7 +9,7 @@
 #include "Seaport.h"
 #include "CombatInterface.h"
 
-#define	CRUISE_SPEED					50.f
+#define	CRUISE_SPEED					100.f
 #define ANGLE_SPEED						30.f
 
 #define NB_UPKEEP_COSTS					(Resource_Fish + 1)

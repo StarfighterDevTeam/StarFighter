@@ -23,6 +23,8 @@ struct DockyardInterface
 	Location* m_location;
 	GameEntity* m_panel;
 	sf::Text m_narrative_text;
+
+	GameEntity* m_leave_button;
 };
 
 #endif //DOCKYARDINTERFACE_H_INCLUDED

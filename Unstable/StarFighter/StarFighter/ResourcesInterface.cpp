@@ -309,24 +309,9 @@ void ResourcesInterface::Update()
 		k++;
 	}
 
-	//save & load hovering buttons
-	if (m_save_button->IsHoveredByMouse() == true && (*CurrentGame).m_window_has_focus == true)
-	{
-		m_save_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_CrewFidelity_Positive]);
-	}
-	else
-	{
-		m_save_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
-	}
-
-	if (m_load_button->IsHoveredByMouse() == true && (*CurrentGame).m_window_has_focus == true)
-	{
-		m_load_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_CrewFidelity_Positive]);
-	}
-	else
-	{
-		m_load_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
-	}
+	//save & load buttons' hovering feedback
+	m_save_button->ButtonUpdate();
+	m_load_button->ButtonUpdate();
 }
 
 void ResourcesInterface::Draw(sf::RenderTexture& screen)

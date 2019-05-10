@@ -58,6 +58,7 @@ public:
 	void Draw(sf::RenderTexture& screen);
 
 	bool IsHoveredByMouse();
+	void ButtonUpdate();
 
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
