@@ -20,6 +20,7 @@ enum UI_Type
 	UI_Room,
 	UI_RoomTile,
 	UI_Rudder,
+	UI_Upgrade,
 	UI_Warship,
 	UI_WaterTile,
 	UI_Weapon,

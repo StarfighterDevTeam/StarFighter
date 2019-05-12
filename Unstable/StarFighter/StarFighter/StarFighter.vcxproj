@@ -121,6 +121,7 @@
     <ClCompile Include="Rudder.cpp" />
     <ClCompile Include="Seaport.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="Upgrade.cpp" />
     <ClCompile Include="WaterTile.cpp" />
     <ClCompile Include="Warship.cpp" />
     <ClCompile Include="SFText.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Rudder.h" />
     <ClInclude Include="Seaport.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="Upgrade.h" />
     <ClInclude Include="WaterTile.h" />
     <ClInclude Include="Warship.h" />
     <ClInclude Include="SFText.h" />
