@@ -151,7 +151,7 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 
 	//choices
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
-	int choicesID[NB_CHOICES_MAX];
+	string choicesID[NB_CHOICES_MAX];
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
 		if (location != NULL)
@@ -168,13 +168,28 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
 		//has a valid choice ID?
-		if (choicesID[i] < 0)
+		if (choicesID[i].empty() == true)
 		{
 			break;
 		}
-		else if (ship->HasCommodity((CommodityType)stoi((*CurrentGame).m_choices_config[choicesID[i] - 1][Choice_CommodityRequired])) == false)
+
+		bool ok_to_continue = false;
+		int line = 0;
+		for (vector<vector <string> >::iterator it = (*CurrentGame).m_choices_config.begin(); it != (*CurrentGame).m_choices_config.end(); it++)
 		{
-			//player doesn't have the required commodities in holds for this choice to appear
+			if ((*it).front().compare(choicesID[i]) == 0)
+			{
+				ok_to_continue = ship->HasCommodity((CommodityType)stoi((*CurrentGame).m_choices_config[line][Choice_CommodityRequired])) == true;
+				break;
+			}
+			else
+			{
+				line++;
+			}
+		}
+
+		if (ok_to_continue == false)
+		{
 			continue;
 		}
 
@@ -223,7 +238,7 @@ Choice* CrewUnboardInterface::Update(sf::Time deltaTime)
 	//choices
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_choices[i].m_ID < 0)
+		if (m_choices[i].m_ID.empty() == true)
 		{
 			break;
 		}
@@ -284,7 +299,7 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_choices[i].m_ID < 0)
+		if (m_choices[i].m_ID.empty() == true)
 		{
 			break;
 		}

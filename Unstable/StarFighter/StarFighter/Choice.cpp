@@ -35,7 +35,7 @@ void Choice::Destroy()
 	m_ID = -1;
 }
 
-void Choice::Init(int index, int choiceID, string text, string portrait_filename)
+void Choice::Init(int index, string choiceID, string text, string portrait_filename)
 {
 	m_ID = choiceID;
 
@@ -50,28 +50,44 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	m_cost_commodity = Commodity_None;
 
 	//Load from an ID?
-	if (choiceID > 0)
+	if (choiceID.empty() == false)
 	{
-		choiceID--;//ID 1 starts at line 0
-		text = (*CurrentGame).m_choices_config[choiceID][Choice_Text];
-		text = StringReplace(text, "_", " ");
-
-		portrait_filename = (*CurrentGame).m_choices_config[choiceID][Choice_Picturename];
-
-		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+		int line = 0;
+		for (vector<vector <string> >::iterator it = (*CurrentGame).m_choices_config.begin(); it != (*CurrentGame).m_choices_config.end(); it++)
 		{
-			m_cost[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_CostGold + i]);
-		}
-		m_skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
-		m_gauge_value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
+			if ((*it).front().compare(choiceID) == 0)
+			{
+				text = (*CurrentGame).m_choices_config[line][Choice_Text];
+				text = StringReplace(text, "_", " ");
 
-		for (int i = 0; i < NB_CHOICE_REWARDS_MAX; i++)
-		{
-			m_rewardsID[i].first = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Reward1 + (i * 2)]);
-			m_rewardsID[i].second = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Reward1_Proba + (i * 2)]);
-		}
+				portrait_filename = (*CurrentGame).m_choices_config[line][Choice_Picturename];
 
-		m_cost_commodity = (CommodityType)stoi((*CurrentGame).m_choices_config[choiceID][Choice_CostCommodity]);
+				for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+				{
+					m_cost[i] = stoi((*CurrentGame).m_choices_config[line][Choice_CostGold + i]);
+				}
+				m_skill = stoi((*CurrentGame).m_choices_config[line][Choice_Skill]);
+				m_gauge_value_max = stoi((*CurrentGame).m_choices_config[line][Choice_ValueMax]);
+
+				for (int i = 0; i < NB_CHOICE_REWARDS_MAX; i++)
+				{
+					m_rewardsID[i].first = (*CurrentGame).m_choices_config[line][Choice_Reward1 + (i * 2)];
+					if (m_rewardsID[i].first.compare("0") == 0)
+					{
+						m_rewardsID[i].first = "";
+					}
+					m_rewardsID[i].second = stoi((*CurrentGame).m_choices_config[line][Choice_Reward1_Proba + (i * 2)]);
+				}
+
+				m_cost_commodity = (CommodityType)stoi((*CurrentGame).m_choices_config[line][Choice_CostCommodity]);
+				
+				break;
+			}
+			else
+			{
+				line++;
+			}
+		}
 	}
 
 	//Start building interface
@@ -273,9 +289,9 @@ void Choice::Draw(sf::RenderTexture& screen)
 	}
 }
 
-int Choice::RandomizeRewardID()
+string Choice::RandomizeRewardID()
 {
-	int rewardID;
+	string rewardID;
 	float random = RandomizeFloatBetweenValues(0, 100);
 	int proba_cumulated = 0;
 	for (int i = 0; i < NB_CHOICE_REWARDS_MAX; i++)
@@ -290,5 +306,5 @@ int Choice::RandomizeRewardID()
 		}
 	}
 
-	return -1;
+	return "";
 }

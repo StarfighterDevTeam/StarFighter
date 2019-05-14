@@ -64,7 +64,7 @@ public:
 	string m_display_name;
 	int m_visited_countdown;
 	LocationType m_type;
-	int m_choicesID[NB_CHOICES_MAX];
+	string m_choicesID[NB_CHOICES_MAX];
 	int m_depth;
 	bool m_known;
 };

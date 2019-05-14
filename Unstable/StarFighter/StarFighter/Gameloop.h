@@ -80,7 +80,7 @@ public:
 	bool AddCommodityToHolds(CommodityType commodity_type);
 	void RemoveCommodity(CommodityType commodity_type);
 
-	Reward* GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
+	Reward* GenerateReward(string rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
 
 	//IA
 	void SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS);

@@ -1114,11 +1114,11 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//get reward
-			int rewardID = choice->RandomizeRewardID();
+			string rewardID = choice->RandomizeRewardID();
 			Reward* reward = GenerateReward(rewardID, m_warship->m_crew_unboard_interface.m_location, m_warship->m_crew_unboard_interface.m_other_ship, choice->m_gauge_value, choice->m_gauge_value_max);
 
 			//reward is not empty? open the reward interface.
-			if (reward->m_string.empty() == false && reward->m_string.compare("[SKIP]") != 0)
+			if (reward->m_string.empty() == false && reward->m_string.compare("0") != 0)
 			{
 				//crew killed or recruited?
 				int size = reward->m_resources.size();
@@ -2466,11 +2466,10 @@ bool Gameloop::CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int widt
 	return is_on_grid && is_free;
 }
 
-Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max)
+Reward* Gameloop::GenerateReward(string rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max)
 {
-	if (rewardID > 0)
+	if (rewardID.empty() == false)
 	{
-		rewardID--;
 		Reward* reward = new Reward();
 
 		//chance of failing?
@@ -2496,82 +2495,87 @@ Reward* Gameloop::GenerateReward(int rewardID, Location* location, Ship* other_s
 
 		if (losing_reward == false)
 		{
-			//get rewards
-			int k = 0;
-			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
+			int line = 0;
+			for (vector< vector<string> >::iterator it = (*CurrentGame).m_rewards_config.begin(); it != (*CurrentGame).m_rewards_config.end(); it++)
 			{
-				int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
-
-				if (value == 0)
+				if ((*it).front().compare(rewardID) == 0)
 				{
-					continue;
-				}
-
-				if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
-				{
-					//add random + pro rata of skills invested (if any)
-					float cooldown = location->m_visited_countdown == 0 ? 1.f : (1.f * location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
-
-					if (gauge_max == 0)
+					//get rewards
+					for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 					{
-						value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+						int value = stoi((*CurrentGame).m_rewards_config[line][Reward_Gold + j]);
+
+						if (value == 0)
+						{
+							continue;
+						}
+
+						if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
+						{
+							//add random + pro rata of skills invested (if any)
+							float cooldown = location->m_visited_countdown == 0 ? 1.f : (1.f * location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+
+							if (gauge_max == 0)
+							{
+								value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+							}
+							else
+							{
+								value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+							}
+						}
+
+						pair<ResourceType, int> resource;
+						resource.first = (ResourceType)j;
+						resource.second = value;
+						reward->m_resources.push_back(resource);
 					}
-					else
+
+					//secret wreck location
+					int secret = stoi((*CurrentGame).m_rewards_config[line][Reward_SecretWreck]);
+					if (secret == 1)
 					{
-						value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+						if (m_secret_locations[Location_Wreck].size() > 0)
+						{
+							//get a secret wreck location from the water zone map
+							int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
+							reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
+						}
 					}
+
+					//commodity
+					reward->m_commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[line][Reward_Commodity]);
+
+					//combat
+					int combat = stoi((*CurrentGame).m_rewards_config[line][Reward_Combat]);
+					if (combat == 1)
+					{
+						reward->m_combat_ship = other_ship;
+					}
+
+					//dockyard
+					int dockyard = stoi((*CurrentGame).m_rewards_config[line][Reward_Dockyard]);
+					if (dockyard == 1)
+					{
+						reward->m_dockyard = location;
+					}
+
+					//reward text
+					reward->m_string = (*CurrentGame).m_rewards_config[line][Reward_Text];
+					reward->m_string = StringReplace(reward->m_string, "_", " ");
+					reward->m_string = StringCut(reward->m_string, 48);
+
+					return reward;
 				}
-
-				pair<ResourceType, int> resource;
-				resource.first = (ResourceType)j;
-				resource.second = value;
-				reward->m_resources.push_back(resource);
-
-				k++;
-			}
-
-			//secret wreck location
-			int secret = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_SecretWreck]);
-			if (secret == 1)
-			{
-				if (m_secret_locations[Location_Wreck].size() > 0)
+				else
 				{
-					//get a secret wreck location from the water zone map
-					int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
-					reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
-					k++;
+					line++;
 				}
-			}
-
-			//commodity
-			reward->m_commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Commodity]);
-
-			//combat
-			int combat = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Combat]);
-			if (combat == 1)
-			{
-				reward->m_combat_ship = other_ship;
-			}
-
-			//dockyard
-			int dockyard = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Dockyard]);
-			if (dockyard == 1)
-			{
-				reward->m_dockyard = location;
-			}
-
-			//reward text
-			reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
-			reward->m_string = StringReplace(reward->m_string, "_", " ");
-			reward->m_string = StringCut(reward->m_string, 48);
+			}	
 		}
-
-		return reward;
 	}
-	else
-	{
-		return new Reward();
-	}
+	
+	return new Reward();
 }
 
 void Gameloop::SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS)

@@ -66,13 +66,13 @@ public:
 	Choice();
 	~Choice();
 
-	void Init(int index, int choiceID, string text = "", string portrait_filename = "");
+	void Init(int index, string choiceID, string text = "", string portrait_filename = "");
 	void Destroy();
 
 	bool Update(int gauge_value);
 	void Draw(sf::RenderTexture& screen);
 	void SetPosition(sf::Vector2f position);
-	int RandomizeRewardID();
+	string RandomizeRewardID();
 
 	sf::Vector2f m_position;
 
@@ -87,12 +87,11 @@ public:
 	int m_gauge_value;
 	int m_skill;
 	int m_cost[NB_RESOURCES_TYPES];
-	int m_ID;
+	string m_ID;
 	CommodityType m_cost_commodity;
-	CommodityType m_commodity_required;
 
 	vector<GameEntity*> m_costs_displayed;
-	pair<int, int> m_rewardsID[NB_CHOICE_REWARDS_MAX];
+	pair<string, int> m_rewardsID[NB_CHOICE_REWARDS_MAX];
 	//string m_reward_string;
 	//int m_reward_resources[NB_RESOURCES_TYPES];
 	//int m_reward_crew;

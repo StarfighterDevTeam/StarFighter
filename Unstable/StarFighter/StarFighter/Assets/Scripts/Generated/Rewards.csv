@@ -1,11 +1,15 @@
 #reward_ID,reward_gold,reward_fish,reward_mech,reward_fidelity,reward_days,reward_crew,reward_secret_wreck,reward_commodity,combat,dockyard,reward_text
-1,0,1000,0,0,0,0,0,0,0,0,You_found_various_nutshells_that_can_make_for_a_very_good_meal
-2,500,0,0,0,0,1,0,0,0,0,Your_crew_wandered_on_the_beach_and_found_valuable_goods.
-3,0,0,0,20,0,0,0,3,0,0,Everyone_enjoyed_the_beach_and_comes_back_happier._You_also_found_an_interesting_amulet.
-4,500,0,10,0,0,0,0,0,0,0,"Your_crew_wandered_on_the_beach_and_found_valuable_goods,_plus_some_rare_pieces_of_anciant_tech."
-5,0,0,0,0,0,0,1,0,0,0,A_lonely_man_living_on_the_island_tells_you_about_a_secret_wreck_location_in_exchange_for_the_amulet.
-6,1000,0,10,0,0,0,0,0,0,0,You_found_a_wreck_containing_full_loads_of_gold_and_some_pieces_of_anciant_tech.
-7,0,0,0,0,0,0,0,0,0,0,The_massive_object_appears_to_be_a_seamonster._You_lose_some_of_your_divers.
-8,0,500,0,0,0,0,0,0,0,0,Thats_not_a_monster_fish_but_thats_a_pretty_good-sized_fish.
-9,0,0,0,0,0,0,0,0,1,0,You_engage_combat.
-10,0,0,0,0,0,0,0,0,0,1,[SKIP]
+beach_nutshells,0,1000,0,0,0,0,0,0,0,0,You_found_various_nutshells_that_can_make_for_a_very_good_meal
+beach_goods,500,0,0,0,0,1,0,0,0,0,Your_crew_wandered_on_the_beach_and_found_valuable_goods.
+beach_fidelity,0,0,0,20,0,0,0,3,0,0,Everyone_enjoyed_the_beach_and_comes_back_happier._You_also_found_an_interesting_amulet.
+oldman_ancient_tech,500,0,10,0,0,0,0,0,0,0,"Your_crew_wandered_on_the_beach_and_found_valuable_goods,_plus_some_rare_pieces_of_ancient_tech."
+oldman_secret_wreck,0,0,0,0,0,0,1,0,0,0,A_lonely_man_living_on_the_island_tells_you_about_a_secret_wreck_location_in_exchange_for_the_amulet.
+wreck_gold_ancient_tech,1000,0,10,0,0,0,0,0,0,0,You_found_a_wreck_containing_full_loads_of_gold_and_some_pieces_of_ancient_tech.
+seamonster,0,0,0,0,0,0,0,0,0,0,The_massive_object_appears_to_be_a_seamonster._You_lose_some_of_your_divers.
+fish,0,500,0,0,0,0,0,0,0,0,Thats_not_a_monster_fish_but_thats_a_pretty_good-sized_fish.
+start_combat,0,0,0,0,0,0,0,0,1,0,You_engage_combat.
+dockyard,0,0,0,0,0,0,0,0,0,1,0
+win_gambling1,200,0,0,0,0,0,0,0,0,0,"How_lucky_you_are._Well_done_pal,_you_win."
+lose_gambling1,0,0,0,0,0,0,0,0,0,0,Guess_that_was_not_your_day_pal._You_lose.
+win_gambling2,200,0,0,0,0,0,0,0,0,0,Again !!_Are_you_cheating_or_something_pal?_Grrrr...here_is_your_money.
+lose_gambling2,0,0,0,0,0,0,0,0,0,0,Your_luck_ends_here_pal._You_lose_this_time._That_is_life.

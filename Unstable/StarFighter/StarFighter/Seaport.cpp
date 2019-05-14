@@ -13,30 +13,30 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	{
 		case Seaport_Small:
 		{
-			m_choicesID[0] = 1;
-			m_choicesID[1] = 2;
-			m_choicesID[2] = 3;
-			m_choicesID[3] = 13;
+			m_choicesID[0] = "collect_shells";
+			m_choicesID[1] = "explore_shore";
+			m_choicesID[2] = "off_duty";
+			m_choicesID[3] = "leave_island";
 
 			texture = TextureLoader::getInstance()->loadTexture("2D/seaportS_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 			break;
 		}
 		case Seaport_Medium:
 		{
-			m_choicesID[0] = 1;
-			m_choicesID[1] = 2;
-			m_choicesID[2] = 3;
-			m_choicesID[3] = 13;
+			m_choicesID[0] = "collect_shells";
+			m_choicesID[1] = "explore_shore";
+			m_choicesID[2] = "off_duty";
+			m_choicesID[3] = "leave_island";
 
 			texture = TextureLoader::getInstance()->loadTexture("2D/seaportM_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 			break;
 		}
 		case Seaport_Large:
 		{
-			m_choicesID[0] = 1;
-			m_choicesID[1] = 14;
-			m_choicesID[2] = 3;
-			m_choicesID[3] = 13;
+			m_choicesID[0] = "collect_shells";
+			m_choicesID[1] = "dockyard";
+			m_choicesID[2] = "gambling_den";
+			m_choicesID[3] = "leave_island";
 
 			texture = TextureLoader::getInstance()->loadTexture("2D/seaportL_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 			break;
