@@ -8,7 +8,7 @@ Choice::Choice()
 	m_picture = NULL;
 	m_gauge = NULL;
 
-	m_ID = -1;
+	m_ID = "";
 }
 
 Choice::~Choice()
