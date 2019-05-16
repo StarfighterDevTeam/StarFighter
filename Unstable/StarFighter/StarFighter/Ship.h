@@ -82,7 +82,7 @@ public:
 	sf::Vector2i m_rooms_size;
 	string m_textureName;
 
-	int m_choicesID[NB_CHOICES_MAX];
+	string m_choicesID[NB_CHOICES_MAX];
 
 	int m_moves_max;
 	bool m_has_played;
