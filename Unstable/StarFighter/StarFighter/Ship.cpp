@@ -82,7 +82,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 			m_textureName = "2D/ship_neutral_icon.png";
 
 			m_choicesID[0] = "trade";
-			m_choicesID[1] = "ignore_ship";
+			m_choicesID[1] = "leave_trade";
 			m_choicesID[2] = "";
 			m_choicesID[3] = "";
 			break;
@@ -209,16 +209,8 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 		if (GetDistanceSquaredInSecondsDMS(waypoint) < 2)
 		{
 			m_DMS = waypoint->m_DMS;//snap boat to position
-			//snap AI boats' position to tile position for clean movements
-			if (m_alliance != Alliance_Player)
-			{
-				m_position = waypoint->m_position;
-				GameEntity::UpdatePosition();
-			}
-			//else
-			//{
-			//	waypoint->UpdatePosition(m_DMS);//snap tile to boat -> doesn't seem necessary because it's going to be popped back
-			//}
+			m_tile = waypoint;
+			
 			m_current_path.pop_back();
 
 			//arrived at final destination
@@ -241,12 +233,8 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 				{
 					waypoint->UpdatePosition(warshipDMS);
 				}
-				else if (m_alliance == Alliance_Player)
-				{
-					waypoint->UpdatePosition(m_DMS);//update waypoint position because the waypoint has changed
-				}
 
-				sf::Vector2f vec = waypoint->m_position - m_position;
+				sf::Vector2f vec = waypoint->m_position - m_tile->m_position;
 				ScaleVector(&vec, CRUISE_SPEED);
 				m_speed = vec;
 

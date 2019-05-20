@@ -10,6 +10,7 @@ ignore_fish,Lets_not_waste_time_and_leave.,2D/choice_prisoner_1.png,0,0,0,0,0,0,
 fight,Fight,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,start_combat,100,0,0,0,0
 flee,Flee,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 trade,Trade,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+leave_trade,Ignore_the_ship_and_leave.,2D/choice_leave_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 leave_island,Leave,2D/choice_leave_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 dockyard,Visit_the_dockyard,2D/choice_dockyard_1.png,0,0,0,0,0,0,0,0,0,dockyard,100,0,0,0,0
 gambling_den,Visit_the_gambling_den,2D/choice_gambling_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

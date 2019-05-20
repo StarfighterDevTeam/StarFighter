@@ -1956,6 +1956,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				name = StringReplace(name, "_", " ");
 
 				Ship* ship = new Ship(DMS_Coord{ 0, minute_x, 0, 0, minute_y, 0 }, (ShipType)type, (ShipAlliance)alliance);
+				ship->m_display_name = name;
 				m_ships.push_back(ship);
 			}
 			else if (t.compare("Wreck") == 0 || t.compare("SeaMonster") == 0 || t.compare("Fish") == 0)
