@@ -24,6 +24,7 @@ enum ContextualMenu
 	Menu_CrewOverboard,
 	Menu_PrisonersChoice,
 	Menu_CrewUnboard,
+	Menu_CrewUnboardLeave,
 	Menu_Reward,
 	Menu_Dockyard,
 };
@@ -81,6 +82,8 @@ public:
 	void RemoveCommodity(CommodityType commodity_type);
 
 	Reward* GenerateReward(string rewardID, Location* location, Ship* other_ship, int gauge, int gauge_max);
+	void CloseCrewUnboardInterface();
+	void SetNextMenuFromReward(Reward* reward);
 
 	//IA
 	void SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS);

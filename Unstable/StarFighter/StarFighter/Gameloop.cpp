@@ -1118,7 +1118,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			Reward* reward = GenerateReward(rewardID, m_warship->m_crew_unboard_interface.m_location, m_warship->m_crew_unboard_interface.m_other_ship, choice->m_gauge_value, choice->m_gauge_value_max);
 
 			//reward is not empty? open the reward interface.
-			if (reward->m_string.empty() == false && reward->m_string.compare("0") != 0)
+			if (reward != NULL && reward->m_string.compare("0") != 0)
 			{
 				//crew killed or recruited?
 				int size = reward->m_resources.size();
@@ -1152,27 +1152,11 @@ void Gameloop::Update(sf::Time deltaTime)
 				m_warship->m_reward_interface.Init(m_warship, reward);
 				m_menu = Menu_Reward;
 			}
-			else if (reward->m_string.empty() == false)
+			else//no reward interface
 			{
-				delete reward;
-				m_menu = Menu_Dockyard;
-				m_warship->m_dockyard_interface.Init(m_warship, reward->m_dockyard);
+				//set next menu
+				SetNextMenuFromReward(reward);
 			}
-			else
-			{
-				delete reward;
-				m_menu = Menu_None;
-			}
-
-			//Update resources cooldown
-			if (m_warship->m_crew_unboard_interface.m_location != NULL)
-			{
-				m_warship->m_crew_unboard_interface.m_location->m_visited_countdown = 1;
-			}
-
-			//Clean unboarding interface and crew
-			m_warship->m_crew_unboard_interface.Destroy();
-			m_warship->m_crew_unboarding.clear();
 		}
 	}
 	else if (m_menu == Menu_Reward)
@@ -1227,16 +1211,11 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 
-			//init combat?
-			if (m_warship->m_crew_unboard_interface.m_other_ship != NULL)
-			{
-				m_scale = Scale_Tactical;
-				StartCombatWithShip(m_warship->m_crew_unboard_interface.m_other_ship);
-			}
+			//set next menu
+			SetNextMenuFromReward(m_warship->m_reward_interface.m_reward);
 
-			//close interface
+			//kill reward interface
 			m_warship->m_reward_interface.Destroy();
-			m_menu = Menu_None;
 		}
 	}
 	else if (m_menu == Menu_Dockyard)
@@ -1247,8 +1226,14 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			//close interface
 			m_warship->m_dockyard_interface.Destroy();
-			m_menu = Menu_None;
+			m_menu = Menu_CrewUnboard;
 		}
+	}
+
+	//close crew unboard interface?
+	if (m_menu == Menu_CrewUnboardLeave)
+	{
+		CloseCrewUnboardInterface();
 	}
 
 	//Music
@@ -1276,7 +1261,7 @@ void Gameloop::Draw()
 			{
 				(*it)->Draw((*CurrentGame).m_mainScreen);
 				//secret locations (if known)
-				if ((*it)->m_location != NULL && (*it)->m_location->m_type != Location_Seaport && (*it)->m_location->m_known == true)
+				if ((*it)->m_location != NULL && (*it)->m_location->m_type != Location_Seaport && (*it)->m_location->m_known == true && (*it)->m_location->m_visited_countdown == 0)
 				{
 					(*it)->m_location->Draw((*CurrentGame).m_mainScreen);
 				}
@@ -1286,7 +1271,7 @@ void Gameloop::Draw()
 		{
 			focused_water_tile->Draw((*CurrentGame).m_mainScreen);
 			//secret locations (if known)
-			if (focused_water_tile->m_location != NULL && focused_water_tile->m_location->m_type != Location_Seaport && focused_water_tile->m_location->m_known == true)
+			if (focused_water_tile->m_location != NULL && focused_water_tile->m_location->m_type != Location_Seaport && focused_water_tile->m_location->m_known == true && focused_water_tile->m_location->m_visited_countdown == 0)
 			{
 				focused_water_tile->m_location->Draw((*CurrentGame).m_mainScreen);
 			}
@@ -1862,7 +1847,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 				}
 
 				DMS_Coord& dms = (*it)->m_tile->m_DMS;
-				data << dms.m_degree_x << " " << dms.m_minute_x << " " << dms.m_second_x << " " << dms.m_degree_y << " " << dms.m_minute_y << " " << dms.m_second_y << " " << (*it)->m_depth;
+				data << dms.m_degree_x << " " << dms.m_minute_x << " " << dms.m_second_x << " " << dms.m_degree_y << " " << dms.m_minute_y << " " << dms.m_second_y << " " << (*it)->m_depth << " " << (*it)->m_visited_countdown;
 				data << endl;
 			}
 		}
@@ -1959,6 +1944,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				Seaport* seaport = new Seaport(seaport_coord_x, seaport_coord_y, zone_coord_x, zone_coord_y, (SeaportType)seaport_type);
 				seaport->m_display_name = name;
 				seaport->m_text.setString(name);
+				seaport->m_visited_countdown = seaport_visited_countdown;
 				Island* island = seaport->AddIsland(island_upcorner_x, island_upcorner_y, island_width, island_height, island_skin);
 				m_seaports.push_back(seaport);
 			}
@@ -1974,9 +1960,9 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			}
 			else if (t.compare("Wreck") == 0 || t.compare("SeaMonster") == 0 || t.compare("Fish") == 0)
 			{
-				int degree_x, minute_x, degree_y, minute_y, depth;
+				int degree_x, minute_x, degree_y, minute_y, depth, visited_countdown;
 				float second_x, second_y;
-				std::istringstream(line) >> t >> degree_x >> minute_x >> second_x >> degree_y >> minute_y >> second_y >> depth;
+				std::istringstream(line) >> t >> degree_x >> minute_x >> second_x >> degree_y >> minute_y >> second_y >> depth >> visited_countdown;
 
 				DMS_Coord* dms = new DMS_Coord(degree_x, minute_x, second_x, degree_y, minute_y, second_y);
 				WaterTile* tile = (*CurrentGame).m_waterzones[degree_x][degree_y]->m_watertiles[minute_x][minute_y];
@@ -1999,6 +1985,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				}
 
 				location->m_depth = depth;
+				location->m_visited_countdown = visited_countdown;
 				tile->m_location = location;
 			}
 
@@ -2473,7 +2460,6 @@ Reward* Gameloop::GenerateReward(string rewardID, Location* location, Ship* othe
 		Reward* reward = new Reward();
 
 		//chance of failing?
-		bool losing_reward = false;
 		if (location != NULL && location->m_type == Location_SeaMonster)
 		{
 			int monster_strenght = (int)Lerp(location->m_depth, SEAMONSTER_DEPTH_MIN, SEAMONSTER_DEPTH_MAX, 0, gauge_max);
@@ -2489,93 +2475,92 @@ Reward* Gameloop::GenerateReward(string rewardID, Location* location, Ship* othe
 				reward->m_resources.push_back(resource);
 				reward->m_string = "The massive ojbect turns out to be a dangerous\nsea monster!\nAfter a fierce fight, your divers get torn apart.";
 
-				losing_reward = true;
+				return reward;
 			}
 		}
 
-		if (losing_reward == false)
+		int line = 0;
+		for (vector< vector<string> >::iterator it = (*CurrentGame).m_rewards_config.begin(); it != (*CurrentGame).m_rewards_config.end(); it++)
 		{
-			int line = 0;
-			for (vector< vector<string> >::iterator it = (*CurrentGame).m_rewards_config.begin(); it != (*CurrentGame).m_rewards_config.end(); it++)
+			if ((*it).front().compare(rewardID) == 0)
 			{
-				if ((*it).front().compare(rewardID) == 0)
+				//get rewards
+				for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 				{
-					//get rewards
-					for (int j = 0; j < NB_RESOURCES_TYPES; j++)
+					int value = stoi((*CurrentGame).m_rewards_config[line][Reward_Gold + j]);
+
+					if (value == 0)
 					{
-						int value = stoi((*CurrentGame).m_rewards_config[line][Reward_Gold + j]);
-
-						if (value == 0)
-						{
-							continue;
-						}
-
-						if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
-						{
-							//add random + pro rata of skills invested (if any)
-							float cooldown = location->m_visited_countdown == 0 ? 1.f : (1.f * location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
-
-							if (gauge_max == 0)
-							{
-								value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
-							}
-							else
-							{
-								value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
-							}
-						}
-
-						pair<ResourceType, int> resource;
-						resource.first = (ResourceType)j;
-						resource.second = value;
-						reward->m_resources.push_back(resource);
+						continue;
 					}
 
-					//secret wreck location
-					int secret = stoi((*CurrentGame).m_rewards_config[line][Reward_SecretWreck]);
-					if (secret == 1)
+					if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 					{
-						if (m_secret_locations[Location_Wreck].size() > 0)
+						//add random + pro rata of skills invested (if any)
+						float cooldown = location->m_visited_countdown == 0 ? 1.f : (1.f * location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+
+						if (gauge_max == 0)
 						{
-							//get a secret wreck location from the water zone map
-							int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
-							reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
+							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+						}
+						else
+						{
+							value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
 						}
 					}
 
-					//commodity
-					reward->m_commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[line][Reward_Commodity]);
-
-					//combat
-					int combat = stoi((*CurrentGame).m_rewards_config[line][Reward_Combat]);
-					if (combat == 1)
-					{
-						reward->m_combat_ship = other_ship;
-					}
-
-					//dockyard
-					int dockyard = stoi((*CurrentGame).m_rewards_config[line][Reward_Dockyard]);
-					if (dockyard == 1)
-					{
-						reward->m_dockyard = location;
-					}
-
-					//reward text
-					reward->m_string = (*CurrentGame).m_rewards_config[line][Reward_Text];
-					reward->m_string = StringReplace(reward->m_string, "_", " ");
-					reward->m_string = StringCut(reward->m_string, 48);
-
-					return reward;
+					pair<ResourceType, int> resource;
+					resource.first = (ResourceType)j;
+					resource.second = value;
+					reward->m_resources.push_back(resource);
 				}
-				else
+
+				//secret wreck location
+				int secret = stoi((*CurrentGame).m_rewards_config[line][Reward_SecretWreck]);
+				if (secret == 1)
 				{
-					line++;
+					if (m_secret_locations[Location_Wreck].size() > 0)
+					{
+						//get a secret wreck location from the water zone map
+						int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
+						reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
+					}
 				}
-			}	
-		}
+
+				//commodity
+				reward->m_commodity = (CommodityType)stoi((*CurrentGame).m_rewards_config[line][Reward_Commodity]);
+
+				//combat
+				int combat = stoi((*CurrentGame).m_rewards_config[line][Reward_Combat]);
+				if (combat == 1)
+				{
+					reward->m_combat_ship = other_ship;
+				}
+
+				//dockyard
+				int dockyard = stoi((*CurrentGame).m_rewards_config[line][Reward_Dockyard]);
+				if (dockyard == 1)
+				{
+					reward->m_dockyard = location;
+				}
+
+				//reward text
+				reward->m_string = (*CurrentGame).m_rewards_config[line][Reward_Text];
+				reward->m_string = StringReplace(reward->m_string, "_", " ");
+				reward->m_string = StringCut(reward->m_string, 48);
+
+				return reward;
+			}
+			else
+			{
+				line++;
+			}
+		}	
 	}
-	
-	return new Reward();
+	else
+	{
+		return NULL;
+	}
 }
 
 void Gameloop::SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS)
@@ -2705,5 +2690,41 @@ void Gameloop::RemoveCommodity(CommodityType commodity_type)
 			removed = true;
 			delete *it;
 		}
+	}
+}
+
+void Gameloop::CloseCrewUnboardInterface()
+{
+	m_menu = Menu_None;
+
+	//Refresh location's cooldown
+	if (m_warship->m_crew_unboard_interface.m_location != NULL)
+	{
+		m_warship->m_crew_unboard_interface.m_location->m_visited_countdown = 1;
+	}
+	
+	//Clean unboarding interface and crew
+	m_warship->m_crew_unboard_interface.Destroy();
+	m_warship->m_crew_unboarding.clear();
+}
+
+void Gameloop::SetNextMenuFromReward(Reward* reward)
+{
+	//init combat?
+	if (reward !=NULL && reward->m_combat_ship != NULL)
+	{
+		m_scale = Scale_Tactical;
+		StartCombatWithShip(reward->m_combat_ship);
+
+		m_menu = Menu_CrewUnboardLeave;
+	}
+	else if (reward != NULL && reward->m_dockyard != NULL)//open dockyard menu?
+	{
+		m_menu = Menu_Dockyard;
+		m_warship->m_dockyard_interface.Init(m_warship, reward->m_dockyard);
+	}
+	else
+	{
+		m_menu = Menu_CrewUnboardLeave;
 	}
 }

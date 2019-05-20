@@ -32,7 +32,7 @@ void Choice::Destroy()
 	m_picture = NULL;
 	m_gauge = NULL;
 
-	m_ID = -1;
+	m_ID = "";
 }
 
 void Choice::Init(int index, string choiceID, string text, string portrait_filename)

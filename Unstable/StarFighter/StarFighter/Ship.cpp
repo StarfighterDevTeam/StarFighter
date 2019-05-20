@@ -215,7 +215,10 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 				m_position = waypoint->m_position;
 				GameEntity::UpdatePosition();
 			}
-			//waypoint->UpdatePosition(m_DMS);//snap tile to boat - 06.05.2019: doesn't seem necessary anymore
+			//else
+			//{
+			//	waypoint->UpdatePosition(m_DMS);//snap tile to boat -> doesn't seem necessary because it's going to be popped back
+			//}
 			m_current_path.pop_back();
 
 			//arrived at final destination
@@ -238,10 +241,20 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 				{
 					waypoint->UpdatePosition(warshipDMS);
 				}
-				//waypoint->UpdatePosition(m_DMS);//update waypoint position (because of the previous snap)
+				else if (m_alliance == Alliance_Player)
+				{
+					waypoint->UpdatePosition(m_DMS);//update waypoint position because the waypoint has changed
+				}
+
 				sf::Vector2f vec = waypoint->m_position - m_position;
 				ScaleVector(&vec, CRUISE_SPEED);
 				m_speed = vec;
+
+				//DEBUG
+				if ((abs(m_speed.x) > 0 && abs(m_speed.x) < 2) || (abs(m_speed.y) > 0 && abs(m_speed.y) < 2))
+				{
+					printf("ERROR");
+				}
 			}
 		}
 	}
