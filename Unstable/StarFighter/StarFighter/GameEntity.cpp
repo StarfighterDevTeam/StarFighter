@@ -218,14 +218,16 @@ bool GameEntity::IsColliding(GameEntity* entityA, GameEntity* entityB)
 	}
 }
 
-void GameEntity::ButtonUpdate()
+bool GameEntity::ButtonUpdate()
 {
 	if (IsHoveredByMouse() == true && (*CurrentGame).m_window_has_focus == true)
 	{
 		m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_CrewFidelity_Positive]);
+		return true;
 	}
 	else
 	{
 		m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
+		return false;
 	}
 }

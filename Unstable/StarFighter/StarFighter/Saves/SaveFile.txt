@@ -1,8 +1,8 @@
-DMS 0 6 0 10
-Gold 990
-Fish 980
+DMS 0 7 0 12
+Gold 987
+Fish 974
 Mech 100
-Fidelity 58
+Fidelity 53
 Days 10
 Crew Reynold_Fletcher 0 1 0 20 20 6 14 12 14 18 8 0 0 1
 Island 0 0 17 36 1 0 18 36 1 2 0 Paradise_Island
@@ -73,7 +73,7 @@ Ship 35 27 0 1 Eagle
 Ship 16 25 0 1 Sparrow
 Ship 30 35 1 1 Medusa
 Ship 3 26 1 1 Prosperity
-Ship 7 5 1 1 The_Andromeda
+Ship 7 8 1 1 The_Andromeda
 Ship 20 44 1 1 Albatros
 Ship 18 19 1 1 Faithful
 Ship 42 24 1 1 Bathgate
@@ -94,7 +94,7 @@ Ship 55 58 1 1 Vulcan
 Ship 58 40 1 1 Longbow
 Ship 11 58 1 1 El_Capitan
 Ship 57 11 1 1 Rose_des_Vents
-Ship 12 10 1 1 Margaret
+Ship 9 10 1 1 Margaret
 Ship 20 33 1 1 Rose_des_Vents
 Ship 26 13 1 1 El_Capitan
 Ship 3 50 1 1 Vulcan
@@ -103,7 +103,7 @@ Ship 45 35 1 1 Zephyr
 Ship 34 34 1 1 Discovery
 Ship 43 20 1 2 Sea_Turtle
 Ship 58 13 1 2 Medusa
-Ship 8 10 1 2 Prosperity
+Ship 8 12 1 2 Prosperity
 Ship 33 32 1 2 Longbow
 Ship 46 55 1 2 Gryhound
 Ship 3 42 1 2 Aurora
@@ -117,11 +117,11 @@ Ship 15 15 1 2 The_Eclipse
 Ship 27 1 1 2 Newbark
 Ship 32 6 1 2 Alouette
 Ship 38 12 1 2 Ghost
-Ship 8 10 1 2 Longbow
+Ship 8 12 1 2 Longbow
 Ship 50 36 1 2 Sea_Turtle
 Ship 14 32 1 2 Discovery
 Ship 54 43 1 2 Medusa
-Ship 3 18 1 2 Zephyr
+Ship 2 20 1 2 Zephyr
 Ship 40 54 1 2 El_Capitan
 Ship 32 46 1 2 Alouette
 Ship 35 16 1 2 Bathgate
@@ -130,7 +130,7 @@ Ship 32 1 1 2 The_Eclipse
 Ship 20 8 1 2 Gryhound
 Ship 51 13 1 2 Faithful
 Ship 45 0 1 2 Albatros
-Ship 3 11 1 2 Vulcan
+Ship 5 12 1 2 Vulcan
 Wreck 0 36 0 0 24 0 84 0
 Wreck 0 6 0 0 51 0 181 0
 Wreck 0 18 0 0 38 0 126 0

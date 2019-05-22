@@ -20,6 +20,7 @@ enum UI_Type
 	UI_Room,
 	UI_RoomTile,
 	UI_Rudder,
+	UI_ShopItem,
 	UI_Upgrade,
 	UI_Warship,
 	UI_WaterTile,
@@ -59,7 +60,7 @@ public:
 	void Draw(sf::RenderTexture& screen);
 
 	bool IsHoveredByMouse();
-	void ButtonUpdate();
+	bool ButtonUpdate();
 
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;

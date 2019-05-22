@@ -4,6 +4,8 @@
 #include "Game.h"
 #include "GameEntity.h"
 
+#define UPGRADE_ICON_SIZE				64
+
 enum UpgradeType
 {
 	Upgrade_None,

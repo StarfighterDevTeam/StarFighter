@@ -93,12 +93,12 @@ bool Gameloop::GetSaveOrLoadInputs()
 		SavePlayerData(m_warship);
 		return true;
 	}
-	else if (m_resources_interface.m_save_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
+	else if (m_resources_interface.m_save_button->ButtonUpdate() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
 	{
 		SavePlayerData(m_warship);
 		return true;
 	}
-	else if (m_resources_interface.m_load_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
+	else if (m_resources_interface.m_load_button->ButtonUpdate() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
 	{
 		//todo: clean current game
 		LoadPlayerData(m_warship);

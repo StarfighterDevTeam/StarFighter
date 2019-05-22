@@ -308,10 +308,6 @@ void ResourcesInterface::Update()
 		(*it)->GetHoveredState();
 		k++;
 	}
-
-	//save & load buttons' hovering feedback
-	m_save_button->ButtonUpdate();
-	m_load_button->ButtonUpdate();
 }
 
 void ResourcesInterface::Draw(sf::RenderTexture& screen)
