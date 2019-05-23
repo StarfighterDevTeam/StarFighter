@@ -338,3 +338,25 @@ bool Warship::HasCommodity(CommodityType commodity)
 
 	return false;
 }
+
+bool Warship::ApplyUpgrade(UpgradeType upgrade_type)
+{
+	switch (upgrade_type)
+	{
+		case Upgrade_SonarI:
+		{
+			m_sonar = 100;
+			break;
+		}
+		case Upgrade_SonarII:
+		{
+			m_sonar = 200;
+			break;
+		}
+
+		default:
+			break;
+	}
+
+	return true;
+}

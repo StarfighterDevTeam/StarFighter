@@ -19,7 +19,7 @@ Upgrade::Upgrade(UpgradeType type) : GameEntity(UI_Upgrade)
 		}
 		case Upgrade_SonarII:
 		{
-			m_value = 1500;
+			m_value = 1000;
 			m_display_name = "Sonar II";
 			m_description = "Allows to detect underwater elements down to 100 meters of depth.";
 			m_texture_name = "2D/upgrade_sonar_2.png";

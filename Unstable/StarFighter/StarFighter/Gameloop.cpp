@@ -1220,9 +1220,14 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 	else if (m_menu == Menu_Dockyard)
 	{
-		m_warship->m_dockyard_interface.Update(deltaTime);
+		UpgradeType buy_upgrade = m_warship->m_dockyard_interface.Update(deltaTime);
+		if (buy_upgrade != Upgrade_None)
+		{
+			//apply upgrade
+			m_warship->ApplyUpgrade(buy_upgrade);
+		}
 
-		if (m_warship->m_dockyard_interface.m_leave_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
+		if (m_warship->m_dockyard_interface.m_leave_button->ButtonUpdate() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			//close interface
 			m_warship->m_dockyard_interface.Destroy();

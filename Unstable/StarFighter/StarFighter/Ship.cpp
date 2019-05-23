@@ -143,6 +143,12 @@ Ship::~Ship()
 	delete m_rudder;
 
 	m_combat_interface.Destroy();
+
+	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
+	{
+		delete *it;
+	}
+	m_upgrades.clear();
 }
 
 WaterTile* Ship::GetWaterTileAtDMSCoord(DMS_Coord coord)
@@ -2283,4 +2289,25 @@ bool Ship::HasCommodity(CommodityType commodity)
 {
 	//see override in class Warship
 	return false;
+}
+
+bool Ship::BuyUpgrade(Upgrade* upgrade)
+{
+	if (m_resources[Resource_Gold] < upgrade->m_value)
+	{
+		return false;//insufficient gold
+	}
+
+	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
+	{
+		if ((*it)->m_type == upgrade->m_type)
+		{
+			return false;//upgrade already owned
+		}
+	}
+
+	AddResource(Resource_Gold, -upgrade->m_value);
+	m_upgrades.push_back(new Upgrade(upgrade->m_type));
+
+	return true;
 }

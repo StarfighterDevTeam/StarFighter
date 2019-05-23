@@ -26,7 +26,7 @@ void DockyardInterface::Destroy()
 	delete m_leave_button;
 	m_leave_button = NULL;
 
-	for (vector<GameEntity*>::iterator it = m_items.begin(); it != m_items.end(); it++)
+	for (vector<ShopItem*>::iterator it = m_items.begin(); it != m_items.end(); it++)
 	{
 		delete *it;
 	}
@@ -51,7 +51,7 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
 	
 	//narrative text
-	string ss_narrative = "Welcome to your dockyard.\nPlease suit yourself and buy all what you need for your ship.";
+	string ss_narrative = "Welcome to your dockyard.\nPlease suit yourself and buy all what you need for your ship (with left-click).";
 	
 	float offset_y = m_panel->m_position.y - DOCKYARDINTERFACE_SIZE_Y * 0.5;
 	offset_y += 20;
@@ -65,44 +65,53 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	offset_y += m_narrative_text.getGlobalBounds().height + 50;
 
 	//array of items
-	for (int i = 0; i < 2; i++)
+	for (vector<UpgradeType>::iterator it = m_location->m_upgrades.begin(); it != m_location->m_upgrades.end(); it++)
 	{
-		GameEntity* item = new GameEntity(UI_ShopItem);
-		item->m_shape_container.setSize(sf::Vector2f(SHOP_ITEM_CONTAINER_SIZE_X, SHOP_ITEM_CONTAINER_SIZE_Y));
-		item->m_shape_container.setOrigin(sf::Vector2f(item->m_shape_container.getSize().x * 0.5, item->m_shape_container.getSize().y * 0.5));
-		item->m_shape_container.setFillColor(sf::Color::Black);
-		item->m_shape_container.setOutlineThickness(2);
-		item->m_shape_container.setOutlineColor(sf::Color::White);
-		item->m_shape_container.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_shape_container.getSize().x * 0.5, offset_y + SHOP_ITEM_CONTAINER_SIZE_Y * 0.5));
+		ShopItem* item = new ShopItem(*it);
 
-		item->m_shape.setSize(sf::Vector2f(UPGRADE_ICON_SIZE, UPGRADE_ICON_SIZE));
-		item->m_shape.setOrigin(sf::Vector2f(item->m_shape.getSize().x * 0.5, item->m_shape.getSize().y * 0.5));
-		item->m_shape.setFillColor(sf::Color::Black);
-		item->m_shape.setOutlineThickness(2);
-		item->m_shape.setOutlineColor(sf::Color::White);
-		item->m_shape.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_shape.getSize().x * 0.5 + 8, item->m_shape_container.getPosition().y));
+		//container
+		item->m_upgrade->m_shape_container.setSize(sf::Vector2f(SHOP_ITEM_CONTAINER_SIZE_X, SHOP_ITEM_CONTAINER_SIZE_Y));
+		item->m_upgrade->m_shape_container.setOrigin(sf::Vector2f(item->m_upgrade->m_shape_container.getSize().x * 0.5, item->m_upgrade->m_shape_container.getSize().y * 0.5));
+		item->m_upgrade->m_shape_container.setFillColor(sf::Color::Black);
+		item->m_upgrade->m_shape_container.setOutlineThickness(2);
+		item->m_upgrade->m_shape_container.setOutlineColor(sf::Color::White);
+		item->m_upgrade->m_shape_container.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_upgrade->m_shape_container.getSize().x * 0.5, offset_y + SHOP_ITEM_CONTAINER_SIZE_Y * 0.5));
 
-		Upgrade* sonar;
-		if (i == 0)
-			sonar = new Upgrade(Upgrade_SonarI);
-		else if (i == 1)
-			sonar = new Upgrade(Upgrade_SonarII);
+		//icon container
+		item->m_upgrade->m_shape.setSize(sf::Vector2f(UPGRADE_ICON_SIZE, UPGRADE_ICON_SIZE));
+		item->m_upgrade->m_shape.setOrigin(sf::Vector2f(item->m_upgrade->m_shape.getSize().x * 0.5, item->m_upgrade->m_shape.getSize().y * 0.5));
+		item->m_upgrade->m_shape.setFillColor(sf::Color::Black);
+		item->m_upgrade->m_shape.setOutlineThickness(2);
+		item->m_upgrade->m_shape.setOutlineColor(sf::Color::White);
+		item->m_upgrade->m_shape.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_upgrade->m_shape.getSize().x * 0.5 + 8, item->m_upgrade->m_shape_container.getPosition().y));
 
-		string texture_name = sonar->m_texture_name;
-		Texture* texture = TextureLoader::getInstance()->loadTexture(texture_name, UPGRADE_ICON_SIZE, UPGRADE_ICON_SIZE);
-		string display_name = sonar->m_display_name;
-		delete sonar;
-		item->setAnimation(texture, 1, 1);
-		item->setPosition(item->m_shape.getPosition());
+		//icon
+		Texture* texture = TextureLoader::getInstance()->loadTexture(item->m_upgrade->m_texture_name, UPGRADE_ICON_SIZE, UPGRADE_ICON_SIZE);
+		item->m_upgrade->setAnimation(texture, 1, 1);
+		item->m_upgrade->setPosition(item->m_upgrade->m_shape.getPosition());
 
-		item->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		item->m_text.setCharacterSize(20);
-		item->m_text.setStyle(sf::Text::Bold);
-		item->m_text.setColor(sf::Color::White);
-		item->m_text.setString(display_name);
-		item->m_text.setPosition(sf::Vector2f(item->m_shape.getPosition().x + item->m_shape.getSize().x * 0.5 + 12, item->getPosition().y - item->m_text.getCharacterSize() * 0.65));
+		//text
+		item->m_upgrade->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		item->m_upgrade->m_text.setCharacterSize(20);
+		item->m_upgrade->m_text.setStyle(sf::Text::Bold);
+		item->m_upgrade->m_text.setColor(sf::Color::White);
+		item->m_upgrade->m_text.setString(item->m_upgrade->m_display_name);
+		item->m_upgrade->m_text.setPosition(sf::Vector2f(item->m_upgrade->m_shape.getPosition().x + item->m_upgrade->m_shape.getSize().x * 0.5 + 12, item->m_upgrade->getPosition().y - item->m_upgrade->m_text.getCharacterSize() * 0.65));
 
+		//cost
+		Texture* texture_gold = TextureLoader::getInstance()->loadTexture("2D/icon_gold.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+		item->m_cost->setAnimation(texture_gold, 1, 1);
+		item->m_cost->setPosition(sf::Vector2f(item->m_upgrade->m_shape_container.getPosition().x + item->m_upgrade->m_shape_container.getSize().x * 0.5 - 100, item->m_upgrade->getPosition().y));
+
+		item->m_cost->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		item->m_cost->m_text.setCharacterSize(16);
+		item->m_cost->m_text.setStyle(sf::Text::Bold);
+		item->m_cost->m_text.setColor(sf::Color::White);
+		item->m_cost->m_text.setString(to_string(item->m_upgrade->m_value));
+		item->m_cost->m_text.setPosition(sf::Vector2f(item->m_cost->getPosition().x + RESOURCES_ICON_SIZE * 0.5 + 8, item->m_cost->getPosition().y - item->m_cost->m_text.getCharacterSize() * 0.65));
+		
 		m_items.push_back(item);
+
 		offset_y += SHOP_ITEM_CONTAINER_SIZE_Y;
 	}
 	
@@ -124,26 +133,45 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	m_leave_button->m_text.setPosition(sf::Vector2f(m_leave_button->m_shape_container.getPosition().x - m_leave_button->m_text.getGlobalBounds().width * 0.5, offset_y - m_leave_button->m_text.getCharacterSize() * 0.65));
 }
 
-void DockyardInterface::Update(sf::Time deltaTime)
+UpgradeType DockyardInterface::Update(sf::Time deltaTime)
 {
-	//leave button's hovering feedback
-	m_leave_button->ButtonUpdate();
+	UpgradeType upgrade = Upgrade_None;
 
 	//detail interface for the focused (hovered) item
 	bool focus = false;
-	for (vector<GameEntity*>::iterator it = m_items.begin(); it != m_items.end(); it++)
+	for (vector<ShopItem*>::iterator it = m_items.begin(); it != m_items.end(); it++)
 	{
-		if ((*it)->ButtonUpdate() == true)
+		//update text color if not enough money to buy
+		if (m_ship->m_resources[Resource_Gold] < (*it)->m_upgrade->m_value)
+		{
+			(*it)->m_cost->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+		}
+		else
+		{
+			(*it)->m_cost->m_text.setColor(sf::Color::White);
+		}
+
+		//hovering
+		if ((*it)->m_upgrade->ButtonUpdate() == true)
 		{
 			//if not already focused, create a detail interface for this item
-			if (m_focused_item != *it)
+			if (m_focused_item != (*it)->m_upgrade)
 			{
 				DestroyDetail();	
-				InitDetail(Upgrade_SonarI);
-				m_focused_item = *it;
+				InitDetail((*it)->m_upgrade);
+				m_focused_item = (*it)->m_upgrade;
 			}
 
 			focus = true;
+
+			//click = faction
+			if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
+			{
+				if (m_ship->BuyUpgrade((*it)->m_upgrade) == true)
+				{
+					upgrade = (*it)->m_upgrade->m_type;//buying upgrade
+				}
+			}
 		}
 	}
 
@@ -152,6 +180,8 @@ void DockyardInterface::Update(sf::Time deltaTime)
 	{
 		DestroyDetail();
 	}
+
+	return upgrade;
 }
 
 void DockyardInterface::Draw(sf::RenderTexture& screen)
@@ -161,9 +191,10 @@ void DockyardInterface::Draw(sf::RenderTexture& screen)
 
 	m_leave_button->Draw(screen);
 
-	for (vector<GameEntity*>::iterator it = m_items.begin(); it != m_items.end(); it++)
+	for (vector<ShopItem*>::iterator it = m_items.begin(); it != m_items.end(); it++)
 	{
-		(*it)->Draw(screen);
+		(*it)->m_upgrade->Draw(screen);
+		(*it)->m_cost->Draw(screen);
 	}
 
 	if (m_focused_item != NULL)
@@ -174,7 +205,7 @@ void DockyardInterface::Draw(sf::RenderTexture& screen)
 	}
 }
 
-void DockyardInterface::InitDetail(UpgradeType upgrade)
+void DockyardInterface::InitDetail(Upgrade* upgrade)
 {
 	m_detail_panel = new GameEntity(UI_None);
 	m_detail_panel->m_shape_container.setSize(sf::Vector2f(DOCKYARDINTERFACE_DETAIL_SIZE_X, DOCKYARDINTERFACE_DETAIL_SIZE_Y));
@@ -182,17 +213,19 @@ void DockyardInterface::InitDetail(UpgradeType upgrade)
 	m_detail_panel->m_shape_container.setFillColor(sf::Color::Black);
 	m_detail_panel->m_shape_container.setOutlineThickness(2);
 	m_detail_panel->m_shape_container.setOutlineColor(sf::Color::White);
-	m_detail_panel->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x + m_detail_panel->m_shape_container.getSize().x * 0.5, m_items[0]->getPosition().y - m_items[0]->m_shape_container.getSize().y * 0.5 + m_detail_panel->m_shape_container.getSize().y * 0.5));
+	m_detail_panel->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x + m_detail_panel->m_shape_container.getSize().x * 0.5, m_items[0]->m_upgrade->getPosition().y - m_items[0]->m_upgrade->m_shape_container.getSize().y * 0.5 + m_detail_panel->m_shape_container.getSize().y * 0.5));
 	m_detail_panel->m_position = m_detail_panel->m_shape_container.getPosition();
 
-	m_detail_title.setString("TITRE");
+	m_detail_title.setString(upgrade->m_display_name);
 	m_detail_title.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_detail_title.setCharacterSize(16);
 	m_detail_title.setStyle(sf::Text::Bold);
-	m_detail_title.setColor(sf::Color::Green);
+	m_detail_title.setColor((*CurrentGame).m_dico_colors[Color_Green_System]);
 	m_detail_title.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5 + 8, m_detail_panel->m_position.y - m_detail_panel->m_shape_container.getSize().y * 0.5 + 8));
 
-	m_detail_body.setString("Texte\navec\ndes lignes");
+	string description = upgrade->m_description;
+	description = StringCut(description, 44);
+	m_detail_body.setString(description);
 	m_detail_body.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_detail_body.setCharacterSize(16);
 	m_detail_body.setStyle(sf::Text::Bold);
@@ -209,4 +242,17 @@ void DockyardInterface::DestroyDetail()
 	m_detail_body.setString("");
 
 	m_focused_item = NULL;
+}
+
+ShopItem::ShopItem(UpgradeType upgrade_type)
+{
+	m_upgrade = new Upgrade(upgrade_type);
+	m_cost = new GameEntity(UI_None);
+}
+
+
+ShopItem::~ShopItem()
+{
+	delete m_upgrade;
+	delete m_cost;
 }

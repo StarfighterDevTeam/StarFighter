@@ -4,7 +4,6 @@
 #include "Game.h"
 #include "Ship.h"
 #include "CrewUnboardInterface.h"
-#include "Upgrade.h"
 
 #define DOCKYARDINTERFACE_SIZE_X		CREWUNBOARDINTERFACE_SIZE_X
 #define DOCKYARDINTERFACE_SIZE_Y		CREWUNBOARDINTERFACE_SIZE_Y
@@ -15,6 +14,16 @@
 #define SHOP_ITEM_CONTAINER_SIZE_X			400
 #define SHOP_ITEM_CONTAINER_SIZE_Y			80
 
+class ShopItem
+{
+public:
+	ShopItem(UpgradeType upgrade_type);
+	~ShopItem();
+	Upgrade* m_upgrade;
+	GameEntity* m_cost;
+};
+
+
 struct DockyardInterface
 {
 	DockyardInterface();
@@ -23,10 +32,10 @@ struct DockyardInterface
 	void Init(Ship* ship, Location* location);
 	void Destroy();
 
-	void InitDetail(UpgradeType upgrade);
+	void InitDetail(Upgrade* upgrade);
 	void DestroyDetail();
 
-	/*Choice*/void Update(sf::Time deltaTime);
+	UpgradeType Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 
 	Ship* m_ship;
@@ -34,8 +43,8 @@ struct DockyardInterface
 	GameEntity* m_panel;
 	sf::Text m_narrative_text;
 
-	vector<GameEntity*> m_items;
-	
+	vector<ShopItem*> m_items;
+
 	GameEntity* m_detail_panel;
 	GameEntity* m_focused_item;
 	sf::Text m_detail_title;
@@ -43,5 +52,6 @@ struct DockyardInterface
 
 	GameEntity* m_leave_button;
 };
+
 
 #endif //DOCKYARDINTERFACE_H_INCLUDED

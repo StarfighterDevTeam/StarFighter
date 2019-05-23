@@ -87,6 +87,9 @@ public:
 	int m_moves_max;
 	bool m_has_played;
 
+	vector<Upgrade*> m_upgrades;
+	bool BuyUpgrade(Upgrade* upgrade);
+
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
 	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);

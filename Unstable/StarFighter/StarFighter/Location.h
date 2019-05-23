@@ -3,6 +3,7 @@
 
 #include "Game.h"
 #include "GameEntity.h"
+#include "Upgrade.h"
 
 #define RESOURCES_REFRESH_RATE_IN_DAYS			40
 #define NB_CHOICES_MAX							4
@@ -67,6 +68,7 @@ public:
 	string m_choicesID[NB_CHOICES_MAX];
 	int m_depth;
 	bool m_known;
+	vector<UpgradeType> m_upgrades;
 };
 
 #endif //LOCATION_H_INCLUDED

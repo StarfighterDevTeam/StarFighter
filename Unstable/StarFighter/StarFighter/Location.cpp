@@ -15,6 +15,9 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 		{
 			//see choices in class Seaport
 			m_depth = 0;
+			m_upgrades.push_back(Upgrade_SonarI);
+			m_upgrades.push_back(Upgrade_SonarII);
+
 			break;
 		}
 

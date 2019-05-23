@@ -127,14 +127,6 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 		resources_displayed->m_shape.setFillColor(sf::Color::Black);
 		resources_displayed->m_shape.setPosition(resources_displayed->getPosition());
 
-		//ostringstream ss_resource;
-		//ss_resource << reward->m_resources[i].second;
-		//resources_displayed->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		//resources_displayed->m_text.setCharacterSize(20);
-		//resources_displayed->m_text.setColor(sf::Color::White);
-		//resources_displayed->m_text.setString(ss_resource.str());
-		//resources_displayed->m_text.setPosition(sf::Vector2f(resources_displayed->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, resources_displayed->m_shape.getPosition().y - resources_displayed->m_text.getCharacterSize() * 0.65));
-
 		m_resources_displayed.push_back(resources_displayed);
 	}
 
