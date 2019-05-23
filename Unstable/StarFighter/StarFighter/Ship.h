@@ -139,6 +139,7 @@ public:
 	bool AddResource(ResourceType resource, int value);
 	void PayUpkeepCost(int days);
 	virtual bool HasCommodity(CommodityType commodity);
+	bool HasUpgradeRequiredFor(string upgrade_type);
 
 	//AI
 	void UpdateAITilesCanBeSeen();

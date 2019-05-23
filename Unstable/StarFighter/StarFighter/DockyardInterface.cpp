@@ -141,7 +141,7 @@ string DockyardInterface::Update(sf::Time deltaTime)
 	bool focus = false;
 	for (vector<ShopItem*>::iterator it = m_items.begin(); it != m_items.end(); it++)
 	{
-		//update text color if not enough money to buy
+		//update cost's text color if not enough money to buy
 		if (m_ship->m_resources[Resource_Gold] < (*it)->m_upgrade->m_cost)
 		{
 			(*it)->m_cost->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
@@ -149,6 +149,16 @@ string DockyardInterface::Update(sf::Time deltaTime)
 		else
 		{
 			(*it)->m_cost->m_text.setColor(sf::Color::White);
+		}
+
+		//update textore color if required upgrade not owned
+		if (m_ship->HasUpgradeRequiredFor((*it)->m_upgrade->m_type) == true)
+		{
+			(*it)->m_upgrade->m_text.setColor(sf::Color::White);
+		}
+		else
+		{
+			(*it)->m_upgrade->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
 		}
 
 		//hovering
@@ -202,6 +212,7 @@ void DockyardInterface::Draw(sf::RenderTexture& screen)
 		m_detail_panel->Draw(screen);
 		screen.draw(m_detail_title);
 		screen.draw(m_detail_body);
+		screen.draw(m_detail_requirement);
 	}
 }
 
@@ -231,6 +242,42 @@ void DockyardInterface::InitDetail(Upgrade* upgrade)
 	m_detail_body.setStyle(sf::Text::Bold);
 	m_detail_body.setColor(sf::Color::White);
 	m_detail_body.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5 + 8, m_detail_title.getPosition().y + m_detail_title.getCharacterSize() + 10));
+
+	if (upgrade->m_upgrade_required.compare("0") != 0)
+	{
+		string requirement_display_name;
+		for (vector<vector<string> >::iterator it = (*CurrentGame).m_upgrades_config.begin(); it != (*CurrentGame).m_upgrades_config.end(); it++)
+		{
+			if ((*it)[Upgrade_ID].compare(upgrade->m_upgrade_required) == 0)
+			{
+				requirement_display_name = (*it)[Upgrade_Name];
+				requirement_display_name = StringReplace(requirement_display_name, "_", " ");
+				m_detail_requirement.setString("Upgrade required: " + requirement_display_name);
+				m_detail_requirement.setFont(*(*CurrentGame).m_font[Font_Arial]);
+				m_detail_requirement.setCharacterSize(16);
+				m_detail_requirement.setStyle(sf::Text::Bold);
+				m_detail_requirement.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5 + 8, m_detail_body.getPosition().y + m_detail_body.getGlobalBounds().height + 10));
+				
+				//set color (red = upgrade required not owned)
+				bool found = false;
+				for (vector<Upgrade*>::iterator it2 = m_ship->m_upgrades.begin(); it2 != m_ship->m_upgrades.end(); it2++)
+				{
+					if ((*it)[Upgrade_ID].compare((*it2)->m_type) == 0)
+					{
+						m_detail_requirement.setColor(sf::Color::White);
+						found = true;
+						break;
+					}
+				}
+				if (found == false)
+				{
+					m_detail_requirement.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+				}
+				
+				break;
+			}
+		}
+	}
 }
 
 void DockyardInterface::DestroyDetail()
@@ -240,6 +287,7 @@ void DockyardInterface::DestroyDetail()
 
 	m_detail_title.setString("");
 	m_detail_body.setString("");
+	m_detail_requirement.setString("");
 
 	m_focused_item = NULL;
 }

@@ -31,7 +31,7 @@ public:
 	string m_description;
 	string m_texture_name;
 	int m_dynamic_value;
-	string m_required_upgrade;
+	string m_upgrade_required;
 };
 
 #endif //UPGRADE_H_INCLUDED

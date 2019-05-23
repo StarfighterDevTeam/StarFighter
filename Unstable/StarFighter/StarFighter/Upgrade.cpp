@@ -17,7 +17,7 @@ Upgrade::Upgrade(string upgrade_type) : GameEntity(UI_Upgrade)
 			m_texture_name = (*it)[Upgrade_TextureName];
 			m_dynamic_value = stoi((*it)[Upgrade_DynamicValue]);
 			m_description = StringReplace(m_description, "#1$", (*it)[Upgrade_DynamicValue]);
-			m_required_upgrade = (*it)[Upgrade_UpgradeRequired];
+			m_upgrade_required = (*it)[Upgrade_UpgradeRequired];
 			return;
 		}
 	}

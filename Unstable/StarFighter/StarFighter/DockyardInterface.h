@@ -48,6 +48,7 @@ struct DockyardInterface
 	GameEntity* m_focused_item;
 	sf::Text m_detail_title;
 	sf::Text m_detail_body;
+	sf::Text m_detail_requirement;
 
 	GameEntity* m_leave_button;
 };

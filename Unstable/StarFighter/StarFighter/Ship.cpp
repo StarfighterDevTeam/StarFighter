@@ -2298,7 +2298,7 @@ bool Ship::BuyUpgrade(Upgrade* upgrade)
 		return false;//insufficient gold
 	}
 
-	bool upgrade_required_owned = (upgrade->m_required_upgrade.compare("0") == 0);
+	bool upgrade_required_owned = (upgrade->m_upgrade_required.compare("0") == 0);
 
 	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
 	{
@@ -2307,7 +2307,7 @@ bool Ship::BuyUpgrade(Upgrade* upgrade)
 			return false;//upgrade already owned
 		}
 
-		if (upgrade_required_owned == false && (*it)->m_type.compare(upgrade->m_required_upgrade) == 0)
+		if (upgrade_required_owned == false && (*it)->m_type.compare(upgrade->m_upgrade_required) == 0)
 		{
 			upgrade_required_owned = true;
 		}
@@ -2322,4 +2322,31 @@ bool Ship::BuyUpgrade(Upgrade* upgrade)
 	m_upgrades.push_back(new Upgrade(upgrade->m_type));
 
 	return true;
+}
+
+bool Ship::HasUpgradeRequiredFor(string upgrade_type)
+{
+	for (vector<vector<string> >::iterator it = (*CurrentGame).m_upgrades_config.begin(); it != (*CurrentGame).m_upgrades_config.end(); it++)
+	{
+		if ((*it)[Upgrade_ID].compare(upgrade_type) == 0)
+		{
+			string upgrade_required = (*it)[Upgrade_UpgradeRequired];
+			if (upgrade_required.compare("0") == 0)
+			{
+				return true;
+			}
+
+			for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
+			{
+				if ((*it)->m_type.compare(upgrade_required) == 0)
+				{
+					return true;
+				}
+			}
+
+			break;
+		}
+	}
+
+	return false;
 }
