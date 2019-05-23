@@ -6,28 +6,32 @@
 
 #define UPGRADE_ICON_SIZE				64
 
-enum UpgradeType
+enum UpgradeData
 {
-	Upgrade_None,
-	Upgrade_SonarI,
-	Upgrade_SonarII,
-	Upgrade_Lifeboat,
-	Upgrade_DivingSuit,
-	Upgrade_Repair,
-	NB_UPGRADE_TYPES,
+	Upgrade_ID,
+	Upgrade_Name,
+	Upgrade_TextureName,
+	Upgrade_Cost,
+	Upgrade_Description,
+	Upgrade_DynamicValue,
+	Upgrade_UpgradeRequired,
+	Upgrade_Stat,
+	NB_UPGRADE_DATA,
 };
 
 struct Upgrade : GameEntity
 {
 public:
-	Upgrade(UpgradeType type);
+	Upgrade(string upgrade_type);
 	~Upgrade();
 	
-	UpgradeType m_type;
-	int m_value;
+	string m_type;
+	int m_cost;
 	string m_display_name;
 	string m_description;
 	string m_texture_name;
+	int m_dynamic_value;
+	string m_required_upgrade;
 };
 
 #endif //UPGRADE_H_INCLUDED

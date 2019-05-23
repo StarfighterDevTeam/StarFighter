@@ -117,24 +117,25 @@ std::string StringCut(std::string str, const size_t length);
 #define INTERACTION_BUTTON_X_FILENAME			"2D/HUD/Button_X.png"
 #define INTERACTION_BUTTON_Y_FILENAME			"2D/HUD/Button_Y.png"
 #define INTERACTION_BUTTON_B_FILENAME			"2D/HUD/Button_B.png"
-#define INTERACTION_BUTTON_WIDTH				16
+#define INTERACTION_BUTTON_WIDTH					16
 #define INTERACTION_BUTTON_HEIGHT				16
 #define INTERACTION_BUTTON_MARGIN				4
 #define INTERACTION_INTERBLOCK					20
-#define INTERACTION_MARGIN_SIDES				12
+#define INTERACTION_MARGIN_SIDES					12
 #define SFPANEL_SPECIFIC_WIDTH					200
 #define SFPANEL_SPECIFIC_HEIGHT					100
 
 //CSV DATA
 #define CHOICES_CSV_FILE							"Scripts/Generated/Choices.csv"
 #define REWARDS_CSV_FILE							"Scripts/Generated/Rewards.csv"
-#define COMMODITY_CSV_FILE							"Scripts/Generated/Commodity.csv"
-#define PIRATE_NAMES_MALE_CSV						"Scripts/Generated/PirateNamesMale.csv"
-#define PIRATE_NAMES_FEMALE_CSV						"Scripts/Generated/PirateNamesFemale.csv"
-#define PIRATE_SURNAMES_CSV							"Scripts/Generated/PirateSurnames.csv"
+#define COMMODITY_CSV_FILE						"Scripts/Generated/Commodity.csv"
+#define UPGRADES_CSV_FILE						"Scripts/Generated/Upgrades.csv"
+#define PIRATE_NAMES_MALE_CSV					"Scripts/Generated/PirateNamesMale.csv"
+#define PIRATE_NAMES_FEMALE_CSV					"Scripts/Generated/PirateNamesFemale.csv"
+#define PIRATE_SURNAMES_CSV						"Scripts/Generated/PirateSurnames.csv"
 #define ISLAND_NAMES_CSV							"Scripts/Generated/IslandNames.csv"
-#define SHIP_NAMES_FIRSTCLASS_CSV					"Scripts/Generated/ShipNamesFirstClass.csv"
-#define SHIP_NAMES_SECONDCLASS_CSV					"Scripts/Generated/ShipNamesSecondClass.csv"
+#define SHIP_NAMES_FIRSTCLASS_CSV				"Scripts/Generated/ShipNamesFirstClass.csv"
+#define SHIP_NAMES_SECONDCLASS_CSV				"Scripts/Generated/ShipNamesSecondClass.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

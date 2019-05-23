@@ -65,7 +65,7 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	offset_y += m_narrative_text.getGlobalBounds().height + 50;
 
 	//array of items
-	for (vector<UpgradeType>::iterator it = m_location->m_upgrades.begin(); it != m_location->m_upgrades.end(); it++)
+	for (vector<string>::iterator it = m_location->m_upgrades.begin(); it != m_location->m_upgrades.end(); it++)
 	{
 		ShopItem* item = new ShopItem(*it);
 
@@ -107,7 +107,7 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 		item->m_cost->m_text.setCharacterSize(16);
 		item->m_cost->m_text.setStyle(sf::Text::Bold);
 		item->m_cost->m_text.setColor(sf::Color::White);
-		item->m_cost->m_text.setString(to_string(item->m_upgrade->m_value));
+		item->m_cost->m_text.setString(to_string(item->m_upgrade->m_cost));
 		item->m_cost->m_text.setPosition(sf::Vector2f(item->m_cost->getPosition().x + RESOURCES_ICON_SIZE * 0.5 + 8, item->m_cost->getPosition().y - item->m_cost->m_text.getCharacterSize() * 0.65));
 		
 		m_items.push_back(item);
@@ -133,16 +133,16 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	m_leave_button->m_text.setPosition(sf::Vector2f(m_leave_button->m_shape_container.getPosition().x - m_leave_button->m_text.getGlobalBounds().width * 0.5, offset_y - m_leave_button->m_text.getCharacterSize() * 0.65));
 }
 
-UpgradeType DockyardInterface::Update(sf::Time deltaTime)
+string DockyardInterface::Update(sf::Time deltaTime)
 {
-	UpgradeType upgrade = Upgrade_None;
+	string upgrade_type = "";
 
 	//detail interface for the focused (hovered) item
 	bool focus = false;
 	for (vector<ShopItem*>::iterator it = m_items.begin(); it != m_items.end(); it++)
 	{
 		//update text color if not enough money to buy
-		if (m_ship->m_resources[Resource_Gold] < (*it)->m_upgrade->m_value)
+		if (m_ship->m_resources[Resource_Gold] < (*it)->m_upgrade->m_cost)
 		{
 			(*it)->m_cost->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
 		}
@@ -169,7 +169,7 @@ UpgradeType DockyardInterface::Update(sf::Time deltaTime)
 			{
 				if (m_ship->BuyUpgrade((*it)->m_upgrade) == true)
 				{
-					upgrade = (*it)->m_upgrade->m_type;//buying upgrade
+					upgrade_type = (*it)->m_upgrade->m_type;//buying upgrade
 				}
 			}
 		}
@@ -181,7 +181,7 @@ UpgradeType DockyardInterface::Update(sf::Time deltaTime)
 		DestroyDetail();
 	}
 
-	return upgrade;
+	return upgrade_type;
 }
 
 void DockyardInterface::Draw(sf::RenderTexture& screen)
@@ -244,7 +244,7 @@ void DockyardInterface::DestroyDetail()
 	m_focused_item = NULL;
 }
 
-ShopItem::ShopItem(UpgradeType upgrade_type)
+ShopItem::ShopItem(string upgrade_type)
 {
 	m_upgrade = new Upgrade(upgrade_type);
 	m_cost = new GameEntity(UI_None);

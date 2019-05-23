@@ -2293,20 +2293,32 @@ bool Ship::HasCommodity(CommodityType commodity)
 
 bool Ship::BuyUpgrade(Upgrade* upgrade)
 {
-	if (m_resources[Resource_Gold] < upgrade->m_value)
+	if (m_resources[Resource_Gold] < upgrade->m_cost)
 	{
 		return false;//insufficient gold
 	}
 
+	bool upgrade_required_owned = (upgrade->m_required_upgrade.compare("0") == 0);
+
 	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
 	{
-		if ((*it)->m_type == upgrade->m_type)
+		if ((*it)->m_type.compare(upgrade->m_type) == 0)
 		{
 			return false;//upgrade already owned
 		}
+
+		if (upgrade_required_owned == false && (*it)->m_type.compare(upgrade->m_required_upgrade) == 0)
+		{
+			upgrade_required_owned = true;
+		}
 	}
 
-	AddResource(Resource_Gold, -upgrade->m_value);
+	if (upgrade_required_owned == false)
+	{
+		return false;//upgrade required not owned
+	}
+
+	AddResource(Resource_Gold, -upgrade->m_cost);
 	m_upgrades.push_back(new Upgrade(upgrade->m_type));
 
 	return true;

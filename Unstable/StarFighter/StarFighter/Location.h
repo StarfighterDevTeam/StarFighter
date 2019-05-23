@@ -68,7 +68,7 @@ public:
 	string m_choicesID[NB_CHOICES_MAX];
 	int m_depth;
 	bool m_known;
-	vector<UpgradeType> m_upgrades;
+	vector<string> m_upgrades;
 };
 
 #endif //LOCATION_H_INCLUDED

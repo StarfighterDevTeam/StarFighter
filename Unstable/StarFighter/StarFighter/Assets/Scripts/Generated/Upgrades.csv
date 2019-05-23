@@ -1,0 +1,5 @@
+#upgrade_ID,display_name,textureName,value,description,dyanmic_value1,upgrade_required,upgrade_stat
+sonar1,Sonar_I,2D/upgrade_sonar_1.png,200,Allow_to_detect_underwater_elements_down_to_#1$_meters_of_depth.,100,0,sonar
+sonar2,Sonar_II,2D/upgrade_sonar_1.png,300,Allow_to_detect_underwater_elements_down_to_#1$_meters_of_depth.,150,sonar1,sonar
+sonar3,Sonar_III,2D/upgrade_sonar_1.png,400,Allow_to_detect_underwater_elements_down_to_#1$_meters_of_depth.,200,sonar2,sonar
+lifeboat1,Lifeboat_I,2D/upgrade_sonar_1.png,100,Allow_to_unboard_and_rescue_#1$_crew_members.,5,0,lifeboat

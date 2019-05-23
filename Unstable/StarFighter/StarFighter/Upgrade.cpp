@@ -2,54 +2,27 @@
 
 extern Game* CurrentGame;
 
-Upgrade::Upgrade(UpgradeType type) : GameEntity(UI_Upgrade)
+Upgrade::Upgrade(string upgrade_type) : GameEntity(UI_Upgrade)
 {
-	m_type = type;
-	m_value = 0;
-
-	switch (type)
+	for (vector<vector<string > >::iterator it = (*CurrentGame).m_upgrades_config.begin(); it != (*CurrentGame).m_upgrades_config.end(); it++)
 	{
-		case Upgrade_SonarI:
+		if ((*it)[Upgrade_ID].compare(upgrade_type) == 0)
 		{
-			m_value = 500;
-			m_display_name = "Sonar I";
-			m_description = "Allows to detect underwater elements down to 50 meters of depth.";
-			m_texture_name = "2D/upgrade_sonar_1.png";
-			break;
-		}
-		case Upgrade_SonarII:
-		{
-			m_value = 1000;
-			m_display_name = "Sonar II";
-			m_description = "Allows to detect underwater elements down to 100 meters of depth.";
-			m_texture_name = "2D/upgrade_sonar_2.png";
-			break;
-		}
-		case Upgrade_Lifeboat:
-		{
-			m_value = 1000;
-			m_display_name = "Lifeboat";
-			m_description = "Allows to unboard crew members on islands.";
-			m_texture_name = "2D/upgrade_sonar_1.png";
-			break;
-		}
-		case Upgrade_DivingSuit:
-		{
-			m_value = 1000;
-			m_display_name = "Lifeboat";
-			m_description = "Allows to send crew members diving underneath the sea.";
-			m_texture_name = "2D/upgrade_sonar_1.png";
-			break;
-		}
-		case Upgrade_Repair:
-		{
-			m_value = 100;
-			m_display_name = "Repair";
-			m_description = "Restore 100 health to your ship.";
-			m_texture_name = "2D/upgrade_sonar_1.png";
-			break;
+			m_type = upgrade_type;
+			m_cost = stoi((*it)[Upgrade_Cost]);
+			m_display_name = (*it)[Upgrade_Name];
+			m_display_name = StringReplace(m_display_name, "_", " ");
+			m_description = (*it)[Upgrade_Description];
+			m_description = StringReplace(m_description, "_", " ");
+			m_texture_name = (*it)[Upgrade_TextureName];
+			m_dynamic_value = stoi((*it)[Upgrade_DynamicValue]);
+			m_description = StringReplace(m_description, "#1$", (*it)[Upgrade_DynamicValue]);
+			m_required_upgrade = (*it)[Upgrade_UpgradeRequired];
+			return;
 		}
 	}
+
+	printf("ERROR: can't find upgrade %s in database\n", upgrade_type.c_str());
 }
 
 Upgrade::~Upgrade()

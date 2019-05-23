@@ -48,7 +48,7 @@ public:
 	void UpdateUpkeepCosts();
 	bool HasCommodity(CommodityType commodity) override;
 
-	bool ApplyUpgrade(UpgradeType upgrade_type);
+	bool ApplyUpgrade(string upgrade_type);
 };
 
 #endif //WARSHIP_H_INCLUDED

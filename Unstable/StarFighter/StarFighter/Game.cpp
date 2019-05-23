@@ -184,6 +184,7 @@ Game::Game(RenderWindow& window)
 	m_choices_config = *(FileLoaderUtils::FileLoader(CHOICES_CSV_FILE));
 	m_rewards_config = *(FileLoaderUtils::FileLoader(REWARDS_CSV_FILE));
 	m_commodities_config = *(FileLoaderUtils::FileLoader(COMMODITY_CSV_FILE));
+	m_upgrades_config = *(FileLoaderUtils::FileLoader(UPGRADES_CSV_FILE));
 }
 
 string Game::GetRandomNameFromDico(vector<string>& dico, vector<string>& dico_used)

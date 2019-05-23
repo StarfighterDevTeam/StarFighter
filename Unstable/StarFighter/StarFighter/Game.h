@@ -262,6 +262,7 @@ public:
 	vector<vector<string> > m_choices_config;
 	vector<vector<string> > m_rewards_config;
 	vector<vector<string> > m_commodities_config;
+	vector<vector<string> > m_upgrades_config;
 
 	//void CreateSFTextPop(const Font& font, unsigned int size, Uint32 style, const Color& color, string text_string, float distance_not_faded, float distance_faded, float total_pop_time, GameEntity* target, float offset_positionY);
 

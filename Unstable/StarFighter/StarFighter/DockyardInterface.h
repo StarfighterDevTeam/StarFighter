@@ -17,12 +17,11 @@
 class ShopItem
 {
 public:
-	ShopItem(UpgradeType upgrade_type);
+	ShopItem(string upgrade_type);
 	~ShopItem();
 	Upgrade* m_upgrade;
 	GameEntity* m_cost;
 };
-
 
 struct DockyardInterface
 {
@@ -35,7 +34,7 @@ struct DockyardInterface
 	void InitDetail(Upgrade* upgrade);
 	void DestroyDetail();
 
-	UpgradeType Update(sf::Time deltaTime);
+	string Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 
 	Ship* m_ship;

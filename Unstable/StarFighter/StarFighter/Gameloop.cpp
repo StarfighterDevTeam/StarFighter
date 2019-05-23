@@ -1220,8 +1220,8 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 	else if (m_menu == Menu_Dockyard)
 	{
-		UpgradeType buy_upgrade = m_warship->m_dockyard_interface.Update(deltaTime);
-		if (buy_upgrade != Upgrade_None)
+		string buy_upgrade = m_warship->m_dockyard_interface.Update(deltaTime);
+		if (buy_upgrade.empty() == false)
 		{
 			//apply upgrade
 			m_warship->ApplyUpgrade(buy_upgrade);

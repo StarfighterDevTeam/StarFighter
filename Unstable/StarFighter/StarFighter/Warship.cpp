@@ -339,24 +339,26 @@ bool Warship::HasCommodity(CommodityType commodity)
 	return false;
 }
 
-bool Warship::ApplyUpgrade(UpgradeType upgrade_type)
+bool Warship::ApplyUpgrade(string upgrade_type)
 {
-	switch (upgrade_type)
+	for (vector<vector<string> >::iterator it = (*CurrentGame).m_upgrades_config.begin(); it != (*CurrentGame).m_upgrades_config.end(); it++)
 	{
-		case Upgrade_SonarI:
+		if ((*it)[Upgrade_ID].compare(upgrade_type) == 0)
 		{
-			m_sonar = 100;
-			break;
-		}
-		case Upgrade_SonarII:
-		{
-			m_sonar = 200;
-			break;
-		}
+			int value = stoi((*it)[Upgrade_DynamicValue]);
 
-		default:
-			break;
+			if ((*it)[Upgrade_Stat].compare("sonar") == 0)
+			{
+				m_sonar = value;
+			}
+			else if ((*it)[Upgrade_Stat].compare("lifeboat") == 0)
+			{
+				m_lifeboats = value;
+			}
+
+			return true;
+		}
 	}
 
-	return true;
+	return false;
 }
