@@ -1490,6 +1490,12 @@ void Ship::Reset()
 		m_crew[j].clear();
 	}
 
+	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
+	{
+		delete *it;
+	}
+	m_upgrades.clear();
+
 	m_speed = sf::Vector2f(0, 0);
 }
 
@@ -2319,7 +2325,6 @@ bool Ship::BuyUpgrade(Upgrade* upgrade)
 	}
 
 	AddResource(Resource_Gold, -upgrade->m_cost);
-	m_upgrades.push_back(new Upgrade(upgrade->m_type));
 
 	return true;
 }

@@ -1781,6 +1781,11 @@ int Gameloop::SavePlayerData(Warship* warship)
 		data << "Mech " << warship->m_resources[Resource_Mech] << endl;
 		data << "Fidelity " << warship->m_resources[Resource_Fidelity] << endl;
 		data << "Days " << warship->m_resources[Resource_Days] << endl;
+		
+		for (vector<Upgrade*>::iterator it = warship->m_upgrades.begin(); it != warship->m_upgrades.end(); it++)
+		{
+			data << "Upgrade " << (*it)->m_type << endl;
+		}
 
 		for (int j = 0; j < 2; j++)
 		{
@@ -1906,7 +1911,14 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			string t;
 			std::istringstream(line) >> t;
 
-			if (t.compare("Crew") == 0)
+			if (t.compare("Upgrade") == 0)
+			{
+				string upgrade_type;
+				std::istringstream(line) >> t >> upgrade_type;
+				
+				warship->ApplyUpgrade(upgrade_type);
+			}
+			else if (t.compare("Crew") == 0)
 			{
 				string name;
 				int type, race, skin;

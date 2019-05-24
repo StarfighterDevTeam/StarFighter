@@ -356,6 +356,8 @@ bool Warship::ApplyUpgrade(string upgrade_type)
 				m_lifeboats = value;
 			}
 
+			m_upgrades.push_back(new Upgrade(upgrade_type));
+
 			return true;
 		}
 	}
