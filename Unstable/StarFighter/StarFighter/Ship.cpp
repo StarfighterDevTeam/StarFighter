@@ -2355,3 +2355,16 @@ bool Ship::HasUpgradeRequiredFor(string upgrade_type)
 
 	return false;
 }
+
+bool Ship::HasUpgrade(string upgrade_type)
+{
+	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
+	{
+		if ((*it)->m_type.compare(upgrade_type) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}

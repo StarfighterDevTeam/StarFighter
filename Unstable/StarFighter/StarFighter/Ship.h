@@ -140,6 +140,7 @@ public:
 	void PayUpkeepCost(int days);
 	virtual bool HasCommodity(CommodityType commodity);
 	bool HasUpgradeRequiredFor(string upgrade_type);
+	bool HasUpgrade(string upgrade_type);
 
 	//AI
 	void UpdateAITilesCanBeSeen();

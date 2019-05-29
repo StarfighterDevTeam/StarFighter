@@ -164,6 +164,7 @@ enum Color_Chart
 	Color_Red_Impossible,
 	Color_DarkGrey_Background,
 	Color_VeryDarkGrey_Background,
+	Color_DarkGrey_AlreadyPossessed,
 	Color_Orange_System,
 	Color_Green_System,
 	Color_Green_Lifebar,

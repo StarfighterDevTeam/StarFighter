@@ -179,6 +179,7 @@ Game::Game(RenderWindow& window)
 	m_dico_colors[Color_Green_Lifebar] = m_dico_colors[Color_Green_System];
 	m_dico_colors[Color_Red_Impossible] = m_dico_colors[Color_Red_Target_Locked];
 	m_dico_colors[Color_Magenta_EngineCharged] = m_dico_colors[Color_Magenta_Crew];
+	m_dico_colors[Color_DarkGrey_AlreadyPossessed] = m_dico_colors[Color_DarkGrey_Background];
 
 	//load database files
 	m_choices_config = *(FileLoaderUtils::FileLoader(CHOICES_CSV_FILE));

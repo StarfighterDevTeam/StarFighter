@@ -151,14 +151,19 @@ string DockyardInterface::Update(sf::Time deltaTime)
 			(*it)->m_cost->m_text.setColor(sf::Color::White);
 		}
 
-		//update textore color if required upgrade not owned
-		if (m_ship->HasUpgradeRequiredFor((*it)->m_upgrade->m_type) == true)
+		//update text color if required upgrade not owned
+		if (m_ship->HasUpgradeRequiredFor((*it)->m_upgrade->m_type) == false)
 		{
-			(*it)->m_upgrade->m_text.setColor(sf::Color::White);
+			(*it)->m_upgrade->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+		}
+		else if (m_ship->HasUpgrade((*it)->m_upgrade->m_type) == true)
+		{
+			(*it)->m_upgrade->m_text.setColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
+			(*it)->m_cost->m_text.setColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 		}
 		else
 		{
-			(*it)->m_upgrade->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+			(*it)->m_upgrade->m_text.setColor(sf::Color::White);
 		}
 
 		//hovering
