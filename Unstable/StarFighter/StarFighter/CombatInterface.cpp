@@ -21,6 +21,7 @@ CombatInterface::CombatInterface()
 	m_lifebar = NULL;
 	m_floodbar = NULL;
 	m_crewbar = NULL;
+	m_sonar = NULL;
 	m_ship_name = NULL;
 	m_ship_info = NULL;
 }
@@ -30,6 +31,7 @@ CombatInterface::~CombatInterface()
 	delete m_lifebar;
 	delete m_floodbar;
 	delete m_crewbar;
+	delete m_sonar;
 	delete m_ship_name;
 	delete m_ship_info;
 	//delete m_distance_line;
@@ -52,11 +54,13 @@ void CombatInterface::Destroy()
 	delete m_lifebar;
 	delete m_floodbar;
 	delete m_crewbar;
+	delete m_sonar;
 	delete m_ship_name;
 	delete m_ship_info;
 	m_lifebar = NULL;
 	m_floodbar = NULL;
 	m_crewbar = NULL;
+	m_sonar = NULL;
 	m_ship_name = NULL;
 	m_ship_info = NULL;
 
@@ -67,7 +71,8 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 {
 	m_ship = ship;
 	
-	Texture* texture = TextureLoader::getInstance()->loadTexture("2D/icon_crew.png", 30, 30);
+	Texture* texture_crew = TextureLoader::getInstance()->loadTexture("2D/icon_crew.png", 30, 30);
+	Texture* texture_sonar = TextureLoader::getInstance()->loadTexture("2D/icon_sonar.png", 30, 30);
 
 	float offset = alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
 
@@ -127,13 +132,23 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 
 	//crew bar
 	m_crewbar = new GameEntity(UI_None);
-	m_crewbar->setAnimation(texture, 1, 1);
+	m_crewbar->setAnimation(texture_crew, 1, 1);
 	m_crewbar->setPosition(sf::Vector2f(offset - COMBAT_LIFEBAR_SIZE_X * 0.5f + 16, floodbar_pos.y + COMBAT_LIFEBAR_SIZE_Y * 0.5f + 16));
 
 	m_crewbar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_crewbar->m_text.setCharacterSize(20);
 	m_crewbar->m_text.setColor(sf::Color::White);
-	m_crewbar->m_text.setPosition(sf::Vector2f(m_crewbar->getPosition().x + 20, m_crewbar->getPosition().y - 14));
+	m_crewbar->m_text.setPosition(sf::Vector2f(m_crewbar->getPosition().x + m_crewbar->m_size.x * 0.5 + 4, m_crewbar->getPosition().y - 14));
+
+	//sonar
+	m_sonar = new GameEntity(UI_Sonar);
+	m_sonar->setAnimation(texture_sonar, 1, 1);
+	m_sonar->setPosition(sf::Vector2f(m_crewbar->m_text.getPosition().x + 50 + m_sonar->m_size.x * 0.5, m_crewbar->getPosition().y));
+
+	m_sonar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_sonar->m_text.setCharacterSize(20);
+	m_sonar->m_text.setColor(sf::Color::White);
+	m_sonar->m_text.setPosition(sf::Vector2f(m_sonar->getPosition().x + m_sonar->m_size.x * 0.5 + 2, m_crewbar->m_text.getPosition().y));
 
 	//distance interface
 	//m_distance_line = new GameEntity(UI_None);
@@ -181,7 +196,7 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 	//}
 }
 
-void CombatInterface::Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max)
+void CombatInterface::Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max, int sonar)
 {
 	if (m_ship == NULL)
 	{
@@ -225,6 +240,14 @@ void CombatInterface::Update(int health, int health_max, int flood, int flood_ma
 	ostringstream ss_crew;
 	ss_crew << nb_crew << "/" << nb_crew_max;
 	m_crewbar->m_text.setString(ss_crew.str());
+
+	//sonar
+	if (sonar >= 0)
+	{
+		ostringstream ss_sonar;
+		ss_sonar << sonar << "m";
+		m_sonar->m_text.setString(ss_sonar.str());
+	}
 	
 	//distance
 	//float distance_ratio = m_enemy_ship->m_distance_combat / DISTANCE_COMBAT_INIT;
@@ -242,10 +265,13 @@ void CombatInterface::Draw(sf::RenderTexture& screen)
 	m_ship_name->Draw(screen);
 	m_ship_info->Draw(screen);
 
-	//life bar
-	m_crewbar->Draw(screen);
+	//life bars
 	m_floodbar->Draw(screen);
 	m_lifebar->Draw(screen);
+
+	//other infos
+	m_crewbar->Draw(screen);
+	m_sonar->Draw(screen);
 	
 	//distance
 	//m_distance_line->Draw(screen);

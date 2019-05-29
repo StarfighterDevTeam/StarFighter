@@ -49,6 +49,7 @@ public:
 	bool HasCommodity(CommodityType commodity) override;
 
 	bool ApplyUpgrade(string upgrade_type);
+	void UpdateRooms();
 };
 
 #endif //WARSHIP_H_INCLUDED

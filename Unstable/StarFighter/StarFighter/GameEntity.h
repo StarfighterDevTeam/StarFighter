@@ -21,6 +21,7 @@ enum UI_Type
 	UI_RoomTile,
 	UI_Rudder,
 	UI_ShopItem,
+	UI_Sonar,
 	UI_Upgrade,
 	UI_Warship,
 	UI_WaterTile,

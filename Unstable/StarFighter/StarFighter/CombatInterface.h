@@ -30,13 +30,14 @@ struct CombatInterface
 	GameEntity* m_lifebar;
 	GameEntity* m_floodbar;
 	GameEntity* m_crewbar;
+	GameEntity* m_sonar;
 	//GameEntity* m_distance_line;
 	//GameEntity* m_distance_markers[5];
 	//GameEntity* m_distance_ships[2];
 	GameEntity* m_ship_name;
 	GameEntity* m_ship_info;
 
-	void Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max);
+	void Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max, int sonar);
 	void Draw(sf::RenderTexture& screen);
 };
 

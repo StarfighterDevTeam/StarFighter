@@ -33,6 +33,8 @@ void CrewUnboardInterface::Destroy()
 
 	m_ship = NULL;
 	m_location = NULL;
+	m_other_ship = NULL;
+	m_slots_avaible = 0;
 
 	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 	{
@@ -53,7 +55,14 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 	m_ship = ship;
 	m_location = location;
 	m_other_ship = other_ship;
-	m_slots_avaible = ship->m_lifeboats;
+	if (location->m_type == Location_Seaport)
+	{
+		m_slots_avaible = ship->m_lifeboats;
+	}
+	else
+	{
+		m_slots_avaible = ship->m_diving_suits;
+	}
 
 	//background panel
 	m_panel = new GameEntity(UI_None);

@@ -11,6 +11,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	m_seaport = NULL;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
 	m_lifeboats = 0;
+	m_diving_suits = 0; 
 	if (type < NB_SHIP_TYPES)
 	{
 		m_display_name = (*CurrentGame).GetRandomNameFromDico((*CurrentGame).m_dico_ships_names[type], (*CurrentGame).m_dico_ships_names_used[type]);
@@ -847,9 +848,6 @@ void Ship::BuildShip()
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
 		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
-
-	//lifeboats
-	m_lifeboats += lifeboats->m_tiles.size();
 
 	//crew
 	m_nb_crew_max = 12;

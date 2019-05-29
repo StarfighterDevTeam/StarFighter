@@ -1,12 +1,9 @@
 DMS 0 7 0 12
-Gold 567
+Gold 1567
 Fish 844
 Mech 100
 Fidelity 51
 Days 10
-Upgrade sonar1
-Upgrade sonar2
-Upgrade lifeboat1
 Crew Jamie 0 1 2 20 20 5 16 13 11 14 16 0 0 1
 Crew Lucy 0 1 1 20 20 17 20 6 9 7 5 0 9 5
 Crew Serena 1 0 2 20 20 7 9 6 7 5 5 0 9 6

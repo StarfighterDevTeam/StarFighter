@@ -13,7 +13,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 	m_can_be_seen = true;
 	m_can_open_new_menu = false;
-	m_sonar = 300;
+	m_sonar = 50;
 	m_holds_capacity = 4;
 
 	m_flee_timer = 0.f;
@@ -74,7 +74,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	Room* weapon_room = AddRoom(8, 5, 3, 4, Room_Weapon);
 
 	m_health = m_health_max;
-	m_lifeboats += 4;
+	m_lifeboats = 4;
+	m_diving_suits = 4;
 	m_nb_crew_max = 8;
 
 	//center position of each room & room tiles
@@ -363,4 +364,30 @@ bool Warship::ApplyUpgrade(string upgrade_type)
 	}
 
 	return false;
+}
+
+void Warship::UpdateRooms()
+{
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		switch ((*it)->m_type)
+		{
+			case Room_Lifeboat:
+			{
+				ostringstream ss;
+				ss << (*CurrentGame).m_dico_room_types[(*it)->m_type] << ": " << to_string(m_lifeboats);
+				(*it)->m_text.setString(ss.str());
+				break;
+			}
+			case Room_Diving:
+			{
+				ostringstream ss;
+				ss << (*CurrentGame).m_dico_room_types[(*it)->m_type] << ": " << to_string(m_diving_suits);
+				(*it)->m_text.setString(ss.str());
+				break;
+			}
+			default:
+				break;
+		}
+	}
 }

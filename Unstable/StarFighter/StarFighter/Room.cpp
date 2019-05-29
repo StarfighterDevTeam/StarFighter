@@ -51,15 +51,6 @@ Room::~Room()
 	}
 }
 
-void Room::Update(Time deltaTime)
-{
-	ostringstream ss;
-	ss << (*CurrentGame).m_dico_room_types[m_type];
-	m_text.setString(ss.str());
-
-	GameEntity::Update(deltaTime);
-}
-
 bool Room::IsConnectedToRoom(Room* room)
 {
 	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)

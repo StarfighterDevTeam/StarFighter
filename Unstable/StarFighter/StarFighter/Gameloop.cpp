@@ -331,6 +331,9 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 
 				ship->GameEntity::Update(deltaTime);
+
+				//Rooms
+				m_warship->UpdateRooms();
 			}
 			else//AI
 			{
@@ -715,7 +718,12 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Combat interface
-			ship->m_combat_interface.Update(ship->m_health, ship->m_health_max, ship->m_flood, ship->m_flood_max, ship->m_nb_crew, ship->m_nb_crew_max);
+			int sonar = -1;
+			if (ship == m_warship)
+			{
+				sonar = m_warship->m_sonar;
+			}
+			ship->m_combat_interface.Update(ship->m_health, ship->m_health_max, ship->m_flood, ship->m_flood_max, ship->m_nb_crew, ship->m_nb_crew_max, sonar);
 		}
 
 		ship->UpdateTactical(deltaTime);
