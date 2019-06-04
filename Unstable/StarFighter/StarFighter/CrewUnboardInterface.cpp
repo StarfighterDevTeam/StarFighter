@@ -55,11 +55,11 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 	m_ship = ship;
 	m_location = location;
 	m_other_ship = other_ship;
-	if (location->m_type == Location_Seaport)
+	if (location != NULL && location->m_type == Location_Seaport)
 	{
 		m_slots_avaible = ship->m_lifeboats;
 	}
-	else
+	else if (location != NULL)
 	{
 		m_slots_avaible = ship->m_diving_suits;
 	}
