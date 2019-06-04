@@ -246,10 +246,10 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 				m_speed = vec;
 
 				//DEBUG
-				if ((abs(m_speed.x) > 0 && abs(m_speed.x) < 2) || (abs(m_speed.y) > 0 && abs(m_speed.y) < 2))
-				{
-					printf("ERROR");
-				}
+				//if ((abs(m_speed.x) > 0 && abs(m_speed.x) < 2) || (abs(m_speed.y) > 0 && abs(m_speed.y) < 2))
+				//{
+				//	printf("ERROR");
+				//}
 			}
 		}
 	}
@@ -286,6 +286,18 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_y -= minutes;
 		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
+	}
+
+	//minimum values
+	if (m_DMS.m_minute_x < 0)
+	{
+		m_DMS.m_minute_x = 0;
+		m_DMS.m_second_x = 0;
+	}
+	if (m_DMS.m_minute_y < 0)
+	{
+		m_DMS.m_minute_y = 0;
+		m_DMS.m_second_y = 0;
 	}
 
 	//update tile information
@@ -1514,7 +1526,7 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 		{
 			waypoint->UpdatePosition(warshipDMS);
 		}
-		sf::Vector2f vec = waypoint->m_position - m_position;
+		sf::Vector2f vec = waypoint->m_position - m_tile->m_position;
 		ScaleVector(&vec, CRUISE_SPEED);
 		m_speed = vec;
 	}
