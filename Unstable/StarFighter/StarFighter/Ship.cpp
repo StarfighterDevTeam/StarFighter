@@ -1526,6 +1526,10 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile, DMS_Coord warshipDMS)
 		{
 			waypoint->UpdatePosition(warshipDMS);
 		}
+		if (m_tile->m_can_be_seen == false)
+		{
+			m_tile->UpdatePosition(warshipDMS);
+		}
 		sf::Vector2f vec = waypoint->m_position - m_tile->m_position;
 		ScaleVector(&vec, CRUISE_SPEED);
 		m_speed = vec;
