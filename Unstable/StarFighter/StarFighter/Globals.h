@@ -3,9 +3,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "TextureLoader.h"
-#include "TextUtils.h"
-#include "Logger.h"
 #include <assert.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -17,12 +14,6 @@ void createSavesDirectory();
 const char* getSavesPath();
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 std::string StringCut(std::string str, const size_t length);
-
-#ifdef __APPLE__
-	#define PLAYER_SAVE_FILE						"SaveFile.txt"
-#else
-	#define PLAYER_SAVE_FILE						"Saves/SaveFile.txt"
-#endif
 
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080
