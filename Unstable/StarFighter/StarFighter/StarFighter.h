@@ -22,6 +22,42 @@ enum MutationType
 	Mutation_Expand,
 };
 
+struct Evolution
+{
+	Evolution()
+	{
+		m_mutation = -1;
+		m_crossover = -1;
+		m_gen = -1;
+		for (int i = 0; i < 4; i++)
+		{
+			m_dna_input_a[i] = -1;
+			m_dna_input_b[i] = -1;
+			m_dna_output[i] = -1;
+		}
+	}
+
+	void Copy(Evolution& const evolution)
+	{
+		m_mutation = evolution.m_mutation;
+		m_crossover = evolution.m_crossover;
+		m_gen = evolution.m_gen;
+		for (int i = 0; i < 4; i++)
+		{
+			m_dna_input_a[i] = evolution.m_dna_input_a[i];
+			m_dna_input_b[i] = evolution.m_dna_input_b[i];
+			m_dna_output[i] = evolution.m_dna_output[i];
+		}
+	}
+
+	int m_mutation;
+	int m_crossover;
+	int m_gen;
+	int m_dna_input_a[4];
+	int m_dna_input_b[4];
+	int m_dna_output[4];
+};
+
 class Individual
 {
 public:
@@ -30,14 +66,25 @@ public:
 		RandomizeDNA();
 	};
 
+	std::vector<Evolution> m_evolution_record;
+
 	void RandomizeDNA()
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			m_dna[i] = RandomizeIntBetweenValues(0, 7);
 		}
+
+		m_evolution_record.clear();
 	}
 
+	static void CopyDNA(int dna_input[], int dna_output[])
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			dna_output[i] = dna_input[i];
+		}
+	}
 	void DisplayDNA()
 	{
 		for (int i = 0; i < 4; i++)
@@ -58,11 +105,20 @@ public:
 		{
 			m_dna[i] = individual.m_dna[i];
 		}
+
+		//m_evolution_record.clear();
+		//
+		//for (int i = 0; i < individual.m_evolution_record.size(); i++)
+		//{
+		//	Evolution evolution;
+		//	evolution.Copy(individual.m_evolution_record[i]);
+		//	m_evolution_record.push_back(evolution);
+		//}
 	}
 	static void CrossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type)
 	{
 		switch (type)
-			{
+		{
 			case CrossOver_FirstHalf:
 			{
 				for (int i = 0; i < 4; i++)
@@ -110,6 +166,13 @@ public:
 		default:
 			break;
 		}
+
+		Evolution evolution;
+		evolution.m_crossover = (int)type;
+		Individual::CopyDNA(input_a.m_dna, evolution.m_dna_input_a);
+		Individual::CopyDNA(input_b.m_dna, evolution.m_dna_input_b);
+		Individual::CopyDNA(output.m_dna, evolution.m_dna_output);
+		output.m_evolution_record.push_back(evolution);
 	}
 	static void Mutate(Individual& output, Individual& input, MutationType type)
 	{
@@ -136,15 +199,18 @@ public:
 			default:
 				break;
 		}
+
+		Evolution evolution;
+		evolution.m_mutation = (int)type;
+		Individual::CopyDNA(input.m_dna, evolution.m_dna_input_a);
+		Individual::CopyDNA(output.m_dna, evolution.m_dna_output);
+		output.m_evolution_record.push_back(evolution);
 	}
 	
 	int m_dna[4];
 	int m_index;
 	int m_fitness;
 	int m_gen;
-	int m_mutations;
-	int m_crossovers;
-	int m_startovers;
 };
 
 class Generation
@@ -185,7 +251,11 @@ public:
 		m_gen++;
 		for (int i = 99; i > 0; i--)
 		{
-			m_population[i].m_gen++;
+			m_population[i].m_gen = m_gen;
+
+			Evolution evolution;
+			evolution.m_gen = m_gen;
+			m_population[i].m_evolution_record.push_back(evolution);
 
 			//top 10% + hero
 			if (i > 90)
