@@ -38,20 +38,13 @@ void Generation::CreateNewGeneration(Individual& hero)
 		//evolution record
 		Evolution* evolution = new Evolution();
 		evolution->m_gen = m_gen;
+		Individual::CopyDNA(m_population[i].m_dna, evolution->m_dna_output);
 		m_population[i].m_evolution_record.push_back(evolution);
 
 		//top 10% + hero
 		if (i > 90)
 		{
 			//do nothing
-		}
-		else if (i > 89)
-		{
-			//reincarnate hero from previous gen if it was better than our top10
-			if (hero.m_fitness > m_population[i].m_fitness)
-			{
-				m_population[i].Copy(hero);
-			}
 		}
 		//10 random
 		else if (i > 79)
@@ -113,56 +106,10 @@ void Generation::CreateNewGeneration(Individual& hero)
 	}
 }
 
-int Generation::ComputeFitness(Individual& individual, Individual& const secret)
-{
-	std::vector<int> slots_marked;
-
-	individual.m_fitness = 0;
-	for (int i = 0; i < 4; i++)//proposal
-	{
-		if (individual.m_dna[i] == secret.m_dna[i])
-		{
-			//"red" marker
-			individual.m_fitness += 10;
-			slots_marked.push_back(i);
-			continue;
-		}
-	}
-
-	for (int i = 0; i < 4; i++)//proposal
-	{
-		for (int j = 0; j < 4; j++)//secret
-		{
-			if (individual.m_dna[i] == secret.m_dna[j])
-			{
-				bool found = false;
-				for (int v = 0; v < slots_marked.size(); v++)
-				{
-					if (slots_marked[v] == j)
-					{
-						found = true;
-						break;
-					}
-				}
-
-				if (found == false)
-				{
-					//"white" marker
-					individual.m_fitness += 4;
-					slots_marked.push_back(i);
-					continue;
-				}
-			}
-		}
-	}
-
-	return individual.m_fitness;
-}
-
 void Generation::ComputeFitness(Individual& const secret)
 {
 	for (int i = 0; i < 100; i++)
 	{
-		ComputeFitness(m_population[i], secret);
+		Individual::ComputeFitness(m_population[i], secret);
 	}
 }

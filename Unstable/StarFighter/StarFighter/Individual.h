@@ -15,9 +15,14 @@ public:
 
 	static void CopyDNA(int dna_input[], int dna_output[]);
 	void DisplayDNA();
+	static void DisplayDNA(int dna[]);
+	void DisplayEvolutionRecord(int dna_secret[]);
 	void Copy(Individual& individual);
 	static void CrossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type);
 	static void Mutate(Individual& output, Individual& input, MutationType type);
+
+	static int ComputeFitness(Individual& individual, Individual& const secret);
+	static int ComputeFitness(int dna_individual[], int dna_secret[]);
 
 	int m_dna[4];
 	int m_index;

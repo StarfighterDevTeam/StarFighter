@@ -14,7 +14,6 @@ public:
 	void OrderPopulation();
 	void CreateNewGeneration(Individual& hero);
 	void ComputeFitness(Individual& const secret);
-	static int ComputeFitness(Individual& individual, Individual& const secret);
 };
 
 #endif // GENERATION_H_INCLUDED
