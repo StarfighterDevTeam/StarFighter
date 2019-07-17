@@ -86,11 +86,17 @@
     <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Evolution.cpp" />
+    <ClCompile Include="Generation.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Individual.cpp" />
     <ClCompile Include="StarFighter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Evolution.h" />
+    <ClInclude Include="Generation.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Individual.h" />
     <ClInclude Include="StarFighter.h" />
   </ItemGroup>
   <ItemGroup>
