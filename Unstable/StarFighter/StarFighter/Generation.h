@@ -8,7 +8,7 @@ class Generation
 public:
 	Generation();
 
-	Individual m_population[100];
+	Individual m_population[POPULATION_SIZE];
 	int m_gen;
 
 	void OrderPopulation();

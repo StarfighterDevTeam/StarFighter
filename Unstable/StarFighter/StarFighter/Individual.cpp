@@ -24,15 +24,15 @@ Individual::~Individual()
 
 void Individual::RandomizeDNA()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < DNA_LENGTH; i++)
 	{
-		m_dna[i] = RandomizeIntBetweenValues(0, 7);
+		m_dna[i] = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
 	}
 }
 
 void Individual::CopyDNA(int dna_input[], int dna_output[])
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < DNA_LENGTH; i++)
 	{
 		dna_output[i] = dna_input[i];
 	}
@@ -40,20 +40,20 @@ void Individual::CopyDNA(int dna_input[], int dna_output[])
 
 void Individual::DisplayDNA()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < DNA_LENGTH; i++)
 	{
 		printf("%d", m_dna[i]);
-		if (i < 4 - 1)
+		if (i < DNA_LENGTH - 1)
 			printf(",");
 	}
 };
 
 void Individual::DisplayDNA(int dna[])
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < DNA_LENGTH; i++)
 	{
 		printf("%d", dna[i]);
-		if (i < 4 - 1)
+		if (i < DNA_LENGTH - 1)
 			printf(",");
 	}
 };
@@ -148,7 +148,7 @@ void Individual::Copy(Individual& individual)
 	m_index = individual.m_index;
 	m_fitness = individual.m_fitness;
 	m_gen = individual.m_gen;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < DNA_LENGTH; i++)
 	{
 		m_dna[i] = individual.m_dna[i];
 	}
@@ -176,9 +176,9 @@ void Individual::CrossOver(Individual& output, Individual& input_a, Individual& 
 	{
 		case CrossOver_FirstHalf:
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < DNA_LENGTH; i++)
 			{
-				if (i < 4 / 2)
+				if (i < DNA_LENGTH / 2)
 					output.m_dna[i] = input_b.m_dna[i];
 				else
 					output.m_dna[i] = input_a.m_dna[i];
@@ -187,9 +187,9 @@ void Individual::CrossOver(Individual& output, Individual& input_a, Individual& 
 		}
 		case CrossOver_SecondHalf:
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < DNA_LENGTH; i++)
 			{
-				if (i < 4 / 2)
+				if (i < DNA_LENGTH / 2)
 					output.m_dna[i] = input_a.m_dna[i];
 				else
 					output.m_dna[i] = input_b.m_dna[i];
@@ -198,9 +198,9 @@ void Individual::CrossOver(Individual& output, Individual& input_a, Individual& 
 		}
 		case CrossOver_AlternateOdd:
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < DNA_LENGTH; i++)
 			{
-				if (i % 2 == 0)
+				if (i % DNA_LENGTH == 0)
 					output.m_dna[i] = input_a.m_dna[i];
 				else
 					output.m_dna[i] = input_b.m_dna[i];
@@ -209,7 +209,7 @@ void Individual::CrossOver(Individual& output, Individual& input_a, Individual& 
 		}
 		case CrossOver_AlternateNotOdd:
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < DNA_LENGTH; i++)
 			{
 				if (i % 2 == 0)
 					output.m_dna[i] = input_b.m_dna[i];
@@ -236,14 +236,14 @@ void Individual::Mutate(Individual& output, Individual& input, MutationType type
 {
 	output.Copy(input);
 
-	int r = RandomizeIntBetweenValues(0, 3);
-	int v = RandomizeIntBetweenValues(0, 7);
+	int r = RandomizeIntBetweenValues(0, DNA_LENGTH - 1);
+	int v = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
 
 	switch (type)
 	{
 	case Mutation_Add:
 	{
-		output.m_dna[r] = (input.m_dna[r] + v) % 8;
+		output.m_dna[r] = (input.m_dna[r] + v) % DNA_ENTROPY;
 		break;
 	}
 	case Mutation_Erase:
@@ -253,7 +253,7 @@ void Individual::Mutate(Individual& output, Individual& input, MutationType type
 	}
 	case Mutation_Expand:
 	{
-		output.m_dna[(r + v) % 8] = input.m_dna[r];
+		output.m_dna[(r + v) % DNA_ENTROPY] = input.m_dna[r];
 		break;
 	}
 	default:
@@ -273,7 +273,7 @@ int Individual::ComputeFitness(int dna_individual[], int dna_secret[])
 	std::vector<int> slots_marked;
 
 	int fitness = 0;
-	for (int i = 0; i < 4; i++)//proposal
+	for (int i = 0; i < DNA_LENGTH; i++)//proposal
 	{
 		if (dna_individual[i] == dna_secret[i])
 		{
@@ -284,9 +284,9 @@ int Individual::ComputeFitness(int dna_individual[], int dna_secret[])
 		}
 	}
 
-	for (int i = 0; i < 4; i++)//proposal
+	for (int i = 0; i < DNA_LENGTH; i++)//proposal
 	{
-		for (int j = 0; j < 4; j++)//secret
+		for (int j = 0; j < DNA_LENGTH; j++)//secret
 		{
 			if (dna_individual[i] == dna_secret[j])
 			{

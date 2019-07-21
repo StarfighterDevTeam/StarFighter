@@ -17,19 +17,19 @@ int main()
 	Generation current_gen = Generation();
 	current_gen.ComputeFitness(secret);
 	current_gen.OrderPopulation();
-	Individual& hero = current_gen.m_population[99];
+	Individual& hero = current_gen.m_population[POPULATION_SIZE - 1];
 	printf("HERO dna: ");
 	hero.DisplayDNA();
 	printf(", Fitness: %d\n", hero.m_fitness);
 
 	//Main loop
-	while (hero.m_fitness < 40 || current_gen.m_gen == 0)
+	while (hero.m_fitness < MAX_FITNESS || current_gen.m_gen == 0)
 	{
 		printf("\nGeneration %d. ", current_gen.m_gen + 1);
 		current_gen.CreateNewGeneration(hero);
 		current_gen.ComputeFitness(secret);
 		current_gen.OrderPopulation();
-		hero = current_gen.m_population[99];
+		hero = current_gen.m_population[POPULATION_SIZE - 1];
 
 		printf("HERO dna: ");
 		hero.DisplayDNA();

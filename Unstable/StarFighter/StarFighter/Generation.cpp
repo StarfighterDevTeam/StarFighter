@@ -3,7 +3,7 @@
 Generation::Generation()
 {
 	m_gen = 0;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < POPULATION_SIZE; i++)
 	{
 		m_population[i].m_index = i;
 		m_population[i].m_gen = 0;
@@ -13,9 +13,9 @@ Generation::Generation()
 
 void Generation::OrderPopulation()
 {
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < POPULATION_SIZE; i++)
 	{
-		for (int j = i + 1; j < 100; j++)
+		for (int j = i + 1; j < POPULATION_SIZE; j++)
 		{
 			if (m_population[i].m_fitness > m_population[j].m_fitness)
 			{
@@ -31,7 +31,7 @@ void Generation::OrderPopulation()
 void Generation::CreateNewGeneration(Individual& hero)
 {	
 	m_gen++;
-	for (int i = 99; i > 0; i--)
+	for (int i = POPULATION_SIZE - 1; i > 0; i--)
 	{
 		m_population[i].m_gen = m_gen;
 
@@ -42,12 +42,12 @@ void Generation::CreateNewGeneration(Individual& hero)
 		m_population[i].m_evolution_record.push_back(evolution);
 
 		//top 10% + hero
-		if (i > 90)
+		if (i > POPULATION_SIZE - 10)
 		{
 			//do nothing
 		}
 		//10 random
-		else if (i > 79)
+		else if (i > POPULATION_SIZE - 20)
 		{
 			int random = RandomizeIntBetweenValues(0, i);
 			Individual a;
@@ -56,48 +56,48 @@ void Generation::CreateNewGeneration(Individual& hero)
 			m_population[random].Copy(a);
 		}
 		//top 1 crossovers & mutations
-		else if (i > 49)
+		else if (i > POPULATION_SIZE - 50)
 		{
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 1], CrossOver_FirstHalf);
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 1], CrossOver_SecondHalf);
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 1], CrossOver_AlternateOdd);
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 1], CrossOver_AlternateNotOdd);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 2], CrossOver_FirstHalf);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 2], CrossOver_SecondHalf);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 2], CrossOver_AlternateOdd);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 2], CrossOver_AlternateNotOdd);
 
-			Individual::Mutate(m_population[i--], m_population[99], Mutation_Add);
-			Individual::Mutate(m_population[i--], m_population[99], Mutation_Expand);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 1], Mutation_Add);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 1], Mutation_Expand);
 
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 2], CrossOver_FirstHalf);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 3], CrossOver_FirstHalf);
 			Individual::Mutate(m_population[i--], m_population[i + 1], Mutation_Add);
 			Individual::Mutate(m_population[i--], m_population[i + 2], Mutation_Expand);
 
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 2], CrossOver_SecondHalf);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 3], CrossOver_SecondHalf);
 			Individual::Mutate(m_population[i--], m_population[i + 1], Mutation_Add);
 			Individual::Mutate(m_population[i--], m_population[i + 2], Mutation_Expand);
 
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 2], CrossOver_AlternateOdd);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 3], CrossOver_AlternateOdd);
 			Individual::Mutate(m_population[i--], m_population[i + 1], Mutation_Add);
 			Individual::Mutate(m_population[i--], m_population[i + 2], Mutation_Expand);
 
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 2], CrossOver_AlternateNotOdd);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
 			Individual::Mutate(m_population[i--], m_population[i + 1], Mutation_Add);
 			Individual::Mutate(m_population[i--], m_population[i + 2], Mutation_Expand);
 
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 3], CrossOver_FirstHalf);
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 3], CrossOver_SecondHalf);
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 3], CrossOver_AlternateOdd);
-			Individual::CrossOver(m_population[i--], m_population[99], m_population[99 - 2], CrossOver_AlternateNotOdd);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 4], CrossOver_FirstHalf);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 4], CrossOver_SecondHalf);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 4], CrossOver_AlternateOdd);
+			Individual::CrossOver(m_population[i--], m_population[POPULATION_SIZE - 1], m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
 
-			Individual::Mutate(m_population[i--], m_population[99 - 1], Mutation_Add);
-			Individual::Mutate(m_population[i--], m_population[99 - 1], Mutation_Expand);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 2], Mutation_Add);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 2], Mutation_Expand);
 
-			Individual::Mutate(m_population[i--], m_population[99 - 2], Mutation_Add);
-			Individual::Mutate(m_population[i--], m_population[99 - 2], Mutation_Expand);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 3], Mutation_Add);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 3], Mutation_Expand);
 
-			Individual::Mutate(m_population[i--], m_population[99 - 2], Mutation_Add);
-			Individual::Mutate(m_population[i--], m_population[99 - 2], Mutation_Expand);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 3], Mutation_Add);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 3], Mutation_Expand);
 
-			Individual::Mutate(m_population[i--], m_population[99 - 3], Mutation_Add);
-			Individual::Mutate(m_population[i--], m_population[99 - 3], Mutation_Expand);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 4], Mutation_Add);
+			Individual::Mutate(m_population[i--], m_population[POPULATION_SIZE - 4], Mutation_Expand);
 		}
 		else
 		{
@@ -108,7 +108,7 @@ void Generation::CreateNewGeneration(Individual& hero)
 
 void Generation::ComputeFitness(Individual& const secret)
 {
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < POPULATION_SIZE; i++)
 	{
 		Individual::ComputeFitness(m_population[i], secret);
 	}

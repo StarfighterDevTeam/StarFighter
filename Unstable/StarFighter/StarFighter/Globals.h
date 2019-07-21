@@ -15,6 +15,14 @@ const char* getSavesPath();
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 std::string StringCut(std::string str, const size_t length);
 
+
+#define DNA_LENGTH			4
+#define DNA_ENTROPY			8
+#define MAX_FITNESS			40
+#define POPULATION_SIZE		100//min 50
+
+
+//###
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080
 
@@ -41,21 +49,6 @@ std::string StringCut(std::string str, const size_t length);
 #define DEFAULT_SFX_VOLUME							100
 #define MUSIC_FADE_IN_TIME						2.f
 #define MUSIC_FADE_OUT_TIME						2.f
-
-//TEXT POP FEEDBACK
-#define TEXT_POP_OFFSET_Y							10
-
-#define INTERACTION_BUTTON_A_FILENAME			"2D/HUD/Button_A.png"
-#define INTERACTION_BUTTON_X_FILENAME			"2D/HUD/Button_X.png"
-#define INTERACTION_BUTTON_Y_FILENAME			"2D/HUD/Button_Y.png"
-#define INTERACTION_BUTTON_B_FILENAME			"2D/HUD/Button_B.png"
-#define INTERACTION_BUTTON_WIDTH				16
-#define INTERACTION_BUTTON_HEIGHT				16
-#define INTERACTION_BUTTON_MARGIN				4
-#define INTERACTION_INTERBLOCK					20
-#define INTERACTION_MARGIN_SIDES				12
-#define SFPANEL_SPECIFIC_WIDTH					200
-#define SFPANEL_SPECIFIC_HEIGHT					100
 
 //CSV DATA
 #define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"

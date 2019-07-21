@@ -24,7 +24,7 @@ public:
 	static int ComputeFitness(Individual& individual, Individual& const secret);
 	static int ComputeFitness(int dna_individual[], int dna_secret[]);
 
-	int m_dna[4];
+	int m_dna[DNA_LENGTH];
 	int m_index;
 	int m_fitness;
 	int m_gen;
