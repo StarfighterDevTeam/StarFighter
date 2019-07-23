@@ -44,7 +44,7 @@ using namespace sf;
 struct Game
 {
 public:
-	void init(RenderWindow* window);
+	Game(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
