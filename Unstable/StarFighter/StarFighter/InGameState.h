@@ -9,6 +9,7 @@
 #include "Ship.h"
 #include "SFPanelSpecific.h"
 #include "FileLoadUtils.h"
+#include "StarGenerator.h"
 
 class GameObject;
 
@@ -25,6 +26,9 @@ public:
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFile(string scenes_file);
+
+	//L16
+	StarGenerator* m_star_generator;
 
 private:
 	sf::RenderWindow* mainWindow;

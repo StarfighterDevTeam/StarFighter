@@ -27,6 +27,9 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_map_size = background->m_size;
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+
+	// L16
+	m_star_generator = NULL;// new StarGenerator();
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -68,6 +71,7 @@ void InGameState::Draw()
 void InGameState::Release()
 {
 	//TODO
+	delete m_star_generator;
 }
 
 void InGameState::UpdateCamera(sf::Time deltaTime)

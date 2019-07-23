@@ -104,7 +104,9 @@
     <ClCompile Include="SFText.cpp" />
     <ClCompile Include="SFTextPop.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="Star.cpp" />
     <ClCompile Include="StarFighter.cpp" />
+    <ClCompile Include="StarGenerator.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
   </ItemGroup>
@@ -131,7 +133,9 @@
     <ClInclude Include="SFText.h" />
     <ClInclude Include="SFTextPop.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="Star.h" />
     <ClInclude Include="StarFighter.h" />
+    <ClInclude Include="StarGenerator.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
   </ItemGroup>
