@@ -36,7 +36,7 @@ int main()
 
 	//Loading InGame state
 	printf("Starting game\n");
-	Gameloop gameloop;
+	Gameloop* gameloop = new Gameloop();
 
 	//Handling various window resolutions
 	enum WindowResolutions
@@ -79,71 +79,75 @@ int main()
 			{
 				renderWindow.close();
 			}
-
-			//Resolution switch
-			if (InputGuy::isChangingResolution())
+			else
 			{
-				resolution = (WindowResolutions)(((int)resolution + 1) % (NBVAL_RESOLUTIONS - 1));
-				switch (resolution)
+				//Resolution switch
+				if (InputGuy::isChangingResolution())
 				{
-					case RESOLUTION_1600x900:
+					resolution = (WindowResolutions)(((int)resolution + 1) % (NBVAL_RESOLUTIONS - 1));
+					switch (resolution)
 					{
-						fullscreen = false;
-						renderWindow.create(VideoMode(1600, 900), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-						(*CurrentGame).m_screen_size = sf::Vector2i(1600, 900);
-						break;
+						case RESOLUTION_1600x900:
+						{
+							fullscreen = false;
+							renderWindow.create(VideoMode(1600, 900), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+							(*CurrentGame).m_screen_size = sf::Vector2i(1600, 900);
+							break;
+						}
+						case RESOLUTION_1920x1080_FullScreen:
+						{
+							fullscreen = true;
+							renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+							(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
+							break;
+						}
+						case RESOLUTION_1280x720:
+						{
+							fullscreen = false;
+							renderWindow.create(VideoMode(1280, 720), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+							(*CurrentGame).m_screen_size = sf::Vector2i(1280, 720);
+							break;
+						}
+						case RESOLUTION_1920x1080:
+						{
+							fullscreen = false;
+							renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+							(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
+							break;
+						}
 					}
-					case RESOLUTION_1920x1080_FullScreen:
-					{
-						fullscreen = true;
-						renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-						(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
-						break;
-					}
-					case RESOLUTION_1280x720:
-					{
-						fullscreen = false;
-						renderWindow.create(VideoMode(1280, 720), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-						(*CurrentGame).m_screen_size = sf::Vector2i(1280, 720);
-						break;
-					}
-					case RESOLUTION_1920x1080:
-					{
-						fullscreen = false;
-						renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-						(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
-						break;
-					}
+
+					//setting parameters again, because they are lost on calling renderWindow.create
+					renderWindow.setKeyRepeatEnabled(false);
+					renderWindow.setFramerateLimit(60);
+					sf::Image icon = sf::Image();
+					icon.loadFromFile(makePath(ICON_SHIP_PNG));
+					renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+					renderWindow.setTitle("StarFighter Engine");
 				}
 
-				//setting parameters again, because they are lost on calling renderWindow.create
-				renderWindow.setKeyRepeatEnabled(false);
-				renderWindow.setFramerateLimit(60);
-				sf::Image icon = sf::Image();
-				icon.loadFromFile(makePath(ICON_SHIP_PNG));
-				renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-				renderWindow.setTitle("StarFighter Engine");
+				dt = deltaClock.restart();
+
+				if (dt.asSeconds() < 0.3f)
+				{
+					//Update
+					gameloop->Update(dt);
+
+					//Draw
+					gameloop->Draw();
+
+					//Diplay
+					renderWindow.display();
+				}
+				else
+				{
+					printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT\n");
+				}
 			}
 		}
-
-		dt = deltaClock.restart();
-
-		if (dt.asSeconds() < 0.3f)
-		{
-			//Update
-			gameloop.Update(dt);
-
-			//Draw
-			gameloop.Draw();
-
-			//Diplay
-			renderWindow.display();
-		}
-		else
-		{
-			printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT\n");
-		}
 	}
+
+	delete gameloop;
 
 	return 0;
 }
