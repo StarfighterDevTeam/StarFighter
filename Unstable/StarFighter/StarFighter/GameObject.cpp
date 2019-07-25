@@ -16,9 +16,14 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	Init(position, speed, texture, 1);
 }
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size)
 {
-	Init(position, speed, color, size);
+	Init(position, speed, color, size, stroke_size);
+}
+
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size)
+{
+	Init(position, speed, color, radius, stroke_size);
 }
 
 string GameObject::getName()
@@ -131,9 +136,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size)
 {
-	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
+	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, stroke_size);
 	ostringstream ss;
 	ss << "rectangle_" << (int)size.x << "x" << (int)size.y << "_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
 	string textureName = ss.str();
@@ -143,6 +148,20 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 	Init(position, speed, texture, 1, 1);
 
 	setOrigin(size.x / 2, size.y / 2);
+}
+
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size)
+{
+	sf::Uint8* pixels = GameObject::CreateCircleWithStroke(radius, color, stroke_size);
+	ostringstream ss;
+	ss << "circle_" << (int)radius * 2 << "x" << (int)radius * 2 << "_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
+	string textureName = ss.str();
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture(textureName, radius * 2, radius * 2, pixels);
+	Init(position, speed, texture, 1, 1);
+
+	setOrigin(radius, radius);
 }
 
 GameObject::~GameObject()
@@ -593,6 +612,48 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 		else
 		{
 			pixels[i + 3] = RECTANGLE_INSIDE_ALPHA;
+		}
+	}
+
+	return pixels;
+}
+
+sf::Uint8* GameObject::CreateCircleWithStroke(float radius, sf::Color color, int stroke_size)
+{
+	//pixel array creation
+	const int W = radius * 2;
+	const int H = radius * 2;
+
+	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
+
+	for (int i = 0; i < W * H * 4; i += 4)
+	{
+		int x = (i / 4) % W;
+		int y = (i / 4) / W;
+		int dx = W / 2 - x;
+		int dy = H / 2 - y;
+		float delta = sqrt(dx * dx + dy * dy);// -radius * radius;
+		
+		if (stroke_size > 0 && delta <= radius - stroke_size)
+		{
+			pixels[i] = color.r;						// R
+			pixels[i + 1] = color.g;					// G
+			pixels[i + 2] = color.b;					// B
+			pixels[i + 3] = RECTANGLE_INSIDE_ALPHA;		// A
+		}
+		else if (delta <= radius)
+		{
+			pixels[i] = color.r;			// R
+			pixels[i + 1] = color.g;		// G
+			pixels[i + 2] = color.b;		// B
+			pixels[i + 3] = 255;			// A
+		}
+		else
+		{
+			pixels[i] = color.r;			// R
+			pixels[i + 1] = color.g;		// G
+			pixels[i + 2] = color.b;		// B
+			pixels[i + 3] = 0;				// A
 		}
 	}
 

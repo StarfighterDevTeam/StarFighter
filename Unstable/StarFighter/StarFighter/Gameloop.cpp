@@ -13,6 +13,11 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::White , sf::Vector2f(64, 64));
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
+
+	//node
+	GameObject* node = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Blue, 16, 4);
+	(*CurrentGame).addToScene(node, PlayerShipLayer, PlayerShip);
+
 }
 
 Gameloop::~Gameloop()
