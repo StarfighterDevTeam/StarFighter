@@ -54,13 +54,15 @@ public:
 	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
-	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size = 0);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size = 0);
 	GameObject();
 	
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber = 1, int animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size);
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size = 0);
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size = 0);
 
 	~GameObject();
 
@@ -121,6 +123,7 @@ public:
 	static float DistancePointToSement(float p0_x, float p0_y, float p_1x, float p_1y, float p_2x, float p_2y, float *i_x = NULL, float *i_y = NULL);
 
 	static sf::Uint8* CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size = 0);
+	static sf::Uint8* CreateCircleWithStroke(float radius, sf::Color color, int stroke_size = 0);
 
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
