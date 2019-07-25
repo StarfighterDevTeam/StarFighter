@@ -20,6 +20,10 @@ public:
 
 	GameObject* m_background;
 
+	//Liaison16
+	GameObject* CreateNode(sf::Vector2f position, bool player);
+	GameObject* CreateTerminal(sf::Vector2f position, bool player);
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

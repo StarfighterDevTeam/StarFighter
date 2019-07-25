@@ -15,8 +15,11 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
 
 	//node
-	GameObject* node = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Blue, 16, 4);
-	(*CurrentGame).addToScene(node, PlayerShipLayer, PlayerShip);
+	CreateTerminal(sf::Vector2f(200, 440), true);
+	CreateNode(sf::Vector2f(450, 540), true);
+	CreateNode(sf::Vector2f(650, 340), true);
+
+	CreateNode(sf::Vector2f(1920 - 400, 540), false);
 
 }
 
@@ -54,4 +57,21 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, y);
 	if (b >(*CurrentGame).m_map_size.y - y)
 		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, (*CurrentGame).m_map_size.y - y);
+}
+
+//Liaison 16
+GameObject* Gameloop::CreateNode(sf::Vector2f position, bool player)
+{
+	GameObject* node = new GameObject(position, sf::Vector2f(0, 0), player ? sf::Color::Blue : sf::Color::Red, 16, 4);
+	(*CurrentGame).addToScene(node, NodeLayer, NodeObject);
+
+	return node;
+}
+
+GameObject* Gameloop::CreateTerminal(sf::Vector2f position, bool player)
+{
+	GameObject* node = new GameObject(position, sf::Vector2f(0, 0), player ? sf::Color::Blue : sf::Color::Red, 32, 4);
+	(*CurrentGame).addToScene(node, NodeLayer, NodeObject);
+
+	return node;
 }
