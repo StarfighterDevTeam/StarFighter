@@ -37,6 +37,11 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	this->Init();
 }
 
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size) : GameObject(position, speed, color, size)
+{
+	this->Init();
+}
+
 Ship::~Ship()
 {
 	
