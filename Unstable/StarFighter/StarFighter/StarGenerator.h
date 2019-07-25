@@ -7,6 +7,10 @@ class StarGenerator
 {
 public :
 	StarGenerator();
+	void Update(sf::Time deltaTime);
+
+	float m_generator_clock;
+	float m_generator_threshold;
 };
 
 #endif // STARGENERATOR_H_INCLUDED

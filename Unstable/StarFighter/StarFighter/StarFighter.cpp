@@ -22,7 +22,7 @@ int main()
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title
-	renderWindow.setTitle("Pirates of the Seven Seas");
+	renderWindow.setTitle("StarFighter Engine");
 
 	//Random seed
 	srand(time(NULL));

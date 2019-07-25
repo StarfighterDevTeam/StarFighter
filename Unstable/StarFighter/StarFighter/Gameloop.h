@@ -7,7 +7,7 @@
 #include "Game.h"
 #include "FileLoadUtils.h"
 #include "StarGenerator.h"
-
+#include "Ship.h"
 
 class Gameloop
 {
@@ -17,8 +17,10 @@ public:
 	
 	void Update(sf::Time deltaTime);
 	void Draw();
+	void UpdateCamera(sf::Time deltaTime);
 
 	GameObject* m_background;
+	vector<StarGenerator*> m_star_generator;
 
 private:
 	sf::RenderWindow* mainWindow;

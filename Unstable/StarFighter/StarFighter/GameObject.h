@@ -18,16 +18,9 @@ class Loot;
 
 enum LayerType {
 	BackgroundLayer,
-	PortalLayer,
-	PlayerStroboscopicLayer,
-	ExplosionLayer,
-	EnemyObjectLayer,
-	AuraLayer,
-	FeedbacksLayer,
-	FriendlyFireLayer,
-	PlayerShipLayer,
+	StarLayer,	PlayerShipLayer,
 	EnemyFireLayer,
-
+	FeedbacksLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -36,9 +29,6 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
-	PortalObject,
-	ShopObject,
-	LootObject,
 	PlayerShip,
 	FakePlayerShip,
 	FriendlyFire,

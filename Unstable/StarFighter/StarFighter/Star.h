@@ -8,8 +8,12 @@
 class Star : public GameObject
 {
 public :
-	Star();
-	void update(sf::Time deltaTime) override;
+	Star(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float pulse_periodicity = 0.f);
+	void update(sf::Time deltaTime);
+
+	float m_pulse_periodicity;
+	float m_pulse_clock;
+	sf::Color m_color;
 };
 
 #endif // STAR_H_INCLUDED
