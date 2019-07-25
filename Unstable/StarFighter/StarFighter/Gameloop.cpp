@@ -60,18 +60,18 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 }
 
 //Liaison 16
-GameObject* Gameloop::CreateNode(sf::Vector2f position, bool player)
+Node* Gameloop::CreateNode(sf::Vector2f position, bool player)
 {
-	GameObject* node = new GameObject(position, sf::Vector2f(0, 0), player ? sf::Color::Blue : sf::Color::Red, 16, 4);
+	Node* node = new Node(position, player);
 	(*CurrentGame).addToScene(node, NodeLayer, NodeObject);
 
 	return node;
 }
 
-GameObject* Gameloop::CreateTerminal(sf::Vector2f position, bool player)
+Terminal* Gameloop::CreateTerminal(sf::Vector2f position, bool player)
 {
-	GameObject* node = new GameObject(position, sf::Vector2f(0, 0), player ? sf::Color::Blue : sf::Color::Red, 32, 4);
-	(*CurrentGame).addToScene(node, NodeLayer, NodeObject);
+	Terminal* terminal = new Terminal(position, player);
+	(*CurrentGame).addToScene(terminal, NodeLayer, NodeObject);
 
-	return node;
+	return terminal;
 }

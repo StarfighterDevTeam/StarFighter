@@ -7,6 +7,8 @@
 #include "Game.h"
 #include "FileLoadUtils.h"
 #include "Ship.h"
+#include "Node.h"
+#include "Terminal.h"
 
 class Gameloop
 {
@@ -21,8 +23,8 @@ public:
 	GameObject* m_background;
 
 	//Liaison16
-	GameObject* CreateNode(sf::Vector2f position, bool player);
-	GameObject* CreateTerminal(sf::Vector2f position, bool player);
+	Node* CreateNode(sf::Vector2f position, bool player);
+	Terminal* CreateTerminal(sf::Vector2f position, bool player);
 
 private:
 	sf::RenderWindow* mainWindow;
