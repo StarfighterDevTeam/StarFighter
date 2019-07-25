@@ -19,6 +19,7 @@
 #include "SFTextPop.h"
 
 class Ship;
+class Node;
 
 enum SFX_Bank
 {
@@ -37,6 +38,15 @@ enum FontsStyle
 	Font_Arial,//0
 	Font_Terminator,//1
 	NBVAL_FontsStyle,//2
+};
+
+enum MouseAction
+{
+	Mouse_None,
+	Mouse_LeftClick,
+	Mouse_LeftClickHold,
+	Mouse_RightClick,
+	Mouse_RightClickHold,
 };
 
 using namespace sf;
@@ -73,6 +83,10 @@ public:
 	bool m_pause;
 	bool m_window_has_focus;
 
+	sf::Vector2f m_mouse_pos;
+	MouseAction m_mouse_click;
+	void GetMouseInputs(sf::Time deltaTime);
+
 	sf::View m_view;
 	sf::Vector2f m_map_size;
 
@@ -107,6 +121,10 @@ public:
 
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
+
+	//Liaison 16
+	Node* m_hovered_node;
+	Node* m_selected_node;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

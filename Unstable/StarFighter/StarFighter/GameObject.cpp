@@ -148,6 +148,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 	Init(position, speed, texture, 1, 1);
 
 	setOrigin(size.x / 2, size.y / 2);
+	m_color = color;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size)
@@ -162,6 +163,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 	Init(position, speed, texture, 1, 1);
 
 	setOrigin(radius, radius);
+	m_color = color;
 }
 
 GameObject::~GameObject()

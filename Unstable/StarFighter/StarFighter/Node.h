@@ -8,6 +8,13 @@ class Node : public GameObject
 public :
 	Node(sf::Vector2f position, bool player);
 	Node(sf::Vector2f position, bool player, float radius);
+
+	void update(sf::Time deltaTime) override;
+
+	bool IsHoveredByMouse();
+
+	bool m_hovered;
+	bool m_selected;
 };
 
 #endif // NODE_H_INCLUDED

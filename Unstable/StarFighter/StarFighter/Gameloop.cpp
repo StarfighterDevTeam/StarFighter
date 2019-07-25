@@ -30,8 +30,25 @@ Gameloop::~Gameloop()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
+	//Get mouse & keyboard inputs
+	(*CurrentGame).m_hovered_node = NULL;
+	(*CurrentGame).GetMouseInputs(deltaTime);
+	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
+	{
+		if ((*CurrentGame).m_hovered_node != NULL)
+		{
+			if ((*CurrentGame).m_hovered_node->IsHoveredByMouse() == false)
+			{
+				(*CurrentGame).m_hovered_node->m_selected = false;
+				(*CurrentGame).m_hovered_node = NULL;
+			}
+		}
+	}
+
+	//Update objects
 	(*CurrentGame).updateScene(deltaTime);
 
+	//Scroll camera
 	UpdateCamera(deltaTime);
 }
 
