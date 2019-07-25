@@ -38,12 +38,12 @@ public:
 		sf::Texture* texture = new sf::Texture;
 		if (!(*texture).loadFromFile(makePath(filename), sf::IntRect(0, 0, sizeX, sizeY)))
 		{
-			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'", (char*)filename.c_str()));
+			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'\n", (char*)filename.c_str()));
 		}
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		printf("Loading texture from file '%s'", (char*)filename.c_str());
+		printf("Loading texture from file '%s'\n", (char*)filename.c_str());
 		return texture;
 	}
 
@@ -80,7 +80,7 @@ public:
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		printf("Loading texture from file '%s'", (char*)filename.c_str());
+		printf("Loading texture from file '%s'\n", (char*)filename.c_str());
 		return texture;
 	}
 
