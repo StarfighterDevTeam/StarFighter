@@ -5,10 +5,12 @@
 #include <SFML/OpenGL.hpp>
 #include "TextureLoader.h"
 #include "TextUtils.h"
-#include "Logger.h"
 #include <assert.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 using namespace sf;
 

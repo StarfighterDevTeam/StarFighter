@@ -6,7 +6,6 @@
 #include <map>
 #include <tuple>
 #include "TextUtils.h"
-#include "Logger.h"
 
 std::string makePath(const std::string& srcPath);
 
@@ -44,7 +43,7 @@ public:
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+		printf("Loading texture from file '%s'", (char*)filename.c_str());
 		return texture;
 	}
 
@@ -81,7 +80,7 @@ public:
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+		printf("Loading texture from file '%s'", (char*)filename.c_str());
 		return texture;
 	}
 

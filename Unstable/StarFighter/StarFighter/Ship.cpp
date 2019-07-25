@@ -253,7 +253,7 @@ void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
 //SAVE AND LOAD LOCAL FILE
 int Ship::SaveShip(Ship* ship)
 {
-	LOGGER_WRITE(Logger::DEBUG, "Saving game in local file.\n");
+	printf("Saving game in local file.\n");
 	assert(ship != NULL);
 
 	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
@@ -273,10 +273,10 @@ int Ship::SaveShip(Ship* ship)
 
 bool Ship::LoadShip(Ship* ship)
 {
-	LOGGER_WRITE(Logger::DEBUG, "Loading ship from local file.\n");
+	printf("Loading ship from local file.\n");
 	assert(ship != NULL);
 
-	std::ifstream  data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
+	std::ifstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
 
 	if (data) // si ouverture du fichier réussie
 	{

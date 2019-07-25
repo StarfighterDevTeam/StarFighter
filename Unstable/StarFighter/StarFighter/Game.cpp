@@ -10,7 +10,7 @@ const char* GameObjectTypeValues[] =
 	stringify(EnemyObject)
 };
 
-void Game::init(RenderWindow* window)
+Game::Game(RenderWindow* window)
 {
 	m_playerShip = NULL;
 	m_pause = false;
@@ -51,7 +51,7 @@ void Game::init(RenderWindow* window)
 	LoadSFX();
 
 	//Music
-	LOGGER_WRITE(Logger::DEBUG, "Loading Musics");
+	printf("Loading Musics");
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
