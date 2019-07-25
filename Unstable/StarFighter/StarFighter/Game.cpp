@@ -768,3 +768,30 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
 }
+
+void Game::GetMouseInputs(sf::Time deltaTime)
+{
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
+	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_window_has_focus && m_mouse_click == Mouse_None)
+	{
+		m_mouse_click = Mouse_LeftClick;
+	}
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_window_has_focus && (m_mouse_click == Mouse_LeftClick || m_mouse_click == Mouse_LeftClickHold))
+	{
+		m_mouse_click = Mouse_LeftClickHold;
+	}
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && m_window_has_focus && m_mouse_click == Mouse_None)
+	{
+		m_mouse_click = Mouse_RightClick;
+	}
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && m_window_has_focus && (m_mouse_click == Mouse_RightClick || m_mouse_click == Mouse_RightClickHold))
+	{
+		m_mouse_click = Mouse_RightClickHold;
+	}
+	else// if (sf::Mouse::isButtonPressed(sf::Mouse::Left) == false && sf::Mouse::isButtonPressed(sf::Mouse::Right) == false)//release
+	{
+		m_mouse_click = Mouse_None;
+	}
+}

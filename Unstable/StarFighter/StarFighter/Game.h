@@ -39,6 +39,15 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
+enum MouseAction
+{
+	Mouse_None,
+	Mouse_LeftClick,
+	Mouse_LeftClickHold,
+	Mouse_RightClick,
+	Mouse_RightClickHold,
+};
+
 using namespace sf;
 
 struct Game
@@ -72,6 +81,10 @@ public:
 	Ship* m_playerShip;
 	bool m_pause;
 	bool m_window_has_focus;
+
+	sf::Vector2f m_mouse_pos;
+	MouseAction m_mouse_click;
+	void GetMouseInputs(sf::Time deltaTime);
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;

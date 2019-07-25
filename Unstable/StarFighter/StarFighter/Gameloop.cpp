@@ -21,6 +21,8 @@ Gameloop::~Gameloop()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
+	(*CurrentGame).GetMouseInputs(deltaTime);
+
 	(*CurrentGame).updateScene(deltaTime);
 
 	UpdateCamera(deltaTime);
