@@ -11,6 +11,7 @@ public :
 
 	void update(sf::Time deltaTime) override;
 	bool IsHoveredByMouse();
+	void ResetColor();
 
 	bool m_hovered;
 	bool m_selected;

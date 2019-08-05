@@ -26,21 +26,28 @@ void Node::update(sf::Time deltaTime)
 {
 	if (IsHoveredByMouse() == true)
 	{
-		setFillColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
-		setOutlineColor(sf::Color(255, 255, 255, 255));
-		m_hovered = true;
-		(*CurrentGame).m_hovered_node = this;
+		if (m_selected == false && m_hovered == false)
+		{
+			setFillColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+			setOutlineColor(sf::Color(255, 255, 255, 255));
+
+			m_hovered = true;
+			(*CurrentGame).m_hovered_node = this;
+		}
 
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			if ((*CurrentGame).m_selected_node != NULL && (*CurrentGame).m_selected_node != this)
 			{
 				(*CurrentGame).m_selected_node->m_selected = false;
+				(*CurrentGame).m_selected_node->ResetColor();
 			}
 
 			if ((*CurrentGame).m_selected_node != this)
 			{
 				m_selected = true;
+				setFillColor(sf::Color(0, 255, 0, GHOST_ALPHA_VALUE));
+				setOutlineColor(sf::Color(0, 255, 0, 255));
 				(*CurrentGame).m_selected_node = this;
 			}
 		}
@@ -48,8 +55,10 @@ void Node::update(sf::Time deltaTime)
 	else
 	{
 		m_hovered = false;
-		setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
-		setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
+		if (m_selected == false)
+		{
+			ResetColor();
+		}
 	}
 
 	CircleObject::update(deltaTime);
@@ -73,4 +82,10 @@ bool Node::IsHoveredByMouse()
 	{
 		return false;
 	}
+}
+
+void Node::ResetColor()
+{
+	setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
+	setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
 }
