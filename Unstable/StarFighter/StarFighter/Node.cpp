@@ -11,9 +11,9 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	setPosition(position);
 	setOrigin(sf::Vector2f(radius, radius));
 	setRadius(radius);
-	m_color = alliance ? sf::Color(0, 0, 255, 255) : sf::Color(255, 0, 0, 255);
-	setFillColor(alliance ? sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE) : sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
-	setOutlineColor(alliance ? sf::Color(m_color.r, m_color.g, m_color.b, 255) : sf::Color(m_color.r, m_color.g, m_color.b, 255));
+	m_color = alliance == PlayerAlliance ? sf::Color(0, 0, 255, 255) : sf::Color(255, 0, 0, 255);
+	setFillColor(alliance == PlayerAlliance ? sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE) : sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
+	setOutlineColor(alliance == PlayerAlliance ? sf::Color(m_color.r, m_color.g, m_color.b, 255) : sf::Color(m_color.r, m_color.g, m_color.b, 255));
 	setOutlineThickness(-4);
 }
 

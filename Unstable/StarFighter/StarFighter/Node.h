@@ -3,6 +3,8 @@
 
 #include "Game.h"
 
+class Link;
+
 class Node : public CircleObject
 {
 public :

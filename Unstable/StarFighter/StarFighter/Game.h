@@ -19,6 +19,7 @@
 #include "SFTextPop.h"
 
 #include "CircleObject.h"
+#include "LineObject.h"
 
 class Ship;
 class Node;
@@ -128,6 +129,7 @@ public:
 	Node* m_hovered_node;
 	Node* m_selected_node;
 	void AddCircleObject(CircleObject* object);
+	void AddLineObject(LineObject* object);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
@@ -152,6 +154,7 @@ private:
 
 	//Liaison 16
 	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES];
+	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
 };
 
 #endif // GAME_H_INCLUDED

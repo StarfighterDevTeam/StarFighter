@@ -270,6 +270,15 @@ void Game::updateScene(Time deltaTime)
 
 			this->m_sceneCircleObjects[i][j]->update(deltaTime);
 		}
+
+		size_t sceneLineObjectsSize = this->m_sceneLineObjects[i].size();
+		for (size_t j = 0; j < sceneLineObjectsSize; j++)
+		{
+			if (this->m_sceneLineObjects[i][j] == NULL)
+				continue;
+
+			this->m_sceneLineObjects[i][j]->update(deltaTime);
+		}
 	}
 	
 	//SFTextPop (text feedbacks)
@@ -332,6 +341,11 @@ void Game::drawScene()
 				for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[j].begin(); it != m_sceneCircleObjects[j].end(); it++)
 				{
 					m_mainScreen.draw(*(*it));
+				}
+
+				for (vector<LineObject*>::iterator it = m_sceneLineObjects[j].begin(); it != m_sceneLineObjects[j].end(); it++)
+				{
+					m_mainScreen.draw((*(*it)).m_points, 2, sf::Lines);
 				}
 			}
 		}
@@ -826,4 +840,9 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 void Game::AddCircleObject(CircleObject* object)
 {
 	m_sceneCircleObjects[object->m_alliance].push_back(object);
+}
+
+void Game::AddLineObject(LineObject* object)
+{
+	m_sceneLineObjects[object->m_alliance].push_back(object);
 }

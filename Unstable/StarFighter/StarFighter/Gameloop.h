@@ -9,6 +9,7 @@
 #include "Ship.h"
 #include "Node.h"
 #include "Terminal.h"
+#include "Link.h"
 
 class Gameloop
 {
@@ -25,6 +26,7 @@ public:
 	//Liaison16
 	Node* CreateNode(sf::Vector2f position, AllianceType alliance);
 	Terminal* CreateTerminal(sf::Vector2f position, AllianceType alliance);
+	void CreateLink(Node* node_a, Node* node_b);
 
 private:
 	sf::RenderWindow* mainWindow;

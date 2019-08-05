@@ -16,11 +16,12 @@ Gameloop::Gameloop()
 
 	//node
 	CreateTerminal(sf::Vector2f(200, 440), PlayerAlliance);
-	CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
-	CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
+	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
+	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
 
 	CreateNode(sf::Vector2f(1920 - 400, 540), EnemyAlliance);
 
+	CreateLink(node_a, node_b);
 }
 
 Gameloop::~Gameloop()
@@ -92,4 +93,10 @@ Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 	(*CurrentGame).AddCircleObject(terminal);
 
 	return terminal;
+}
+
+void Gameloop::CreateLink(Node* node_a, Node* node_b)
+{
+	Link* link = new Link(node_a, node_b);
+	(*CurrentGame).AddLineObject(link);
 }

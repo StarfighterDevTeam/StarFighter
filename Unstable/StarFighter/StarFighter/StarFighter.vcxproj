@@ -95,6 +95,8 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="LineObject.cpp" />
+    <ClCompile Include="Link.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
@@ -119,6 +121,8 @@
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
+    <ClInclude Include="LineObject.h" />
+    <ClInclude Include="Link.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SFPanel.h" />
