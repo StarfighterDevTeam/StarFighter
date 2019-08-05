@@ -4,13 +4,20 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Node::Node(sf::Vector2f position, bool player, float radius) : GameObject(position, sf::Vector2f(0, 0), player ? sf::Color::Blue : sf::Color::Red, radius, 4)
+Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleObject(alliance)
 {
 	m_hovered = false;
 	m_selected = false;
+	setPosition(position);
+	setOrigin(sf::Vector2f(radius, radius));
+	setRadius(radius);
+	m_color = alliance ? sf::Color(0, 0, 255, 255) : sf::Color(255, 0, 0, 255);
+	setFillColor(alliance ? sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE) : sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
+	setOutlineColor(alliance ? sf::Color(m_color.r, m_color.g, m_color.b, 255) : sf::Color(m_color.r, m_color.g, m_color.b, 255));
+	setOutlineThickness(-4);
 }
 
-Node::Node(sf::Vector2f position, bool player) : Node::Node(position, player, 16)
+Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, alliance, 16)
 {
 
 }
@@ -19,7 +26,8 @@ void Node::update(sf::Time deltaTime)
 {
 	if (IsHoveredByMouse() == true)
 	{
-		setColor(sf::Color(m_color.r, m_color.g, m_color.b, 120));
+		setFillColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		setOutlineColor(sf::Color(255, 255, 255, 255));
 		m_hovered = true;
 		(*CurrentGame).m_hovered_node = this;
 
@@ -40,13 +48,12 @@ void Node::update(sf::Time deltaTime)
 	else
 	{
 		m_hovered = false;
-		setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
+		setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
+		setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
 	}
 
-	GameObject::update(deltaTime);
+	CircleObject::update(deltaTime);
 }
-
-
 
 bool Node::IsHoveredByMouse()
 {
@@ -58,7 +65,7 @@ bool Node::IsHoveredByMouse()
 	//collision with a circle = inside radius?
 	float dx = abs((*CurrentGame).m_mouse_pos.x - getPosition().x);
 	float dy = abs((*CurrentGame).m_mouse_pos.y - getPosition().y);
-	if (dx < m_size.x * 0.5 && dy < m_size.y * 0.5)
+	if (dx < getRadius() && dy < getRadius())
 	{
 		return true;
 	}

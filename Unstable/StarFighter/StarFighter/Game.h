@@ -18,6 +18,8 @@
 #include "SFPanel.h"
 #include "SFTextPop.h"
 
+#include "CircleObject.h"
+
 class Ship;
 class Node;
 
@@ -125,6 +127,7 @@ public:
 	//Liaison 16
 	Node* m_hovered_node;
 	Node* m_selected_node;
+	void AddCircleObject(CircleObject* object);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
@@ -146,6 +149,9 @@ private:
 	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;
 	std::vector<SFText*> m_garbageTexts;
+
+	//Liaison 16
+	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES];
 };
 
 #endif // GAME_H_INCLUDED

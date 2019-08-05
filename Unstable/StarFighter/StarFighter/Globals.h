@@ -37,7 +37,7 @@ std::string StringCut(std::string str, const size_t length);
 
 #define ICON_SHIP_PNG							"Icons/ShipModel_icon.png"
 
-#define	GHOST_ALPHA_VALUE						120
+#define	GHOST_ALPHA_VALUE						180
 
 #define JOYSTICK_MIN_AXIS_VALUE					25
 

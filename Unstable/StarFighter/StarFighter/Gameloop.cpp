@@ -15,11 +15,11 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
 
 	//node
-	CreateTerminal(sf::Vector2f(200, 440), true);
-	CreateNode(sf::Vector2f(450, 540), true);
-	CreateNode(sf::Vector2f(650, 340), true);
+	CreateTerminal(sf::Vector2f(200, 440), PlayerAlliance);
+	CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
+	CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
 
-	CreateNode(sf::Vector2f(1920 - 400, 540), false);
+	CreateNode(sf::Vector2f(1920 - 400, 540), EnemyAlliance);
 
 }
 
@@ -77,18 +77,18 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 }
 
 //Liaison 16
-Node* Gameloop::CreateNode(sf::Vector2f position, bool player)
+Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
-	Node* node = new Node(position, player);
-	(*CurrentGame).addToScene(node, NodeLayer, NodeObject);
+	Node* node = new Node(position, alliance);
+	(*CurrentGame).AddCircleObject(node);
 
 	return node;
 }
 
-Terminal* Gameloop::CreateTerminal(sf::Vector2f position, bool player)
+Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
-	Terminal* terminal = new Terminal(position, player);
-	(*CurrentGame).addToScene(terminal, NodeLayer, NodeObject);
+	Terminal* terminal = new Terminal(position, alliance);
+	(*CurrentGame).AddCircleObject(terminal);
 
 	return terminal;
 }

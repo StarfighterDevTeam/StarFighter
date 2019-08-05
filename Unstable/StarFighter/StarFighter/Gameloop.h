@@ -23,8 +23,8 @@ public:
 	GameObject* m_background;
 
 	//Liaison16
-	Node* CreateNode(sf::Vector2f position, bool player);
-	Terminal* CreateTerminal(sf::Vector2f position, bool player);
+	Node* CreateNode(sf::Vector2f position, AllianceType alliance);
+	Terminal* CreateTerminal(sf::Vector2f position, AllianceType alliance);
 
 private:
 	sf::RenderWindow* mainWindow;

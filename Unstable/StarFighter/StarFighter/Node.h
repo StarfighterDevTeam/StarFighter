@@ -3,14 +3,13 @@
 
 #include "Game.h"
 
-class Node : public GameObject
+class Node : public CircleObject
 {
 public :
-	Node(sf::Vector2f position, bool player);
-	Node(sf::Vector2f position, bool player, float radius);
+	Node(sf::Vector2f position, AllianceType alliance);
+	Node(sf::Vector2f position, AllianceType alliance, float radius);
 
 	void update(sf::Time deltaTime) override;
-
 	bool IsHoveredByMouse();
 
 	bool m_hovered;

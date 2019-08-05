@@ -260,6 +260,18 @@ void Game::updateScene(Time deltaTime)
 		this->m_sceneGameObjects[i]->update(deltaTime);
 	}
 
+	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
+	{
+		size_t sceneCircleObjectsSize = this->m_sceneCircleObjects[i].size();
+		for (size_t j = 0; j < sceneCircleObjectsSize; j++)
+		{
+			if (this->m_sceneCircleObjects[i][j] == NULL)
+				continue;
+
+			this->m_sceneCircleObjects[i][j]->update(deltaTime);
+		}
+	}
+	
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
 	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
@@ -308,6 +320,16 @@ void Game::drawScene()
 					continue;
 
 				if ((*(*it)).m_visible)
+				{
+					m_mainScreen.draw(*(*it));
+				}
+			}
+		}
+		else if (i == NodeLayer)
+		{
+			for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
+			{
+				for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[j].begin(); it != m_sceneCircleObjects[j].end(); it++)
 				{
 					m_mainScreen.draw(*(*it));
 				}
@@ -798,4 +820,10 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 	{
 		m_mouse_click = Mouse_None;
 	}
+}
+
+//Liaison 16
+void Game::AddCircleObject(CircleObject* object)
+{
+	m_sceneCircleObjects[object->m_alliance].push_back(object);
 }

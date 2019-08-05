@@ -24,11 +24,11 @@ enum LayerType {
 	EnemyObjectLayer,
 	AuraLayer,
 	FeedbacksLayer,
-	NodeLayer,
 	FriendlyFireLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
 
+	NodeLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,

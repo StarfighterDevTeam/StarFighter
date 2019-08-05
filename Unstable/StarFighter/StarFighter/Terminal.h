@@ -6,7 +6,7 @@
 class Terminal : public Node
 {
 public :
-	Terminal(sf::Vector2f position, bool player);
+	Terminal(sf::Vector2f position, AllianceType alliance);
 };
 
 #endif // TERMINAL_H_INCLUDED

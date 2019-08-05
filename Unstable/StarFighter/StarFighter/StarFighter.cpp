@@ -50,6 +50,7 @@ int main()
 	bool fullscreen = false;
 	WindowResolutions resolution = RESOLUTION_1600x900;
 	printf("Initialization complete. Starting main loop...\n");
+	bool pause = false;
 
 	//Main loop
 	while (renderWindow.isOpen())
@@ -128,8 +129,14 @@ int main()
 
 				dt = deltaClock.restart();
 
+
 				if (dt.asSeconds() < 0.3f)
 				{
+					if (pause == true)
+					{
+						pause = false;
+						printf("GAME IS RESUMED\n");
+					}
 					//Update
 					gameloop->Update(dt);
 
@@ -141,6 +148,7 @@ int main()
 				}
 				else
 				{
+					pause = true;
 					printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT\n");
 				}
 			}
