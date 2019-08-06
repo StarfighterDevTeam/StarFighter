@@ -21,6 +21,9 @@ public:
 
 	AllianceType m_alliance;
 	sf::Color m_color;
+
+	sf::Vector2f m_previous_speed;
+	sf::Vector2f m_speed;
 };
 
 #endif // CIRCLEOBJECT_H_INCLUDED
