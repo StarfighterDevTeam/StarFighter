@@ -51,3 +51,8 @@ Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f v
 
 	return wave;
 }
+
+void Wave::WaveReception()
+{
+	m_lifespan = 0;
+}

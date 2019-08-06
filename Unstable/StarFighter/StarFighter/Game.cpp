@@ -311,27 +311,40 @@ void Game::updateScene(Time deltaTime)
 
 	//wave collisions
 	vector<WaveBounce*> wave_bounces;
+	vector<Wave*> wave_receptions;
 
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
-		if (i != NeutralAlliance)
+		for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][WaveType].begin(); it != m_sceneCircleObjects[i][WaveType].end(); it++)
 		{
-			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][WaveType].begin(); it != m_sceneCircleObjects[i][WaveType].end(); it++)
+			for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
 			{
-				AllianceType opposite_alliance = i == PlayerAlliance ? EnemyAlliance : PlayerAlliance;
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[opposite_alliance][NodeType].begin(); it2 != m_sceneCircleObjects[opposite_alliance][NodeType].end(); it2++)
+				if (i == j || j == NeutralAlliance)
+				{
+					continue;
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][NodeType].begin(); it2 != m_sceneCircleObjects[j][NodeType].end(); it2++)
 				{
 					float dx = (*it)->getPosition().x - (*it2)->getPosition().x;
 					float dy = (*it)->getPosition().y - (*it2)->getPosition().y;
 					float radius = (*it)->getRadius() + (*it2)->getRadius();
 					if (dx*dx + dy*dy < radius*radius)
 					{
-						sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
-						ScaleVector(&vector, (*it)->getRadius());
-						sf::Vector2f position = (*it)->getPosition() + vector;
-
+						//wave bounce on enemy
 						Wave* wave = (Wave*)(*it);
-						wave_bounces.push_back(new WaveBounce(position, vector, (*it2)->getRadius(), wave));
+						if (i != NeutralAlliance)
+						{
+							sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
+							ScaleVector(&vector, (*it)->getRadius());
+							sf::Vector2f position = (*it)->getPosition() + vector;
+
+							wave_bounces.push_back(new WaveBounce(position, vector, (*it2)->getRadius(), wave));
+						}
+						else if (j == PlayerAlliance)
+						{
+							wave_receptions.push_back(wave);
+						}
 					}
 				}
 			}
@@ -344,6 +357,12 @@ void Game::updateScene(Time deltaTime)
 		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_vector);
 
 		delete *it;
+	}
+
+	for (vector<Wave*>::iterator it = wave_receptions.begin(); it != wave_receptions.end(); it++)
+	{
+		CircleObject* object = (CircleObject*)(*it);
+		object->WaveReception();
 	}
 	
 	//SFTextPop (text feedbacks)

@@ -20,6 +20,7 @@ public:
 	virtual void update(sf::Time deltaTime);
 
 	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector);
+	virtual void WaveReception();
 
 	AllianceType m_alliance;
 	sf::Color m_color;
