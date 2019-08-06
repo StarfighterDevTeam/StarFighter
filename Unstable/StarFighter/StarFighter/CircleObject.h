@@ -32,6 +32,8 @@ public:
 	sf::Vector2f m_previous_speed;
 	sf::Vector2f m_speed;
 	CircleType m_type;
+
+	bool m_garbageMe;
 };
 
 #endif // CIRCLEOBJECT_H_INCLUDED

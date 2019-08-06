@@ -16,9 +16,13 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	setOutlineColor(m_color);
 	setOutlineThickness(-4);
 
-	m_active_radar = true;
+	m_radar_activated = false;
 	m_radar_frequency = 1.f;
-	m_radar_clock = 0;
+	m_radar_frequency_clock = 0;
+	m_radar_range = 100;
+	m_radar_speed = 50;
+
+	m_is_terminal_node = false;
 }
 
 Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, alliance, 16)
@@ -34,20 +38,36 @@ Node::~Node()
 void Node::update(sf::Time deltaTime)
 {
 	//radar
-	if (m_active_radar == true)
+	if (m_is_terminal_node == true)
 	{
-		m_radar_clock += deltaTime.asSeconds();
-		if (m_radar_clock > m_radar_frequency)
+		m_radar_activated = true;
+	}
+	else
+	{
+		m_radar_activated = false;
+		for (vector<Node*>::iterator it = m_linked_nodes.begin(); it != m_linked_nodes.end(); it++)
 		{
-			m_radar_clock -= m_radar_frequency;
+			if ((*it)->m_radar_activated == true)
+			{
+				m_radar_activated = true;
+				break;
+			}
+		}
+	}
+
+	if (m_radar_activated == true)
+	{
+		m_radar_frequency_clock += deltaTime.asSeconds();
+		if (m_radar_frequency_clock > m_radar_frequency)
+		{
+			m_radar_frequency_clock -= m_radar_frequency;
 			CreateRadarWave();
 		}
 	}
 	else
 	{
-		m_radar_clock = 0;
+		m_radar_frequency_clock = 0;
 	}
-
 
 	//hovering & selection
 	m_hovered = false;
@@ -111,6 +131,6 @@ void Node::ResetColor()
 
 void Node::CreateRadarWave()
 {
-	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), 10);
+	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_speed, m_radar_range / m_radar_speed);
 	(*CurrentGame).AddCircleObject(wave, WaveType);
 }

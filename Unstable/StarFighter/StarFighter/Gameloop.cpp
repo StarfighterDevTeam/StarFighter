@@ -55,34 +55,28 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Create new links
-	size_t nodesVectorSize = m_nodes.size();
-	for (size_t i = 0; i < nodesVectorSize; i++)
-	{
-		m_nodes[i]->update(deltaTime);
-
-		if (m_nodes[i]->m_hovered == true && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_node != NULL && (*CurrentGame).m_selected_node != m_nodes[i] && (*CurrentGame).m_selected_node->m_alliance == PlayerAlliance && m_nodes[i]->m_alliance == PlayerAlliance)
-		{
-			//link already existing?
-			bool found = false;
-			for (vector<Node*>::iterator it = m_nodes[i]->m_linked_nodes.begin(); it != m_nodes[i]->m_linked_nodes.end(); it++)
-			{
-				if ((*it) == (*CurrentGame).m_selected_node)
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (found == false)
-			{
-				CreateLink(m_nodes[i], (*CurrentGame).m_selected_node);
-			}
-		}
-	}
-
 	//Update objects
 	(*CurrentGame).updateScene(deltaTime);
+
+	//Create new links
+	if ((*CurrentGame).m_hovered_node != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_node != NULL && (*CurrentGame).m_selected_node != (*CurrentGame).m_hovered_node && (*CurrentGame).m_selected_node->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_node->m_alliance == PlayerAlliance)
+	{
+		//link already existing?
+		bool found = false;
+		for (vector<Node*>::iterator it = (*CurrentGame).m_hovered_node->m_linked_nodes.begin(); it != (*CurrentGame).m_hovered_node->m_linked_nodes.end(); it++)
+		{
+			if ((*it) == (*CurrentGame).m_selected_node)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (found == false)
+		{
+			CreateLink((*CurrentGame).m_hovered_node, (*CurrentGame).m_selected_node);
+		}
+	}
 
 	//Scroll camera
 	UpdateCamera(deltaTime);

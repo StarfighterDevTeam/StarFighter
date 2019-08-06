@@ -260,24 +260,52 @@ void Game::updateScene(Time deltaTime)
 		this->m_sceneGameObjects[i]->update(deltaTime);
 	}
 
+	//update and garbe collection
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
-		size_t sceneCircleObjectsSize = this->m_sceneCircleObjects[i][WaveType].size();
-		for (size_t j = 0; j < sceneCircleObjectsSize; j++)
+		for (int j = 0; j < NB_CIRCLE_TYPES; j++)
 		{
-			if (this->m_sceneCircleObjects[i][WaveType][j] == NULL)
-				continue;
+			vector<CircleObject*> old_objects;
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][j].begin(); it != m_sceneCircleObjects[i][j].end(); it++)
+			{
+				old_objects.push_back(*it);
+				(*it)->update(deltaTime);
+			}
+
+			m_sceneCircleObjects[i][j].clear();
+
+			for (vector<CircleObject*>::iterator it = old_objects.begin(); it != old_objects.end(); it++)
+			{
+				if ((*it)->m_garbageMe == true)
+				{
+					delete *it;
+				}
+				else
+				{
+					m_sceneCircleObjects[i][j].push_back(*it);
+				}
+			}
+		}
 		
-			this->m_sceneCircleObjects[i][WaveType][j]->update(deltaTime);
+		vector<LineObject*> old_objects;
+		for (vector<LineObject*>::iterator it = m_sceneLineObjects[i].begin(); it != m_sceneLineObjects[i].end(); it++)
+		{
+			old_objects.push_back(*it);
+			(*it)->update(deltaTime);
 		}
 
-		size_t sceneLineObjectsSize = this->m_sceneLineObjects[i].size();
-		for (size_t j = 0; j < sceneLineObjectsSize; j++)
-		{
-			if (this->m_sceneLineObjects[i][j] == NULL)
-				continue;
+		m_sceneLineObjects[i].clear();
 
-			this->m_sceneLineObjects[i][j]->update(deltaTime);
+		for (vector<LineObject*>::iterator it = old_objects.begin(); it != old_objects.end(); it++)
+		{
+			if ((*it)->m_garbageMe == true)
+			{
+				delete *it;
+			}
+			else
+			{
+				m_sceneLineObjects[i].push_back(*it);
+			}
 		}
 	}
 	

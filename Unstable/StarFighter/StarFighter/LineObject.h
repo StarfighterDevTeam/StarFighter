@@ -17,6 +17,8 @@ public:
 	AllianceType m_alliance;
 	sf::Color m_color;
 
+	bool m_garbageMe;
+
 protected:
 	float m_thickness;
 };

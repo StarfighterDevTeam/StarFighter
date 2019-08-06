@@ -22,9 +22,13 @@ public :
 
 	vector<Node*> m_linked_nodes;
 
-	bool m_active_radar;
+	bool m_is_terminal_node;
+
+	bool m_radar_activated;
 	float m_radar_frequency;
-	float m_radar_clock;
+	float m_radar_frequency_clock;
+	float m_radar_range;
+	float m_radar_speed;
 	void CreateRadarWave();
 };
 

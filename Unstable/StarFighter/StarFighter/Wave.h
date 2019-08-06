@@ -6,12 +6,13 @@
 class Wave : public CircleObject
 {
 public :
-	Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed);
+	Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan);
 	~Wave();
 
 	void update(sf::Time deltaTime) override;
 
 	float m_expansion_speed;
+	float m_lifespan;
 };
 
 #endif // WAVE_H_INCLUDED
