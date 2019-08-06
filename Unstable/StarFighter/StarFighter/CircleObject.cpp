@@ -6,6 +6,8 @@ CircleObject::CircleObject(AllianceType alliance)
 	m_color = GameObject::GetAllianceColor(alliance);
 	m_speed = sf::Vector2f(0, 0);
 	m_garbageMe = false;
+	m_visible = alliance != EnemyAlliance;
+
 	setPointCount(64);
 }
 
@@ -29,13 +31,13 @@ void CircleObject::update(sf::Time deltaTime)
 }
 
 
-Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector)
+Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node)
 {
 	//see override function in class Wave
 	return NULL;
 }
 
-void CircleObject::WaveReception()
+void CircleObject::WaveReception(Wave* wave)
 {
-	//see override function in class Wave
+	//see override function in class Node
 }

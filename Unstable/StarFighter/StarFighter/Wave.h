@@ -10,11 +10,13 @@ public :
 	~Wave();
 
 	void update(sf::Time deltaTime) override;
-	Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector) override;
-	void WaveReception() override;
+	Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node) override;
 
 	float m_expansion_speed;
 	float m_lifespan;
+
+	Node* m_emitter_node;
+	Node* m_bounced_node;
 };
 
 #endif // WAVE_H_INCLUDED

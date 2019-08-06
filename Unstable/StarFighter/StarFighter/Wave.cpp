@@ -42,17 +42,13 @@ void Wave::update(sf::Time deltaTime)
 }
 
 
-Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector)
+Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node)
 {
 	Wave* wave = new Wave(position, NeutralAlliance, radius, m_expansion_speed, m_lifespan);
+	wave->m_bounced_node = bounced_node;
 	(*CurrentGame).AddCircleObject(wave, WaveType);
 
 	m_lifespan = 0;
 
 	return wave;
-}
-
-void Wave::WaveReception()
-{
-	m_lifespan = 0;
 }

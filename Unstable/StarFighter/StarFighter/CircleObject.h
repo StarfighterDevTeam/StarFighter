@@ -2,6 +2,8 @@
 #define CIRCLEOBJECT_H_INCLUDED
 
 #include "GameObject.h"
+
+class Node;
 class Wave;
 
 enum CircleType
@@ -19,8 +21,8 @@ public:
 
 	virtual void update(sf::Time deltaTime);
 
-	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector);
-	virtual void WaveReception();
+	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node);
+	virtual void WaveReception(Wave* wave);
 
 	AllianceType m_alliance;
 	sf::Color m_color;
@@ -30,6 +32,7 @@ public:
 	CircleType m_type;
 
 	bool m_garbageMe;
+	bool m_visible;
 };
 
 #endif // CIRCLEOBJECT_H_INCLUDED

@@ -131,6 +131,13 @@ void Node::ResetColor()
 Wave* Node::CreateRadarWave()
 {
 	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_speed, m_radar_range / m_radar_speed);
+	wave->m_emitter_node = this;
 	(*CurrentGame).AddCircleObject(wave, WaveType);
 	return wave;
+}
+
+void Node::WaveReception(Wave* wave)
+{
+	wave->m_lifespan = 0;
+	wave->m_bounced_node->m_visible = true;
 }

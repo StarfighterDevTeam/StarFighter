@@ -31,6 +31,7 @@ public :
 	float m_radar_speed;
 
 	Wave* CreateRadarWave();
+	void WaveReception(Wave* wave) override;
 };
 
 #endif // NODE_H_INCLUDED
