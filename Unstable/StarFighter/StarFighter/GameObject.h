@@ -108,7 +108,6 @@ public:
 	static bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 
 	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
-	static void ScaleVector(sf::Vector2f* vector, float target_value);
 	static void AddValueToVector(sf::Vector2f* vector, float added_value);
 	static float GetAngleRadForVector(sf::Vector2f vector);
 	static void GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, float* output_angle);

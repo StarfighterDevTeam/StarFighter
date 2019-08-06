@@ -469,16 +469,6 @@ bool GameObject::NormalizeVector(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
-void GameObject::ScaleVector(sf::Vector2f* vector, float target_value)
-{
-	if (vector->x == 0 && vector->y == 0)
-		return;
-
-	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
-	vector->x *= p;
-	vector->y *= p;
-}
-
 void GameObject::AddValueToVector(sf::Vector2f* vector, float added_value)
 {
 	if (vector->x == 0 && vector->y == 0)

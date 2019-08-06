@@ -345,7 +345,8 @@ void Game::drawScene()
 
 				for (vector<LineObject*>::iterator it = m_sceneLineObjects[j].begin(); it != m_sceneLineObjects[j].end(); it++)
 				{
-					m_mainScreen.draw((*(*it)).m_points, 2, sf::Lines);
+					//m_mainScreen.draw((*(*it)).m_points, 2, sf::Lines);
+					m_mainScreen.draw((*(*it)).m_quad, 4, sf::Quads);
 				}
 			}
 		}

@@ -83,5 +83,6 @@ float MinBetweenValues(sf::Vector2f values);
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max);
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
+void ScaleVector(sf::Vector2f* vector, float target_value);
 
 #endif // GLOBALS_H_INCLUDED

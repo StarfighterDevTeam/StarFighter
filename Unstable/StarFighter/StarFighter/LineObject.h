@@ -10,11 +10,15 @@ public:
 	~LineObject();
 
 	sf::Vertex m_points[2];
+	sf::Vertex m_quad[4];
 
 	virtual void update(sf::Time deltaTime);
 
 	AllianceType m_alliance;
 	sf::Color m_color;
+
+protected:
+	float m_thickness;
 };
 
 #endif // CIRCLEOBJECT_H_INCLUDED

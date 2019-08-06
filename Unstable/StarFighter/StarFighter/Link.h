@@ -14,6 +14,8 @@ public :
 
 	Node* m_node_a;
 	Node* m_node_b;
+
+	bool m_update_needed;
 };
 
 #endif // LINK_H_INCLUDED
