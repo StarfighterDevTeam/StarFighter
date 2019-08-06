@@ -22,6 +22,7 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	m_radar_speed = 50;
 
 	m_is_terminal_node = false;
+	m_ghost = false;
 }
 
 Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, alliance, 16)
@@ -140,4 +141,9 @@ void Node::WaveReception(Wave* wave)
 {
 	wave->m_lifespan = 0;
 	wave->m_bounced_node->m_visible = true;
+}
+
+AllianceType Node::GetOriginAlliance()
+{
+	return m_alliance;
 }

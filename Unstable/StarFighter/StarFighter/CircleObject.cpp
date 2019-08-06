@@ -41,3 +41,9 @@ void CircleObject::WaveReception(Wave* wave)
 {
 	//see override function in class Node
 }
+
+AllianceType CircleObject::GetOriginAlliance()
+{
+	//see override function in class Wave and class Node
+	return NB_ALLIANCE_TYPES;
+}

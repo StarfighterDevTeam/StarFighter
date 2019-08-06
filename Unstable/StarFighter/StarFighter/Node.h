@@ -14,11 +14,14 @@ public :
 	~Node();
 
 	void update(sf::Time deltaTime) override;
+	AllianceType GetOriginAlliance() override;
 	bool IsHoveredByMouse();
 	void ResetColor();
 
 	bool m_hovered;
 	bool m_selected;
+
+	bool m_ghost;
 
 	vector<Node*> m_linked_nodes;
 

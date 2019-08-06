@@ -342,7 +342,7 @@ void Game::updateScene(Time deltaTime)
 
 							wave_bounces.push_back(new WaveBounce(position, vector, (*it2)->getRadius(), wave, node));
 						}
-						else if (j == PlayerAlliance)
+						else if (j == (*it)->GetOriginAlliance())
 						{
 							wave_receptions.push_back(new WaveReception(wave, node));
 						}

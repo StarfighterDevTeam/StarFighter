@@ -46,9 +46,16 @@ Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f v
 {
 	Wave* wave = new Wave(position, NeutralAlliance, radius, m_expansion_speed, m_lifespan);
 	wave->m_bounced_node = bounced_node;
+	wave->m_emitter_node = m_emitter_node;
 	(*CurrentGame).AddCircleObject(wave, WaveType);
 
 	m_lifespan = 0;
 
 	return wave;
+}
+
+AllianceType Wave::GetOriginAlliance()
+{
+	CircleObject* object = (CircleObject*)m_emitter_node;
+	return object->GetOriginAlliance();
 }

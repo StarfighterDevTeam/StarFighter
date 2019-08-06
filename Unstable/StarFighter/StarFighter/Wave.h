@@ -11,6 +11,7 @@ public :
 
 	void update(sf::Time deltaTime) override;
 	Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node) override;
+	AllianceType GetOriginAlliance() override;
 
 	float m_expansion_speed;
 	float m_lifespan;
