@@ -3,6 +3,7 @@
 CircleObject::CircleObject(AllianceType alliance)
 {
 	m_alliance = alliance;
+	m_color = GameObject::GetAllianceColor(alliance);
 	m_speed = sf::Vector2f(0, 0);
 	m_garbageMe = false;
 	setPointCount(64);
@@ -25,4 +26,11 @@ void CircleObject::update(sf::Time deltaTime)
 	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 	setPosition(newposition.x, newposition.y);
+}
+
+
+Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector)
+{
+	//see override in function Wave
+	return NULL;
 }

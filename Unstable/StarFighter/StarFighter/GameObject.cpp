@@ -706,3 +706,26 @@ bool GameObject::IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf:
 
 	return is_inside_area;
 }
+
+sf::Color GameObject::GetAllianceColor(AllianceType alliance)
+{
+	switch (alliance)
+	{
+		case PlayerAlliance:
+		{
+			return sf::Color(0, 0, 255, 255);
+		}
+		case EnemyAlliance:
+		{
+			return sf::Color(255, 0, 0, 255);
+		}
+		case NeutralAlliance:
+		{
+			return sf::Color(255, 128, 0, GHOST_ALPHA_VALUE);
+		}
+		default:
+		{
+			return sf::Color(255, 255, 255, 255);
+		}
+	}
+}

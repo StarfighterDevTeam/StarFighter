@@ -29,7 +29,8 @@ public :
 	float m_radar_frequency_clock;
 	float m_radar_range;
 	float m_radar_speed;
-	void CreateRadarWave();
+
+	Wave* CreateRadarWave();
 };
 
 #endif // NODE_H_INCLUDED

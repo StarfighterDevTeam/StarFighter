@@ -12,9 +12,13 @@
 using namespace std;
 using namespace sf;
 
-class Equipment;
-class Weapon;
-class Loot;
+enum AllianceType
+{
+	PlayerAlliance,
+	NeutralAlliance,
+	EnemyAlliance,
+	NB_ALLIANCE_TYPES,
+};
 
 enum LayerType {
 	BackgroundLayer,
@@ -84,6 +88,8 @@ public:
 	GameObject* Clone();
 	void setGhost(bool ghost);
 	void SetConditionalColor(sf::Color color, bool condition);
+
+	static sf::Color GetAllianceColor(AllianceType alliance);
 	
 	float m_diag;
 	bool m_ghost;

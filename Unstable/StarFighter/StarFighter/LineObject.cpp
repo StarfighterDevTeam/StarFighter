@@ -4,7 +4,7 @@ LineObject::LineObject(sf::Vector2f position_a, sf::Vector2f position_b, Allianc
 {
 	m_thickness = 3;
 	m_alliance = alliance;
-	m_color = m_alliance == PlayerAlliance ? sf::Color::Blue : sf::Color::Red;
+	m_color = GameObject::GetAllianceColor(alliance);
 	m_garbageMe = false;
 }
 

@@ -18,6 +18,7 @@ Gameloop::Gameloop()
 	CreateTerminal(sf::Vector2f(200, 440), PlayerAlliance);
 	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
 	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
 
 	CreateNode(sf::Vector2f(1920 - 400, 540), EnemyAlliance);
 
@@ -58,7 +59,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Update objects
 	(*CurrentGame).updateScene(deltaTime);
 
-	//Create new links
+	//Create new links on right click
 	if ((*CurrentGame).m_hovered_node != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_node != NULL && (*CurrentGame).m_selected_node != (*CurrentGame).m_hovered_node && (*CurrentGame).m_selected_node->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_node->m_alliance == PlayerAlliance)
 	{
 		//link already existing?

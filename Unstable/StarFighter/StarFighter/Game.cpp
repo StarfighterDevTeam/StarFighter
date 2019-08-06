@@ -308,6 +308,43 @@ void Game::updateScene(Time deltaTime)
 			}
 		}
 	}
+
+	//wave collisions
+	vector<WaveBounce*> wave_bounces;
+
+	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
+	{
+		if (i != NeutralAlliance)
+		{
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][WaveType].begin(); it != m_sceneCircleObjects[i][WaveType].end(); it++)
+			{
+				AllianceType opposite_alliance = i == PlayerAlliance ? EnemyAlliance : PlayerAlliance;
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[opposite_alliance][NodeType].begin(); it2 != m_sceneCircleObjects[opposite_alliance][NodeType].end(); it2++)
+				{
+					float dx = (*it)->getPosition().x - (*it2)->getPosition().x;
+					float dy = (*it)->getPosition().y - (*it2)->getPosition().y;
+					float radius = (*it)->getRadius() + (*it2)->getRadius();
+					if (dx*dx + dy*dy < radius*radius)
+					{
+						sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
+						ScaleVector(&vector, (*it)->getRadius());
+						sf::Vector2f position = (*it)->getPosition() + vector;
+
+						Wave* wave = (Wave*)(*it);
+						wave_bounces.push_back(new WaveBounce(position, vector, (*it2)->getRadius(), wave));
+					}
+				}
+			}
+		}
+	}
+
+	for (vector<WaveBounce*>::iterator it = wave_bounces.begin(); it != wave_bounces.end(); it++)
+	{
+		CircleObject* object = (CircleObject*)(*it)->m_wave;
+		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_vector);
+
+		delete *it;
+	}
 	
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();

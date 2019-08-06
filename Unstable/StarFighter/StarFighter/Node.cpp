@@ -11,7 +11,6 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	setPosition(position);
 	setOrigin(sf::Vector2f(radius, radius));
 	setRadius(radius);
-	m_color = alliance == PlayerAlliance ? sf::Color(0, 0, 255, 255) : sf::Color(255, 0, 0, 255);
 	setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
 	setOutlineColor(m_color);
 	setOutlineThickness(-4);
@@ -129,8 +128,9 @@ void Node::ResetColor()
 	setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
 }
 
-void Node::CreateRadarWave()
+Wave* Node::CreateRadarWave()
 {
 	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_speed, m_radar_range / m_radar_speed);
 	(*CurrentGame).AddCircleObject(wave, WaveType);
+	return wave;
 }

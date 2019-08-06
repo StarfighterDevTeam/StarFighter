@@ -2,14 +2,7 @@
 #define CIRCLEOBJECT_H_INCLUDED
 
 #include "GameObject.h"
-
-enum AllianceType
-{
-	PlayerAlliance,
-	NeutralAlliance,
-	EnemyAlliance,
-	NB_ALLIANCE_TYPES,
-};
+class Wave;
 
 enum CircleType
 {
@@ -25,6 +18,8 @@ public:
 	~CircleObject();
 
 	virtual void update(sf::Time deltaTime);
+
+	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector);
 
 	AllianceType m_alliance;
 	sf::Color m_color;

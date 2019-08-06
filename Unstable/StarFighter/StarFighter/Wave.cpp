@@ -12,7 +12,6 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	m_expansion_speed = expansion_speed;
 	m_lifespan = lifespan;
 
-	m_color = alliance == PlayerAlliance ? sf::Color(0, 0, 255, 255) : sf::Color(255, 0, 0, 255);
 	setFillColor(sf::Color(0, 0, 0, 0));
 	setOutlineColor(m_color);
 	setOutlineThickness(4);
@@ -40,4 +39,15 @@ void Wave::update(sf::Time deltaTime)
 	{
 		m_garbageMe = true;
 	}
+}
+
+
+Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector)
+{
+	Wave* wave = new Wave(position, NeutralAlliance, radius, m_expansion_speed, m_lifespan);
+	(*CurrentGame).AddCircleObject(wave, WaveType);
+
+	m_lifespan = 0;
+
+	return wave;
 }

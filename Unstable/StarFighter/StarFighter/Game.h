@@ -54,6 +54,16 @@ enum MouseAction
 
 using namespace sf;
 
+struct WaveBounce
+{
+public:
+	WaveBounce(sf::Vector2f position, sf::Vector2f vector, float radius, Wave* wave){ m_position = position; m_vector = vector; m_radius = radius; m_wave = wave; }
+	sf::Vector2f m_position;
+	sf::Vector2f m_vector;
+	float m_radius;
+	Wave* m_wave;
+};
+
 struct Game
 {
 public:
