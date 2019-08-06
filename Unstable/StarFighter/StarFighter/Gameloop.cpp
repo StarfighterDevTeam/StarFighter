@@ -38,12 +38,8 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*CurrentGame).m_selected_node != NULL)
 		{
-			if ((*CurrentGame).m_selected_node->IsHoveredByMouse() == false)
-			{
-				(*CurrentGame).m_selected_node->m_selected = false;
-				(*CurrentGame).m_selected_node->ResetColor();
-				(*CurrentGame).m_selected_node = NULL;
-			}
+			(*CurrentGame).m_selected_node->m_selected = false;
+			(*CurrentGame).m_selected_node = NULL;
 		}
 	}
 
