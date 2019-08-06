@@ -12,6 +12,11 @@ Link::Link(Node* node_a, Node* node_b) : LineObject(node_a->getPosition(), node_
 	m_update_needed = true;
 }
 
+Link::~Link()
+{
+
+}
+
 void Link::update(sf::Time deltaTime)
 {
 	if (m_node_a->m_hovered == true)
@@ -21,8 +26,8 @@ void Link::update(sf::Time deltaTime)
 	}
 	else if (m_node_a->m_selected == true)
 	{
-		m_quad[0].color = sf::Color(0, 255, 0, 255);
-		m_quad[3].color = sf::Color(0, 255, 0, 255);
+		//m_quad[0].color = sf::Color(0, 255, 0, 255);
+		//m_quad[3].color = sf::Color(0, 255, 0, 255);
 	}
 	else
 	{
@@ -37,8 +42,8 @@ void Link::update(sf::Time deltaTime)
 	}
 	else if (m_node_b->m_selected == true)
 	{
-		m_quad[1].color = sf::Color(0, 255, 0, 255);
-		m_quad[2].color = sf::Color(0, 255, 0, 255);
+		//m_quad[1].color = sf::Color(0, 255, 0, 255);
+		//m_quad[2].color = sf::Color(0, 255, 0, 255);
 	}
 	else
 	{

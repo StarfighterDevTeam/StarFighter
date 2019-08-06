@@ -262,14 +262,14 @@ void Game::updateScene(Time deltaTime)
 
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
-		size_t sceneCircleObjectsSize = this->m_sceneCircleObjects[i].size();
-		for (size_t j = 0; j < sceneCircleObjectsSize; j++)
-		{
-			if (this->m_sceneCircleObjects[i][j] == NULL)
-				continue;
-
-			this->m_sceneCircleObjects[i][j]->update(deltaTime);
-		}
+		//size_t sceneCircleObjectsSize = this->m_sceneCircleObjects[i].size();
+		//for (size_t j = 0; j < sceneCircleObjectsSize; j++)
+		//{
+		//	if (this->m_sceneCircleObjects[i][j] == NULL)
+		//		continue;
+		//
+		//	this->m_sceneCircleObjects[i][j]->update(deltaTime);
+		//}
 
 		size_t sceneLineObjectsSize = this->m_sceneLineObjects[i].size();
 		for (size_t j = 0; j < sceneLineObjectsSize; j++)

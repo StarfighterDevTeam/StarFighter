@@ -22,6 +22,11 @@ Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, 
 
 }
 
+Node::~Node()
+{
+
+}
+
 void Node::update(sf::Time deltaTime)
 {
 	m_hovered = false;
@@ -30,7 +35,7 @@ void Node::update(sf::Time deltaTime)
 		m_hovered = true;
 		(*CurrentGame).m_hovered_node = this;
 
-		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
+		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick && m_alliance == PlayerAlliance)
 		{
 			if ((*CurrentGame).m_selected_node != NULL)
 			{

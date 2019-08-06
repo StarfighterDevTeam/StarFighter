@@ -9,6 +9,7 @@ class Link : public LineObject
 {
 public :
 	Link(Node* node_a, Node* node_b);
+	~Link();
 	void update(sf::Time deltaTime) override;
 	void ResetColor();
 

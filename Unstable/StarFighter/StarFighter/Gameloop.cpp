@@ -27,6 +27,18 @@ Gameloop::Gameloop()
 Gameloop::~Gameloop()
 {
 	delete m_background;
+
+	for (vector<Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); it++)
+	{
+		delete *it;
+	}
+	m_nodes.clear();
+
+	for (vector<Link*>::iterator it = m_links.begin(); it != m_links.end(); it++)
+	{
+		delete *it;
+	}
+	m_links.clear();
 }
 
 void Gameloop::Update(sf::Time deltaTime)
@@ -40,6 +52,32 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			(*CurrentGame).m_selected_node->m_selected = false;
 			(*CurrentGame).m_selected_node = NULL;
+		}
+	}
+
+	//Create new links
+	size_t nodesVectorSize = m_nodes.size();
+	for (size_t i = 0; i < nodesVectorSize; i++)
+	{
+		m_nodes[i]->update(deltaTime);
+
+		if (m_nodes[i]->m_hovered == true && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_node != NULL && (*CurrentGame).m_selected_node != m_nodes[i] && (*CurrentGame).m_selected_node->m_alliance == PlayerAlliance && m_nodes[i]->m_alliance == PlayerAlliance)
+		{
+			//link already existing?
+			bool found = false;
+			for (vector<Node*>::iterator it = m_nodes[i]->m_linked_nodes.begin(); it != m_nodes[i]->m_linked_nodes.end(); it++)
+			{
+				if ((*it) == (*CurrentGame).m_selected_node)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (found == false)
+			{
+				CreateLink(m_nodes[i], (*CurrentGame).m_selected_node);
+			}
 		}
 	}
 
@@ -79,6 +117,7 @@ Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
 	Node* node = new Node(position, alliance);
 	(*CurrentGame).AddCircleObject(node);
+	m_nodes.push_back(node);
 
 	return node;
 }
@@ -87,6 +126,7 @@ Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
 	Terminal* terminal = new Terminal(position, alliance);
 	(*CurrentGame).AddCircleObject(terminal);
+	m_nodes.push_back(terminal);
 
 	return terminal;
 }
@@ -95,4 +135,8 @@ void Gameloop::CreateLink(Node* node_a, Node* node_b)
 {
 	Link* link = new Link(node_a, node_b);
 	(*CurrentGame).AddLineObject(link);
+	m_links.push_back(link);
+
+	node_a->m_linked_nodes.push_back(node_b);
+	node_b->m_linked_nodes.push_back(node_a);
 }

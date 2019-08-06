@@ -28,6 +28,9 @@ public:
 	Terminal* CreateTerminal(sf::Vector2f position, AllianceType alliance);
 	void CreateLink(Node* node_a, Node* node_b);
 
+	vector<Node*> m_nodes;
+	vector<Link*> m_links;
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
