@@ -128,7 +128,7 @@ public:
 	//Liaison 16
 	Node* m_hovered_node;
 	Node* m_selected_node;
-	void AddCircleObject(CircleObject* object);
+	void AddCircleObject(CircleObject* object, CircleType type);
 	void AddLineObject(LineObject* object);
 
 private:
@@ -153,7 +153,7 @@ private:
 	std::vector<SFText*> m_garbageTexts;
 
 	//Liaison 16
-	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES];
+	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
 	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
 };
 

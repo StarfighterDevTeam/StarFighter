@@ -12,9 +12,13 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	setOrigin(sf::Vector2f(radius, radius));
 	setRadius(radius);
 	m_color = alliance == PlayerAlliance ? sf::Color(0, 0, 255, 255) : sf::Color(255, 0, 0, 255);
-	setFillColor(alliance == PlayerAlliance ? sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE) : sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
-	setOutlineColor(alliance == PlayerAlliance ? sf::Color(m_color.r, m_color.g, m_color.b, 255) : sf::Color(m_color.r, m_color.g, m_color.b, 255));
+	setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
+	setOutlineColor(m_color);
 	setOutlineThickness(-4);
+
+	m_active_radar = true;
+	m_radar_frequency = 1.f;
+	m_radar_clock = 0;
 }
 
 Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, alliance, 16)
@@ -29,6 +33,23 @@ Node::~Node()
 
 void Node::update(sf::Time deltaTime)
 {
+	//radar
+	if (m_active_radar == true)
+	{
+		m_radar_clock += deltaTime.asSeconds();
+		if (m_radar_clock > m_radar_frequency)
+		{
+			m_radar_clock -= m_radar_frequency;
+			CreateRadarWave();
+		}
+	}
+	else
+	{
+		m_radar_clock = 0;
+	}
+
+
+	//hovering & selection
 	m_hovered = false;
 	if (IsHoveredByMouse() == true)
 	{
@@ -86,4 +107,10 @@ void Node::ResetColor()
 {
 	setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
 	setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
+}
+
+void Node::CreateRadarWave()
+{
+	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), 10);
+	(*CurrentGame).AddCircleObject(wave, WaveType);
 }

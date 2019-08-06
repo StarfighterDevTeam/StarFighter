@@ -116,7 +116,7 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
 	Node* node = new Node(position, alliance);
-	(*CurrentGame).AddCircleObject(node);
+	(*CurrentGame).AddCircleObject(node, NodeType);
 	m_nodes.push_back(node);
 
 	return node;
@@ -125,7 +125,7 @@ Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
 	Terminal* terminal = new Terminal(position, alliance);
-	(*CurrentGame).AddCircleObject(terminal);
+	(*CurrentGame).AddCircleObject(terminal, NodeType);
 	m_nodes.push_back(terminal);
 
 	return terminal;

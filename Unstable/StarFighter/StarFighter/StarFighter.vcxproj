@@ -108,6 +108,7 @@
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="Terminal.cpp" />
     <ClCompile Include="TextureLoader.h" />
+    <ClCompile Include="Wave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="Terminal.h" />
     <ClInclude Include="TextUtils.h" />
+    <ClInclude Include="Wave.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />

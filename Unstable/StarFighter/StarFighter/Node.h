@@ -2,6 +2,7 @@
 #define NODE_H_INCLUDED
 
 #include "Game.h"
+#include "Wave.h"
 
 class Link;
 
@@ -20,6 +21,11 @@ public :
 	bool m_selected;
 
 	vector<Node*> m_linked_nodes;
+
+	bool m_active_radar;
+	float m_radar_frequency;
+	float m_radar_clock;
+	void CreateRadarWave();
 };
 
 #endif // NODE_H_INCLUDED

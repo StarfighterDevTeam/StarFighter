@@ -262,14 +262,14 @@ void Game::updateScene(Time deltaTime)
 
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
-		//size_t sceneCircleObjectsSize = this->m_sceneCircleObjects[i].size();
-		//for (size_t j = 0; j < sceneCircleObjectsSize; j++)
-		//{
-		//	if (this->m_sceneCircleObjects[i][j] == NULL)
-		//		continue;
-		//
-		//	this->m_sceneCircleObjects[i][j]->update(deltaTime);
-		//}
+		size_t sceneCircleObjectsSize = this->m_sceneCircleObjects[i][WaveType].size();
+		for (size_t j = 0; j < sceneCircleObjectsSize; j++)
+		{
+			if (this->m_sceneCircleObjects[i][WaveType][j] == NULL)
+				continue;
+		
+			this->m_sceneCircleObjects[i][WaveType][j]->update(deltaTime);
+		}
 
 		size_t sceneLineObjectsSize = this->m_sceneLineObjects[i].size();
 		for (size_t j = 0; j < sceneLineObjectsSize; j++)
@@ -338,11 +338,14 @@ void Game::drawScene()
 		{
 			for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
 			{
-				for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[j].begin(); it != m_sceneCircleObjects[j].end(); it++)
+				for (int k = 0; k < NB_CIRCLE_TYPES; k++)
 				{
-					m_mainScreen.draw(*(*it));
+					for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[j][k].begin(); it != m_sceneCircleObjects[j][k].end(); it++)
+					{
+						m_mainScreen.draw(*(*it));
+					}
 				}
-
+				
 				for (vector<LineObject*>::iterator it = m_sceneLineObjects[j].begin(); it != m_sceneLineObjects[j].end(); it++)
 				{
 					//m_mainScreen.draw((*(*it)).m_points, 2, sf::Lines);
@@ -838,9 +841,9 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 }
 
 //Liaison 16
-void Game::AddCircleObject(CircleObject* object)
+void Game::AddCircleObject(CircleObject* object, CircleType type)
 {
-	m_sceneCircleObjects[object->m_alliance].push_back(object);
+	m_sceneCircleObjects[object->m_alliance][type].push_back(object);
 }
 
 void Game::AddLineObject(LineObject* object)

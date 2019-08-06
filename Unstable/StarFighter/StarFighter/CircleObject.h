@@ -11,6 +11,13 @@ enum AllianceType
 	NB_ALLIANCE_TYPES,
 };
 
+enum CircleType
+{
+	NodeType,
+	WaveType,
+	NB_CIRCLE_TYPES,
+};
+
 class CircleObject : public sf::CircleShape
 {
 public:
@@ -24,6 +31,7 @@ public:
 
 	sf::Vector2f m_previous_speed;
 	sf::Vector2f m_speed;
+	CircleType m_type;
 };
 
 #endif // CIRCLEOBJECT_H_INCLUDED
