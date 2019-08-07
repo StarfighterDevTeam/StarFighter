@@ -18,6 +18,7 @@ public :
 	bool IsHoveredByMouse();
 	void ResetColor();
 	bool IsColliding(Wave* wave, float direction) override;
+	Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave) override;
 
 	bool m_hovered;
 	bool m_selected;

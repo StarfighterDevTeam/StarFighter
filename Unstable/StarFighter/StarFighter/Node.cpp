@@ -154,3 +154,26 @@ bool Node::IsColliding(Wave* wave, float direction)
 {
 	return IsInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction);
 }
+
+
+Wave* Node::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
+{
+	Wave* new_wave = new Wave(position, NeutralAlliance, radius, wave->m_expansion_speed, wave->m_lifespan, wave->m_angle_coverage, direction + 180);
+	new_wave->m_bounced_node = this;
+	new_wave->m_emitter_node = wave->m_emitter_node;
+	(*CurrentGame).AddCircleObject(new_wave, WaveType);
+	wave->m_bounced_nodes.push_back(this);
+
+	//masking wave sector of incidence
+	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
+	for (int i = 0; i < 64 * 2; i++)
+	{
+		float ang = (i / 2) * 360.f / 63;
+		if (IsInsideAngleCoverage(ang, delta_angle * 2, direction))
+		{
+			wave->m_points[i].color = sf::Color(0, 0, 0, 0);
+		}
+	}
+
+	return new_wave;
+}

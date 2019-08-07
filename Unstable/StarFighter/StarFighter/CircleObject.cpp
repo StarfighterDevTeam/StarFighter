@@ -32,7 +32,7 @@ void CircleObject::update(sf::Time deltaTime)
 }
 
 
-Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Node* bounced_node)
+Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
 {
 	//see override function in class Wave
 	return NULL;

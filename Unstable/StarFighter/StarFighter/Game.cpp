@@ -337,9 +337,9 @@ void Game::updateScene(Time deltaTime)
 						{
 							//testing sector or circle
 							Wave* wave = (Wave*)(*it);
-							float ang = GetAngleForVector((*it2)->getPosition() - (*it)->getPosition());
+							float direction = GetAngleForVector(sf::Vector2f((*it2)->getPosition().x - (*it)->getPosition().x, - ((*it2)->getPosition().y - (*it)->getPosition().y)));
 
-							if ((*it2)->IsColliding(wave, ang) == true)
+							if ((*it2)->IsColliding(wave, direction) == true)
 							{
 								//wave bounce on enemy
 								Node* node = (Node*)(*it2);
@@ -349,7 +349,7 @@ void Game::updateScene(Time deltaTime)
 									ScaleVector(&vector, (*it)->getRadius());
 									sf::Vector2f position = (*it)->getPosition() + vector;
 
-									wave_bounces.push_back(new WaveBounce(position, ang, (*it2)->getRadius(), wave, node));
+									wave_bounces.push_back(new WaveBounce(position, direction, (*it2)->getRadius(), wave, node));
 								}
 								else if (j == (*it)->GetOriginAlliance())
 								{
@@ -365,8 +365,8 @@ void Game::updateScene(Time deltaTime)
 
 	for (vector<WaveBounce*>::iterator it = wave_bounces.begin(); it != wave_bounces.end(); it++)
 	{
-		CircleObject* object = (CircleObject*)(*it)->m_wave;
-		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_direction, (*it)->m_bounced_node);
+		CircleObject* object = (CircleObject*)(*it)->m_bounced_node;
+		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_direction, (*it)->m_wave);
 
 		delete *it;
 	}

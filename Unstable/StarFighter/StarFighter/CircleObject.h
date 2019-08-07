@@ -21,7 +21,7 @@ public:
 
 	virtual void update(sf::Time deltaTime);
 
-	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Node* bounced_node);
+	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave);
 	virtual void WaveReception(Wave* wave);
 	virtual AllianceType GetOriginAlliance();
 	virtual void Draw(RenderTarget& screen);

@@ -25,24 +25,6 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	{
 		float ang = (i / 2) * 360.f / 63;
 		m_points[i].color = IsInsideAngleCoverage(ang, angle_coverage, angle_direction) ? m_color : sf::Color(0, 0, 0, 0);
-		/*
-		float delta = ang - angle_direction;
-
-		if (delta > 180)
-			delta -= 360;
-
-		else if (delta < -180)
-			delta += 360;
-
-		if (abs(delta) <= angle_coverage / 2)
-		{
-			m_points[i].color = m_color;
-		}
-		else
-		{
-			m_points[i].color = sf::Color(0, 0, 0, 0);
-		}
-		*/
 	}
 }
 
@@ -86,19 +68,6 @@ void Wave::update(sf::Time deltaTime)
 
 	//points
 	UpdateCirclePoints();
-}
-
-Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Node* bounced_node)
-{
-	Wave* wave = new Wave(position, NeutralAlliance, radius, m_expansion_speed, m_lifespan, m_angle_coverage, - direction + 180);
-	wave->m_bounced_node = bounced_node;
-	wave->m_emitter_node = m_emitter_node;
-	(*CurrentGame).AddCircleObject(wave, WaveType);
-
-	m_bounced_nodes.push_back(bounced_node);
-	//m_lifespan = 0;
-
-	return wave;
 }
 
 AllianceType Wave::GetOriginAlliance()
