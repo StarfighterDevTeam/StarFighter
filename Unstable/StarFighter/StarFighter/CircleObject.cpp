@@ -47,3 +47,8 @@ AllianceType CircleObject::GetOriginAlliance()
 	//see override function in class Wave and class Node
 	return NB_ALLIANCE_TYPES;
 }
+
+void CircleObject::Draw(RenderTarget& screen)
+{
+	screen.draw(*this);
+}

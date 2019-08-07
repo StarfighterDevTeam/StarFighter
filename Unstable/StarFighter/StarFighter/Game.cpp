@@ -429,7 +429,7 @@ void Game::drawScene()
 					{
 						if ((*it)->m_visible == true)
 						{
-							m_mainScreen.draw(*(*it));
+							(*it)->Draw(m_mainScreen);
 						}
 					}
 				}

@@ -15,6 +15,25 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	setFillColor(sf::Color(0, 0, 0, 0));
 	setOutlineColor(m_color);
 	setOutlineThickness(4);
+
+	for (int i = 0; i < 64*2; i++)
+	{
+		m_points[i].color = m_color;
+	}
+}
+
+void Wave::UpdateCirclePoints()
+{
+	sf::Vector2f position = getPosition();
+	float radius = getRadius();
+	float thickness = getOutlineThickness();
+	sf::Vector2f origin = getOrigin();
+	
+	for (int i = 0; i < 64*2; i++)
+	{
+		m_points[i].position.x = position.x + (radius + (i % 2) * thickness) * cos((i / 2) * 2.f * M_PI / 63);
+		m_points[i].position.y = position.y + (radius + (i % 2) * thickness) * sin((i / 2) * 2.f * M_PI / 63);
+	}
 }
 
 Wave::~Wave()
@@ -24,6 +43,7 @@ Wave::~Wave()
 
 void Wave::update(sf::Time deltaTime)
 {
+	//update expansion
 	setRadius(getRadius() + m_expansion_speed * deltaTime.asSeconds());
 	setOrigin(sf::Vector2f(getRadius(), getRadius()));
 
@@ -38,6 +58,14 @@ void Wave::update(sf::Time deltaTime)
 	if (m_lifespan <= 0)
 	{
 		m_garbageMe = true;
+	}
+
+	//points
+	UpdateCirclePoints();
+
+	for (int i = 0; i < 20*2; i++)
+	{
+		m_points[i].color = sf::Color(0, 0, 0, 0);
 	}
 }
 
@@ -58,4 +86,9 @@ AllianceType Wave::GetOriginAlliance()
 {
 	CircleObject* object = (CircleObject*)m_emitter_node;
 	return object->GetOriginAlliance();
+}
+
+void Wave::Draw(RenderTarget& screen)
+{
+	screen.draw(m_points, 64*2, sf::TrianglesStrip);
 }

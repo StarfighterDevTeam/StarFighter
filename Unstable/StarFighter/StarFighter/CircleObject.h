@@ -24,6 +24,7 @@ public:
 	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node);
 	virtual void WaveReception(Wave* wave);
 	virtual AllianceType GetOriginAlliance();
+	virtual void Draw(RenderTarget& screen);
 
 	AllianceType m_alliance;
 	sf::Color m_color;

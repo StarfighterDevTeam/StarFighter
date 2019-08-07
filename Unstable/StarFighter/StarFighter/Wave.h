@@ -12,12 +12,16 @@ public :
 	void update(sf::Time deltaTime) override;
 	Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node) override;
 	AllianceType GetOriginAlliance() override;
+	void UpdateCirclePoints();
+	void Draw(RenderTarget& screen) override;
 
 	float m_expansion_speed;
 	float m_lifespan;
 
 	Node* m_emitter_node;
 	Node* m_bounced_node;
+
+	sf::Vertex m_points[64*2];
 };
 
 #endif // WAVE_H_INCLUDED
