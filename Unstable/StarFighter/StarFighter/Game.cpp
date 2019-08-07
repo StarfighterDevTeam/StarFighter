@@ -331,25 +331,30 @@ void Game::updateScene(Time deltaTime)
 					float radius = (*it)->getRadius() + (*it2)->getRadius();
 					if (dx*dx + dy*dy < radius*radius)
 					{
-						//testing sector or circle
-						Wave* wave = (Wave*)(*it);
-						float ang = GetAngleForVector((*it2)->getPosition() - (*it)->getPosition());
-						
-						if ((*it2)->IsColliding(wave, ang) == true)
+						//already bounced on this node?
+						Node* node = (Node*)(*it2);
+						if ((*it)->HasBouncedOnNode(node) == false)
 						{
-							//wave bounce on enemy
-							Node* node = (Node*)(*it2);
-							if (i != NeutralAlliance)
-							{
-								sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
-								ScaleVector(&vector, (*it)->getRadius());
-								sf::Vector2f position = (*it)->getPosition() + vector;
+							//testing sector or circle
+							Wave* wave = (Wave*)(*it);
+							float ang = GetAngleForVector((*it2)->getPosition() - (*it)->getPosition());
 
-								wave_bounces.push_back(new WaveBounce(position, ang, (*it2)->getRadius(), wave, node));
-							}
-							else if (j == (*it)->GetOriginAlliance())
+							if ((*it2)->IsColliding(wave, ang) == true)
 							{
-								wave_receptions.push_back(new WaveReception(wave, node));
+								//wave bounce on enemy
+								Node* node = (Node*)(*it2);
+								if (i != NeutralAlliance)
+								{
+									sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
+									ScaleVector(&vector, (*it)->getRadius());
+									sf::Vector2f position = (*it)->getPosition() + vector;
+
+									wave_bounces.push_back(new WaveBounce(position, ang, (*it2)->getRadius(), wave, node));
+								}
+								else if (j == (*it)->GetOriginAlliance())
+								{
+									wave_receptions.push_back(new WaveReception(wave, node));
+								}
 							}
 						}
 					}

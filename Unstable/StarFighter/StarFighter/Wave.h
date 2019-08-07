@@ -14,6 +14,7 @@ public :
 	AllianceType GetOriginAlliance() override;
 	void UpdateCirclePoints();
 	void Draw(RenderTarget& screen) override;
+	bool HasBouncedOnNode(Node* node) override;
 
 	float m_expansion_speed;
 	float m_lifespan;
@@ -23,6 +24,7 @@ public :
 
 	Node* m_emitter_node;
 	Node* m_bounced_node;
+	vector<Node*> m_bounced_nodes;
 
 	sf::Vertex m_points[64*2];
 };

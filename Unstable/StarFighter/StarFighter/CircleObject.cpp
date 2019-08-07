@@ -60,3 +60,9 @@ bool CircleObject::IsColliding(Wave* wave, float direction)
 	//see override function in class Node
 	return false;
 }
+
+bool CircleObject::HasBouncedOnNode(Node* node)
+{
+	//see override function in class Wave
+	return false;
+}

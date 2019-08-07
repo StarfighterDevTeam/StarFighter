@@ -95,7 +95,8 @@ Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, float directio
 	wave->m_emitter_node = m_emitter_node;
 	(*CurrentGame).AddCircleObject(wave, WaveType);
 
-	m_lifespan = 0;
+	m_bounced_nodes.push_back(bounced_node);
+	//m_lifespan = 0;
 
 	return wave;
 }
@@ -109,4 +110,15 @@ AllianceType Wave::GetOriginAlliance()
 void Wave::Draw(RenderTarget& screen)
 {
 	screen.draw(m_points, 64*2, sf::TrianglesStrip);
+}
+
+bool Wave::HasBouncedOnNode(Node* node)
+{
+	for (vector<Node*>::iterator it = m_bounced_nodes.begin(); it != m_bounced_nodes.end(); it++)
+	{
+		if (node == *it)
+			return true;
+	}
+
+	return false;
 }

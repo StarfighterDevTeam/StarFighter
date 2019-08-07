@@ -26,6 +26,7 @@ public:
 	virtual AllianceType GetOriginAlliance();
 	virtual void Draw(RenderTarget& screen);
 	virtual bool IsColliding(Wave* wave, float direction);
+	virtual bool HasBouncedOnNode(Node* node);
 
 	AllianceType m_alliance;
 	sf::Color m_color;
