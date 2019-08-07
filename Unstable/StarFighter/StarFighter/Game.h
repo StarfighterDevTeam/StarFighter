@@ -157,6 +157,9 @@ public:
 	void AddCircleObject(CircleObject* object, CircleType type);
 	void AddLineObject(LineObject* object);
 
+	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
+	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);
@@ -177,10 +180,6 @@ private:
 	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;
 	std::vector<SFText*> m_garbageTexts;
-
-	//Liaison 16
-	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
-	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
 };
 
 #endif // GAME_H_INCLUDED

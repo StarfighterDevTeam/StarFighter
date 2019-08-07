@@ -20,11 +20,13 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	m_radar_frequency_clock = 0;
 	m_radar_range = 100;
 	m_radar_speed = 50;
-	m_radar_direction = 0;
+	m_radar_direction = alliance == PlayerAlliance ? 0 : 180;
 	m_radar_coverage = 60;
 
 	m_is_terminal_node = false;
 	m_ghost = false;
+
+	m_visible = alliance == PlayerAlliance;
 }
 
 Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, alliance, 16)
@@ -187,12 +189,35 @@ Wave* Node::CreateWaveBounce(sf::Vector2f position, float radius, float directio
 		}
 	}
 
+	//RWR (radar warning receiver)
+	if (wave->m_alliance != NeutralAlliance && wave->m_alliance != m_alliance)
+	{
+		wave->m_emitter_node->m_visible = true;
+		for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[wave->m_alliance][WaveType].begin(); it != (*CurrentGame).m_sceneCircleObjects[wave->m_alliance][WaveType].end(); it++)
+		{
+			Wave* wave_iterator = (Wave*)(*it);
+			if (wave_iterator->m_emitter_node == wave->m_emitter_node)
+			{
+				wave_iterator->m_visible = true;
+			}
+		}
+	}
+
 	return new_wave;
 }
 
 void Node::WaveReception(Wave* wave)
 {
 	wave->m_bounced_node->m_visible = true;
+
+	for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][WaveType].begin(); it != (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][WaveType].end(); it++)
+	{
+		Wave* wave_iterator = (Wave*)(*it);
+		if (wave_iterator->m_bounced_node == wave->m_bounced_node)// && wave_iterator->m_emitter_node->m_alliance == PlayerAlliance)
+		{
+			wave_iterator->m_visible = true;
+		}
+	}
 
 	wave->m_lifespan = 0;
 	//masking wave sector of incidence

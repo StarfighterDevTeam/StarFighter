@@ -6,8 +6,7 @@ CircleObject::CircleObject(AllianceType alliance)
 	m_color = GameObject::GetAllianceColor(alliance);
 	m_speed = sf::Vector2f(0, 0);
 	m_garbageMe = false;
-	//m_visible = alliance != EnemyAlliance;
-	m_visible = true;
+	m_visible = true;// alliance == PlayerAlliance;
 
 	setPointCount(CIRCLE_POINTS_COUNT);
 }
