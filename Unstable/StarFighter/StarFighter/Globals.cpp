@@ -211,3 +211,32 @@ sf::Color GrayScaleColor(sf::Color input_color, float ratio)
 
 	return sf::Color(r2, g2, b2, input_color.a);
 }
+
+float GetAngleAbsDeltaToTarget(float angle_input, float angle_target)
+{
+	float delta = angle_input - angle_target;
+
+	if (delta > 180)
+		delta -= 360;
+
+	else if (delta < -180)
+		delta += 360;
+
+	return abs(delta);
+}
+
+void Bound(float& input, float min, float max)
+{
+	if (min > max)
+	{
+		float _min = min;
+		min = max;
+		max = _min;
+	}
+
+	if (input < min)
+		input = min;
+
+	if (input > max)
+		input = max;
+}
