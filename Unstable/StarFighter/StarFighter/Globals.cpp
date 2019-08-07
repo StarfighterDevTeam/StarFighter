@@ -221,3 +221,55 @@ void ScaleVector(sf::Vector2f* vector, float target_value)
 	vector->x *= p;
 	vector->y *= p;
 }
+
+float GetAngleForVector(sf::Vector2f vector)
+{
+	const float a = vector.x;
+	const float b = vector.y;
+
+	if (a == 0 && b == 0)
+		return 0.f;
+
+	float distance_to_obj = (a * a) + (b * b);
+	distance_to_obj = sqrt(distance_to_obj);
+
+	float angle;
+	angle = acos(a / distance_to_obj);
+
+	if (b < 0)
+	{
+		angle = -angle;
+	}
+
+	return angle * 180.f / M_PI;
+}
+
+
+bool IsInsideAngleCoverage(float input, float angle_coverage, float angle_target)
+{
+	float delta = input - angle_target;
+
+	if (delta > 180)
+		delta -= 360;
+
+	else if (delta < -180)
+		delta += 360;
+
+	return abs(delta) <= angle_coverage / 2;
+}
+
+void Bound(float& input, float min, float max)
+{
+	if (min > max)
+	{
+		float _min = min;
+		min = max;
+		max = _min;
+	}
+
+	if (input < min)
+		input = min;
+
+	if (input > max)
+		input = max;
+}

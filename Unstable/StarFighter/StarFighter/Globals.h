@@ -84,5 +84,8 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
 void ScaleVector(sf::Vector2f* vector, float target_value);
+float GetAngleForVector(sf::Vector2f vector);
+bool IsInsideAngleCoverage(float input, float angle_coverage, float angle_target);
+void Bound(float& input, float min, float max);
 
 #endif // GLOBALS_H_INCLUDED

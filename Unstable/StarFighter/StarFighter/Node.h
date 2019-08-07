@@ -17,6 +17,7 @@ public :
 	AllianceType GetOriginAlliance() override;
 	bool IsHoveredByMouse();
 	void ResetColor();
+	bool IsColliding(Wave* wave, float direction) override;
 
 	bool m_hovered;
 	bool m_selected;

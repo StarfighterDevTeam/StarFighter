@@ -20,7 +20,7 @@ Gameloop::Gameloop()
 	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
 	CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
 
-	CreateNode(sf::Vector2f(1920 - 400, 540), EnemyAlliance);
+	CreateNode(sf::Vector2f(1920 - 400, 650), EnemyAlliance);
 
 	CreateLink(node_a, node_b);
 }

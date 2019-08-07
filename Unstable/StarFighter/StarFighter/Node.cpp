@@ -149,3 +149,8 @@ AllianceType Node::GetOriginAlliance()
 {
 	return m_alliance;
 }
+
+bool Node::IsColliding(Wave* wave, float direction)
+{
+	return IsInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction);
+}

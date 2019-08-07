@@ -10,11 +10,10 @@ public :
 	~Wave();
 
 	void update(sf::Time deltaTime) override;
-	Wave* CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node) override;
+	Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Node* bounced_node) override;
 	AllianceType GetOriginAlliance() override;
 	void UpdateCirclePoints();
 	void Draw(RenderTarget& screen) override;
-	bool IsColliding(Node* node) override;
 
 	float m_expansion_speed;
 	float m_lifespan;

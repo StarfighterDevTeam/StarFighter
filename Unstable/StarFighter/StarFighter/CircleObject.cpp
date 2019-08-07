@@ -6,7 +6,8 @@ CircleObject::CircleObject(AllianceType alliance)
 	m_color = GameObject::GetAllianceColor(alliance);
 	m_speed = sf::Vector2f(0, 0);
 	m_garbageMe = false;
-	m_visible = alliance != EnemyAlliance;
+	//m_visible = alliance != EnemyAlliance;
+	m_visible = true;
 
 	setPointCount(64);
 }
@@ -31,7 +32,7 @@ void CircleObject::update(sf::Time deltaTime)
 }
 
 
-Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node)
+Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Node* bounced_node)
 {
 	//see override function in class Wave
 	return NULL;
@@ -54,8 +55,8 @@ void CircleObject::Draw(RenderTarget& screen)
 	screen.draw(*this);
 }
 
-bool CircleObject::IsColliding(Node* node)
+bool CircleObject::IsColliding(Wave* wave, float direction)
 {
-	//see override function in class Wave
+	//see override function in class Node
 	return false;
 }

@@ -57,13 +57,13 @@ using namespace sf;
 struct WaveBounce
 {
 public:
-	WaveBounce(sf::Vector2f position, sf::Vector2f vector, float radius, Wave* wave, Node* bounced_node)
+	WaveBounce(sf::Vector2f position, float direction, float radius, Wave* wave, Node* bounced_node)
 	{
-		m_position = position; m_vector = vector; m_radius = radius; m_wave = wave; m_bounced_node = bounced_node;
+		m_position = position; m_direction = direction; m_radius = radius; m_wave = wave; m_bounced_node = bounced_node;
 	}
 
 	sf::Vector2f m_position;
-	sf::Vector2f m_vector;
+	float m_direction;
 	float m_radius;
 	Wave* m_wave;
 	Node* m_bounced_node;

@@ -6,6 +6,9 @@ using namespace sf;
 
 Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan, float angle_coverage, float angle_direction) : CircleObject(alliance)
 {
+	Bound(angle_direction, 0, 360);
+	Bound(angle_coverage, 0, 360);
+
 	setRadius(radius);
 	setOrigin(sf::Vector2f(radius, radius));
 	setPosition(position);
@@ -21,6 +24,8 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	for (int i = 0; i < 64*2; i++)
 	{
 		float ang = (i / 2) * 360.f / 63;
+		m_points[i].color = IsInsideAngleCoverage(ang, angle_coverage, angle_direction) ? m_color : sf::Color(0, 0, 0, 0);
+		/*
 		float delta = ang - angle_direction;
 
 		if (delta > 180)
@@ -37,6 +42,7 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 		{
 			m_points[i].color = sf::Color(0, 0, 0, 0);
 		}
+		*/
 	}
 }
 
@@ -82,10 +88,9 @@ void Wave::update(sf::Time deltaTime)
 	UpdateCirclePoints();
 }
 
-
-Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, sf::Vector2f vector, Node* bounced_node)
+Wave* Wave::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Node* bounced_node)
 {
-	Wave* wave = new Wave(position, NeutralAlliance, radius, m_expansion_speed, m_lifespan, m_angle_coverage, m_angle_direction - 180);
+	Wave* wave = new Wave(position, NeutralAlliance, radius, m_expansion_speed, m_lifespan, m_angle_coverage, - direction + 180);
 	wave->m_bounced_node = bounced_node;
 	wave->m_emitter_node = m_emitter_node;
 	(*CurrentGame).AddCircleObject(wave, WaveType);
@@ -104,10 +109,4 @@ AllianceType Wave::GetOriginAlliance()
 void Wave::Draw(RenderTarget& screen)
 {
 	screen.draw(m_points, 64*2, sf::TrianglesStrip);
-}
-
-bool Wave::IsColliding(Node* node)
-{
-
-	return false;
 }
