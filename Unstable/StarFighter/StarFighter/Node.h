@@ -32,6 +32,8 @@ public :
 	float m_radar_frequency_clock;
 	float m_radar_range;
 	float m_radar_speed;
+	float m_radar_direction;
+	float m_radar_coverage;
 
 	Wave* CreateRadarWave();
 	void WaveReception(Wave* wave) override;

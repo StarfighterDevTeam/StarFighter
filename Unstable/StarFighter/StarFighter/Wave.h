@@ -6,7 +6,7 @@
 class Wave : public CircleObject
 {
 public :
-	Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan);
+	Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan, float angle_coverage, float angle_direction);
 	~Wave();
 
 	void update(sf::Time deltaTime) override;
@@ -14,9 +14,13 @@ public :
 	AllianceType GetOriginAlliance() override;
 	void UpdateCirclePoints();
 	void Draw(RenderTarget& screen) override;
+	bool IsColliding(Node* node) override;
 
 	float m_expansion_speed;
 	float m_lifespan;
+
+	float m_angle_coverage;//in degrees
+	float m_angle_direction;//in degress
 
 	Node* m_emitter_node;
 	Node* m_bounced_node;

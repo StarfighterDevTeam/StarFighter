@@ -50,5 +50,12 @@ AllianceType CircleObject::GetOriginAlliance()
 
 void CircleObject::Draw(RenderTarget& screen)
 {
+	//see override function in class Wave
 	screen.draw(*this);
+}
+
+bool CircleObject::IsColliding(Node* node)
+{
+	//see override function in class Wave
+	return false;
 }

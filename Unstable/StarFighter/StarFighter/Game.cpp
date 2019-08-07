@@ -331,6 +331,9 @@ void Game::updateScene(Time deltaTime)
 					float radius = (*it)->getRadius() + (*it2)->getRadius();
 					if (dx*dx + dy*dy < radius*radius)
 					{
+						//testing sector or circle
+
+
 						//wave bounce on enemy
 						Wave* wave = (Wave*)(*it);
 						Node* node = (Node*)(*it2);

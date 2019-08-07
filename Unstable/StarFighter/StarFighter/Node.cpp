@@ -20,6 +20,8 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	m_radar_frequency_clock = 0;
 	m_radar_range = 100;
 	m_radar_speed = 50;
+	m_radar_direction = 0;
+	m_radar_coverage = 60;
 
 	m_is_terminal_node = false;
 	m_ghost = false;
@@ -131,7 +133,7 @@ void Node::ResetColor()
 
 Wave* Node::CreateRadarWave()
 {
-	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_speed, m_radar_range / m_radar_speed);
+	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_speed, m_radar_range / m_radar_speed, m_radar_coverage, m_radar_direction);
 	wave->m_emitter_node = this;
 	(*CurrentGame).AddCircleObject(wave, WaveType);
 	return wave;
