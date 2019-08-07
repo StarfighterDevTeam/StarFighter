@@ -139,12 +139,6 @@ Wave* Node::CreateRadarWave()
 	return wave;
 }
 
-void Node::WaveReception(Wave* wave)
-{
-	wave->m_lifespan = 0;
-	wave->m_bounced_node->m_visible = true;
-}
-
 AllianceType Node::GetOriginAlliance()
 {
 	return m_alliance;
@@ -152,9 +146,26 @@ AllianceType Node::GetOriginAlliance()
 
 bool Node::IsColliding(Wave* wave, float direction)
 {
-	return IsInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction);
-}
+	if (IsInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction) == false)
+	{
+		return false;
+	}
+	else
+	{
+		for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
+		{
+			float ang = i * 360.f / 63;
+			float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 
+			if (IsInsideAngleCoverage(ang, delta_angle * 2, direction) == true && wave->m_points[i * 2].color != sf::Color(0, 0, 0, 0))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
 
 Wave* Node::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
 {
@@ -166,14 +177,35 @@ Wave* Node::CreateWaveBounce(sf::Vector2f position, float radius, float directio
 
 	//masking wave sector of incidence
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
-	for (int i = 0; i < 64 * 2; i++)
+	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
-		float ang = (i / 2) * 360.f / 63;
+		float ang = i * 360.f / 63;
 		if (IsInsideAngleCoverage(ang, delta_angle * 2, direction))
 		{
-			wave->m_points[i].color = sf::Color(0, 0, 0, 0);
+			wave->m_points[i * 2].color = sf::Color(0, 0, 0, 0);
+			wave->m_points[i * 2 + 1].color = sf::Color(0, 0, 0, 0);
 		}
 	}
 
 	return new_wave;
+}
+
+void Node::WaveReception(Wave* wave)
+{
+	wave->m_bounced_node->m_visible = true;
+
+	wave->m_lifespan = 0;
+	//masking wave sector of incidence
+	/*
+	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
+	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
+	{
+		float ang = i * 360.f / 63;
+		if (IsInsideAngleCoverage(ang, delta_angle * 2, wave->m_angle_direction))
+		{
+			wave->m_points[i * 2].color = sf::Color(0, 0, 0, 0);
+			wave->m_points[i * 2 + 1].color = sf::Color(0, 0, 0, 0);
+		}
+	}
+	*/
 }

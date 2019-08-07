@@ -9,7 +9,7 @@ CircleObject::CircleObject(AllianceType alliance)
 	//m_visible = alliance != EnemyAlliance;
 	m_visible = true;
 
-	setPointCount(64);
+	setPointCount(CIRCLE_POINTS_COUNT);
 }
 
 CircleObject::~CircleObject()

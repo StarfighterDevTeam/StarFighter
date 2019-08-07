@@ -6,6 +6,8 @@
 class Node;
 class Wave;
 
+#define CIRCLE_POINTS_COUNT			64
+
 enum CircleType
 {
 	NodeType,

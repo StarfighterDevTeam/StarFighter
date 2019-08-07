@@ -25,7 +25,7 @@ public :
 	Node* m_bounced_node;
 	vector<Node*> m_bounced_nodes;
 
-	sf::Vertex m_points[64*2];
+	sf::Vertex m_points[CIRCLE_POINTS_COUNT*2];
 };
 
 #endif // WAVE_H_INCLUDED

@@ -21,10 +21,11 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	setOutlineColor(m_color);
 	setOutlineThickness(4);
 
-	for (int i = 0; i < 64*2; i++)
+	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
-		float ang = (i / 2) * 360.f / 63;
-		m_points[i].color = IsInsideAngleCoverage(ang, angle_coverage, angle_direction) ? m_color : sf::Color(0, 0, 0, 0);
+		float ang = i * 360.f / 63;
+		m_points[i * 2].color = IsInsideAngleCoverage(ang, angle_coverage, angle_direction) ? m_color : sf::Color(0, 0, 0, 0);
+		m_points[i * 2 + 1].color = m_points[i * 2].color;
 	}
 }
 
@@ -35,7 +36,7 @@ void Wave::UpdateCirclePoints()
 	float thickness = getOutlineThickness();
 	sf::Vector2f origin = getOrigin();
 	
-	for (int i = 0; i < 64*2; i++)
+	for (int i = 0; i < CIRCLE_POINTS_COUNT*2; i++)
 	{
 		m_points[i].position.x = position.x + (radius + (i % 2) * thickness) * cos((i / 2) * 2.f * M_PI / 63);
 		m_points[i].position.y = position.y - (radius + (i % 2) * thickness) * sin((i / 2) * 2.f * M_PI / 63);
@@ -78,7 +79,7 @@ AllianceType Wave::GetOriginAlliance()
 
 void Wave::Draw(RenderTarget& screen)
 {
-	screen.draw(m_points, 64*2, sf::TrianglesStrip);
+	screen.draw(m_points, CIRCLE_POINTS_COUNT*2, sf::TrianglesStrip);
 }
 
 bool Wave::HasBouncedOnNode(Node* node)
