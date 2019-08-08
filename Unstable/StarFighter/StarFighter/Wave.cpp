@@ -23,7 +23,7 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 
 	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
-		float ang = i * 360.f / 63;
+		float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
 		m_points[i * 2].color = IsInsideAngleCoverage(ang, angle_coverage, angle_direction) ? m_color : sf::Color(0, 0, 0, 0);
 		m_points[i * 2 + 1].color = m_points[i * 2].color;
 	}
@@ -38,8 +38,8 @@ void Wave::UpdateCirclePoints()
 	
 	for (int i = 0; i < CIRCLE_POINTS_COUNT*2; i++)
 	{
-		m_points[i].position.x = position.x + (radius + (i % 2) * thickness) * cos((i / 2) * 2.f * M_PI / 63);
-		m_points[i].position.y = position.y - (radius + (i % 2) * thickness) * sin((i / 2) * 2.f * M_PI / 63);
+		m_points[i].position.x = position.x + (radius + (i % 2) * thickness) * cos((i / 2) * 2.f * M_PI / (CIRCLE_POINTS_COUNT - 1));
+		m_points[i].position.y = position.y - (radius + (i % 2) * thickness) * sin((i / 2) * 2.f * M_PI / (CIRCLE_POINTS_COUNT - 1));
 	}
 }
 

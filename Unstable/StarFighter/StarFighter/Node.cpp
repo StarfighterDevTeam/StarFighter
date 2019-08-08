@@ -26,7 +26,7 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : CircleO
 	m_is_terminal_node = false;
 	m_ghost = false;
 
-	m_visible = alliance == PlayerAlliance;
+	m_visible = true;// alliance == PlayerAlliance;
 }
 
 Node::Node(sf::Vector2f position, AllianceType alliance) : Node::Node(position, alliance, 16)
@@ -156,7 +156,7 @@ bool Node::IsColliding(Wave* wave, float direction)
 	{
 		for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 		{
-			float ang = i * 360.f / 63;
+			float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
 			float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 
 			if (IsInsideAngleCoverage(ang, delta_angle * 2, direction) == true && wave->m_points[i * 2].color != sf::Color(0, 0, 0, 0))
@@ -181,7 +181,7 @@ Wave* Node::CreateWaveBounce(sf::Vector2f position, float radius, float directio
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
-		float ang = i * 360.f / 63;
+		float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
 		if (IsInsideAngleCoverage(ang, delta_angle * 2, direction))
 		{
 			wave->m_points[i * 2].color = sf::Color(0, 0, 0, 0);
@@ -225,7 +225,7 @@ void Node::WaveReception(Wave* wave)
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
-		float ang = i * 360.f / 63;
+		float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
 		if (IsInsideAngleCoverage(ang, delta_angle * 2, wave->m_angle_direction))
 		{
 			wave->m_points[i * 2].color = sf::Color(0, 0, 0, 0);
