@@ -331,8 +331,14 @@ void Game::updateScene(Time deltaTime)
 					float radius = (*it)->getRadius() + (*it2)->getRadius();
 					if (dx*dx + dy*dy < radius*radius)
 					{
-						//already bounced on this node?
+						//this node already evaded this wave? no need to check again as it's 100% unlikely to happen
 						Node* node = (Node*)(*it2);
+						if ((*it)->IsEvadedNode(node) == true)
+						{
+							continue;
+						}
+
+						//already bounced on this node?
 						if ((*it)->HasBouncedOnNode(node) == false)
 						{
 							//testing sector or circle
@@ -355,6 +361,10 @@ void Game::updateScene(Time deltaTime)
 								{
 									wave_receptions.push_back(new WaveReception(wave, node));
 								}
+							}
+							else
+							{
+								(*it)->AddToEvadedNodes(node);
 							}
 						}
 					}

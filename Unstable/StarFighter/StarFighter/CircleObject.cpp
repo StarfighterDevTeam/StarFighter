@@ -65,3 +65,14 @@ bool CircleObject::HasBouncedOnNode(Node* node)
 	//see override function in class Wave
 	return false;
 }
+
+bool CircleObject::IsEvadedNode(Node* node)
+{
+	//see override function in class Wave
+	return false;
+}
+
+void CircleObject::AddToEvadedNodes(Node* node)
+{
+	//see override function in class Wave
+}

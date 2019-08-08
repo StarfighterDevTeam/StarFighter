@@ -92,3 +92,19 @@ bool Wave::HasBouncedOnNode(Node* node)
 
 	return false;
 }
+
+bool Wave::IsEvadedNode(Node* node)
+{
+	for (vector<Node*>::iterator it = m_evaded_nodes.begin(); it != m_evaded_nodes.end(); it++)
+	{
+		if (node == *it)
+			return true;
+	}
+
+	return false;
+}
+
+void Wave::AddToEvadedNodes(Node* node)
+{
+	m_evaded_nodes.push_back(node);
+}
