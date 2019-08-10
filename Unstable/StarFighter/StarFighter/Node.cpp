@@ -177,14 +177,15 @@ bool Node::IsColliding(Wave* wave, float direction)
 
 Wave* Node::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
 {
-	Wave* new_wave = new Wave(position, NeutralAlliance, radius, wave->m_expansion_speed, wave->m_lifespan, wave->m_angle_coverage, direction + 180);
+	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
+
+	Wave* new_wave = new Wave(position, NeutralAlliance, radius, wave->m_expansion_speed, wave->m_lifespan, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
 	new_wave->m_bounced_node = this;
 	new_wave->m_emitter_node = wave->m_emitter_node;
 	(*CurrentGame).AddCircleObject(new_wave, WaveType);
 	wave->m_bounced_nodes.push_back(this);
 
 	//masking wave sector of incidence
-	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
 		float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);

@@ -108,22 +108,22 @@ int RandomizeSign()
 	return sign;
 }
 
-float MaxBetweenValues(sf::Vector2f values)
+float MaxBetweenValues(float value_a, float value_b)
 {
-	float max = values.x;
-	if (values.y > max)
+	float max = value_a;
+	if (value_b > max)
 	{
-		max = values.y;
+		max = value_b;
 	}
 	return max;
 }
 
-float MinBetweenValues(sf::Vector2f values)
+float MinBetweenValues(float value_a, float value_b)
 {
-	float min = values.x;
-	if (values.y < min)
+	float min = value_a;
+	if (value_b < min)
 	{
-		min = values.y;
+		min = value_b;
 	}
 	return min;
 }
