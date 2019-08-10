@@ -154,18 +154,24 @@ bool Node::IsColliding(Wave* wave, float direction)
 	}
 	else
 	{
-		for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
+		if (wave->m_bounced_nodes.empty() == true)
 		{
-			float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
-			float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
-
-			if (IsInsideAngleCoverage(ang, delta_angle * 2, direction) == true && wave->m_points[i * 2].color != sf::Color(0, 0, 0, 0))
-			{
-				return true;
-			}
+			return true;
 		}
+		else
+		{
+			float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
+			for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
+			{
+				float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
+				if (IsInsideAngleCoverage(ang, delta_angle * 2, direction) == true && wave->m_points[i * 2].color != sf::Color(0, 0, 0, 0))
+				{
+					return true;
+				}
+			}
 
-		return false;
+			return false;
+		}
 	}
 }
 
