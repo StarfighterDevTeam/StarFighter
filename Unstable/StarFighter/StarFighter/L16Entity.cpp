@@ -16,12 +16,7 @@ L16Entity::L16Entity(sf::Vector2f position, AllianceType alliance, float radius)
 	setOutlineThickness(-4);
 
 	m_radar_activated = false;
-	m_radar_frequency = 0.5;
 	m_radar_frequency_clock = 0;
-	m_radar_range = 100;
-	m_radar_wavespeed = 200;
-	m_radar_direction = alliance == PlayerAlliance ? 0 : 180;
-	m_radar_coverage = 60;
 	m_radar_bounce_feedback_clock = 0;
 
 	m_ghost = false;
@@ -184,7 +179,8 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 	//RWR (radar warning receiver)
 	if (wave->m_alliance != NeutralAlliance && wave->m_alliance != m_alliance)
 	{
-		wave->m_emitter_entity->m_visible = true;
+		wave->m_emitter_entity->RevealEntity();
+
 		for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[wave->m_alliance][Circle_Wave].begin(); it != (*CurrentGame).m_sceneCircleObjects[wave->m_alliance][Circle_Wave].end(); it++)
 		{
 			Wave* wave_iterator = (Wave*)(*it);
@@ -200,8 +196,7 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 
 void L16Entity::WaveReception(Wave* wave)
 {
-	wave->m_bounced_entity->m_visible = true;
-	wave->m_bounced_entity->m_radar_bounce_feedback_clock = 1;
+	wave->m_bounced_entity->RevealEntity();
 
 	for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][Circle_Wave].begin(); it != (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][Circle_Wave].end(); it++)
 	{
@@ -213,7 +208,6 @@ void L16Entity::WaveReception(Wave* wave)
 	}
 
 	wave->m_lifespan = 0;
-
 
 	//masking wave sector of incidence
 	/*
@@ -228,4 +222,10 @@ void L16Entity::WaveReception(Wave* wave)
 		}
 	}
 	*/
+}
+
+void L16Entity::RevealEntity()
+{
+	m_visible = true;
+	m_radar_bounce_feedback_clock = 1;
 }

@@ -9,6 +9,12 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : L16Enti
 	m_type = L16Entity_Node;
 	m_is_terminal_node = false;
 
+	m_radar_frequency = 0.5;
+	m_radar_range = 100;
+	m_radar_wavespeed = 200;
+	m_radar_direction = alliance == PlayerAlliance ? 0 : 180;
+	m_radar_coverage = 60;
+
 	//m_visible = true;// alliance == PlayerAlliance;
 }
 
