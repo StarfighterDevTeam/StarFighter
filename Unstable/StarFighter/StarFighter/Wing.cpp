@@ -35,47 +35,47 @@ Wing::~Wing()
 
 void Wing::update(sf::Time deltaTime)
 {
-	float previous_speed = GetVectorLength(m_speed);
+	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+
+	m_autopilot = !m_selected;
 
 	//manual pilot
-	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
-	//float roll_speed = Lerp(previous_speed, m_speed_min, m_speed_max, m_roll_speed_max, m_roll_speed_min);
-	float speed_ratio = (previous_speed - m_speed_min) / (m_speed_max - m_speed_min);
-	float roll_speed = CosInterpolation(speed_ratio, 0, 1, m_roll_speed_max, m_roll_speed_min);
-	
 	if (m_autopilot == false)
 	{
 		if ((*CurrentGame).m_window_has_focus == true)
 		{
 			inputs_direction = InputGuy::getDirections();
 		}
-
-		if (inputs_direction.x < 0)
-		{
-			m_roll += roll_speed * deltaTime.asSeconds();
-		}
-		else if (inputs_direction.x > 0)
-		{
-			m_roll -= roll_speed * deltaTime.asSeconds();
-		}
-		else
-		{
-			if (m_roll > roll_speed * deltaTime.asSeconds())
-			{
-				m_roll -= roll_speed * deltaTime.asSeconds();
-			}
-			else if (m_roll < - roll_speed * deltaTime.asSeconds())
-			{
-				m_roll += roll_speed * deltaTime.asSeconds();
-			}
-			else
-			{
-				m_roll = 0;
-			}
-		}
 	}
 
 	//apply speed & direction
+	float previous_speed = GetVectorLength(m_speed);
+	//float roll_speed = Lerp(previous_speed, m_speed_min, m_speed_max, m_roll_speed_max, m_roll_speed_min);
+	float roll_speed = CosInterpolation(previous_speed, m_speed_min, m_speed_max, m_roll_speed_max, m_roll_speed_min);
+	if (inputs_direction.x < 0)
+	{
+		m_roll += roll_speed * deltaTime.asSeconds();
+	}
+	else if (inputs_direction.x > 0)
+	{
+		m_roll -= roll_speed * deltaTime.asSeconds();
+	}
+	else
+	{
+		if (m_roll > roll_speed * deltaTime.asSeconds())
+		{
+			m_roll -= roll_speed * deltaTime.asSeconds();
+		}
+		else if (m_roll < -roll_speed * deltaTime.asSeconds())
+		{
+			m_roll += roll_speed * deltaTime.asSeconds();
+		}
+		else
+		{
+			m_roll = 0;
+		}
+	}
+
 	Bound(m_roll, -90, 90);
 	if (inputs_direction != sf::Vector2f(0, 0))
 	{
@@ -87,11 +87,10 @@ void Wing::update(sf::Time deltaTime)
 	m_speed += acceleration_vector;
 
 	//float speed_max = Lerp(-abs(m_roll), -90, 0, m_speed_min, m_speed_max);
-	float roll_ratio = abs(m_roll) / 90;
-	float speed_max = CosInterpolation(roll_ratio, 0, 1, m_speed_max, m_speed_min);
+	float speed_max = CosInterpolation(abs(m_roll), 0, 90, m_speed_max, m_speed_min);
 	NormalizeVector(&m_speed, speed_max);
 
-	printf("roll: %f, roll speed: %f, heading: %f, speed: %f\n", m_roll, roll_speed, m_heading, GetVectorLength(m_speed));
+	//printf("roll: %f, roll speed: %f, heading: %f, speed: %f\n", m_roll, roll_speed, m_heading, GetVectorLength(m_speed));
 
 	m_radar_heading = m_heading;
 

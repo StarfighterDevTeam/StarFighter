@@ -189,10 +189,11 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 	if (value > input_max)
 		return output_max;
 
-	float ratio = (1 - cos(value * M_PI)) / 2;
-	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI)) / 2;"
+	float ratio = (value - input_min) / (input_max - input_min);
+	float cos_ratio = (1 - cos(ratio * M_PI)) / 2;
+	//for stiffer curves, use "cos_ratio = (1 - cos(ratio * ratio * M_PI)) / 2;"
 
-	float ouput = output_min + ratio * (output_max - output_min);
+	float ouput = output_min + cos_ratio * (output_max - output_min);
 
 	return ouput;
 }
