@@ -19,9 +19,8 @@ L16Entity::L16Entity(sf::Vector2f position, AllianceType alliance, float radius)
 	m_radar_frequency_clock = 0;
 	m_radar_bounce_feedback_clock = 0;
 
-	m_ghost = false;
-
 	m_visible = true;// alliance == PlayerAlliance;
+	m_mission = L16Mission_Idle;
 }
 
 L16Entity::~L16Entity()

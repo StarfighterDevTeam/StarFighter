@@ -13,6 +13,11 @@ enum L16EntityType
 	L16Entity_Node,
 };
 
+enum L16MissionType
+{
+	L16Mission_Idle,
+};
+
 class L16Entity : public CircleObject
 {
 public :
@@ -27,10 +32,10 @@ public :
 	Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave) override;
 
 	L16EntityType m_type;
+	L16MissionType m_mission;
+
 	bool m_hovered;
 	bool m_selected;
-
-	bool m_ghost;
 
 	bool m_radar_activated;
 	float m_radar_frequency;

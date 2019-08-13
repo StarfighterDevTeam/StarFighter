@@ -47,6 +47,15 @@ void Wing::update(sf::Time deltaTime)
 			inputs_direction = InputGuy::getDirections();
 		}
 	}
+	else
+	{
+		//auto pilot
+		if (m_mission == L16Mission_Idle)
+		{
+			//circle patrol
+			inputs_direction.x = 1;
+		}
+	}
 
 	//apply speed & direction
 	float previous_speed = GetVectorLength(m_speed);
