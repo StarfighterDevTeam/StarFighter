@@ -12,7 +12,7 @@ Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : L16Enti
 	m_radar_frequency = 0.5;
 	m_radar_range = 100;
 	m_radar_wavespeed = 200;
-	m_radar_direction = alliance == PlayerAlliance ? 0 : 180;
+	m_radar_heading = alliance == PlayerAlliance ? 0 : 180;
 	m_radar_coverage = 60;
 
 	//m_visible = true;// alliance == PlayerAlliance;
@@ -48,7 +48,7 @@ void Node::update(sf::Time deltaTime)
 
 Wing* Node::CreateWing()
 {
-	Wing* wing = new Wing(getPosition(), m_alliance);
+	Wing* wing = new Wing(getPosition(), m_alliance, m_radar_heading);
 	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity);
 	(*CurrentGame).m_wings.push_back(wing);
 

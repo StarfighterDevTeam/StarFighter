@@ -37,7 +37,7 @@ public :
 	float m_radar_frequency_clock;
 	float m_radar_range;
 	float m_radar_wavespeed;
-	float m_radar_direction;
+	float m_radar_heading;
 	float m_radar_coverage;
 
 	float m_radar_bounce_feedback_clock;

@@ -149,7 +149,7 @@ bool L16Entity::IsColliding(Wave* wave, float direction)
 
 Wave* L16Entity::CreateRadarWave()
 {
-	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_wavespeed, m_radar_range / m_radar_wavespeed, m_radar_coverage, m_radar_direction);
+	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_wavespeed, m_radar_range / m_radar_wavespeed, m_radar_coverage, m_radar_heading);
 	wave->m_emitter_entity = this;
 	(*CurrentGame).AddCircleObject(wave, Circle_Wave);
 	return wave;

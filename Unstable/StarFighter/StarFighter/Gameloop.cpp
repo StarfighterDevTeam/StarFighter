@@ -154,9 +154,9 @@ Link* Gameloop::CreateLink(Node* node_a, Node* node_b)
 	return link;
 }
 
-Wing* Gameloop::CreateWing(sf::Vector2f position, AllianceType alliance)
+Wing* Gameloop::CreateWing(sf::Vector2f position, AllianceType alliance, float heading)
 {
-	Wing* wing = new Wing(position, alliance);
+	Wing* wing = new Wing(position, alliance, heading);
 	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity);
 	(*CurrentGame).m_wings.push_back(wing);
 	
