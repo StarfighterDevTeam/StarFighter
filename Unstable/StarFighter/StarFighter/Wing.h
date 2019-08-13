@@ -12,10 +12,11 @@ public:
 	void update(sf::Time deltaTime) override;
 
 	bool m_autopilot;
+	float m_min_speed;
 	float m_max_speed;
 	float m_acceleration;
 	float m_angular_speed;
-	float m_direction;//direction in degrees
+	float m_direction;//in degrees
 };
 
 #endif // WING_H_INCLUDED

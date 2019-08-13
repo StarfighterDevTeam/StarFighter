@@ -300,6 +300,31 @@ bool NormalizeVector(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
+bool BoundVector(sf::Vector2f* vector, float min_value, float max_value)
+{
+	if (vector->x == 0 && vector->y == 0)
+		return true;
+
+	if (vector->x * vector->x + vector->y * vector->y > max_value * max_value)
+	{
+		float p = max_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+		vector->x *= p;
+		vector->y *= p;
+
+		return true;
+	}
+	else if (vector->x * vector->x + vector->y * vector->y < min_value * min_value)
+	{
+		float p = min_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+		vector->x *= p;
+		vector->y *= p;
+
+		return true;
+	}
+
+	return false;
+}
+
 void AddValueToVector(sf::Vector2f* vector, float added_value)
 {
 	if (vector->x == 0 && vector->y == 0)

@@ -85,6 +85,7 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
 void ScaleVector(sf::Vector2f* vector, float target_value);
 bool NormalizeVector(sf::Vector2f* vector, float max_value);
+bool BoundVector(sf::Vector2f* vector, float min_value, float max_value);
 void AddValueToVector(sf::Vector2f* vector, float added_value);
 float GetAngleRadForVector(sf::Vector2f vector);
 void GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, float* output_angle);
