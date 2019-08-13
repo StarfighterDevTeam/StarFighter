@@ -734,7 +734,7 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectT
 			{
 				if (dist_max < 0 || distance_to_ref < dist_max)
 				{
-					float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
+					float angle_delta = GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
 					if (angle_delta < 0)
 						angle_delta = -angle_delta;
 

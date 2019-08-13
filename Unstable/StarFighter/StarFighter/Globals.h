@@ -85,5 +85,33 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
 bool IsInsideAngleCoverage(float angle_input, float angle_coverage, float angle_target);
 void Bound(float& input, float min, float max);
+void BoundAngle(float& input, float max_angle);
+bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
+
+float GetVectorLength(sf::Vector2f vector);
+float GetVectorLengthSquared(sf::Vector2f vector);
+sf::Vector2f GetVectorFromLengthAndAngle(float length, float angle);
+bool NormalizeVector(sf::Vector2f* vector, float max_value);
+bool BoundVector(sf::Vector2f* vector, float min_value, float max_value);
+void ScaleVector(sf::Vector2f* vector, float target_value);
+void AddValueToVector(sf::Vector2f* vector, float added_value);
+float GetAngleRadForVector(sf::Vector2f vector);
+void GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, float* output_angle);
+float GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
+float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
+float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
+sf::Vector2f RotateVector(sf::Vector2f vector, float angle_rad);
+void SetVectorRotation(sf::Vector2f* vector, float angle_rad);
+bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x = NULL, float *i_y = NULL);
+float DistancePointToSement(float p0_x, float p0_y, float p_1x, float p_1y, float p_2x, float p_2y, float *i_x = NULL, float *i_y = NULL);
+
+sf::Uint8* CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size = 0);
+sf::Uint8* CreateCircleWithStroke(float radius, sf::Color color, int stroke_size = 0);
+
+int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
+void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
+int GaussianBlurDistribution(int x);
 
 #endif // GLOBALS_H_INCLUDED
