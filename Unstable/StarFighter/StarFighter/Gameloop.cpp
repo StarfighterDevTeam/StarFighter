@@ -15,7 +15,9 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
 
 	//node
-	CreateTerminal(sf::Vector2f(200, 440), PlayerAlliance);
+	Terminal* t = CreateTerminal(sf::Vector2f(200, 440), PlayerAlliance);
+	t->CreateWing();
+
 	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
 	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
 	CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
@@ -35,30 +37,36 @@ Gameloop::~Gameloop()
 {
 	delete m_background;
 
-	for (vector<Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); it++)
+	for (vector<Node*>::iterator it = (*CurrentGame).m_nodes.begin(); it != (*CurrentGame).m_nodes.end(); it++)
 	{
 		delete *it;
 	}
-	m_nodes.clear();
+	(*CurrentGame).m_nodes.clear();
 
-	for (vector<Link*>::iterator it = m_links.begin(); it != m_links.end(); it++)
+	for (vector<Link*>::iterator it = (*CurrentGame).m_links.begin(); it != (*CurrentGame).m_links.end(); it++)
 	{
 		delete *it;
 	}
-	m_links.clear();
+	(*CurrentGame).m_links.clear();
+
+	for (vector<Wing*>::iterator it = (*CurrentGame).m_wings.begin(); it != (*CurrentGame).m_wings.end(); it++)
+	{
+		delete *it;
+	}
+	(*CurrentGame).m_wings.clear();
 }
 
 void Gameloop::Update(sf::Time deltaTime)
 {
 	//Get mouse & keyboard inputs
-	(*CurrentGame).m_hovered_node = NULL;
+	(*CurrentGame).m_hovered_entity = NULL;
 	(*CurrentGame).GetMouseInputs(deltaTime);
 	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 	{
-		if ((*CurrentGame).m_selected_node != NULL)
+		if ((*CurrentGame).m_selected_entity != NULL)
 		{
-			(*CurrentGame).m_selected_node->m_selected = false;
-			(*CurrentGame).m_selected_node = NULL;
+			(*CurrentGame).m_selected_entity->m_selected = false;
+			(*CurrentGame).m_selected_entity = NULL;
 		}
 	}
 
@@ -66,13 +74,15 @@ void Gameloop::Update(sf::Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//Create new links on right click
-	if ((*CurrentGame).m_hovered_node != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_node != NULL && (*CurrentGame).m_selected_node != (*CurrentGame).m_hovered_node && (*CurrentGame).m_selected_node->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_node->m_alliance == PlayerAlliance)
+	if ((*CurrentGame).m_hovered_entity != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_entity != NULL && (*CurrentGame).m_selected_entity != (*CurrentGame).m_hovered_entity && (*CurrentGame).m_selected_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_type == L16Entity_Node && (*CurrentGame).m_selected_entity->m_type == L16Entity_Node)
 	{
 		//link already existing?
 		bool found = false;
-		for (vector<Node*>::iterator it = (*CurrentGame).m_hovered_node->m_linked_nodes.begin(); it != (*CurrentGame).m_hovered_node->m_linked_nodes.end(); it++)
+		Node* hovered_node = (Node*)(*CurrentGame).m_hovered_entity;
+		Node* selected_node = (Node*)(*CurrentGame).m_selected_entity;
+		for (vector<L16Entity*>::iterator it = hovered_node->m_linked_entities.begin(); it != hovered_node->m_linked_entities.end(); it++)
 		{
-			if ((*it) == (*CurrentGame).m_selected_node)
+			if ((*it) == selected_node)
 			{
 				found = true;
 				break;
@@ -81,7 +91,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 		if (found == false)
 		{
-			CreateLink((*CurrentGame).m_hovered_node, (*CurrentGame).m_selected_node);
+			CreateLink(hovered_node, selected_node);
 		}
 	}
 
@@ -117,8 +127,8 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
 	Node* node = new Node(position, alliance);
-	(*CurrentGame).AddCircleObject(node, NodeType);
-	m_nodes.push_back(node);
+	(*CurrentGame).AddCircleObject(node, Circle_L16Entity);
+	(*CurrentGame).m_nodes.push_back(node);
 
 	return node;
 }
@@ -126,18 +136,29 @@ Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
 	Terminal* terminal = new Terminal(position, alliance);
-	(*CurrentGame).AddCircleObject(terminal, NodeType);
-	m_nodes.push_back(terminal);
+	(*CurrentGame).AddCircleObject(terminal, Circle_L16Entity);
+	(*CurrentGame).m_nodes.push_back(terminal);
 
 	return terminal;
 }
 
-void Gameloop::CreateLink(Node* node_a, Node* node_b)
+Link* Gameloop::CreateLink(Node* node_a, Node* node_b)
 {
 	Link* link = new Link(node_a, node_b);
 	(*CurrentGame).AddLineObject(link);
-	m_links.push_back(link);
+	(*CurrentGame).m_links.push_back(link);
 
-	node_a->m_linked_nodes.push_back(node_b);
-	node_b->m_linked_nodes.push_back(node_a);
+	node_a->m_linked_entities.push_back(node_b);
+	node_b->m_linked_entities.push_back(node_a);
+
+	return link;
+}
+
+Wing* Gameloop::CreateWing(sf::Vector2f position, AllianceType alliance)
+{
+	Wing* wing = new Wing(position, alliance);
+	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity);
+	(*CurrentGame).m_wings.push_back(wing);
+	
+	return wing;
 }

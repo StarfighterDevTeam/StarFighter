@@ -3,15 +3,15 @@
 
 #include "GameObject.h"
 
-class Node;
+class L16Entity;
 class Wave;
 
 #define CIRCLE_POINTS_COUNT			128
 
 enum CircleType
 {
-	NodeType,
-	WaveType,
+	Circle_L16Entity,
+	Circle_Wave,
 	NB_CIRCLE_TYPES,
 };
 
@@ -28,9 +28,9 @@ public:
 	virtual AllianceType GetOriginAlliance();
 	virtual void Draw(RenderTarget& screen);
 	virtual bool IsColliding(Wave* wave, float direction);
-	virtual bool HasBouncedOnNode(Node* node);
-	virtual bool IsEvadedNode(Node* node);
-	virtual void AddToEvadedNodes(Node* node);
+	virtual bool HasBouncedOnEntity(L16Entity* entity);
+	virtual bool IsEvadedEntity(L16Entity* entity);
+	virtual void AddToEvadedEntities(L16Entity* entity);
 
 	AllianceType m_alliance;
 	sf::Color m_color;

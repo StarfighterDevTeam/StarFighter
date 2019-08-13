@@ -84,8 +84,21 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
 void ScaleVector(sf::Vector2f* vector, float target_value);
+bool NormalizeVector(sf::Vector2f* vector, float max_value);
+void AddValueToVector(sf::Vector2f* vector, float added_value);
+float GetAngleRadForVector(sf::Vector2f vector);
+void GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, float* output_angle);
+float GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
+float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
 float GetAngleForVector(sf::Vector2f vector);
+float GetVectorLength(sf::Vector2f vector);
+float GetVectorLengthSquared(sf::Vector2f vector);
+sf::Vector2f GetVectorFromLengthAndAngle(float length, float angle);
+float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 bool IsInsideAngleCoverage(float input, float angle_coverage, float angle_target);
 void Bound(float& input, float min, float max);
+void BoundAngle(float &input, float max_angle);
 
 #endif // GLOBALS_H_INCLUDED

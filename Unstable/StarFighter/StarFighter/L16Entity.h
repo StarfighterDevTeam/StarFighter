@@ -1,0 +1,47 @@
+#ifndef L16ENTITY_H_INCLUDED
+#define L16ENTITY_H_INCLUDED
+
+#include "Game.h"
+#include "Wave.h"
+
+class Link;
+
+enum L16EntityType
+{
+	L16Entity_Ballistic,
+	L16Entity_Wing,
+	L16Entity_Node,
+};
+
+class L16Entity : public CircleObject
+{
+public :
+	L16Entity(sf::Vector2f position, AllianceType alliance, float radius);
+	~L16Entity();
+
+	void update(sf::Time deltaTime) override;
+	AllianceType GetOriginAlliance() override;
+	bool IsHoveredByMouse();
+	void ResetColor();
+	bool IsColliding(Wave* wave, float direction) override;
+	Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave) override;
+
+	L16EntityType m_type;
+	bool m_hovered;
+	bool m_selected;
+
+	bool m_ghost;
+
+	bool m_radar_activated;
+	float m_radar_frequency;
+	float m_radar_frequency_clock;
+	float m_radar_range;
+	float m_radar_speed;
+	float m_radar_direction;
+	float m_radar_coverage;
+
+	Wave* CreateRadarWave();
+	void WaveReception(Wave* wave) override;
+};
+
+#endif // L16ENTITY_H_INCLUDED

@@ -13,9 +13,9 @@ public :
 	AllianceType GetOriginAlliance() override;
 	void UpdateCirclePoints();
 	void Draw(RenderTarget& screen) override;
-	bool HasBouncedOnNode(Node* node) override;
-	bool IsEvadedNode(Node* node) override;
-	void AddToEvadedNodes(Node* node) override;
+	bool HasBouncedOnEntity(L16Entity* entity) override;
+	bool IsEvadedEntity(L16Entity* entity) override;
+	void AddToEvadedEntities(L16Entity* entity) override;
 
 	float m_expansion_speed;
 	float m_lifespan;
@@ -23,10 +23,10 @@ public :
 	float m_angle_coverage;//in degrees
 	float m_angle_direction;//in degress
 
-	Node* m_emitter_node;
-	Node* m_bounced_node;
-	vector<Node*> m_bounced_nodes;
-	vector<Node*> m_evaded_nodes;
+	L16Entity* m_emitter_entity;
+	L16Entity* m_bounced_entity;
+	vector<L16Entity*> m_bounced_entities;
+	vector<L16Entity*> m_evaded_entities;
 
 	sf::Vertex m_points[CIRCLE_POINTS_COUNT*2];
 };

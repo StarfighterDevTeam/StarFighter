@@ -73,7 +73,7 @@ void Wave::update(sf::Time deltaTime)
 
 AllianceType Wave::GetOriginAlliance()
 {
-	CircleObject* object = (CircleObject*)m_emitter_node;
+	CircleObject* object = (CircleObject*)m_emitter_entity;
 	return object->GetOriginAlliance();
 }
 
@@ -82,29 +82,29 @@ void Wave::Draw(RenderTarget& screen)
 	screen.draw(m_points, CIRCLE_POINTS_COUNT*2, sf::TrianglesStrip);
 }
 
-bool Wave::HasBouncedOnNode(Node* node)
+bool Wave::HasBouncedOnEntity(L16Entity* entity)
 {
-	for (vector<Node*>::iterator it = m_bounced_nodes.begin(); it != m_bounced_nodes.end(); it++)
+	for (vector<L16Entity*>::iterator it = m_bounced_entities.begin(); it != m_bounced_entities.end(); it++)
 	{
-		if (node == *it)
+		if (entity == *it)
 			return true;
 	}
 
 	return false;
 }
 
-bool Wave::IsEvadedNode(Node* node)
+bool Wave::IsEvadedEntity(L16Entity* entity)
 {
-	for (vector<Node*>::iterator it = m_evaded_nodes.begin(); it != m_evaded_nodes.end(); it++)
+	for (vector<L16Entity*>::iterator it = m_evaded_entities.begin(); it != m_evaded_entities.end(); it++)
 	{
-		if (node == *it)
+		if (entity == *it)
 			return true;
 	}
 
 	return false;
 }
 
-void Wave::AddToEvadedNodes(Node* node)
+void Wave::AddToEvadedEntities(L16Entity* entity)
 {
-	m_evaded_nodes.push_back(node);
+	m_evaded_entities.push_back(entity);
 }

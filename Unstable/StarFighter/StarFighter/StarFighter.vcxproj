@@ -95,6 +95,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="L16Entity.cpp" />
     <ClCompile Include="LineObject.cpp" />
     <ClCompile Include="Link.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -109,6 +110,7 @@
     <ClCompile Include="Terminal.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="Wave.cpp" />
+    <ClCompile Include="Wing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
@@ -122,6 +124,7 @@
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
+    <ClInclude Include="L16Entity.h" />
     <ClInclude Include="LineObject.h" />
     <ClInclude Include="Link.h" />
     <ClInclude Include="Node.h" />
@@ -137,6 +140,7 @@
     <ClInclude Include="Terminal.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="Wave.h" />
+    <ClInclude Include="Wing.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />

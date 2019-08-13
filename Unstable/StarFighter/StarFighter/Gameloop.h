@@ -26,10 +26,8 @@ public:
 	//Liaison16
 	Node* CreateNode(sf::Vector2f position, AllianceType alliance);
 	Terminal* CreateTerminal(sf::Vector2f position, AllianceType alliance);
-	void CreateLink(Node* node_a, Node* node_b);
-
-	vector<Node*> m_nodes;
-	vector<Link*> m_links;
+	Link* CreateLink(Node* node_a, Node* node_b);
+	Wing* CreateWing(sf::Vector2f position, AllianceType alliance);
 
 private:
 	sf::RenderWindow* mainWindow;

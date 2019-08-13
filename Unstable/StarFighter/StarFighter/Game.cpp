@@ -57,8 +57,8 @@ Game::Game(RenderWindow* window)
 	PlayMusic(Music_Main);
 
 	//liaison 16
-	m_hovered_node = NULL;
-	m_selected_node = NULL;
+	m_hovered_entity = NULL;
+	m_selected_entity = NULL;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -315,7 +315,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
-		for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][WaveType].begin(); it != m_sceneCircleObjects[i][WaveType].end(); it++)
+		for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
 		{
 			for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
 			{
@@ -324,7 +324,7 @@ void Game::updateScene(Time deltaTime)
 					continue;
 				}
 
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][NodeType].begin(); it2 != m_sceneCircleObjects[j][NodeType].end(); it2++)
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity].end(); it2++)
 				{
 					float dx = (*it)->getPosition().x - (*it2)->getPosition().x;
 					float dy = (*it)->getPosition().y - (*it2)->getPosition().y;
@@ -332,14 +332,14 @@ void Game::updateScene(Time deltaTime)
 					if (dx*dx + dy*dy < radius*radius)
 					{
 						//this node already evaded this wave? no need to check again as it's 100% unlikely to happen
-						Node* node = (Node*)(*it2);
-						if ((*it)->IsEvadedNode(node) == true)
+						L16Entity* entity = (L16Entity*)(*it2);
+						if ((*it)->IsEvadedEntity(entity) == true)
 						{
 							continue;
 						}
 
 						//already bounced on this node?
-						if ((*it)->HasBouncedOnNode(node) == false)
+						if ((*it)->HasBouncedOnEntity(entity) == false)
 						{
 							//testing sector or circle
 							Wave* wave = (Wave*)(*it);
@@ -348,23 +348,22 @@ void Game::updateScene(Time deltaTime)
 							if ((*it2)->IsColliding(wave, direction) == true)
 							{
 								//wave bounce on enemy
-								Node* node = (Node*)(*it2);
 								if (i != NeutralAlliance)
 								{
 									sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
 									ScaleVector(&vector, (*it)->getRadius());
 									sf::Vector2f position = (*it)->getPosition() + vector;
 
-									wave_bounces.push_back(new WaveBounce(position, direction, (*it2)->getRadius(), wave, node));
+									wave_bounces.push_back(new WaveBounce(position, direction, (*it2)->getRadius(), wave, entity));
 								}
 								else if (j == (*it)->GetOriginAlliance())
 								{
-									wave_receptions.push_back(new WaveReception(wave, node));
+									wave_receptions.push_back(new WaveReception(wave, entity));
 								}
 							}
 							else
 							{
-								(*it)->AddToEvadedNodes(node);
+								(*it)->AddToEvadedEntities(entity);
 							}
 						}
 					}
@@ -375,7 +374,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (vector<WaveBounce*>::iterator it = wave_bounces.begin(); it != wave_bounces.end(); it++)
 	{
-		CircleObject* object = (CircleObject*)(*it)->m_bounced_node;
+		CircleObject* object = (CircleObject*)(*it)->m_bounced_entity;
 		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_direction, (*it)->m_wave);
 
 		delete *it;
@@ -383,7 +382,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (vector<WaveReception*>::iterator it = wave_receptions.begin(); it != wave_receptions.end(); it++)
 	{
-		CircleObject* object = (CircleObject*)(*it)->m_node;
+		CircleObject* object = (CircleObject*)(*it)->m_entity;
 		object->WaveReception((*it)->m_wave);
 	}
 	
@@ -887,7 +886,7 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectT
 			{
 				if (dist_max < 0 || distance_to_ref < dist_max)
 				{
-					float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
+					float angle_delta = GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
 					if (angle_delta < 0)
 						angle_delta = -angle_delta;
 

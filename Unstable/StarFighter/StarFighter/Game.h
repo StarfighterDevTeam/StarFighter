@@ -22,7 +22,10 @@
 #include "LineObject.h"
 
 class Ship;
+class L16Entity;
 class Node;
+class Wing;
+class Link;
 
 enum SFX_Bank
 {
@@ -57,27 +60,28 @@ using namespace sf;
 struct WaveBounce
 {
 public:
-	WaveBounce(sf::Vector2f position, float direction, float radius, Wave* wave, Node* bounced_node)
+	WaveBounce(sf::Vector2f position, float direction, float radius, Wave* wave, L16Entity* bounced_entity)
 	{
-		m_position = position; m_direction = direction; m_radius = radius; m_wave = wave; m_bounced_node = bounced_node;
+		m_position = position; m_direction = direction; m_radius = radius; m_wave = wave; m_bounced_entity = bounced_entity;
 	}
 
 	sf::Vector2f m_position;
 	float m_direction;
 	float m_radius;
 	Wave* m_wave;
-	Node* m_bounced_node;
+	L16Entity* m_bounced_entity;
 };
 
 struct WaveReception
 {
 public:
-	WaveReception(Wave* wave, Node* node)
+	WaveReception(Wave* wave, L16Entity* entity)
 	{
-		m_wave = wave; m_node = node;
+		m_wave = wave; m_entity = entity;
 	}
+
 	Wave* m_wave;
-	Node* m_node;
+	L16Entity* m_entity;
 };
 
 struct Game
@@ -152,11 +156,16 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//Liaison 16
-	Node* m_hovered_node;
-	Node* m_selected_node;
 	void AddCircleObject(CircleObject* object, CircleType type);
 	void AddLineObject(LineObject* object);
 
+	L16Entity* m_hovered_entity;
+	L16Entity* m_selected_entity;
+
+	vector<Node*> m_nodes;
+	vector<Link*> m_links;
+	vector<Wing*> m_wings;
+	
 	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
 	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
 

@@ -60,19 +60,19 @@ bool CircleObject::IsColliding(Wave* wave, float direction)
 	return false;
 }
 
-bool CircleObject::HasBouncedOnNode(Node* node)
+bool CircleObject::HasBouncedOnEntity(L16Entity* entity)
 {
 	//see override function in class Wave
 	return false;
 }
 
-bool CircleObject::IsEvadedNode(Node* node)
+bool CircleObject::IsEvadedEntity(L16Entity* entity)
 {
 	//see override function in class Wave
 	return false;
 }
 
-void CircleObject::AddToEvadedNodes(Node* node)
+void CircleObject::AddToEvadedEntities(L16Entity* entity)
 {
 	//see override function in class Wave
 }
