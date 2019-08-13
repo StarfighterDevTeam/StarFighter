@@ -16,12 +16,13 @@ L16Entity::L16Entity(sf::Vector2f position, AllianceType alliance, float radius)
 	setOutlineThickness(-4);
 
 	m_radar_activated = false;
-	m_radar_frequency = 1.f;
+	m_radar_frequency = 0.5;
 	m_radar_frequency_clock = 0;
 	m_radar_range = 100;
-	m_radar_speed = 50;
+	m_radar_wavespeed = 200;
 	m_radar_direction = alliance == PlayerAlliance ? 0 : 180;
 	m_radar_coverage = 60;
+	m_radar_bounce_feedback_clock = 0;
 
 	m_ghost = false;
 
@@ -48,6 +49,44 @@ void L16Entity::update(sf::Time deltaTime)
 	else
 	{
 		m_radar_frequency_clock = 0;
+	}
+
+	//hovering & selection
+	m_hovered = false;
+	if (IsHoveredByMouse() == true)
+	{
+		m_hovered = true;
+		(*CurrentGame).m_hovered_entity = this;
+
+		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick && m_alliance == PlayerAlliance)
+		{
+			if ((*CurrentGame).m_selected_entity != NULL)
+			{
+				(*CurrentGame).m_selected_entity->m_selected = false;
+				(*CurrentGame).m_selected_entity->ResetColor();
+			}
+
+			m_selected = true;
+			(*CurrentGame).m_selected_entity = this;
+		}
+	}
+
+	ResetColor();
+	if (m_selected == true)
+	{
+		setFillColor(sf::Color(0, 255, 0, GHOST_ALPHA_VALUE));
+		//setOutlineColor(sf::Color(0, 255, 0, 255));
+	}
+	if (m_hovered == true)
+	{
+		setOutlineColor(sf::Color(255, 255, 255, 255));
+	}
+
+	//radar bounced feedback
+	if (m_radar_bounce_feedback_clock > 0 && m_alliance == PlayerAlliance)
+	{
+		setOutlineColor(sf::Color(255, 0, 0, 255));
+		m_radar_bounce_feedback_clock -= deltaTime.asSeconds();
 	}
 
 	CircleObject::update(deltaTime);
@@ -77,14 +116,6 @@ void L16Entity::ResetColor()
 {
 	setFillColor(sf::Color(m_color.r, m_color.g, m_color.b, GHOST_ALPHA_VALUE));
 	setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
-}
-
-Wave* L16Entity::CreateRadarWave()
-{
-	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_speed, m_radar_range / m_radar_speed, m_radar_coverage, m_radar_direction);
-	wave->m_emitter_entity = this;
-	(*CurrentGame).AddCircleObject(wave, Circle_Wave);
-	return wave;
 }
 
 AllianceType L16Entity::GetOriginAlliance()
@@ -119,6 +150,14 @@ bool L16Entity::IsColliding(Wave* wave, float direction)
 			return false;
 		}
 	}
+}
+
+Wave* L16Entity::CreateRadarWave()
+{
+	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_wavespeed, m_radar_range / m_radar_wavespeed, m_radar_coverage, m_radar_direction);
+	wave->m_emitter_entity = this;
+	(*CurrentGame).AddCircleObject(wave, Circle_Wave);
+	return wave;
 }
 
 Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
@@ -162,6 +201,7 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 void L16Entity::WaveReception(Wave* wave)
 {
 	wave->m_bounced_entity->m_visible = true;
+	wave->m_bounced_entity->m_radar_bounce_feedback_clock = 1;
 
 	for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][Circle_Wave].begin(); it != (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][Circle_Wave].end(); it++)
 	{
@@ -173,6 +213,8 @@ void L16Entity::WaveReception(Wave* wave)
 	}
 
 	wave->m_lifespan = 0;
+
+
 	//masking wave sector of incidence
 	/*
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;

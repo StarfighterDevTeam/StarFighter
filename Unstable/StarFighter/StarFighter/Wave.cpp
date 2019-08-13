@@ -6,8 +6,8 @@ using namespace sf;
 
 Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan, float angle_coverage, float angle_direction) : CircleObject(alliance)
 {
-	Bound(angle_direction, 0, 360);
-	Bound(angle_coverage, 0, 360);
+	BoundAngle(angle_direction, 360);
+	BoundAngle(angle_coverage, 360);
 
 	setRadius(radius);
 	setOrigin(sf::Vector2f(radius, radius));
@@ -50,10 +50,7 @@ Wave::~Wave()
 
 void Wave::update(sf::Time deltaTime)
 {
-	//update expansion
-	setRadius(getRadius() + m_expansion_speed * deltaTime.asSeconds());
-	setOrigin(sf::Vector2f(getRadius(), getRadius()));
-
+	//lifespan
 	m_lifespan -= deltaTime.asSeconds();
 
 	if (m_lifespan < 1)
@@ -67,8 +64,15 @@ void Wave::update(sf::Time deltaTime)
 		m_garbageMe = true;
 	}
 
-	//points
+	//update expansion
+	setRadius(getRadius() + m_expansion_speed * deltaTime.asSeconds());
+	setOrigin(sf::Vector2f(getRadius(), getRadius()));
 	UpdateCirclePoints();
+
+	
+
+	//points
+	
 }
 
 AllianceType Wave::GetOriginAlliance()

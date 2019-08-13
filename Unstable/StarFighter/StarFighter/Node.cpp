@@ -37,37 +37,6 @@ void Node::update(sf::Time deltaTime)
 		}
 	}
 
-	//hovering & selection
-	m_hovered = false;
-	if (IsHoveredByMouse() == true)
-	{
-		m_hovered = true;
-		(*CurrentGame).m_hovered_entity = this;
-
-		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick && m_alliance == PlayerAlliance)
-		{
-			if ((*CurrentGame).m_selected_entity != NULL)
-			{
-				(*CurrentGame).m_selected_entity->m_selected = false;
-				(*CurrentGame).m_selected_entity->ResetColor();
-			}
-
-			m_selected = true;
-			(*CurrentGame).m_selected_entity = this;
-		}
-	}
-
-	ResetColor();
-	if (m_selected == true)
-	{
-		setFillColor(sf::Color(0, 255, 0, GHOST_ALPHA_VALUE));
-		setOutlineColor(sf::Color(0, 255, 0, 255));
-	}
-	if (m_hovered == true)
-	{
-		setOutlineColor(sf::Color(255, 255, 255, 255));
-	}
-
 	L16Entity::update(deltaTime);
 }
 

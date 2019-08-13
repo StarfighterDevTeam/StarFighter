@@ -11,7 +11,7 @@ Wing::Wing(sf::Vector2f position, AllianceType alliance) : L16Entity(position, a
 	m_speed = sf::Vector2f(0, 0);
 	m_max_speed = 100;
 	m_acceleration = 500;
-	m_angular_speed = 50;
+	m_angular_speed = 100;
 	m_direction = 0;
 
 	m_autopilot = false;
@@ -35,9 +35,9 @@ void Wing::update(sf::Time deltaTime)
 		}
 
 		if (inputs_direction.x < 0)
-			m_direction -= m_angular_speed * deltaTime.asSeconds();
-		else if (inputs_direction.x > 0)
 			m_direction += m_angular_speed * deltaTime.asSeconds();
+		else if (inputs_direction.x > 0)
+			m_direction -= m_angular_speed * deltaTime.asSeconds();
 	}
 
 	//apply speed
@@ -45,7 +45,6 @@ void Wing::update(sf::Time deltaTime)
 	sf::Vector2f acceleration = GetVectorFromLengthAndAngle(m_acceleration * deltaTime.asSeconds(), m_direction * M_PI / 180);
 	m_speed += acceleration;
 	NormalizeVector(&m_speed, m_max_speed);
-	printf("Speed: %f\n", GetVectorLength(m_speed));
 
-	CircleObject::update(deltaTime);
+	L16Entity::update(deltaTime);
 }
