@@ -56,7 +56,13 @@ Game::Game(RenderWindow* window)
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
 
-	//liaison 16
+	//Inputs
+	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
+	{
+		m_actions_states[i] = false;
+	}
+
+	//Liaison 16
 	m_hovered_entity = NULL;
 	m_selected_entity = NULL;
 }
@@ -288,6 +294,10 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	collision_checks();
 
+	//Get inputs
+	UpdateInputStates();
+
+	//Update objects
 	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
@@ -1064,5 +1074,29 @@ void Game::BallisticCollisionCheck(CircleObject* object_ballistic, CircleObject*
 		//hit
 		object_ballistic->m_garbageMe = true;
 		object_entity->m_garbageMe = true;
+	}
+}
+
+void Game::UpdateInputState(bool input_guy_boolean, PlayerActions action)
+{
+	if (input_guy_boolean)
+	{
+		m_inputs_states[action] = m_inputs_states[action] == Input_Release ? Input_Tap : Input_Hold;
+	}
+	else
+	{
+		m_inputs_states[action] = Input_Release;
+	}
+}
+
+void Game::UpdateInputStates()
+{
+	if (m_window_has_focus)
+	{
+		UpdateInputState(InputGuy::isFiring(), Action_Firing);
+	}
+	else
+	{
+		UpdateInputState(false, Action_Firing);
 	}
 }

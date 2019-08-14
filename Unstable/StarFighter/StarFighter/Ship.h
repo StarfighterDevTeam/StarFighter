@@ -15,22 +15,6 @@
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
-enum PlayerActions
-{
-	Action_Idle,
-	Action_Firing,
-	Action_Muting,
-	Action_Pausing,
-	NBVAL_PlayerActions,
-};
-
-enum PlayerInputStates
-{
-	Input_Release,//0
-	Input_Tap,//1
-	Input_Hold,//2
-};
-
 class Ship : public GameObject
 {
 public :
@@ -51,13 +35,8 @@ public :
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
-	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
-	bool m_actions_states[NBVAL_PlayerActions];
 
 	void SetControllerType(ControlerType contoller);
-	void GetInputState(bool input_guy_boolean, PlayerActions action);
-	void UpdateInputStates();
-	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 
 	static int Ship::SaveShip(Ship* ship);

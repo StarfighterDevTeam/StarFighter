@@ -18,10 +18,6 @@ void Ship::Init()
 	m_movingX = m_movingY = false;
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
-	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
-	{
-		m_actions_states[i] = false;
-	}
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
@@ -70,11 +66,10 @@ void Ship::update(sf::Time deltaTime)
 	ManageAcceleration(inputs_direction);
 	
 	//Action input
-	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
+	if ((*CurrentGame).m_inputs_states[Action_Firing] == Input_Tap)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		//(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
 	MaxSpeedConstraints();
@@ -209,49 +204,6 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
 
 		m_stroboscopic_effect_clock.restart();
-	}
-}
-
-void Ship::UpdateInputStates()
-{
-	if ((*CurrentGame).m_window_has_focus)
-	{
-		GetInputState(InputGuy::isFiring(), Action_Firing);
-	}
-	else
-	{
-		GetInputState(false, Action_Firing);
-	}
-}
-
-bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
-{
-	if (state_required == Input_Tap && condition && m_inputs_states[action] == Input_Tap)
-	{
-		m_actions_states[action] = !m_actions_states[action];
-		return true;
-	}
-	else if (state_required == Input_Hold && condition)
-	{
-		m_actions_states[action] = m_inputs_states[action];
-		return true;
-	}
-	else if (!condition)
-	{
-		m_actions_states[action] = false;
-	}
-	return false;
-}
-
-void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
-{
-	if (input_guy_boolean)
-	{
-		m_inputs_states[action] = m_inputs_states[action] == Input_Release ? Input_Tap : Input_Hold;
-	}
-	else
-	{
-		m_inputs_states[action] = Input_Release;
 	}
 }
 

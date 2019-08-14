@@ -24,7 +24,7 @@ public:
 	float m_roll;//in degrees
 	float m_roll_rate_min;//"taux de roulis"
 	float m_roll_rate_max;
-	//void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime) override;
 };
 
 #endif // BALLISTIC_H_INCLUDED

@@ -17,6 +17,7 @@
 #include "Stroboscopic.h"
 #include "SFPanel.h"
 #include "SFTextPop.h"
+#include "InputGuy.h"
 
 #include "CircleObject.h"
 #include "LineObject.h"
@@ -27,6 +28,22 @@ class Node;
 class Wing;
 class Link;
 class Ballistic;
+
+enum PlayerActions
+{
+	Action_Idle,
+	Action_Firing,
+	Action_Muting,
+	Action_Pausing,
+	NBVAL_PlayerActions,
+};
+
+enum PlayerInputStates
+{
+	Input_Release,//0
+	Input_Tap,//1
+	Input_Hold,//2
+};
 
 enum SFX_Bank
 {
@@ -121,6 +138,11 @@ public:
 	sf::Vector2f m_mouse_pos;
 	MouseAction m_mouse_click;
 	void GetMouseInputs(sf::Time deltaTime);
+
+	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
+	bool m_actions_states[NBVAL_PlayerActions];
+	void UpdateInputStates();
+	void UpdateInputState(bool input_guy_boolean, PlayerActions action);
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;

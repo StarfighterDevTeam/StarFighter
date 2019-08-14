@@ -19,7 +19,7 @@ Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Ent
 
 	m_heading = heading;
 	m_roll = 0;
-	m_speed = GetVectorFromLengthAndAngle(m_speed_min, heading);
+	m_speed = GetVectorFromLengthAndAngle(m_speed_min, heading * M_PI / 180);
 	m_autopilot = false;
 	m_wings = new LineObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), m_alliance);
 
@@ -47,8 +47,11 @@ void Wing::Draw(RenderTarget& screen)
 void Wing::update(sf::Time deltaTime)
 {
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
-
 	m_autopilot = !m_selected;
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+	{
+		(*it)->update(deltaTime);
+	}
 
 	//manual pilot
 	if (m_autopilot == false)
@@ -57,7 +60,7 @@ void Wing::update(sf::Time deltaTime)
 		{
 			inputs_direction = InputGuy::getDirections();
 
-			if (InputGuy::isFiring() == true)
+			if ((*CurrentGame).m_inputs_states[Action_Firing] == Input_Tap)
 			{
 				Fire();
 			}
@@ -108,6 +111,7 @@ void Wing::update(sf::Time deltaTime)
 	}
 	
 	BoundAngle(m_heading, 360);
+
 	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration * deltaTime.asSeconds(), m_heading * M_PI / 180);
 	m_speed += acceleration_vector;
 
@@ -145,6 +149,9 @@ void Wing::Fire()
 {
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
-		(*it)->Fire();
+		if ((*it)->IsReadyToFire() == true)
+		{
+			(*it)->Fire();
+		}
 	}
 }

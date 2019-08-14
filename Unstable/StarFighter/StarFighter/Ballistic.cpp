@@ -27,10 +27,25 @@ Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, Allian
 
 	m_heading = heading;
 	m_roll = 0;
-	m_speed = GetVectorFromLengthAndAngle(m_speed_min, heading);
+	m_speed = GetVectorFromLengthAndAngle(m_speed_min, heading * M_PI / 180);
 }
 
 Ballistic::~Ballistic()
 {
 
+}
+
+void Ballistic::update(sf::Time deltaTime)
+{
+	BoundAngle(m_heading, 360);
+
+	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration * deltaTime.asSeconds(), m_heading * M_PI / 180);
+	m_speed += acceleration_vector;
+
+	float speed_max = CosInterpolation(abs(m_roll), 0, 90, m_speed_max, m_speed_min);
+	NormalizeVector(&m_speed, speed_max);
+
+	m_radar_heading = m_heading;
+
+	L16Entity::update(deltaTime);
 }
