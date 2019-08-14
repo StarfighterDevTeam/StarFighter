@@ -1,8 +1,9 @@
 #include "CircleObject.h"
 
-CircleObject::CircleObject(AllianceType alliance)
+CircleObject::CircleObject(AllianceType alliance, CircleType circle_type)
 {
 	m_alliance = alliance;
+	m_circle_type = circle_type;
 	m_color = GameObject::GetAllianceColor(alliance);
 	m_speed = sf::Vector2f(0, 0);
 	m_garbageMe = false;

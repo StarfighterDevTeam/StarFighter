@@ -26,6 +26,7 @@ class L16Entity;
 class Node;
 class Wing;
 class Link;
+class Ballistic;
 
 enum SFX_Bank
 {
@@ -157,7 +158,7 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//Liaison 16
-	void AddCircleObject(CircleObject* object, CircleType type);
+	void AddCircleObject(CircleObject* object);
 	void AddLineObject(LineObject* object);
 
 	void WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_entity);
@@ -172,8 +173,10 @@ public:
 	vector<Node*> m_nodes;
 	vector<Link*> m_links;
 	vector<Wing*> m_wings;
+	vector<Ballistic*> m_ballistics;
 	
 	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
+	vector<CircleObject*> m_new_sceneCircleObjects;
 	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
 
 private:

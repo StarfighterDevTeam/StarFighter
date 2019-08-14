@@ -21,7 +21,7 @@ enum L16MissionType
 class L16Entity : public CircleObject
 {
 public :
-	L16Entity(sf::Vector2f position, AllianceType alliance, float radius);
+	L16Entity(sf::Vector2f position, AllianceType alliance, float radius, CircleType circle_type);
 	~L16Entity();
 
 	void update(sf::Time deltaTime) override;

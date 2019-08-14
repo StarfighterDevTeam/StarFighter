@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan, float angle_coverage, float angle_direction) : CircleObject(alliance)
+Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float expansion_speed, float lifespan, float angle_coverage, float angle_direction) : CircleObject(alliance, Circle_Wave)
 {
 	BoundAngle(angle_direction, 360);
 	BoundAngle(angle_coverage, 360);

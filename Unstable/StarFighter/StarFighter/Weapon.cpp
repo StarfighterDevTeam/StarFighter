@@ -23,8 +23,9 @@ void Weapon::Fire()
 {
 	sf::Vector2f weapon_pos;
 	weapon_pos.x = m_owner->getPosition().x + cos(m_polar_offset.x) * m_polar_offset.y;
-	weapon_pos.x = m_owner->getPosition().x - sin(m_polar_offset.x) * m_polar_offset.y;
+	weapon_pos.y = m_owner->getPosition().y - sin(m_polar_offset.x) * m_polar_offset.y;
 
 	Ballistic* shot = new Ballistic(m_ballistic_type, weapon_pos, m_owner->m_alliance, m_owner->m_radar_heading + m_heading_offset);
-	(*CurrentGame).AddCircleObject(shot, Circle_L16Entity_Air);
+	(*CurrentGame).m_ballistics.push_back(shot);
+	(*CurrentGame).AddCircleObject(shot);
 }

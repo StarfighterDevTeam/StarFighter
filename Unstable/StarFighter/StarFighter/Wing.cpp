@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Entity(position, alliance, 8)
+Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Entity(position, alliance, 8, Circle_L16Entity_Air)
 {
 	m_type = L16Entity_Wing;
 	
@@ -56,6 +56,11 @@ void Wing::update(sf::Time deltaTime)
 		if ((*CurrentGame).m_window_has_focus == true)
 		{
 			inputs_direction = InputGuy::getDirections();
+
+			if (InputGuy::isFiring() == true)
+			{
+				Fire();
+			}
 		}
 	}
 	else

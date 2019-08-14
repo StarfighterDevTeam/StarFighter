@@ -72,6 +72,30 @@ Game::~Game()
 	{
 		delete *it;
 	}
+
+	for (vector<Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); it++)
+	{
+		delete *it;
+	}
+	m_nodes.clear();
+
+	for (vector<Link*>::iterator it = m_links.begin(); it != m_links.end(); it++)
+	{
+		delete *it;
+	}
+	m_links.clear();
+
+	for (vector<Wing*>::iterator it = m_wings.begin(); it != m_wings.end(); it++)
+	{
+		delete *it;
+	}
+	m_wings.clear();
+
+	for (vector<Ballistic*>::iterator it = m_ballistics.begin(); it != m_ballistics.end(); it++)
+	{
+		delete *it;
+	}
+	m_ballistics.clear();
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -264,7 +288,7 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	collision_checks();
 
-	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
+	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
 		if (this->m_sceneGameObjects[i] == NULL)
@@ -272,6 +296,15 @@ void Game::updateScene(Time deltaTime)
 
 		this->m_sceneGameObjects[i]->update(deltaTime);
 	}
+
+	//New objects created
+	size_t sceneNewCircleObjectsSize = m_new_sceneCircleObjects.size();
+	for (size_t i = 0; i < sceneNewCircleObjectsSize; i++)
+	{
+		CircleObject* obj = m_new_sceneCircleObjects[i];
+		m_sceneCircleObjects[obj->m_alliance][obj->m_circle_type].push_back(obj);
+	}
+	m_new_sceneCircleObjects.clear();
 
 	//update and garbe collection
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
@@ -953,9 +986,9 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 }
 
 //Liaison 16
-void Game::AddCircleObject(CircleObject* object, CircleType type)
+void Game::AddCircleObject(CircleObject* object)
 {
-	m_sceneCircleObjects[object->m_alliance][type].push_back(object);
+	m_new_sceneCircleObjects.push_back(object);
 }
 
 void Game::AddLineObject(LineObject* object)

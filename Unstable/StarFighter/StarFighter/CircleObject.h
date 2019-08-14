@@ -20,7 +20,7 @@ enum CircleType
 class CircleObject : public sf::CircleShape
 {
 public:
-	CircleObject(AllianceType alliance);
+	CircleObject(AllianceType alliance, CircleType circle_type);
 	~CircleObject();
 
 	virtual void update(sf::Time deltaTime);
@@ -39,7 +39,7 @@ public:
 
 	sf::Vector2f m_previous_speed;
 	sf::Vector2f m_speed;
-	CircleType m_type;
+	CircleType m_circle_type;
 
 	bool m_garbageMe;
 	bool m_visible;

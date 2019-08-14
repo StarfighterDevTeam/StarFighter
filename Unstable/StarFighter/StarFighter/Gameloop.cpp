@@ -36,24 +36,6 @@ Gameloop::Gameloop()
 Gameloop::~Gameloop()
 {
 	delete m_background;
-
-	for (vector<Node*>::iterator it = (*CurrentGame).m_nodes.begin(); it != (*CurrentGame).m_nodes.end(); it++)
-	{
-		delete *it;
-	}
-	(*CurrentGame).m_nodes.clear();
-
-	for (vector<Link*>::iterator it = (*CurrentGame).m_links.begin(); it != (*CurrentGame).m_links.end(); it++)
-	{
-		delete *it;
-	}
-	(*CurrentGame).m_links.clear();
-
-	for (vector<Wing*>::iterator it = (*CurrentGame).m_wings.begin(); it != (*CurrentGame).m_wings.end(); it++)
-	{
-		delete *it;
-	}
-	(*CurrentGame).m_wings.clear();
 }
 
 void Gameloop::Update(sf::Time deltaTime)
@@ -127,7 +109,7 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
 	Node* node = new Node(position, alliance);
-	(*CurrentGame).AddCircleObject(node, Circle_L16Entity_Ground);
+	(*CurrentGame).AddCircleObject(node);
 	(*CurrentGame).m_nodes.push_back(node);
 
 	return node;
@@ -136,7 +118,7 @@ Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
 	Terminal* terminal = new Terminal(position, alliance);
-	(*CurrentGame).AddCircleObject(terminal, Circle_L16Entity_Ground);
+	(*CurrentGame).AddCircleObject(terminal);
 	(*CurrentGame).m_nodes.push_back(terminal);
 
 	return terminal;
@@ -157,7 +139,7 @@ Link* Gameloop::CreateLink(Node* node_a, Node* node_b)
 Wing* Gameloop::CreateWing(sf::Vector2f position, AllianceType alliance, float heading)
 {
 	Wing* wing = new Wing(position, alliance, heading);
-	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity_Air);
+	(*CurrentGame).AddCircleObject(wing);
 	(*CurrentGame).m_wings.push_back(wing);
 	
 	return wing;

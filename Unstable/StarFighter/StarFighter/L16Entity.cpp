@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-L16Entity::L16Entity(sf::Vector2f position, AllianceType alliance, float radius) : CircleObject(alliance)
+L16Entity::L16Entity(sf::Vector2f position, AllianceType alliance, float radius, CircleType circle_type) : CircleObject(alliance, circle_type)
 {
 	m_hovered = false;
 	m_selected = false;
@@ -150,7 +150,7 @@ Wave* L16Entity::CreateRadarWave()
 {
 	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_wavespeed, m_radar_range / m_radar_wavespeed, m_radar_coverage, m_radar_heading);
 	wave->m_emitter_entity = this;
-	(*CurrentGame).AddCircleObject(wave, Circle_Wave);
+	(*CurrentGame).AddCircleObject(wave);
 	return wave;
 }
 
@@ -161,7 +161,7 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 	Wave* new_wave = new Wave(position, NeutralAlliance, radius, wave->m_expansion_speed, wave->m_lifespan, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
 	new_wave->m_bounced_entity = this;
 	new_wave->m_emitter_entity = wave->m_emitter_entity;
-	(*CurrentGame).AddCircleObject(new_wave, Circle_Wave);
+	(*CurrentGame).AddCircleObject(new_wave);
 	wave->m_bounced_entities.push_back(this);
 
 	//masking wave sector of incidence

@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : L16Entity(position, alliance, radius)
+Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : L16Entity(position, alliance, radius, Circle_L16Entity_Ground)
 {
 	m_type = L16Entity_Node;
 	m_is_terminal_node = false;
@@ -49,7 +49,7 @@ void Node::update(sf::Time deltaTime)
 Wing* Node::CreateWing()
 {
 	Wing* wing = new Wing(getPosition(), m_alliance, m_radar_heading);
-	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity_Air);
+	(*CurrentGame).AddCircleObject(wing);
 	(*CurrentGame).m_wings.push_back(wing);
 
 	return wing;
