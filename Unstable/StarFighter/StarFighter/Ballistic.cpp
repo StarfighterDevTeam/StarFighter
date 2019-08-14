@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading) : L16Entity(position, alliance, 4, Circle_L16Entity_MultiDomain)
+Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range) : L16Entity(position, alliance, 4, Circle_L16Entity_MultiDomain)
 {
 	m_ballistic_type = ballistic_type;
 	m_type = L16Entity_Ballistic;
@@ -14,20 +14,21 @@ Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, Allian
 		case Ballistic_AAM:
 		{
 			m_circle_type = Circle_L16Entity_Air;
+			m_speed_min = 100;
+			m_speed_max = 300;
+			m_acceleration = 800;
+			m_roll_rate_min = 100;
+			m_roll_rate_max = 500;
 			break;
 		}
 	}
 
-	m_speed_min = 100;
-	m_speed_max = 300;
-	m_acceleration = 800;
-	m_roll_rate_min = 100;
-	m_roll_rate_max = 500;
 	m_manoeuvrability = 0.05 * (getRadius() * 2);//0.03;
 
 	m_heading = heading;
 	m_roll = 0;
 	m_speed = GetVectorFromLengthAndAngle(m_speed_min, heading * M_PI / 180);
+	m_lifespan = range / m_speed_max;
 }
 
 Ballistic::~Ballistic()
@@ -37,15 +38,25 @@ Ballistic::~Ballistic()
 
 void Ballistic::update(sf::Time deltaTime)
 {
-	BoundAngle(m_heading, 360);
+	m_lifespan -= deltaTime.asSeconds();
 
-	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration * deltaTime.asSeconds(), m_heading * M_PI / 180);
-	m_speed += acceleration_vector;
+	if (m_lifespan <= 0)
+	{
+		m_garbageMe = true;
+		m_visible = false;
+	}
+	else
+	{
+		BoundAngle(m_heading, 360);
 
-	float speed_max = CosInterpolation(abs(m_roll), 0, 90, m_speed_max, m_speed_min);
-	NormalizeVector(&m_speed, speed_max);
+		sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration * deltaTime.asSeconds(), m_heading * M_PI / 180);
+		m_speed += acceleration_vector;
 
-	m_radar_heading = m_heading;
+		float speed_max = CosInterpolation(abs(m_roll), 0, 90, m_speed_max, m_speed_min);
+		NormalizeVector(&m_speed, speed_max);
 
-	L16Entity::update(deltaTime);
+		m_radar_heading = m_heading;
+
+		L16Entity::update(deltaTime);
+	}
 }

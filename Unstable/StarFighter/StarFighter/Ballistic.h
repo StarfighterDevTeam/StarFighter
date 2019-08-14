@@ -11,7 +11,7 @@ enum BallisticType
 class Ballistic : public L16Entity
 {
 public:
-	Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading);
+	Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range);
 	~Ballistic();
 
 	BallisticType m_ballistic_type;
@@ -24,6 +24,8 @@ public:
 	float m_roll;//in degrees
 	float m_roll_rate_min;//"taux de roulis"
 	float m_roll_rate_max;
+	float m_lifespan;
+
 	void update(sf::Time deltaTime) override;
 };
 

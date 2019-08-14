@@ -316,7 +316,7 @@ void Game::updateScene(Time deltaTime)
 	}
 	m_new_sceneCircleObjects.clear();
 
-	//update and garbe collection
+	//Update and garbage collection
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
 		for (int j = 0; j < NB_CIRCLE_TYPES; j++)
@@ -326,6 +326,15 @@ void Game::updateScene(Time deltaTime)
 			{
 				old_objects.push_back(*it);
 				(*it)->update(deltaTime);
+
+				//Automatic garbage collection for objects out of screen
+				if ((*it)->m_circle_type != Circle_Wave && 
+						((*it)->getPosition().x < -(*it)->getRadius() || (*it)->getPosition().x > m_map_size.x + (*it)->getRadius()
+						|| (*it)->getPosition().y < -(*it)->getRadius() || (*it)->getPosition().y > m_map_size.y + (*it)->getRadius()))
+				{
+					(*it)->m_garbageMe = true;
+					(*it)->m_visible = false;
+				}
 			}
 
 			m_sceneCircleObjects[i][j].clear();

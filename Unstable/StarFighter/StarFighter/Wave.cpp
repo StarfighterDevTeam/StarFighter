@@ -62,17 +62,13 @@ void Wave::update(sf::Time deltaTime)
 	if (m_lifespan <= 0)
 	{
 		m_garbageMe = true;
+		m_visible = false;
 	}
 
 	//update expansion
 	setRadius(getRadius() + m_expansion_speed * deltaTime.asSeconds());
 	setOrigin(sf::Vector2f(getRadius(), getRadius()));
 	UpdateCirclePoints();
-
-	
-
-	//points
-	
 }
 
 AllianceType Wave::GetOriginAlliance()

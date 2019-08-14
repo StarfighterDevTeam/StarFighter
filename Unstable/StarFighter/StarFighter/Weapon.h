@@ -25,6 +25,7 @@ public:
 	L16Entity* m_owner;
 	float m_rate_of_fire;
 	float m_rate_of_fire_timer;
+	float m_range;
 };
 
 #endif // WEAPON_H_INCLUDED

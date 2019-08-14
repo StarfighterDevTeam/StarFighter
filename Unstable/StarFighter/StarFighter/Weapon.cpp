@@ -18,6 +18,7 @@ Weapon::Weapon(L16Entity* owner, WeaponType weapon_type, BallisticType ballistic
 		case Weapon_AAM:
 		{
 			m_rate_of_fire = 1;
+			m_range = 600;
 			break;
 		}
 	}
@@ -35,7 +36,7 @@ void Weapon::Fire()
 	weapon_pos.x = m_owner->getPosition().x + cos(m_polar_offset.x) * m_polar_offset.y;
 	weapon_pos.y = m_owner->getPosition().y - sin(m_polar_offset.x) * m_polar_offset.y;
 
-	Ballistic* shot = new Ballistic(m_ballistic_type, weapon_pos, m_owner->m_alliance, m_owner->m_radar_heading + m_heading_offset);
+	Ballistic* shot = new Ballistic(m_ballistic_type, weapon_pos, m_owner->m_alliance, m_owner->m_radar_heading + m_heading_offset, m_range);
 	(*CurrentGame).m_ballistics.push_back(shot);
 	(*CurrentGame).AddCircleObject(shot);
 
