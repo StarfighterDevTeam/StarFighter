@@ -7,18 +7,21 @@ using namespace sf;
 Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Entity(position, alliance, 8)
 {
 	m_type = L16Entity_Wing;
-
+	
 	m_speed_min = 70;
 	m_speed_max = 100;
 	m_acceleration = 500;
-	m_manoeuvrability = 0.03;
-	m_roll_speed_min = 100;
-	m_roll_speed_max = 500;
+	m_roll_rate_min = 100;
+	m_roll_rate_max = 500;
+	m_wingspan = (getRadius() * 2) + (getRadius() * 2);
+	m_chord_length = getRadius() / 2;
+	m_manoeuvrability = 0.06 * (getRadius() * 2 / m_wingspan);//0.03;
+
 	m_heading = heading;
 	m_roll = 0;
-
 	m_speed = GetVectorFromLengthAndAngle(m_speed_min, heading);
 	m_autopilot = false;
+	m_wings = new LineObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), m_alliance);
 
 	m_radar_activated = true;
 	m_radar_frequency = 0.5;
@@ -30,7 +33,13 @@ Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Ent
 
 Wing::~Wing()
 {
+	delete m_wings;
+}
 
+void Wing::Draw(RenderTarget& screen)
+{
+	CircleObject::Draw(screen);
+	screen.draw(m_wings->m_quad, 4, sf::Quads);
 }
 
 void Wing::update(sf::Time deltaTime)
@@ -59,8 +68,8 @@ void Wing::update(sf::Time deltaTime)
 
 	//apply speed & direction
 	float previous_speed = GetVectorLength(m_speed);
-	//float roll_speed = Lerp(previous_speed, m_speed_min, m_speed_max, m_roll_speed_max, m_roll_speed_min);
-	float roll_speed = CosInterpolation(previous_speed, m_speed_min, m_speed_max, m_roll_speed_max, m_roll_speed_min);
+	//float roll_speed = Lerp(previous_speed, m_speed_min, m_speed_max, m_roll_rate_max, m_roll_rate_min);
+	float roll_speed = CosInterpolation(previous_speed, m_speed_min, m_speed_max, m_roll_rate_max, m_roll_rate_min);
 	if (inputs_direction.x < 0)
 	{
 		m_roll += roll_speed * deltaTime.asSeconds();
@@ -101,7 +110,25 @@ void Wing::update(sf::Time deltaTime)
 
 	//printf("roll: %f, roll speed: %f, heading: %f, speed: %f\n", m_roll, roll_speed, m_heading, GetVectorLength(m_speed));
 
+	UpdateWingsPositionToNewHeading();
 	m_radar_heading = m_heading;
 
 	L16Entity::update(deltaTime);
+}
+
+void Wing::UpdateWingsPositionToNewHeading()
+{
+	float perpAngle = (m_heading + 90) * M_PI / 180;
+
+	float wingspan = Lerp(-abs(m_roll), -90, 0, (getRadius() * 2) + (m_chord_length * 2), m_wingspan);
+	float xL = getPosition().x + cos(perpAngle) * wingspan / 2;
+	float yL = getPosition().y - sin(perpAngle) * wingspan / 2;
+
+	float xR = getPosition().x - cos(perpAngle) * wingspan / 2;
+	float yR = getPosition().y + sin(perpAngle) * wingspan / 2;
+
+	m_wings->m_points[0].position = sf::Vector2f(xL, yL);
+	m_wings->m_points[1].position = sf::Vector2f(xR, yR);
+
+	m_wings->UpdateQuadPointsPosition();
 }

@@ -15,7 +15,7 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
 
 	//node
-	Terminal* t = CreateTerminal(sf::Vector2f(400, 440), PlayerAlliance);
+	Terminal* t = CreateTerminal(sf::Vector2f(300, 440), PlayerAlliance);
 	t->CreateWing();
 
 	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);

@@ -11,12 +11,10 @@ public :
 	Link(Node* node_a, Node* node_b);
 	~Link();
 	void update(sf::Time deltaTime) override;
-	void ResetColor();
+	void UpdateQuadPointsPosition() override;
 
 	Node* m_node_a;
 	Node* m_node_b;
-
-	bool m_update_needed;
 };
 
 #endif // LINK_H_INCLUDED
