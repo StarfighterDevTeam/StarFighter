@@ -10,7 +10,9 @@ class Wave;
 
 enum CircleType
 {
-	Circle_L16Entity,
+	Circle_L16Entity_Air,
+	Circle_L16Entity_Ground,
+	Circle_L16Entity_MultiDomain,
 	Circle_Wave,
 	NB_CIRCLE_TYPES,
 };

@@ -88,6 +88,7 @@ struct Game
 {
 public:
 	Game(RenderWindow* window);
+	~Game();
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
@@ -102,7 +103,7 @@ public:
 
 	void updateScene(Time deltaTime);
 	void drawScene();
-	void colisionChecksV2();
+	void collision_checks();
 	void cleanGarbage();
 	void collectGarbage();
 
@@ -158,6 +159,12 @@ public:
 	//Liaison 16
 	void AddCircleObject(CircleObject* object, CircleType type);
 	void AddLineObject(LineObject* object);
+
+	void WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_entity);
+	void BallisticCollisionCheck(CircleObject* object_ballistic, CircleObject* object_entity);
+
+	vector<WaveBounce*> m_wave_bounces;
+	vector<WaveReception*> m_wave_receptions;
 
 	L16Entity* m_hovered_entity;
 	L16Entity* m_selected_entity;

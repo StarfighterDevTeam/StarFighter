@@ -49,7 +49,7 @@ void Node::update(sf::Time deltaTime)
 Wing* Node::CreateWing()
 {
 	Wing* wing = new Wing(getPosition(), m_alliance, m_radar_heading);
-	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity);
+	(*CurrentGame).AddCircleObject(wing, Circle_L16Entity_Air);
 	(*CurrentGame).m_wings.push_back(wing);
 
 	return wing;

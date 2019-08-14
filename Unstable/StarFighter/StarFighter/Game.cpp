@@ -61,6 +61,19 @@ Game::Game(RenderWindow* window)
 	m_selected_entity = NULL;
 }
 
+Game::~Game()
+{
+	for (vector<WaveBounce*>::iterator it = m_wave_bounces.begin(); it != m_wave_bounces.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<WaveReception*>::iterator it = m_wave_receptions.begin(); it != m_wave_receptions.end(); it++)
+	{
+		delete *it;
+	}
+}
+
 void Game::SetSFXVolume(bool activate_sfx)
 {
 	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
@@ -249,7 +262,7 @@ void Game::updateScene(Time deltaTime)
 	cleanGarbage();
 
 	//Checking colisions
-	colisionChecksV2();
+	collision_checks();
 
 	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
@@ -307,83 +320,6 @@ void Game::updateScene(Time deltaTime)
 				m_sceneLineObjects[i].push_back(*it);
 			}
 		}
-	}
-
-	//wave collisions
-	vector<WaveBounce*> wave_bounces;
-	vector<WaveReception*> wave_receptions;
-
-	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
-	{
-		for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
-		{
-			for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
-			{
-				if (i == j || j == NeutralAlliance)
-				{
-					continue;
-				}
-
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity].end(); it2++)
-				{
-					float dx = (*it)->getPosition().x - (*it2)->getPosition().x;
-					float dy = (*it)->getPosition().y - (*it2)->getPosition().y;
-					float radius = (*it)->getRadius() + (*it2)->getRadius();
-					if (dx*dx + dy*dy < radius*radius)
-					{
-						//this node already evaded this wave? no need to check again as it's 100% unlikely to happen
-						L16Entity* entity = (L16Entity*)(*it2);
-						if ((*it)->IsEvadedEntity(entity) == true)
-						{
-							continue;
-						}
-
-						//already bounced on this node?
-						if ((*it)->HasBouncedOnEntity(entity) == false)
-						{
-							//testing sector or circle
-							Wave* wave = (Wave*)(*it);
-							float direction = GetAngleForVector(sf::Vector2f((*it2)->getPosition().x - (*it)->getPosition().x, - ((*it2)->getPosition().y - (*it)->getPosition().y)));
-
-							if ((*it2)->IsColliding(wave, direction) == true)
-							{
-								//wave bounce on enemy
-								if (i != NeutralAlliance)
-								{
-									sf::Vector2f vector = (*it2)->getPosition() - (*it)->getPosition();
-									ScaleVector(&vector, (*it)->getRadius());
-									sf::Vector2f position = (*it)->getPosition() + vector;
-
-									wave_bounces.push_back(new WaveBounce(position, direction, (*it2)->getRadius(), wave, entity));
-								}
-								else if (j == (*it)->GetOriginAlliance())
-								{
-									wave_receptions.push_back(new WaveReception(wave, entity));
-								}
-							}
-							else
-							{
-								(*it)->AddToEvadedEntities(entity);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	for (vector<WaveBounce*>::iterator it = wave_bounces.begin(); it != wave_bounces.end(); it++)
-	{
-		CircleObject* object = (CircleObject*)(*it)->m_bounced_entity;
-		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_direction, (*it)->m_wave);
-
-		delete *it;
-	}
-
-	for (vector<WaveReception*>::iterator it = wave_receptions.begin(); it != wave_receptions.end(); it++)
-	{
-		CircleObject* object = (CircleObject*)(*it)->m_entity;
-		object->WaveReception((*it)->m_wave);
 	}
 	
 	//SFTextPop (text feedbacks)
@@ -490,31 +426,99 @@ void Game::drawScene()
 	m_window->draw(temp);
 }
 
-void Game::colisionChecksV2()
+
+void Game::collision_checks()
 {
-	sf::Clock dt;
-	dt.restart();
-
-	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	//Wave collisions
+	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
-		if (*it1 == NULL)
-			continue;
-
-		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
 		{
-			if (*it2 == NULL)
-				continue;
-			
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (i == j || j == NeutralAlliance)
 			{
-				//Do something 
-				
+				continue;
+			}
+
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
+			{
+				if ((*it)->m_visible == false)
+					continue;
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				{
+					WaveCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Ground].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Ground].end(); it2++)
+				{
+					WaveCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].end(); it2++)
+				{
+					WaveCollisionCheck(*it, *it2);
+				}
 			}
 		}
 	}
-	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
+
+	for (vector<WaveBounce*>::iterator it = m_wave_bounces.begin(); it != m_wave_bounces.end(); it++)
+	{
+		CircleObject* object = (CircleObject*)(*it)->m_bounced_entity;
+		object->CreateWaveBounce((*it)->m_position, (*it)->m_radius, (*it)->m_direction, (*it)->m_wave);
+
+		delete *it;
+	}
+	m_wave_bounces.clear();
+
+	for (vector<WaveReception*>::iterator it = m_wave_receptions.begin(); it != m_wave_receptions.end(); it++)
+	{
+		CircleObject* object = (CircleObject*)(*it)->m_entity;
+		object->WaveReception((*it)->m_wave);
+	}
+	m_wave_receptions.clear();
+
+	//Ballistic collision
+	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
+	{
+		for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
+		{
+			if (i == j)
+				continue;
+
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_L16Entity_MultiDomain].begin(); it != m_sceneCircleObjects[i][Circle_L16Entity_MultiDomain].end(); it++)
+			{
+				if ((*it)->m_visible == false)
+					continue;
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Ground].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Ground].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+			}
+
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_L16Entity_Air].begin(); it != m_sceneCircleObjects[i][Circle_L16Entity_Air].end(); it++)
+			{
+				if ((*it)->m_visible == false)
+					continue;
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+			}
+		}
+	}
 }
 
 void Game::TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer)
@@ -957,4 +961,75 @@ void Game::AddCircleObject(CircleObject* object, CircleType type)
 void Game::AddLineObject(LineObject* object)
 {
 	m_sceneLineObjects[object->m_alliance].push_back(object);
+}
+
+
+void Game::WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_entity)
+{
+	if (object_wave == object_entity)
+		return;
+
+	if (object_entity->m_visible == false)
+		return;
+
+	float dx = object_wave->getPosition().x - object_entity->getPosition().x;
+	float dy = object_wave->getPosition().y - object_entity->getPosition().y;
+	float radius = object_wave->getRadius() + object_entity->getRadius();
+	if (dx*dx + dy*dy < radius*radius)
+	{
+		//this node already evaded this wave? no need to check again as it's 100% unlikely to happen
+		L16Entity* entity = (L16Entity*)object_entity;
+		if (object_wave->IsEvadedEntity(entity) == true)
+		{
+			return;
+		}
+
+		//already bounced on this node?
+		if (object_wave->HasBouncedOnEntity(entity) == false)
+		{
+			//testing sector or circle
+			Wave* wave = (Wave*)object_wave;
+			float direction = GetAngleForVector(sf::Vector2f(object_entity->getPosition().x - object_wave->getPosition().x, -(object_entity->getPosition().y - object_wave->getPosition().y)));
+
+			if (object_entity->IsColliding(wave, direction) == true)
+			{
+				//wave bounce on enemy
+				if (object_wave->m_alliance != NeutralAlliance)
+				{
+					sf::Vector2f vector = object_entity->getPosition() - object_wave->getPosition();
+					ScaleVector(&vector, object_wave->getRadius());
+					sf::Vector2f position = object_wave->getPosition() + vector;
+
+					m_wave_bounces.push_back(new WaveBounce(position, direction, object_entity->getRadius(), wave, entity));
+				}
+				else if (object_entity->m_alliance == object_wave->GetOriginAlliance())
+				{
+					m_wave_receptions.push_back(new WaveReception(wave, entity));
+				}
+			}
+			else
+			{
+				object_wave->AddToEvadedEntities(entity);
+			}
+		}
+	}
+}
+
+void Game::BallisticCollisionCheck(CircleObject* object_ballistic, CircleObject* object_entity)
+{
+	if (object_ballistic == object_entity)
+		return;
+
+	if (object_entity->m_visible == false)
+		return;
+
+	float dx = object_ballistic->getPosition().x - object_entity->getPosition().x;
+	float dy = object_ballistic->getPosition().y - object_entity->getPosition().y;
+	float radius = object_ballistic->getRadius() + object_entity->getRadius();
+	if (dx*dx + dy*dy < radius*radius)
+	{
+		//hit
+		object_ballistic->m_garbageMe = true;
+		object_entity->m_garbageMe = true;
+	}
 }

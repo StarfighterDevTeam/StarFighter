@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Ballistic.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Gameloop.cpp" />
@@ -110,11 +111,13 @@
     <ClCompile Include="Terminal.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="Wave.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="Wing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="Ballistic.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />
@@ -140,6 +143,7 @@
     <ClInclude Include="Terminal.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="Wave.h" />
+    <ClInclude Include="Weapon.h" />
     <ClInclude Include="Wing.h" />
   </ItemGroup>
   <ItemGroup>

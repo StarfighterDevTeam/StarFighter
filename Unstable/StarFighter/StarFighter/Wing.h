@@ -2,6 +2,7 @@
 #define WING_H_INCLUDED
 
 #include "L16Entity.h"
+#include "Weapon.h"
 
 class Wing : public L16Entity
 {
@@ -12,6 +13,7 @@ public:
 	void update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void UpdateWingsPositionToNewHeading();
+	void Fire();
 
 	bool m_autopilot;
 	float m_speed_min;
@@ -26,6 +28,7 @@ public:
 	float m_chord_length;//"corde", wing width
 
 	LineObject* m_wings;
+	vector<Weapon*> m_weapons;
 };
 
 #endif // WING_H_INCLUDED

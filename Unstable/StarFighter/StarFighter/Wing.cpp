@@ -29,6 +29,8 @@ Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Ent
 	m_radar_wavespeed = 200;
 	m_radar_heading = m_heading;
 	m_radar_coverage = 30;
+
+	m_weapons.push_back(new Weapon(this, Weapon_AAM, Ballistic_AAM));
 }
 
 Wing::~Wing()
@@ -110,10 +112,11 @@ void Wing::update(sf::Time deltaTime)
 
 	//printf("roll: %f, roll speed: %f, heading: %f, speed: %f\n", m_roll, roll_speed, m_heading, GetVectorLength(m_speed));
 
-	UpdateWingsPositionToNewHeading();
 	m_radar_heading = m_heading;
 
 	L16Entity::update(deltaTime);
+
+	UpdateWingsPositionToNewHeading();
 }
 
 void Wing::UpdateWingsPositionToNewHeading()
@@ -131,4 +134,12 @@ void Wing::UpdateWingsPositionToNewHeading()
 	m_wings->m_points[1].position = sf::Vector2f(xR, yR);
 
 	m_wings->UpdateQuadPointsPosition();
+}
+
+void Wing::Fire()
+{
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+	{
+		(*it)->Fire();
+	}
 }
