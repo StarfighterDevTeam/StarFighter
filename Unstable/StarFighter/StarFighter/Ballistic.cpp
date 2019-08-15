@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range) : L16Entity(position, alliance, 4, Circle_L16Entity_MultiDomain)
+Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range) : L16Entity(position, alliance, 4, Circle_L16Ballistic_MultiDomain)
 {
 	m_L16_type = L16Entity_Ballistic;
 	m_ballistic_type = ballistic_type;
@@ -13,7 +13,7 @@ Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, Allian
 	{
 		case Ballistic_AAM:
 		{
-			m_circle_type = Circle_L16Entity_Air;
+			m_circle_type = Circle_L16Ballistic_Air;
 			m_speed_min = 100;
 			m_speed_max = 300;
 			m_acceleration = 800;

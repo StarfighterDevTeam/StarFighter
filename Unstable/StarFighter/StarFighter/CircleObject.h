@@ -12,7 +12,8 @@ enum CircleType
 {
 	Circle_L16Entity_Air,
 	Circle_L16Entity_Ground,
-	Circle_L16Entity_MultiDomain,
+	Circle_L16Ballistic_Air,
+	Circle_L16Ballistic_MultiDomain,
 	Circle_Wave,//must be performed after L16Entities
 	Circle_WaveBounce,
 	NB_CIRCLE_TYPES,

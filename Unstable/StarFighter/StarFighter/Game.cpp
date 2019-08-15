@@ -508,24 +508,23 @@ void Game::collision_checks()
 				continue;
 			}
 
+			vector<CircleType> types_to_check;
+			types_to_check.push_back(Circle_L16Entity_Air);
+			types_to_check.push_back(Circle_L16Entity_Ground);
+			types_to_check.push_back(Circle_L16Ballistic_Air);
+			types_to_check.push_back(Circle_L16Ballistic_MultiDomain);
+
 			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
 			{
 				if ((*it)->m_visible == false)
 					continue;
-
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				
+				for (vector<CircleType>::iterator it2 = types_to_check.begin(); it2 != types_to_check.end(); it2++)
 				{
-					WaveCollisionCheck(*it, *it2);
-				}
-
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Ground].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Ground].end(); it2++)
-				{
-					WaveCollisionCheck(*it, *it2);
-				}
-
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].end(); it2++)
-				{
-					WaveCollisionCheck(*it, *it2);
+					for (vector<CircleObject*>::iterator it3 = m_sceneCircleObjects[j][*it2].begin(); it3 != m_sceneCircleObjects[j][*it2].end(); it3++)
+					{
+						WaveCollisionCheck(*it, *it3);
+					}
 				}
 			}
 
@@ -534,19 +533,12 @@ void Game::collision_checks()
 				if ((*it)->m_visible == false)
 					continue;
 
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				for (vector<CircleType>::iterator it2 = types_to_check.begin(); it2 != types_to_check.end(); it2++)
 				{
-					WaveCollisionCheck(*it, *it2);
-				}
-
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Ground].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Ground].end(); it2++)
-				{
-					WaveCollisionCheck(*it, *it2);
-				}
-
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].end(); it2++)
-				{
-					WaveCollisionCheck(*it, *it2);
+					for (vector<CircleObject*>::iterator it3 = m_sceneCircleObjects[j][*it2].begin(); it3 != m_sceneCircleObjects[j][*it2].end(); it3++)
+					{
+						WaveCollisionCheck(*it, *it3);
+					}
 				}
 			}
 		}
@@ -576,7 +568,7 @@ void Game::collision_checks()
 			if (i == j)
 				continue;
 
-			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_L16Entity_MultiDomain].begin(); it != m_sceneCircleObjects[i][Circle_L16Entity_MultiDomain].end(); it++)
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_L16Ballistic_MultiDomain].begin(); it != m_sceneCircleObjects[i][Circle_L16Ballistic_MultiDomain].end(); it++)
 			{
 				if ((*it)->m_visible == false)
 					continue;
@@ -591,18 +583,33 @@ void Game::collision_checks()
 					BallisticCollisionCheck(*it, *it2);
 				}
 
-				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].end(); it2++)
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Ballistic_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Ballistic_Air].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Ballistic_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Ballistic_MultiDomain].end(); it2++)
 				{
 					BallisticCollisionCheck(*it, *it2);
 				}
 			}
 
-			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_L16Entity_Air].begin(); it != m_sceneCircleObjects[i][Circle_L16Entity_Air].end(); it++)
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_L16Ballistic_Air].begin(); it != m_sceneCircleObjects[i][Circle_L16Ballistic_Air].end(); it++)
 			{
 				if ((*it)->m_visible == false)
 					continue;
 
 				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Ballistic_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Ballistic_Air].end(); it2++)
+				{
+					BallisticCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Ballistic_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Ballistic_MultiDomain].end(); it2++)
 				{
 					BallisticCollisionCheck(*it, *it2);
 				}
