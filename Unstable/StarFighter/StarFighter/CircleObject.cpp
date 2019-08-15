@@ -34,13 +34,13 @@ void CircleObject::update(sf::Time deltaTime)
 
 Wave* CircleObject::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
 {
-	//see override function in class Wave
+	//see override function in class L16Entity
 	return NULL;
 }
 
 void CircleObject::WaveReception(Wave* wave)
 {
-	//see override function in class Node
+	//see override function in class L16Entity
 }
 
 void CircleObject::Draw(RenderTarget& screen)

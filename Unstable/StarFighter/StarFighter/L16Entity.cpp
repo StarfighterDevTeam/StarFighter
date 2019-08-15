@@ -146,6 +146,7 @@ Wave* L16Entity::CreateRadarWave()
 	Wave* wave = new Wave(getPosition(), m_alliance, getRadius(), m_radar_wavespeed, m_radar_range / m_radar_wavespeed, m_radar_coverage, m_radar_heading);
 	wave->m_emitter_entity = this;
 	(*CurrentGame).AddCircleObject(wave);
+	(*CurrentGame).m_waves.push_back(wave);
 	return wave;
 }
 
@@ -159,6 +160,7 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 	new_wave->m_bounced_entity = this;
 	new_wave->m_emitter_entity = wave->m_emitter_entity;
 	(*CurrentGame).AddCircleObject(new_wave);
+	(*CurrentGame).m_waves.push_back(new_wave);
 	wave->m_bounced_entities.push_back(this);
 
 	//masking wave sector of incidence

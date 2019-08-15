@@ -28,6 +28,7 @@ class Node;
 class Wing;
 class Link;
 class Ballistic;
+class Wave;
 
 enum PlayerActions
 {
@@ -196,6 +197,7 @@ public:
 	vector<Link*> m_links;
 	vector<Wing*> m_wings;
 	vector<Ballistic*> m_ballistics;
+	vector<Wave*> m_waves;
 	
 	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
 	vector<CircleObject*> m_new_sceneCircleObjects;

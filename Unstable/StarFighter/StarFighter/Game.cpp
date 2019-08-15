@@ -83,25 +83,26 @@ Game::~Game()
 	{
 		delete *it;
 	}
-	m_nodes.clear();
-
+	
 	for (vector<Link*>::iterator it = m_links.begin(); it != m_links.end(); it++)
 	{
 		delete *it;
 	}
-	m_links.clear();
-
+	
 	for (vector<Wing*>::iterator it = m_wings.begin(); it != m_wings.end(); it++)
 	{
 		delete *it;
 	}
-	m_wings.clear();
 
 	for (vector<Ballistic*>::iterator it = m_ballistics.begin(); it != m_ballistics.end(); it++)
 	{
 		delete *it;
 	}
-	m_ballistics.clear();
+
+	for (vector<Wave*>::iterator it = m_waves.begin(); it != m_waves.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -349,7 +350,7 @@ void Game::updateScene(Time deltaTime)
 					(*it)->update(deltaTime);
 
 					//Automatic garbage collection for objects out of screen
-					if ((*it)->m_circle_type != Circle_Wave &&
+					if ((*it)->m_circle_type != Circle_Wave && (*it)->m_circle_type != Circle_WaveBounce &&
 						((*it)->getPosition().x < -(*it)->getRadius() || (*it)->getPosition().x > m_map_size.x + (*it)->getRadius()
 						|| (*it)->getPosition().y < -(*it)->getRadius() || (*it)->getPosition().y > m_map_size.y + (*it)->getRadius()))
 					{
@@ -364,9 +365,7 @@ void Game::updateScene(Time deltaTime)
 		for (vector<LineObject*>::iterator it = m_sceneLineObjects[i].begin(); it != m_sceneLineObjects[i].end(); it++)
 		{
 			old_objects.push_back(*it);
-			(*it)->update(deltaTime);
 		}
-
 		m_sceneLineObjects[i].clear();
 
 		for (vector<LineObject*>::iterator it = old_objects.begin(); it != old_objects.end(); it++)
@@ -378,6 +377,7 @@ void Game::updateScene(Time deltaTime)
 			else
 			{
 				m_sceneLineObjects[i].push_back(*it);
+				(*it)->update(deltaTime);
 			}
 		}
 	}
@@ -503,41 +503,41 @@ void Game::collision_checks()
 	{
 		for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
 		{
-			if (i == j)
-			{
-				continue;
-			}
-
 			vector<CircleType> types_to_check;
 			types_to_check.push_back(Circle_L16Entity_Air);
 			types_to_check.push_back(Circle_L16Entity_Ground);
 			types_to_check.push_back(Circle_L16Ballistic_Air);
 			types_to_check.push_back(Circle_L16Ballistic_MultiDomain);
 
-			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
+			if (i != j)
 			{
-				if ((*it)->m_visible == false)
-					continue;
-				
-				for (vector<CircleType>::iterator it2 = types_to_check.begin(); it2 != types_to_check.end(); it2++)
+				for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
 				{
-					for (vector<CircleObject*>::iterator it3 = m_sceneCircleObjects[j][*it2].begin(); it3 != m_sceneCircleObjects[j][*it2].end(); it3++)
+					if ((*it)->m_visible == false)
+						continue;
+
+					for (vector<CircleType>::iterator it2 = types_to_check.begin(); it2 != types_to_check.end(); it2++)
 					{
-						WaveCollisionCheck(*it, *it3);
+						for (vector<CircleObject*>::iterator it3 = m_sceneCircleObjects[j][*it2].begin(); it3 != m_sceneCircleObjects[j][*it2].end(); it3++)
+						{
+							WaveCollisionCheck(*it, *it3);
+						}
 					}
 				}
 			}
-
-			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_WaveBounce].begin(); it != m_sceneCircleObjects[i][Circle_WaveBounce].end(); it++)
+			else
 			{
-				if ((*it)->m_visible == false)
-					continue;
-
-				for (vector<CircleType>::iterator it2 = types_to_check.begin(); it2 != types_to_check.end(); it2++)
+				for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_WaveBounce].begin(); it != m_sceneCircleObjects[i][Circle_WaveBounce].end(); it++)
 				{
-					for (vector<CircleObject*>::iterator it3 = m_sceneCircleObjects[j][*it2].begin(); it3 != m_sceneCircleObjects[j][*it2].end(); it3++)
+					if ((*it)->m_visible == false)
+						continue;
+
+					for (vector<CircleType>::iterator it2 = types_to_check.begin(); it2 != types_to_check.end(); it2++)
 					{
-						WaveCollisionCheck(*it, *it3);
+						for (vector<CircleObject*>::iterator it3 = m_sceneCircleObjects[j][*it2].begin(); it3 != m_sceneCircleObjects[j][*it2].end(); it3++)
+						{
+							WaveCollisionCheck(*it, *it3);
+						}
 					}
 				}
 			}
@@ -1060,7 +1060,6 @@ void Game::AddLineObject(LineObject* object)
 	m_sceneLineObjects[object->m_alliance].push_back(object);
 }
 
-
 void Game::WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_entity)
 {
 	if (object_wave == object_entity)
@@ -1091,7 +1090,7 @@ void Game::WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_en
 			if (object_entity->IsColliding(wave, direction) == true)
 			{
 				//wave bounce on enemy
-				if (object_wave->m_circle_type == Circle_Wave)
+				if (object_wave->m_circle_type == Circle_Wave && object_wave->m_alliance != object_entity->m_alliance)
 				{
 					sf::Vector2f vector = object_entity->getPosition() - object_wave->getPosition();
 					ScaleVector(&vector, object_wave->getRadius());
@@ -1099,12 +1098,13 @@ void Game::WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_en
 
 					m_wave_bounces.push_back(new WaveBounce(position, direction, object_entity->getRadius(), wave, entity));
 				}
-				else if (object_wave->m_circle_type == Circle_WaveBounce)
+				//wave reception
+				else if (object_wave->m_circle_type == Circle_WaveBounce &&  object_wave->m_alliance == object_entity->m_alliance)
 				{
 					m_wave_receptions.push_back(new WaveReception(wave, entity));
 				}
 			}
-			else
+			else 
 			{
 				object_wave->AddToEvadedEntities(entity);
 			}
