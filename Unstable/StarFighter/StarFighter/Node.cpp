@@ -6,7 +6,7 @@ using namespace sf;
 
 Node::Node(sf::Vector2f position, AllianceType alliance, float radius) : L16Entity(position, alliance, radius, Circle_L16Entity_Ground)
 {
-	m_type = L16Entity_Node;
+	m_L16_type = L16Entity_Node;
 	m_is_terminal_node = false;
 
 	m_radar_frequency = 0.5;

@@ -29,6 +29,20 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	}
 }
 
+void Wave::SetColor(sf::Color color)
+{
+	m_color = color;
+
+	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
+	{
+		if (m_points[i * 2].color != sf::Color(0, 0, 0, 0))
+		{
+			m_points[i * 2].color = color;
+			m_points[i * 2 + 1].color = color;
+		}
+	}
+}
+
 void Wave::UpdateCirclePoints()
 {
 	sf::Vector2f position = getPosition();
@@ -71,12 +85,6 @@ void Wave::update(sf::Time deltaTime)
 	UpdateCirclePoints();
 }
 
-AllianceType Wave::GetOriginAlliance()
-{
-	CircleObject* object = (CircleObject*)m_emitter_entity;
-	return object->GetOriginAlliance();
-}
-
 void Wave::Draw(RenderTarget& screen)
 {
 	screen.draw(m_points, CIRCLE_POINTS_COUNT*2, sf::TrianglesStrip);
@@ -107,4 +115,25 @@ bool Wave::IsEvadedEntity(L16Entity* entity)
 void Wave::AddToEvadedEntities(L16Entity* entity)
 {
 	m_evaded_entities.push_back(entity);
+}
+
+void Wave::RemoveEntity(L16Entity* entity)
+{
+	if (m_emitter_entity == entity)
+		m_emitter_entity = NULL;
+
+	if (m_bounced_entity == entity)
+		m_bounced_entity = NULL;
+
+	vector<L16Entity*> old_bounced_entities;
+	for (vector<L16Entity*>::iterator it = m_bounced_entities.begin(); it != m_bounced_entities.end(); it++)
+	{
+		old_bounced_entities.push_back(*it);
+	}
+	m_bounced_entities.clear();
+	for (vector<L16Entity*>::iterator it = old_bounced_entities.begin(); it != old_bounced_entities.end(); it++)
+	{
+		if ((*it) != entity)
+			m_bounced_entities.push_back(*it);
+	}
 }

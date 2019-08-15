@@ -10,12 +10,13 @@ public :
 	~Wave();
 
 	void update(sf::Time deltaTime) override;
-	AllianceType GetOriginAlliance() override;
 	void UpdateCirclePoints();
 	void Draw(RenderTarget& screen) override;
 	bool HasBouncedOnEntity(L16Entity* entity) override;
 	bool IsEvadedEntity(L16Entity* entity) override;
 	void AddToEvadedEntities(L16Entity* entity) override;
+	void RemoveEntity(L16Entity* entity) override;
+	void SetColor(sf::Color color);
 
 	float m_expansion_speed;
 	float m_lifespan;

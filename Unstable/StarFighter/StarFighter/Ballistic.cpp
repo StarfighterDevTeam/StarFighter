@@ -6,8 +6,8 @@ using namespace sf;
 
 Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range) : L16Entity(position, alliance, 4, Circle_L16Entity_MultiDomain)
 {
+	m_L16_type = L16Entity_Ballistic;
 	m_ballistic_type = ballistic_type;
-	m_type = L16Entity_Ballistic;
 
 	switch (m_ballistic_type)
 	{

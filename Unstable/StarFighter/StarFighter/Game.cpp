@@ -52,7 +52,7 @@ Game::Game(RenderWindow* window)
 
 	//Music
 	printf("Loading Musics");
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
 
@@ -297,24 +297,15 @@ void Game::updateScene(Time deltaTime)
 	//Get inputs
 	UpdateInputStates();
 
-	//Update objects
-	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
-	for (size_t i = 0; i < sceneGameObjectsSize; i++)
-	{
-		if (this->m_sceneGameObjects[i] == NULL)
-			continue;
-
-		this->m_sceneGameObjects[i]->update(deltaTime);
-	}
-
-	//New objects created
-	size_t sceneNewCircleObjectsSize = m_new_sceneCircleObjects.size();
-	for (size_t i = 0; i < sceneNewCircleObjectsSize; i++)
-	{
-		CircleObject* obj = m_new_sceneCircleObjects[i];
-		m_sceneCircleObjects[obj->m_alliance][obj->m_circle_type].push_back(obj);
-	}
-	m_new_sceneCircleObjects.clear();
+	//Update game objects
+	//size_t sceneGameObjectsSize = m_sceneGameObjects.size();
+	//for (size_t i = 0; i < sceneGameObjectsSize; i++)
+	//{
+	//	if (this->m_sceneGameObjects[i] == NULL)
+	//		continue;
+	//
+	//	this->m_sceneGameObjects[i]->update(deltaTime);
+	//}
 
 	//Update and garbage collection
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
@@ -325,29 +316,46 @@ void Game::updateScene(Time deltaTime)
 			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][j].begin(); it != m_sceneCircleObjects[i][j].end(); it++)
 			{
 				old_objects.push_back(*it);
-				(*it)->update(deltaTime);
-
-				//Automatic garbage collection for objects out of screen
-				if ((*it)->m_circle_type != Circle_Wave && 
-						((*it)->getPosition().x < -(*it)->getRadius() || (*it)->getPosition().x > m_map_size.x + (*it)->getRadius()
-						|| (*it)->getPosition().y < -(*it)->getRadius() || (*it)->getPosition().y > m_map_size.y + (*it)->getRadius()))
-				{
-					(*it)->m_garbageMe = true;
-					(*it)->m_visible = false;
-				}
 			}
-
 			m_sceneCircleObjects[i][j].clear();
 
 			for (vector<CircleObject*>::iterator it = old_objects.begin(); it != old_objects.end(); it++)
 			{
 				if ((*it)->m_garbageMe == true)
 				{
+					//Clean destroyed L16Entities from member variables stored in bounced waves, as they will be read in next collision frame
+					if (j != Circle_Wave && j != Circle_WaveBounce)
+					{
+						for (int k = 0; k < NB_ALLIANCE_TYPES; k++)
+						{
+							if (k != i)
+							{
+								for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[k][Circle_WaveBounce].begin(); it2 != m_sceneCircleObjects[k][Circle_WaveBounce].end(); it2++)
+								{
+									L16Entity* entity = (L16Entity*)(*it);
+									(*it2)->RemoveEntity(entity);
+								}
+							}
+						}
+						
+					}
+
+					//Destroy objet
 					delete *it;
 				}
 				else
 				{
 					m_sceneCircleObjects[i][j].push_back(*it);
+					(*it)->update(deltaTime);
+
+					//Automatic garbage collection for objects out of screen
+					if ((*it)->m_circle_type != Circle_Wave &&
+						((*it)->getPosition().x < -(*it)->getRadius() || (*it)->getPosition().x > m_map_size.x + (*it)->getRadius()
+						|| (*it)->getPosition().y < -(*it)->getRadius() || (*it)->getPosition().y > m_map_size.y + (*it)->getRadius()))
+					{
+						(*it)->m_garbageMe = true;
+						(*it)->m_visible = false;
+					}
 				}
 			}
 		}
@@ -373,6 +381,15 @@ void Game::updateScene(Time deltaTime)
 			}
 		}
 	}
+
+	//New objects created
+	size_t sceneNewCircleObjectsSize = m_new_sceneCircleObjects.size();
+	for (size_t i = 0; i < sceneNewCircleObjectsSize; i++)
+	{
+		CircleObject* obj = m_new_sceneCircleObjects[i];
+		m_sceneCircleObjects[obj->m_alliance][obj->m_circle_type].push_back(obj);
+	}
+	m_new_sceneCircleObjects.clear();
 	
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
@@ -486,12 +503,33 @@ void Game::collision_checks()
 	{
 		for (int j = 0; j < NB_ALLIANCE_TYPES; j++)
 		{
-			if (i == j || j == NeutralAlliance)
+			if (i == j)
 			{
 				continue;
 			}
 
 			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_Wave].begin(); it != m_sceneCircleObjects[i][Circle_Wave].end(); it++)
+			{
+				if ((*it)->m_visible == false)
+					continue;
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Air].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Air].end(); it2++)
+				{
+					WaveCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_Ground].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_Ground].end(); it2++)
+				{
+					WaveCollisionCheck(*it, *it2);
+				}
+
+				for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].begin(); it2 != m_sceneCircleObjects[j][Circle_L16Entity_MultiDomain].end(); it2++)
+				{
+					WaveCollisionCheck(*it, *it2);
+				}
+			}
+
+			for (vector<CircleObject*>::iterator it = m_sceneCircleObjects[i][Circle_WaveBounce].begin(); it != m_sceneCircleObjects[i][Circle_WaveBounce].end(); it++)
 			{
 				if ((*it)->m_visible == false)
 					continue;
@@ -1046,7 +1084,7 @@ void Game::WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_en
 			if (object_entity->IsColliding(wave, direction) == true)
 			{
 				//wave bounce on enemy
-				if (object_wave->m_alliance != NeutralAlliance)
+				if (object_wave->m_circle_type == Circle_Wave)
 				{
 					sf::Vector2f vector = object_entity->getPosition() - object_wave->getPosition();
 					ScaleVector(&vector, object_wave->getRadius());
@@ -1054,7 +1092,7 @@ void Game::WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_en
 
 					m_wave_bounces.push_back(new WaveBounce(position, direction, object_entity->getRadius(), wave, entity));
 				}
-				else if (object_entity->m_alliance == object_wave->GetOriginAlliance())
+				else if (object_wave->m_circle_type == Circle_WaveBounce)
 				{
 					m_wave_receptions.push_back(new WaveReception(wave, entity));
 				}

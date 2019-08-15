@@ -6,7 +6,7 @@ using namespace sf;
 
 Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Entity(position, alliance, 8, Circle_L16Entity_Air)
 {
-	m_type = L16Entity_Wing;
+	m_L16_type = L16Entity_Wing;
 	
 	m_speed_min = 70;
 	m_speed_max = 100;
@@ -23,7 +23,7 @@ Wing::Wing(sf::Vector2f position, AllianceType alliance, float heading) : L16Ent
 	m_autopilot = false;
 	m_wings = new LineObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), m_alliance);
 
-	m_radar_activated = true;
+	m_radar_activated = false;
 	m_radar_frequency = 0.5;
 	m_radar_range = 500;
 	m_radar_wavespeed = 200;

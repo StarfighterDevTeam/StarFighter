@@ -16,19 +16,22 @@ Gameloop::Gameloop()
 
 	//node
 	Terminal* t = CreateTerminal(sf::Vector2f(300, 440), PlayerAlliance);
-	t->CreateWing();
+	Wing* w = CreateWing(sf::Vector2f(400, 300), PlayerAlliance, 0);
+	w->m_selected = true;
+	(*CurrentGame).m_selected_entity = w;
 
 	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
 	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
-	CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
 
-	CreateNode(sf::Vector2f(1920 - 380, 650), EnemyAlliance);
-	CreateNode(sf::Vector2f(1920 - 300, 635), EnemyAlliance);
-	CreateNode(sf::Vector2f(1920 - 220, 610), EnemyAlliance);
-	CreateNode(sf::Vector2f(1920 - 250, 710), EnemyAlliance);
+	//CreateNode(sf::Vector2f(1920 - 380, 650), EnemyAlliance);
+	//CreateNode(sf::Vector2f(1920 - 300, 635), EnemyAlliance);
+	//CreateNode(sf::Vector2f(1920 - 220, 610), EnemyAlliance);
+	//CreateNode(sf::Vector2f(1920 - 250, 710), EnemyAlliance);
 
-	CreateTerminal(sf::Vector2f(1920 - 700, 800), EnemyAlliance);
-	CreateNode(sf::Vector2f(1920 - 900, 800), PlayerAlliance);
+	Terminal* t2 = CreateTerminal(sf::Vector2f(1920 - 700, 800), EnemyAlliance);
+	t2->CreateWing();
+	CreateNode(sf::Vector2f(1920 - 1000, 800), PlayerAlliance);
 
 	CreateLink(node_a, node_b);
 }
@@ -56,7 +59,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//Create new links on right click
-	if ((*CurrentGame).m_hovered_entity != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_entity != NULL && (*CurrentGame).m_selected_entity != (*CurrentGame).m_hovered_entity && (*CurrentGame).m_selected_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_type == L16Entity_Node && (*CurrentGame).m_selected_entity->m_type == L16Entity_Node)
+	if ((*CurrentGame).m_hovered_entity != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_entity != NULL && (*CurrentGame).m_selected_entity != (*CurrentGame).m_hovered_entity && (*CurrentGame).m_selected_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_L16_type == L16Entity_Node && (*CurrentGame).m_selected_entity->m_L16_type == L16Entity_Node)
 	{
 		//link already existing?
 		bool found = false;

@@ -15,7 +15,7 @@ using namespace sf;
 enum AllianceType
 {
 	PlayerAlliance,
-	NeutralAlliance,
+	//NeutralAlliance,
 	EnemyAlliance,
 	NB_ALLIANCE_TYPES,
 };

@@ -112,11 +112,6 @@ void L16Entity::ResetColor()
 	setOutlineColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
 }
 
-AllianceType L16Entity::GetOriginAlliance()
-{
-	return m_alliance;
-}
-
 bool L16Entity::IsColliding(Wave* wave, float direction)
 {
 	if (IsInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction) == false)
@@ -158,7 +153,9 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 {
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 
-	Wave* new_wave = new Wave(position, NeutralAlliance, radius, wave->m_expansion_speed, wave->m_lifespan, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
+	Wave* new_wave = new Wave(position, wave->m_alliance, radius, wave->m_expansion_speed, wave->m_lifespan, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
+	new_wave->m_circle_type = Circle_WaveBounce;
+	new_wave->SetColor(sf::Color(255, 128, 0, GHOST_ALPHA_VALUE));
 	new_wave->m_bounced_entity = this;
 	new_wave->m_emitter_entity = wave->m_emitter_entity;
 	(*CurrentGame).AddCircleObject(new_wave);
@@ -176,7 +173,7 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 	}
 
 	//RWR (radar warning receiver)
-	if (wave->m_alliance != NeutralAlliance && wave->m_alliance != m_alliance)
+	if (wave->m_circle_type == Circle_Wave && wave->m_alliance != m_alliance && wave->m_emitter_entity != NULL)
 	{
 		wave->m_emitter_entity->RevealEntity();
 
@@ -195,14 +192,17 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 
 void L16Entity::WaveReception(Wave* wave)
 {
-	wave->m_bounced_entity->RevealEntity();
-
-	for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][Circle_Wave].begin(); it != (*CurrentGame).m_sceneCircleObjects[NeutralAlliance][Circle_Wave].end(); it++)
+	if (wave->m_bounced_entity != NULL)
 	{
-		Wave* wave_iterator = (Wave*)(*it);
-		if (wave_iterator->m_bounced_entity == wave->m_bounced_entity)// && wave_iterator->m_emitter_entity->m_alliance == PlayerAlliance)
+		wave->m_bounced_entity->RevealEntity();
+
+		for (vector<CircleObject*>::iterator it = (*CurrentGame).m_sceneCircleObjects[wave->m_alliance][Circle_WaveBounce].begin(); it != (*CurrentGame).m_sceneCircleObjects[wave->m_alliance][Circle_WaveBounce].end(); it++)
 		{
-			wave_iterator->m_visible = true;
+			Wave* wave_iterator = (Wave*)(*it);
+			if (wave_iterator->m_bounced_entity == wave->m_bounced_entity)// && wave_iterator->m_emitter_entity->m_alliance == PlayerAlliance)
+			{
+				wave_iterator->m_visible = true;
+			}
 		}
 	}
 
@@ -226,5 +226,7 @@ void L16Entity::WaveReception(Wave* wave)
 void L16Entity::RevealEntity()
 {
 	m_visible = true;
-	m_radar_bounce_feedback_clock = 1;
+
+	if (m_L16_type != L16Entity_Ballistic)
+		m_radar_bounce_feedback_clock = 0.5;
 }

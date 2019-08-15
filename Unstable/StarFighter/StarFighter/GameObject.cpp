@@ -553,10 +553,10 @@ sf::Color GameObject::GetAllianceColor(AllianceType alliance)
 		{
 			return sf::Color(255, 0, 0, 255);
 		}
-		case NeutralAlliance:
-		{
-			return sf::Color(255, 128, 0, GHOST_ALPHA_VALUE);
-		}
+		//case NeutralAlliance:
+		//{
+		//	return sf::Color(255, 128, 0, GHOST_ALPHA_VALUE);
+		//}
 		default:
 		{
 			return sf::Color(255, 255, 255, 255);

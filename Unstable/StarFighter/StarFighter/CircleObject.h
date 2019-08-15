@@ -13,7 +13,8 @@ enum CircleType
 	Circle_L16Entity_Air,
 	Circle_L16Entity_Ground,
 	Circle_L16Entity_MultiDomain,
-	Circle_Wave,
+	Circle_Wave,//must be performed after L16Entities
+	Circle_WaveBounce,
 	NB_CIRCLE_TYPES,
 };
 
@@ -27,12 +28,12 @@ public:
 
 	virtual Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave);
 	virtual void WaveReception(Wave* wave);
-	virtual AllianceType GetOriginAlliance();
 	virtual void Draw(RenderTarget& screen);
 	virtual bool IsColliding(Wave* wave, float direction);
 	virtual bool HasBouncedOnEntity(L16Entity* entity);
 	virtual bool IsEvadedEntity(L16Entity* entity);
 	virtual void AddToEvadedEntities(L16Entity* entity);
+	virtual void RemoveEntity(L16Entity* entity);
 
 	AllianceType m_alliance;
 	sf::Color m_color;

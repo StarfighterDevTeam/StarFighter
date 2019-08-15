@@ -25,13 +25,12 @@ public :
 	~L16Entity();
 
 	void update(sf::Time deltaTime) override;
-	AllianceType GetOriginAlliance() override;
 	bool IsHoveredByMouse();
 	void ResetColor();
 	bool IsColliding(Wave* wave, float direction) override;
 	Wave* CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave) override;
 
-	L16EntityType m_type;
+	L16EntityType m_L16_type;
 	L16MissionType m_mission;
 
 	bool m_hovered;
