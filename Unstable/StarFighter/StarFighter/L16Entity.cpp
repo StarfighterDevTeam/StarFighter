@@ -152,9 +152,12 @@ Wave* L16Entity::CreateRadarWave()
 
 Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
 {
+	if (wave->m_emitter_entity == NULL)
+		return NULL;
+
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 
-	Wave* new_wave = new Wave(position, wave->m_alliance, radius, wave->m_expansion_speed, wave->m_lifespan, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
+	Wave* new_wave = new Wave(position, wave->m_alliance, radius, wave->m_expansion_speed, wave->m_emitter_entity->m_radar_range / wave->m_emitter_entity->m_radar_wavespeed, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
 	new_wave->m_circle_type = Circle_WaveBounce;
 	new_wave->SetColor(sf::Color(255, 128, 0, GHOST_ALPHA_VALUE));
 	new_wave->m_bounced_entity = this;
