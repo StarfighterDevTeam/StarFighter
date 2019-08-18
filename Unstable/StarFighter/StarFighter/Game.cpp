@@ -63,8 +63,10 @@ Game::Game(RenderWindow* window)
 	}
 
 	//Liaison 16
-	m_hovered_entity = NULL;
-	m_selected_entity = NULL;
+	//rectangular selection
+	m_rectangular_selection.setOutlineColor(sf::Color::White);
+	m_rectangular_selection.setOutlineThickness(-1);
+	m_rectangular_selection.setFillColor(sf::Color(0, 0, 0, 0));
 }
 
 Game::~Game()
@@ -281,6 +283,30 @@ void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, Gam
 	}
 }
 
+void Game::UpdateRectangularSelection()
+{
+	if (m_display_rectangular_selection == true && m_mouse_click == Mouse_None)
+	{
+		m_released_rectangular_selection = true;
+	}
+	else
+	{
+		m_released_rectangular_selection = false;
+	}
+
+	m_display_rectangular_selection = false;
+	if (m_mouse_click == Mouse_LeftClick)
+	{
+		m_rectangular_selection.setSize(sf::Vector2f(0, 0));
+		m_rectangular_selection.setPosition(m_mouse_pos);
+	}
+	else if (m_mouse_click == Mouse_LeftClickHold)
+	{
+		m_rectangular_selection.setSize(m_mouse_pos - m_rectangular_selection.getPosition());
+		m_display_rectangular_selection = (m_rectangular_selection.getSize().x != 0 || m_rectangular_selection.getSize().y != 0);
+	}
+}
+
 void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
@@ -295,8 +321,9 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	collision_checks();
 
-	//Get inputs
+	//Update inputs
 	UpdateInputStates();
+	UpdateRectangularSelection();
 
 	//Update game objects
 	//size_t sceneGameObjectsSize = m_sceneGameObjects.size();
@@ -471,6 +498,13 @@ void Game::drawScene()
 			for (std::list<SFPanel*>::iterator it = this->m_sceneFeedbackSFPanels.begin(); it != this->m_sceneFeedbackSFPanels.end(); it++)
 			{
 				(*(*it)).Draw(m_mainScreen);
+			}
+		}
+		else if (i == RectangularSelectionLayer)
+		{
+			if (m_display_rectangular_selection == true)
+			{
+				m_mainScreen.draw(m_rectangular_selection);
 			}
 		}
 		else

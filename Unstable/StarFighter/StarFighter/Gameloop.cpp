@@ -18,7 +18,7 @@ Gameloop::Gameloop()
 	Terminal* t = CreateTerminal(sf::Vector2f(300, 440), PlayerAlliance);
 	Wing* w = CreateWing(sf::Vector2f(400, 300), PlayerAlliance, 0);
 	w->m_selected = true;
-	(*CurrentGame).m_selected_entity = w;
+	(*CurrentGame).m_selected_entities.push_back(w);
 
 	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
 	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
@@ -44,27 +44,36 @@ Gameloop::~Gameloop()
 void Gameloop::Update(sf::Time deltaTime)
 {
 	//Get mouse & keyboard inputs
-	(*CurrentGame).m_hovered_entity = NULL;
+	(*CurrentGame).m_hovered_entities.clear();
 	(*CurrentGame).GetMouseInputs(deltaTime);
 	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 	{
-		if ((*CurrentGame).m_selected_entity != NULL)
+		for (vector<L16Entity*>::iterator it = (*CurrentGame).m_selected_entities.begin(); it != (*CurrentGame).m_selected_entities.end(); it++)
 		{
-			(*CurrentGame).m_selected_entity->m_selected = false;
-			(*CurrentGame).m_selected_entity = NULL;
+			(*it)->m_selected = false;
+			(*it)->ResetColor();
 		}
+		(*CurrentGame).m_selected_entities.clear();
 	}
 
 	//Update objects
 	(*CurrentGame).updateScene(deltaTime);
 
 	//Create new links on right click
-	if ((*CurrentGame).m_hovered_entity != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_entity != NULL && (*CurrentGame).m_selected_entity != (*CurrentGame).m_hovered_entity && (*CurrentGame).m_selected_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_alliance == PlayerAlliance && (*CurrentGame).m_hovered_entity->m_L16_type == L16Entity_Node && (*CurrentGame).m_selected_entity->m_L16_type == L16Entity_Node)
+	L16Entity* selected = NULL;
+	L16Entity* hovered = NULL;
+	if ((*CurrentGame).m_selected_entities.size() == 1)
+		selected = (*CurrentGame).m_selected_entities.front();
+
+	if ((*CurrentGame).m_hovered_entities.size() == 1)
+		hovered = (*CurrentGame).m_hovered_entities.front();
+
+	if (hovered != NULL && selected != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && selected != hovered && selected->m_alliance == PlayerAlliance && hovered->m_alliance == PlayerAlliance && hovered->m_L16_type == L16Entity_Node && selected->m_L16_type == L16Entity_Node)
 	{
 		//link already existing?
 		bool found = false;
-		Node* hovered_node = (Node*)(*CurrentGame).m_hovered_entity;
-		Node* selected_node = (Node*)(*CurrentGame).m_selected_entity;
+		Node* hovered_node = (Node*)hovered;
+		Node* selected_node = (Node*)selected;
 		for (vector<L16Entity*>::iterator it = hovered_node->m_linked_entities.begin(); it != hovered_node->m_linked_entities.end(); it++)
 		{
 			if ((*it) == selected_node)

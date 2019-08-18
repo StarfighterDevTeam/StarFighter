@@ -35,6 +35,8 @@ public:
 	virtual bool IsEvadedEntity(L16Entity* entity);
 	virtual void AddToEvadedEntities(L16Entity* entity);
 	virtual void RemoveEntity(L16Entity* entity);
+	virtual void SelectEntity();
+	virtual void HoverEntity();
 
 	AllianceType m_alliance;
 	sf::Color m_color;

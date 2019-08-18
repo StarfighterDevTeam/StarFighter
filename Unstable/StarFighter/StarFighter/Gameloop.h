@@ -28,6 +28,7 @@ public:
 	Terminal* CreateTerminal(sf::Vector2f position, AllianceType alliance);
 	Link* CreateLink(Node* node_a, Node* node_b);
 	Wing* CreateWing(sf::Vector2f position, AllianceType alliance, float heading);
+	L16Entity* GetRectangularSelection();
 
 private:
 	sf::RenderWindow* mainWindow;

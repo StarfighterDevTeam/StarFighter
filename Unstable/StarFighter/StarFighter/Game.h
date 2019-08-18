@@ -190,8 +190,13 @@ public:
 	vector<WaveBounce*> m_wave_bounces;
 	vector<WaveReception*> m_wave_receptions;
 
-	L16Entity* m_hovered_entity;
-	L16Entity* m_selected_entity;
+	sf::RectangleShape m_rectangular_selection;
+	bool m_display_rectangular_selection;
+	bool m_released_rectangular_selection;
+
+	void UpdateRectangularSelection();
+	vector<L16Entity*> m_hovered_entities;
+	vector<L16Entity*> m_selected_entities;
 
 	vector<Node*> m_nodes;
 	vector<Link*> m_links;

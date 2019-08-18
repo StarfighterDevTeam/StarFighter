@@ -46,25 +46,53 @@ void L16Entity::update(sf::Time deltaTime)
 	}
 
 	//hovering & selection
-	m_hovered = false;
-	if (IsHoveredByMouse() == true)
+	if ((*CurrentGame).m_display_rectangular_selection == true || (*CurrentGame).m_released_rectangular_selection == true)
 	{
-		m_hovered = true;
-		(*CurrentGame).m_hovered_entity = this;
+		//is inside rectangular selection?
+		float xL = (*CurrentGame).m_rectangular_selection.getSize().x >= 0 ? (*CurrentGame).m_rectangular_selection.getPosition().x : (*CurrentGame).m_rectangular_selection.getPosition().x + (*CurrentGame).m_rectangular_selection.getSize().x;
+		float xR = (*CurrentGame).m_rectangular_selection.getSize().x >= 0 ? (*CurrentGame).m_rectangular_selection.getPosition().x + (*CurrentGame).m_rectangular_selection.getSize().x : (*CurrentGame).m_rectangular_selection.getPosition().x;
 
-		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick && m_alliance == PlayerAlliance)
+		float yU = (*CurrentGame).m_rectangular_selection.getSize().y >= 0 ? (*CurrentGame).m_rectangular_selection.getPosition().y : (*CurrentGame).m_rectangular_selection.getPosition().y + (*CurrentGame).m_rectangular_selection.getSize().y;
+		float yD = (*CurrentGame).m_rectangular_selection.getSize().y >= 0 ? (*CurrentGame).m_rectangular_selection.getPosition().y + (*CurrentGame).m_rectangular_selection.getSize().y : (*CurrentGame).m_rectangular_selection.getPosition().y;
+		
+		float x = getPosition().x;
+		float y = getPosition().y;
+
+		if (x > xL && x < xR && y > yU && y < yD)
 		{
-			if ((*CurrentGame).m_selected_entity != NULL)
-			{
-				(*CurrentGame).m_selected_entity->m_selected = false;
-				(*CurrentGame).m_selected_entity->ResetColor();
-			}
+			m_hovered = true;
+			(*CurrentGame).m_hovered_entities.push_back(this);
 
-			m_selected = true;
-			(*CurrentGame).m_selected_entity = this;
+			if ((*CurrentGame).m_released_rectangular_selection == true)
+			{
+				m_selected = true;
+				(*CurrentGame).m_selected_entities.push_back(this);
+			}
 		}
 	}
+	else
+	{
+		m_hovered = false;
+		if (IsHoveredByMouse() == true)
+		{
+			m_hovered = true;
+			(*CurrentGame).m_hovered_entities.push_back(this);
 
+			if ((*CurrentGame).m_mouse_click == Mouse_LeftClick && m_alliance == PlayerAlliance)
+			{
+				for (vector<L16Entity*>::iterator it = (*CurrentGame).m_selected_entities.begin(); it != (*CurrentGame).m_selected_entities.end(); it++)
+				{
+					(*it)->m_selected = false;
+					(*it)->ResetColor();
+				}
+				(*CurrentGame).m_selected_entities.clear();
+
+				m_selected = true;
+				(*CurrentGame).m_selected_entities.push_back(this);
+			}
+		}
+	}
+	
 	ResetColor();
 	if (m_selected == true)
 	{
@@ -234,4 +262,14 @@ void L16Entity::RevealEntity()
 
 	if (m_L16_type != L16Entity_Ballistic)
 		m_radar_bounce_feedback_clock = 0.5;
+}
+
+void L16Entity::SelectEntity()
+{
+	m_selected = true;
+}
+
+void L16Entity::HoverEntity()
+{
+	m_hovered = true;
 }

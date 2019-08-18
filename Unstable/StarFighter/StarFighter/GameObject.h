@@ -36,6 +36,7 @@ enum LayerType {
 	PanelLayer,
 	HudObject,
 	HudCursor,
+	RectangularSelectionLayer,
 	NBVAL_Layer
 };
 
