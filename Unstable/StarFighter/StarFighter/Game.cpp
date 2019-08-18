@@ -81,27 +81,17 @@ Game::~Game()
 		delete *it;
 	}
 
-	for (vector<Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); it++)
+	for (vector<L16Entity*>::iterator it = m_L16_entities.begin(); it != m_L16_entities.end(); it++)
 	{
 		delete *it;
 	}
 	
-	for (vector<Link*>::iterator it = m_links.begin(); it != m_links.end(); it++)
-	{
-		delete *it;
-	}
-	
-	for (vector<Wing*>::iterator it = m_wings.begin(); it != m_wings.end(); it++)
-	{
-		delete *it;
-	}
-
-	for (vector<Ballistic*>::iterator it = m_ballistics.begin(); it != m_ballistics.end(); it++)
-	{
-		delete *it;
-	}
-
 	for (vector<Wave*>::iterator it = m_waves.begin(); it != m_waves.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<Link*>::iterator it = m_links.begin(); it != m_links.end(); it++)
 	{
 		delete *it;
 	}
@@ -999,6 +989,51 @@ GameObject* Game::GetClosestObjectTyped(const GameObject* ref_obj, GameObjectTyp
 	const sf::Vector2f ref_position = ref_obj->getPosition();
 
 	return GetClosestObjectTyped(ref_position, type_of_closest_object, dist_max, angle_delta_max);
+}
+
+
+L16Entity* Game::GetClosestL16Target(sf::Vector2f position, float heading, CircleType collision_domain, AllianceType alliance, float dist_max, float angle_delta_max)
+{
+	float shortest_distance = -1;
+	L16Entity* returned_entity = NULL;
+	for (std::vector<L16Entity*>::iterator it = m_L16_entities.begin(); it != m_L16_entities.end(); it++)
+	{
+		CircleObject* obj = (CircleObject*)(*it);
+
+		if (obj->m_alliance != alliance)
+			continue;
+
+		if (collision_domain == Circle_L16Ballistic_Air)
+		{
+			if (obj->m_circle_type == Circle_L16Entity_Ground)
+				continue;
+		}
+
+		if (collision_domain == Circle_L16Ballistic_MultiDomain)
+		{
+			//ok.
+		}
+
+		if (obj->m_visible == false)
+			continue;
+
+		const float a = position.x - obj->getPosition().x;
+		const float b = position.y - obj->getPosition().y;
+
+		float distance_to_ref = (a * a) + (b * b);
+		//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
+		if ((distance_to_ref <= dist_max * dist_max) && (distance_to_ref < shortest_distance || shortest_distance < 0))
+		{
+			float angle_delta = GetAngleDegToTargetPosition(position, heading, obj->getPosition());
+			if (abs(angle_delta) <= angle_delta_max)
+			{
+				shortest_distance = distance_to_ref;
+				returned_entity = (*it);
+			}
+		}
+	}
+
+	return returned_entity;
 }
 
 GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectType type_of_closest_object, float dist_max, float angle_delta_max)

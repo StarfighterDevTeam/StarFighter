@@ -98,7 +98,7 @@ sf::Vector2f GetVectorFromLengthAndAngle(float length, float angle);
 float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
-bool IsInsideAngleCoverage(float input, float angle_coverage, float angle_target);
+bool IsAngleInsideAngleCoverage(float angle_input, float angle_coverage, float angle_target);
 void Bound(float& input, float min, float max);
 void BoundAngle(float &input, float max_angle);
 

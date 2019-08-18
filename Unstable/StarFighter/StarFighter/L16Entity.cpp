@@ -46,7 +46,7 @@ void L16Entity::update(sf::Time deltaTime)
 	}
 
 	//hovering & selection
-	if ((*CurrentGame).m_display_rectangular_selection == true || (*CurrentGame).m_released_rectangular_selection == true)
+	if (m_alliance == PlayerAlliance && ((*CurrentGame).m_display_rectangular_selection == true || (*CurrentGame).m_released_rectangular_selection == true))
 	{
 		//is inside rectangular selection?
 		float xL = (*CurrentGame).m_rectangular_selection.getSize().x >= 0 ? (*CurrentGame).m_rectangular_selection.getPosition().x : (*CurrentGame).m_rectangular_selection.getPosition().x + (*CurrentGame).m_rectangular_selection.getSize().x;
@@ -142,7 +142,7 @@ void L16Entity::ResetColor()
 
 bool L16Entity::IsColliding(Wave* wave, float direction)
 {
-	if (IsInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction) == false)
+	if (IsAngleInsideAngleCoverage(direction, wave->m_angle_coverage, wave->m_angle_direction) == false)
 	{
 		return false;
 	}
@@ -158,7 +158,7 @@ bool L16Entity::IsColliding(Wave* wave, float direction)
 			for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 			{
 				float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
-				if (IsInsideAngleCoverage(ang, delta_angle * 2, direction) == true && wave->m_points[i * 2].color != sf::Color(0, 0, 0, 0))
+				if (IsAngleInsideAngleCoverage(ang, delta_angle * 2, direction) == true && wave->m_points[i * 2].color != sf::Color(0, 0, 0, 0))
 				{
 					return true;
 				}
@@ -198,7 +198,7 @@ Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float dir
 	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
 		float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
-		if (IsInsideAngleCoverage(ang, delta_angle * 2, direction))
+		if (IsAngleInsideAngleCoverage(ang, delta_angle * 2, direction))
 		{
 			wave->m_points[i * 2].color = sf::Color(0, 0, 0, 0);
 			wave->m_points[i * 2 + 1].color = sf::Color(0, 0, 0, 0);
@@ -247,7 +247,7 @@ void L16Entity::WaveReception(Wave* wave)
 	for (int i = 0; i < CIRCLE_POINTS_COUNT; i++)
 	{
 		float ang = i * 360.f / (CIRCLE_POINTS_COUNT - 1);
-		if (IsInsideAngleCoverage(ang, delta_angle * 2, wave->m_angle_direction))
+		if (IsAngleInsideAngleCoverage(ang, delta_angle * 2, wave->m_angle_direction))
 		{
 			wave->m_points[i * 2].color = sf::Color(0, 0, 0, 0);
 			wave->m_points[i * 2 + 1].color = sf::Color(0, 0, 0, 0);

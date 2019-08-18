@@ -186,6 +186,7 @@ public:
 
 	void WaveCollisionCheck(CircleObject* object_wave, CircleObject* object_entity);
 	void BallisticCollisionCheck(CircleObject* object_ballistic, CircleObject* object_entity);
+	L16Entity* GetClosestL16Target(sf::Vector2f position, float heading, CircleType collision_domain, AllianceType alliance, float dist_max, float angle_delta_max);
 
 	vector<WaveBounce*> m_wave_bounces;
 	vector<WaveReception*> m_wave_receptions;
@@ -198,11 +199,9 @@ public:
 	vector<L16Entity*> m_hovered_entities;
 	vector<L16Entity*> m_selected_entities;
 
-	vector<Node*> m_nodes;
-	vector<Link*> m_links;
-	vector<Wing*> m_wings;
-	vector<Ballistic*> m_ballistics;
+	vector<L16Entity*> m_L16_entities;
 	vector<Wave*> m_waves;
+	vector<Link*> m_links;
 	
 	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
 	vector<CircleObject*> m_new_sceneCircleObjects;

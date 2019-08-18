@@ -42,6 +42,17 @@ void Wing::Draw(RenderTarget& screen)
 {
 	CircleObject::Draw(screen);
 	screen.draw(m_wings->m_quad, 4, sf::Quads);
+
+	if (m_alliance == PlayerAlliance)
+	{
+		for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+		{
+			if ((*it)->m_locked_target != NULL)
+			{
+				screen.draw((*it)->m_lock_rectangle);
+			}
+		}
+	}
 }
 
 void Wing::update(sf::Time deltaTime)

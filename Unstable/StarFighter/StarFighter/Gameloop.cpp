@@ -16,12 +16,12 @@ Gameloop::Gameloop()
 
 	//node
 	Terminal* t = CreateTerminal(sf::Vector2f(300, 440), PlayerAlliance);
-	Wing* w = CreateWing(sf::Vector2f(400, 300), PlayerAlliance, 0);
-	w->m_selected = true;
-	(*CurrentGame).m_selected_entities.push_back(w);
+	Wing* w = CreateWing(sf::Vector2f(500, 400), PlayerAlliance, 0);
+	//Wing* w2 = CreateWing(sf::Vector2f(600, 300), PlayerAlliance, 0);
 
-	Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
-	Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
+
+	//Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
+	//Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
 	//CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
 
 	//CreateNode(sf::Vector2f(1920 - 380, 650), EnemyAlliance);
@@ -30,10 +30,10 @@ Gameloop::Gameloop()
 	//CreateNode(sf::Vector2f(1920 - 250, 710), EnemyAlliance);
 
 	Terminal* t2 = CreateTerminal(sf::Vector2f(1920 - 700, 800), EnemyAlliance);
-	t2->CreateWing();
+	CreateWing(sf::Vector2f(1000, 300), EnemyAlliance, 180);
 	CreateNode(sf::Vector2f(1920 - 1000, 800), PlayerAlliance);
 
-	CreateLink(node_a, node_b);
+	//CreateLink(node_a, node_b);
 }
 
 Gameloop::~Gameloop()
@@ -122,7 +122,7 @@ Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
 	Node* node = new Node(position, alliance);
 	(*CurrentGame).AddCircleObject(node);
-	(*CurrentGame).m_nodes.push_back(node);
+	(*CurrentGame).m_L16_entities.push_back(node);
 
 	return node;
 }
@@ -131,7 +131,7 @@ Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
 	Terminal* terminal = new Terminal(position, alliance);
 	(*CurrentGame).AddCircleObject(terminal);
-	(*CurrentGame).m_nodes.push_back(terminal);
+	(*CurrentGame).m_L16_entities.push_back(terminal);
 
 	return terminal;
 }
@@ -152,7 +152,7 @@ Wing* Gameloop::CreateWing(sf::Vector2f position, AllianceType alliance, float h
 {
 	Wing* wing = new Wing(position, alliance, heading);
 	(*CurrentGame).AddCircleObject(wing);
-	(*CurrentGame).m_wings.push_back(wing);
+	(*CurrentGame).m_L16_entities.push_back(wing);
 	
 	return wing;
 }

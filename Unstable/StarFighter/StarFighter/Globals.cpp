@@ -246,9 +246,9 @@ float GetAngleForVector(sf::Vector2f vector)
 }
 
 
-bool IsInsideAngleCoverage(float input, float angle_coverage, float angle_target)
+bool IsAngleInsideAngleCoverage(float angle_input, float angle_coverage, float angle_target)
 {
-	float delta = input - angle_target;
+	float delta = angle_input - angle_target;
 
 	if (delta > 180)
 		delta -= 360;
@@ -433,7 +433,7 @@ float GetAngleRadForVector(sf::Vector2f vector)
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
+	//angle += M_PI_2;
 	//angle = (fmod(angle, 2 * M_PI));
 
 	return angle;
@@ -441,7 +441,7 @@ float GetAngleRadForVector(sf::Vector2f vector)
 
 float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
 {
-	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
+	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, -(ref_position.y - position2.y));
 	float target_angle = GetAngleRadForVector(diff);
 
 	const float a = diff.x;
@@ -458,7 +458,7 @@ float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f positi
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
+	//angle += M_PI_2;
 
 	return angle;
 }

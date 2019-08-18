@@ -50,7 +50,7 @@ Wing* Node::CreateWing()
 {
 	Wing* wing = new Wing(getPosition(), m_alliance, m_radar_heading);
 	(*CurrentGame).AddCircleObject(wing);
-	(*CurrentGame).m_wings.push_back(wing);
+	(*CurrentGame).m_L16_entities.push_back(wing);
 
 	return wing;
 }

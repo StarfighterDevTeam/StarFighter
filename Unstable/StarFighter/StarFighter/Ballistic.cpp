@@ -4,16 +4,17 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range) : L16Entity(position, alliance, 4, Circle_L16Ballistic_MultiDomain)
+Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range, CircleType collision_domain, L16Entity* locked_target) : L16Entity(position, alliance, 4, collision_domain)
 {
 	m_L16_type = L16Entity_Ballistic;
 	m_ballistic_type = ballistic_type;
+	m_circle_type = collision_domain;
+	m_locked_target = locked_target;
 
 	switch (m_ballistic_type)
 	{
 		case Ballistic_AAM:
 		{
-			m_circle_type = Circle_L16Ballistic_Air;
 			m_speed_min = 100;
 			m_speed_max = 300;
 			m_acceleration = 800;
@@ -47,6 +48,14 @@ void Ballistic::update(sf::Time deltaTime)
 	}
 	else
 	{
+		//get target
+		if (m_locked_target != NULL)
+		{
+			float delta_angle = GetAngleDegToTargetPosition(getPosition(), m_heading, m_locked_target->getPosition());
+			m_heading += delta_angle;
+		}
+
+		//apply speed
 		BoundAngle(m_heading, 360);
 
 		sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration * deltaTime.asSeconds(), m_heading * M_PI / 180);
