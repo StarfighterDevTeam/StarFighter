@@ -27,7 +27,7 @@ Weapon::Weapon(L16Entity* owner, WeaponType weapon_type, BallisticType ballistic
 		{
 			m_rate_of_fire = 1;
 			m_range = 600;
-			m_collision_domain = Circle_L16Ballistic_Air;
+			m_collision_domain = Circle_L16Ballistic_MultiDomain;// Circle_L16Ballistic_Air;
 			break;
 		}
 	}
@@ -40,7 +40,7 @@ Weapon::~Weapon()
 
 void Weapon::Fire()
 {
-	Ballistic* shot = new Ballistic(m_ballistic_type, m_position, m_owner->m_alliance, m_heading, m_range, m_collision_domain, m_locked_target);
+	Ballistic* shot = new Ballistic(this, m_ballistic_type, m_position, m_owner->m_alliance, m_heading, m_range, m_collision_domain, m_locked_target);
 	(*CurrentGame).m_L16_entities.push_back(shot);
 	(*CurrentGame).AddCircleObject(shot);
 
@@ -81,8 +81,8 @@ void Weapon::update(sf::Time deltaTime)
 				//lock target
 				m_locked_target = locked_target;
 
-				m_lock_rectangle.setSize(sf::Vector2f(m_locked_target->getRadius() * 2, m_locked_target->getRadius() * 2));
-				m_lock_rectangle.setOrigin(sf::Vector2f(m_locked_target->getRadius(), m_locked_target->getRadius()));
+				m_lock_rectangle.setSize(sf::Vector2f((m_locked_target->getRadius() * 2) + 2, (m_locked_target->getRadius() * 2) + 2));
+				m_lock_rectangle.setOrigin(sf::Vector2f(m_locked_target->getRadius() + 1, m_locked_target->getRadius() + 1));
 				m_lock_rectangle.setPosition(m_locked_target->getPosition());
 			}
 		}
@@ -112,6 +112,11 @@ bool Weapon::IsReadyToFire()
 
 bool Weapon::CanStayLocked(L16Entity* entity)
 {
+	if (entity->m_visible == false || entity->m_garbageMe == true)
+	{
+		return false;
+	}
+
 	float angle_delta = GetAngleDegToTargetPosition(m_position, m_heading, entity->getPosition());
 	if (abs(angle_delta) > m_locking_angle_coverage)
 	{

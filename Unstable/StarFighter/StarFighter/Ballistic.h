@@ -3,6 +3,8 @@
 
 #include "L16Entity.h"
 
+class Weapon;
+
 enum BallisticType
 {
 	Ballistic_AAM,
@@ -11,7 +13,7 @@ enum BallisticType
 class Ballistic : public L16Entity
 {
 public:
-	Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range, CircleType collision_domain, L16Entity* locked_target);
+	Ballistic(Weapon* owner, BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range, CircleType collision_domain, L16Entity* locked_target);
 	~Ballistic();
 
 	BallisticType m_ballistic_type;
@@ -26,6 +28,7 @@ public:
 	float m_roll_rate_max;
 	float m_lifespan;
 	L16Entity* m_locked_target;
+	Weapon* m_owner;
 
 	void update(sf::Time deltaTime) override;
 };

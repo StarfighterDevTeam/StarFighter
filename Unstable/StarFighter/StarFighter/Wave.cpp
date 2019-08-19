@@ -9,6 +9,9 @@ Wave::Wave(sf::Vector2f position, AllianceType alliance, float radius, float exp
 	BoundAngle(angle_direction, 360);
 	BoundAngle(angle_coverage, 360);
 
+	m_emitter_entity = NULL;
+	m_bounced_entity = NULL;
+
 	setRadius(radius);
 	setOrigin(sf::Vector2f(radius, radius));
 	setPosition(position);

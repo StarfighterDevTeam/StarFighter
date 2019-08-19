@@ -4,8 +4,9 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ballistic::Ballistic(BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range, CircleType collision_domain, L16Entity* locked_target) : L16Entity(position, alliance, 4, collision_domain)
+Ballistic::Ballistic(Weapon* owner, BallisticType ballistic_type, sf::Vector2f position, AllianceType alliance, float heading, float range, CircleType collision_domain, L16Entity* locked_target) : L16Entity(position, alliance, 4, collision_domain)
 {
+	m_owner = owner;
 	m_L16_type = L16Entity_Ballistic;
 	m_ballistic_type = ballistic_type;
 	m_circle_type = collision_domain;
@@ -51,8 +52,15 @@ void Ballistic::update(sf::Time deltaTime)
 		//get target
 		if (m_locked_target != NULL)
 		{
-			float delta_angle = GetAngleDegToTargetPosition(getPosition(), m_heading, m_locked_target->getPosition());
-			m_heading += delta_angle;
+			if (m_locked_target->m_garbageMe == false)
+			{
+				float delta_angle = GetAngleDegToTargetPosition(getPosition(), m_heading, m_locked_target->getPosition());
+				m_heading += delta_angle;
+			}
+			else
+			{
+				m_locked_target = NULL;
+			}
 		}
 
 		//apply speed

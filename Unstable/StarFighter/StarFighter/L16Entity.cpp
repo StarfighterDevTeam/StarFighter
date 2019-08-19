@@ -180,9 +180,14 @@ Wave* L16Entity::CreateRadarWave()
 
 Wave* L16Entity::CreateWaveBounce(sf::Vector2f position, float radius, float direction, Wave* wave)
 {
+	//emitter is dead?
 	if (wave->m_emitter_entity == NULL)
+	{
+		wave->m_lifespan = 0;
 		return NULL;
+	}
 
+	//bounce on entity
 	float delta_angle = atan(getRadius() / (getRadius() + wave->getRadius())) * 180.f / M_PI;
 
 	Wave* new_wave = new Wave(position, wave->m_alliance, radius, wave->m_expansion_speed, wave->m_emitter_entity->m_radar_range / wave->m_emitter_entity->m_radar_wavespeed, MinBetweenValues(60, wave->m_angle_coverage), direction + 180);
@@ -262,14 +267,4 @@ void L16Entity::RevealEntity()
 
 	if (m_L16_type != L16Entity_Ballistic)
 		m_radar_bounce_feedback_clock = 0.5;
-}
-
-void L16Entity::SelectEntity()
-{
-	m_selected = true;
-}
-
-void L16Entity::HoverEntity()
-{
-	m_hovered = true;
 }

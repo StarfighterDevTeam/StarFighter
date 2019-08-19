@@ -49,8 +49,6 @@ public :
 	Wave* CreateRadarWave();
 	void WaveReception(Wave* wave) override;
 	void RevealEntity();
-	void SelectEntity() override;
-	void HoverEntity() override;
 };
 
 #endif // L16ENTITY_H_INCLUDED

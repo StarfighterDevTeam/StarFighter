@@ -76,13 +76,3 @@ void CircleObject::RemoveEntity(L16Entity* entity)
 {
 	//see override function in class Wave
 }
-
-void CircleObject::SelectEntity()
-{
-	//see override function in L16Entity
-}
-
-void CircleObject::HoverEntity()
-{
-	//see override function in L16Entity
-}

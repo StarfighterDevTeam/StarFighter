@@ -326,6 +326,8 @@ void Game::updateScene(Time deltaTime)
 	//}
 
 	//Update and garbage collection
+	vector<L16Entity*> old_entities;
+
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
 		for (int j = 0; j < NB_CIRCLE_TYPES; j++)
@@ -346,16 +348,17 @@ void Game::updateScene(Time deltaTime)
 					{
 						for (int k = 0; k < NB_ALLIANCE_TYPES; k++)
 						{
-							if (k != i)
+							for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[k][Circle_Wave].begin(); it2 != m_sceneCircleObjects[k][Circle_Wave].end(); it2++)
 							{
-								for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[k][Circle_WaveBounce].begin(); it2 != m_sceneCircleObjects[k][Circle_WaveBounce].end(); it2++)
-								{
-									L16Entity* entity = (L16Entity*)(*it);
-									(*it2)->RemoveEntity(entity);
-								}
+								L16Entity* entity = (L16Entity*)(*it);
+								(*it2)->RemoveEntity(entity);
+							}
+							for (vector<CircleObject*>::iterator it2 = m_sceneCircleObjects[k][Circle_WaveBounce].begin(); it2 != m_sceneCircleObjects[k][Circle_WaveBounce].end(); it2++)
+							{
+								L16Entity* entity = (L16Entity*)(*it);
+								(*it2)->RemoveEntity(entity);
 							}
 						}
-						
 					}
 
 					//Destroy objet
@@ -364,6 +367,12 @@ void Game::updateScene(Time deltaTime)
 				else
 				{
 					m_sceneCircleObjects[i][j].push_back(*it);
+					if ((*it)->m_circle_type != Circle_Wave && (*it)->m_circle_type != Circle_WaveBounce)
+					{
+						L16Entity* entity = (L16Entity*)(*it);
+						old_entities.push_back(entity);
+					}
+
 					(*it)->update(deltaTime);
 
 					//Automatic garbage collection for objects out of screen
@@ -397,6 +406,12 @@ void Game::updateScene(Time deltaTime)
 				(*it)->update(deltaTime);
 			}
 		}
+	}
+
+	m_L16_entities.clear();
+	for (vector<L16Entity*>::iterator it = old_entities.begin(); it != old_entities.end(); it++)
+	{
+		m_L16_entities.push_back(*it);
 	}
 
 	//New objects created
@@ -1014,7 +1029,7 @@ L16Entity* Game::GetClosestL16Target(sf::Vector2f position, float heading, Circl
 			//ok.
 		}
 
-		if (obj->m_visible == false)
+		if (obj->m_visible == false || obj->m_garbageMe == true)
 			continue;
 
 		const float a = position.x - obj->getPosition().x;
