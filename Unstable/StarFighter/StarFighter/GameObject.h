@@ -19,24 +19,22 @@ class Loot;
 enum LayerType {
 	BackgroundLayer,
 	StarLayer,	
-	PlayerShipLayer,
 	PlayerStroboscopicLayer,
+	PlayerShipLayer,
+	PlayerFireLayer,
+	EnemyShipLayer,
 	EnemyFireLayer,
 	FeedbacksLayer,
-	PanelLayer,
-	HudObject,
-	HudCursor,
 	NBVAL_Layer
 };
 
 enum ColliderType {
 	BackgroundObject,
-	PlayerShip,
-	FakePlayerShip,
-	FriendlyFire,
-	Neutral,
+	PlayerShipObject,
+	PlayerFire,
 	EnemyFire,
-	EnemyObject,
+	EnemyShip,
+	HUDLayer,
 	NBVAL_GameObject
 };
 
@@ -89,6 +87,7 @@ public:
 
 	//Star Hunter
 	void SetStarSectorIndex(sf::Vector2i sector_index);
+	void UpdateStarSectorIndex();
 
 	sf::Vector2i m_star_sector_index;
 };

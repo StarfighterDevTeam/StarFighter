@@ -4,26 +4,26 @@ extern Game* CurrentGame;
 
 Gameloop::Gameloop()
 {
-	//background
-	m_background = new GameObject(sf::Vector2f(1920, 1080), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(1920 * 2, 1080 * 2));
-	//m_background = new GameObject(sf::Vector2f(1980, 1080), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1920, 1080));
-	(*CurrentGame).addToScene(m_background, BackgroundLayer, BackgroundObject);
-	(*CurrentGame).m_map_size = m_background->m_size;
+	//map
+	(*CurrentGame).m_map_size = sf::Vector2f(1920, 1080);
 
 	//ship
-	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha1.png", sf::Vector2f(84, 69*3), sf::Vector2f(42, 42), 3, 1);
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha1.png", sf::Vector2f(68, 84), sf::Vector2f(34, 42), 1, 1);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
+
+	//star
+	StarGenerator* generator = new StarGenerator();
+	generator->CreateStar();
 
 	//star generator
-	for (int i = 0; i < 3; i++)
-	{
+	//for (int i = 0; i < 3; i++)
+	//{
 		//m_star_generator.push_back(new StarGenerator());
-	}
+	//}
 }
 
 Gameloop::~Gameloop()
 {
-	delete m_background;
 	for (StarGenerator* star_generator : m_star_generator)
 	{
 		delete star_generator;
@@ -33,14 +33,14 @@ Gameloop::~Gameloop()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
-	for (StarGenerator* star_generator : m_star_generator)
-	{
-		star_generator->Update(deltaTime);
-	}
+	//for (StarGenerator* star_generator : m_star_generator)
+	//{
+	//	star_generator->Update(deltaTime);
+	//}
 	
 	(*CurrentGame).UpdateScene(deltaTime);
 
-	UpdateCamera(deltaTime);
+	//UpdateCamera(deltaTime);
 }
 
 void Gameloop::Draw()
@@ -55,8 +55,8 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 	//Map border constraints
 	const float x = (*CurrentGame).m_view.getSize().x / 2;
 	const float y = (*CurrentGame).m_view.getSize().y / 2;
-	const float a = (*CurrentGame).m_playerShip->getPosition().x;
-	const float b = (*CurrentGame).m_playerShip->getPosition().y;
+	const float a = (*CurrentGame).m_playerShip->m_position.x;
+	const float b = (*CurrentGame).m_playerShip->m_position.y;
 	if (a < x)
 		(*CurrentGame).m_view.setCenter(x, (*CurrentGame).m_view.getCenter().y);
 	if (a >(*CurrentGame).m_map_size.x - x)

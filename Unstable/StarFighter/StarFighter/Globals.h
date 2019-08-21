@@ -26,11 +26,11 @@ std::string StringCut(std::string str, const size_t length);
 	#define PLAYER_SAVE_FILE						"Saves/SaveFile.txt"
 #endif
 
-#define	REF_WINDOW_RESOLUTION_X					1920
-#define REF_WINDOW_RESOLUTION_Y					1080
+#define	REF_WINDOW_RESOLUTION_X					1920.f
+#define REF_WINDOW_RESOLUTION_Y					1080.f
 
-#define	WINDOW_RESOLUTION_X						1600
-#define WINDOW_RESOLUTION_Y						900
+#define	WINDOW_RESOLUTION_X						1600.f
+#define WINDOW_RESOLUTION_Y						900.f
 
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f

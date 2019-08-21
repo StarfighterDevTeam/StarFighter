@@ -55,6 +55,16 @@ Game::Game(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
+
+	//background
+	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+	addToScene(m_background, BackgroundLayer, BackgroundObject);
+}
+
+Game::~Game()
+{
+	delete m_background;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -171,14 +181,11 @@ void Game::addToScene(GameObject *object, LayerType layer, ColliderType type)
 	object->m_layer = layer;
 	object->m_collider = type;
 
-	//Window resolution adjustements
-	//object->setScale(scale_factor.x, scale_factor.y);
-
 	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
-		AddGameObjectToVector(object, &m_sceneGameObjectsTyped[(int)type]);
-		AddGameObjectToVector(object, &m_sceneGameObjectsLayered[(int)layer]);
-		AddGameObjectToVector(object, &m_sceneGameObjects);
+		m_sceneGameObjectsTyped[(int)type].push_back(object);
+		m_sceneGameObjectsLayered[(int)layer].push_back(object);
+		m_sceneGameObjects.push_back(object);
 	}
 	else
 	{
@@ -224,15 +231,6 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 	m_sceneFeedbackSFPanels.remove(panel);
 }
 
-void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, ColliderType new_type)
-{
-	assert(((int)new_layer >= 0 && (int)new_layer < NBVAL_Layer) && (new_type >= 0 && new_type < NBVAL_GameObject));
-	{
-		m_sceneGameObjectsLayeredTemp[(int)new_layer].push_back(object);
-		m_sceneGameObjectsTypedTemp[(int)new_type].push_back(object);
-	}
-}
-
 void Game::UpdateScene(Time deltaTime)
 {
 	//TODO: Updating screen resolution
@@ -256,6 +254,8 @@ void Game::UpdateScene(Time deltaTime)
 
 void Game::UpdateObjects(Time deltaTime)
 {
+	GameObject* player = (GameObject*)m_playerShip;
+
 	//Update objects and delete "garbage" objects
 	vector<GameObject*> temp_sceneGameObjects;
 	for (GameObject* object : m_sceneGameObjects)
@@ -272,17 +272,14 @@ void Game::UpdateObjects(Time deltaTime)
 		else
 		{
 			object->Update(deltaTime);
+
+			if (object == player || object == m_background)
+				object->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+			else
+				object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, object->m_position.y - player->m_position.y + REF_WINDOW_RESOLUTION_Y * 0.5));
+
 			m_sceneGameObjects.push_back(object);
 		}
-	}
-
-	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
-	for (size_t i = 0; i < sceneGameObjectsSize; i++)
-	{
-		if (m_sceneGameObjects[i] == NULL)
-			continue;
-
-		m_sceneGameObjects[i]->Update(deltaTime);
 	}
 
 	//SFTextPop (text feedbacks)
@@ -329,7 +326,7 @@ void Game::drawScene()
 				}
 			}
 		}
-		else if (i == PanelLayer)
+		else if (i == HUDLayer)
 		{
 			for (std::list<SFPanel*>::iterator it = m_sceneFeedbackSFPanels.begin(); it != m_sceneFeedbackSFPanels.end(); it++)
 			{
@@ -346,6 +343,7 @@ void Game::drawScene()
 				if ((*(*it)).m_visible)
 				{
 					m_mainScreen.draw((*(*it)));
+
 				}
 			}
 		}
@@ -364,7 +362,7 @@ void Game::CheckCollisions()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[ColliderType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[ColliderType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[ColliderType::PlayerShipObject].begin(); it1 != m_sceneGameObjectsTyped[ColliderType::PlayerShipObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
@@ -383,174 +381,6 @@ void Game::CheckCollisions()
 		}
 	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
-}
-
-void Game::TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer)
-{
-	size_t current_index = 0;
-	size_t current_object = 0;
-
-	const size_t vectorSlaveSize = m_sceneGameObjectsLayeredTemp[layer].size();
-	for (size_t i = 0; i < vectorSlaveSize; i++)
-	{
-		if (m_sceneGameObjectsLayeredTemp[layer][i] == NULL)
-			continue;
-
-		const size_t vectorMasterSize = m_sceneGameObjectsLayered[layer].size();
-		for (size_t j = current_index; j < vectorMasterSize; j++)
-		{
-			//found a free slot
-			if (m_sceneGameObjectsLayered[layer][j] == NULL)
-			{
-				//cut from old layer
-				LayerType old_layer = m_sceneGameObjectsLayeredTemp[layer][i]->m_layer;
-				size_t previousVectorSize = m_sceneGameObjectsLayered[old_layer].size();
-				for (size_t l = 0; l < previousVectorSize; l++)
-				{
-					if (m_sceneGameObjectsLayered[old_layer][l] == m_sceneGameObjectsLayeredTemp[layer][i])
-					{
-						m_sceneGameObjectsLayered[old_layer][l] = NULL;
-					}
-				}
-
-				//then insert in new layer
-				m_sceneGameObjectsLayeredTemp[layer][i]->m_layer = layer;
-				m_sceneGameObjectsLayered[layer][j] = m_sceneGameObjectsLayeredTemp[layer][i];
-				current_index = j + 1;
-				current_object++;
-
-				break;
-			}
-		}
-
-		break;
-	}
-
-	for (size_t k = current_object; k < vectorSlaveSize; k++)
-	{
-		//cut from old layer
-		LayerType old_layer = m_sceneGameObjectsLayeredTemp[layer][k]->m_layer;
-		size_t previousVectorSize = m_sceneGameObjectsLayered[old_layer].size();
-		for (size_t l = 0; l < previousVectorSize; l++)
-		{
-			if (m_sceneGameObjectsLayered[old_layer][l] == m_sceneGameObjectsLayeredTemp[layer][k])
-			{
-				m_sceneGameObjectsLayered[old_layer][l] = NULL;
-				continue;
-			}
-		}
-
-		//then insert in new layer
-		m_sceneGameObjectsLayeredTemp[layer][k]->m_layer = layer;
-		m_sceneGameObjectsLayered[layer].push_back(m_sceneGameObjectsLayeredTemp[layer][k]);
-	}
-}
-
-void Game::TransferColliderTypedTempToSceneObjectsTyped(ColliderType collider)
-{
-	size_t current_index = 0;
-	size_t current_object = 0;
-
-	const size_t vectorSlaveSize = m_sceneGameObjectsTypedTemp[collider].size();
-	for (size_t i = 0; i < vectorSlaveSize; i++)
-	{
-		if (m_sceneGameObjectsTypedTemp[collider][i] == NULL)
-			continue;
-
-		const size_t vectorMasterSize = m_sceneGameObjectsTyped[collider].size();
-		for (size_t j = current_index; j < vectorMasterSize; j++)
-		{
-			if (m_sceneGameObjectsTyped[collider][j] == NULL)
-			{
-				//cut from old type
-				ColliderType old_collider = m_sceneGameObjectsTypedTemp[collider][i]->m_collider;
-				size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider].size();
-				for (size_t l = 0; l < previousVectorSize; l++)
-				{
-					if (m_sceneGameObjectsTyped[old_collider][l] == m_sceneGameObjectsTypedTemp[collider][i])
-					{
-						m_sceneGameObjectsTyped[old_collider][l] = NULL;
-						continue;
-					}
-				}
-
-				//then insert in new type
-				m_sceneGameObjectsTypedTemp[collider][i]->m_collider = collider;
-				m_sceneGameObjectsTyped[collider][j] = m_sceneGameObjectsTypedTemp[collider][i];
-				current_index = j + 1;
-				current_object++;
-
-				break;
-			}
-		}
-
-		break;
-	}
-
-	for (size_t k = current_object; k < vectorSlaveSize; k++)
-	{
-		//cut from old type
-		ColliderType old_collider = m_sceneGameObjectsTypedTemp[collider][k]->m_collider;
-		size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider].size();
-		for (size_t l = 0; l < previousVectorSize; l++)
-		{
-			if (m_sceneGameObjectsTyped[old_collider][l] == m_sceneGameObjectsTypedTemp[collider][k])
-			{
-				m_sceneGameObjectsTyped[old_collider][l] = NULL;
-			}
-		}
-
-		//then insert in new type
-		m_sceneGameObjectsTypedTemp[collider][k]->m_collider = collider;
-		m_sceneGameObjectsTyped[collider].push_back(m_sceneGameObjectsTypedTemp[collider][k]);
-	}
-}
-
-
-void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector)
-{
-	const size_t vectorSize = vector->size();
-	for (size_t i = 0; i < vectorSize; i++)
-	{
-		if ((*vector)[i] == NULL)
-		{
-			(*vector)[i] = pGameObject;
-			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
-		}
-	}
-
-	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
-	vector->push_back(pGameObject);
-}
-
-void Game::AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master)
-{
-	size_t current_index = 0;
-	size_t current_object = 0;
-
-	const size_t vectorSlaveSize = vector_slave.size();
-	for (size_t i = 0; i < vectorSlaveSize; i++)
-	{
-		const size_t vectorMasterSize = vector_master->size();
-		for (size_t j = current_index; j < vectorMasterSize; j++)
-		{
-			if ((*vector_master)[j] == NULL)
-			{
-				(*vector_master)[j] = vector_slave[i];
-				current_index = j + 1;
-				current_object++;
-
-				break;
-			}
-		}
-
-		break;
-	}
-
-	for (size_t k = current_object; k < vectorSlaveSize; k++)
-	{
-		vector_master->push_back(vector_slave[k]);
-	}
 }
 
 void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)

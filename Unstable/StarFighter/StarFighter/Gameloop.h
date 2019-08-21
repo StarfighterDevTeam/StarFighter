@@ -19,7 +19,6 @@ public:
 	void Draw();
 	void UpdateCamera(sf::Time deltaTime);
 
-	GameObject* m_background;
 	vector<StarGenerator*> m_star_generator;
 
 private:

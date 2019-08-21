@@ -41,11 +41,6 @@ public :
 	virtual ~Ship();
 	void Update(sf::Time deltaTime) override;
 	
-	void ManageHudControls(sf::Vector2f inputs_directions);
-	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void IdleDecelleration(sf::Time deltaTime);
-	bool ScreenBorderContraints();
-	void MaxSpeedConstraints();
 	void UpdateRotation();
 
 	bool m_disable_inputs;

@@ -45,6 +45,7 @@ struct Game
 {
 public:
 	Game(RenderWindow* window);
+	~Game();
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, ColliderType type);
 	void addToFeedbacks(RectangleShape* feedback);
@@ -55,7 +56,6 @@ public:
 	void removeFromFeedbacks(Text* text);
 	void removeFromFeedbacks(SFPanel* panel);
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
-	void changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, ColliderType new_type);
 
 	void UpdateObjects(Time deltaTime);
 	void UpdateScene(Time deltaTime);
@@ -110,11 +110,9 @@ public:
 	//Star Hunter
 	bool AddStarSector(sf::Vector2i star_sector_index);
 
+	GameObject* m_background;
+
 private:
-	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
-	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);
-	void TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer);
-	void TransferColliderTypedTempToSceneObjectsTyped(ColliderType collider);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 
@@ -126,9 +124,7 @@ private:
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
-	std::vector<GameObject*> m_sceneGameObjectsLayeredTemp[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
-	std::vector<GameObject*> m_garbage;
 	std::vector<SFText*> m_garbageTexts;
 
 	//Star Hunter

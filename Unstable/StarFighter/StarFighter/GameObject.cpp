@@ -79,8 +79,6 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_frameNumber = frameNumber;
 	m_size.x = ((*texture).getSize().x / frameNumber);
 	m_size.y = ((*texture).getSize().y / animationNumber);
-
-	m_collider = ColliderType::BackgroundObject;
 	m_defaultAnimation.setSpriteSheet(*texture);
 
 	for (int j = 0; j < animationNumber; j++)
@@ -97,7 +95,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	SetAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
 	m_speed = speed;
-	setPosition(position.x, position.y);
+	m_position = position;
 	m_visible = true;
 	m_garbageMe = false;
 	m_radius = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
@@ -153,15 +151,9 @@ GameObject::~GameObject()
 void GameObject::Update(sf::Time deltaTime)
 {
 	m_previous_speed = m_speed;
-
-	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = m_speed;
 	
-	//Basic movement (initial vector)
-	m_position.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	m_position.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
-
-	setPosition(m_position);
+	m_position.x += m_speed.x * deltaTime.asSeconds();
+	m_position.y += m_speed.y * deltaTime.asSeconds();
 
 	if (m_frameNumber > 1)
 	{
@@ -279,4 +271,12 @@ void GameObject::SetStarSectorIndex(sf::Vector2i sector_index)
 
 	m_position.x = 1.f * m_star_sector_index.x * STAR_SECTOR_SIZE;
 	m_position.y = 1.f * m_star_sector_index.y * STAR_SECTOR_SIZE;
+}
+
+void GameObject::UpdateStarSectorIndex()
+{
+	float a = (m_position.x / STAR_SECTOR_SIZE);
+	float b = m_position.x / STAR_SECTOR_SIZE + 0.5;
+	m_star_sector_index.x = (int)((m_position.x / STAR_SECTOR_SIZE) + 0.5);
+	m_star_sector_index.y = -(int)((m_position.y / STAR_SECTOR_SIZE) + 0.5);
 }
