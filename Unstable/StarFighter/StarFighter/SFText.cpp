@@ -11,10 +11,10 @@ SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f 
 	m_team = team;
 	m_alliance = AllianceNeutral;
 
-	m_GarbageMe = false;
+	m_garbageMe = false;
 }
 
-void SFText::update(Time deltaTime)
+void SFText::Update(Time deltaTime)
 {
 	//see override function in class SFTextPop
 }
@@ -31,7 +31,7 @@ SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color col
 	m_team = team;
 	m_alliance = (TeamAlliances)0;
 
-	m_GarbageMe = false;
+	m_garbageMe = false;
 }
 
 SFGauge::SFGauge(SFText text, SFRectangle rectangle)
@@ -40,7 +40,7 @@ SFGauge::SFGauge(SFText text, SFRectangle rectangle)
 	m_SFText = text;
 	m_SFRectangle = rectangle;
 
-	m_GarbageMe = text.m_visible || rectangle.m_visible;
+	m_garbageMe = text.m_visible || rectangle.m_visible;
 }
 
 void SFGauge::setVisible(bool visible)

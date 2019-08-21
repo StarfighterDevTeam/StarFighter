@@ -19,22 +19,13 @@ public:
 		if (!GameObjectA->m_visible || !(GameObjectB->m_visible))
 			return false;
 
-		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
-			return false;
-
-		if (!GameObjectA->m_isOnScene || !(GameObjectB->m_isOnScene))
-			return false;
-
 		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
 		const float a = GameObjectA->getPosition().x - GameObjectB->getPosition().x;
 		const float b = GameObjectA->getPosition().y - GameObjectB->getPosition().y;
-		const float c = GameObjectA->m_diag + GameObjectB->m_diag;
+		const float c = GameObjectA->m_radius + GameObjectB->m_radius;
 
 		if (((a * a) + (b * b)) > (c * c))
 			return false;
-
-
 		else
 		{
 			if (PIXEL_PERFECT_COLLISION)
@@ -58,16 +49,9 @@ public:
 		if (!GameObjectA->m_visible || !(GameObjectB->m_visible))
 			return false;
 
-		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
-			return false;
-
-		if (!GameObjectA->m_isOnScene || !(GameObjectB->m_isOnScene))
-			return false;
-
 		const float a = GameObjectA->getPosition().x - GameObjectB->getPosition().x;
 		const float b = GameObjectA->getPosition().y - GameObjectB->getPosition().y;
-		const float c = GameObjectA->m_diag + GameObjectB->m_diag + GRAZE_DISTANCE;
+		const float c = GameObjectA->m_radius + GameObjectB->m_radius + GRAZE_DISTANCE;
 
 		if (((a * a) + (b * b)) < (c * c))
 			return true;

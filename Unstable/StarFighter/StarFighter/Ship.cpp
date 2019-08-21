@@ -13,7 +13,7 @@ Ship::Ship()
 void Ship::Init()
 {
 	m_layer = PlayerShipLayer;
-	m_collider_type = PlayerShip;
+	m_collider = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
 	m_disable_inputs = false;
@@ -29,12 +29,12 @@ void Ship::Init()
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	this->Init();
+	Init();
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size)
 {
-	this->Init();
+	Init();
 }
 
 Ship::~Ship()
@@ -47,7 +47,7 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
-void Ship::update(sf::Time deltaTime)
+void Ship::Update(sf::Time deltaTime)
 {
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
@@ -69,14 +69,14 @@ void Ship::update(sf::Time deltaTime)
 	if (m_inputs_states[Action_Firing] == Input_Tap)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		//(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
 	UpdateRotation();
 
-	GameObject::update(deltaTime);
+	GameObject::Update(deltaTime);
 
 	//HUD
 	m_is_asking_SFPanel = SFPanel_None;
@@ -92,30 +92,30 @@ bool Ship::ScreenBorderContraints()
 {
 	bool touched_screen_border = false;
 
-	if (this->getPosition().x < this->m_size.x / 2)
+	if (getPosition().x < m_size.x / 2)
 	{
-		this->setPosition(m_size.x / 2, this->getPosition().y);
+		setPosition(m_size.x / 2, getPosition().y);
 		m_speed.x = 0;
 		touched_screen_border = true;
 	}
 
-	if (this->getPosition().x > (*CurrentGame).m_map_size.x - (m_size.x / 2))
+	if (getPosition().x > (*CurrentGame).m_map_size.x - (m_size.x / 2))
 	{
-		this->setPosition((*CurrentGame).m_map_size.x - (m_size.x / 2), this->getPosition().y);
+		setPosition((*CurrentGame).m_map_size.x - (m_size.x / 2), getPosition().y);
 		m_speed.x = 0;
 		touched_screen_border = true;
 	}
 
-	if (this->getPosition().y < m_size.y / 2)
+	if (getPosition().y < m_size.y / 2)
 	{
-		this->setPosition(this->getPosition().x, m_size.y / 2);
+		setPosition(getPosition().x, m_size.y / 2);
 		m_speed.y = 0;
 		touched_screen_border = true;
 	}
 
-	if (this->getPosition().y > (*CurrentGame).m_map_size.y - (m_size.y / 2))
+	if (getPosition().y > (*CurrentGame).m_map_size.y - (m_size.y / 2))
 	{
-		this->setPosition(this->getPosition().x, (*CurrentGame).m_map_size.y - (m_size.y / 2));
+		setPosition(getPosition().x, (*CurrentGame).m_map_size.y - (m_size.y / 2));
 		m_speed.y = 0;
 		touched_screen_border = true;
 	}

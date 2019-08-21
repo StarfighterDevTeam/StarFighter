@@ -9,7 +9,7 @@ class Star : public GameObject
 {
 public :
 	Star(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float pulse_periodicity = 0.f);
-	void update(sf::Time deltaTime);
+	void Update(sf::Time deltaTime);
 
 	float m_pulse_periodicity;
 	float m_pulse_clock;

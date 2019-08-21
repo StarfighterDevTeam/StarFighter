@@ -39,7 +39,7 @@ public :
 	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void Init();
 	virtual ~Ship();
-	void update(sf::Time deltaTime) override;
+	void Update(sf::Time deltaTime) override;
 	
 	void ManageHudControls(sf::Vector2f inputs_directions);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
@@ -68,7 +68,7 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	//StarGenerator
-	sf::Vector2i m_star_sector_index;
+	
 
 private:
 	bool m_moving;

@@ -153,7 +153,7 @@ void AnimatedSprite::setFrame(std::size_t newFrame, bool resetTime)
 		m_currentTime = sf::Time::Zero;
 }
 
-void AnimatedSprite::update(sf::Time deltaTime)
+void AnimatedSprite::Update(sf::Time deltaTime)
 {
 	// if not paused and we have a valid animation
 	if (!m_isPaused && m_animation)
@@ -205,5 +205,5 @@ const sf::IntRect& AnimatedSprite::getTextureRect() const
 
 const sf::Texture* AnimatedSprite::getTexture()	const
 {
-	return this->m_texture;
+	return m_texture;
 }

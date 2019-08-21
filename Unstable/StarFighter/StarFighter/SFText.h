@@ -31,11 +31,11 @@ public:
 	SFText() {};
 	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
 	~SFText() {};
-	virtual void update(Time deltaTime);
+	virtual void Update(Time deltaTime);
 	bool m_visible;
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
-	bool m_GarbageMe;
+	bool m_garbageMe;
 };
 
 class SFRectangle : public sf::RectangleShape
@@ -47,7 +47,7 @@ public:
 	bool m_visible;
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
-	bool m_GarbageMe;
+	bool m_garbageMe;
 };
 
 class SFGauge : public sf::RectangleShape
@@ -62,7 +62,7 @@ public:
 
 	void setString(string& str);
 	void setPosition(sf::Vector2f position, sf::Vector2f offset);
-	bool m_GarbageMe;
+	bool m_garbageMe;
 
 	SFText m_SFText;
 	SFRectangle m_SFRectangle;

@@ -49,7 +49,7 @@ sf::Uint8* Glow::CreateGlowFrame(GameObject* parent, sf::Color color, int glow_t
 
 Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
 {
-	m_collider_type = BackgroundObject;
+	m_collider = BackgroundObject;
 	m_color = color;
 	m_glow_radius = glow_thickness;
 	m_glow_animation_duration = glow_animation_duration;
@@ -140,7 +140,7 @@ Glow::~Glow()
 	
 }
 
-void Glow::update(sf::Time deltaTime)
+void Glow::Update(sf::Time deltaTime)
 {
-	AnimatedSprite::update(deltaTime);
+	AnimatedSprite::Update(deltaTime);
 }

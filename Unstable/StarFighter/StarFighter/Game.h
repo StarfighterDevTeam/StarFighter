@@ -18,8 +18,6 @@
 #include "SFPanel.h"
 #include "SFTextPop.h"
 
-#define STAR_SECTOR_SIZE			400
-
 class Ship;
 
 enum SFX_Bank
@@ -48,7 +46,7 @@ struct Game
 public:
 	Game(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
+	void addToScene(GameObject *object, LayerType layer, ColliderType type);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
 	void addToFeedbacks(SFText* text);
@@ -57,13 +55,12 @@ public:
 	void removeFromFeedbacks(Text* text);
 	void removeFromFeedbacks(SFPanel* panel);
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
-	void changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type);
+	void changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, ColliderType new_type);
 
-	void updateScene(Time deltaTime);
+	void UpdateObjects(Time deltaTime);
+	void UpdateScene(Time deltaTime);
 	void drawScene();
-	void colisionChecksV2();
-	void cleanGarbage();
-	void collectGarbage();
+	void CheckCollisions();
 
 	sf::RenderTexture m_mainScreen;
 	sf::Vector2i m_screen_size;
@@ -79,9 +76,9 @@ public:
 	sf::Vector2f m_map_size;
 
 	//Utiliary methods
-	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
-	GameObject* GetClosestObjectTyped(const sf::Vector2f position, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
-	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
+	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, ColliderType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
+	GameObject* GetClosestObjectTyped(const sf::Vector2f position, ColliderType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
+	std::vector<GameObject*> GetSceneGameObjectsTyped(ColliderType type);
 
 	//Fonts
 	sf::Font* m_font[NBVAL_FontsStyle];
@@ -110,11 +107,14 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
+	//Star Hunter
+	bool AddStarSector(sf::Vector2i star_sector_index);
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);
 	void TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer);
-	void TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collider_type);
+	void TransferColliderTypedTempToSceneObjectsTyped(ColliderType collider);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 
@@ -130,6 +130,9 @@ private:
 	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;
 	std::vector<SFText*> m_garbageTexts;
+
+	//Star Hunter
+	vector<sf::Vector2i> m_star_sectors_known;
 };
 
 #endif // GAME_H_INCLUDED

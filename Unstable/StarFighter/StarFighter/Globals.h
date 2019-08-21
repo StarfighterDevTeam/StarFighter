@@ -37,13 +37,15 @@ std::string StringCut(std::string str, const size_t length);
 
 #define ICON_SHIP_PNG							"Icons/ShipModel_icon.png"
 
+#define STAR_SECTOR_SIZE			400
+
 #define	GHOST_ALPHA_VALUE						120
 
 #define JOYSTICK_MIN_AXIS_VALUE					25
 
 #define TEXTURE_SIZE_LIMITATION						8187
 
-#define PIXEL_PERFECT_COLLISION							true
+#define PIXEL_PERFECT_COLLISION							false
 #define GRAZE_DISTANCE									30
 #define RECTANGLE_INSIDE_ALPHA							100
 
@@ -83,5 +85,12 @@ float MinBetweenValues(sf::Vector2f values);
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max);
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
+float GetAngleRadForVector(sf::Vector2f vector);
+float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
+float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
+bool NormalizeVector(sf::Vector2f* vector, float max_value);
+void ScaleVector(sf::Vector2f* vector, float target_value);
+float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+float GetVectorLength(sf::Vector2f vector);
 
 #endif // GLOBALS_H_INCLUDED

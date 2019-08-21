@@ -26,9 +26,9 @@ public:
 	sf::Texture* loadTexture(std::string filename, int sizeX, int sizeY)
 	{
 		//Do we already have this loaded ?
-		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture*>::iterator it = _loadedTextures.find(filename);
 
-		if (it != this->_loadedTextures.end())
+		if (it != _loadedTextures.end())
 		{
 			//element found;
 			return it->second;	//Return the texture*
@@ -42,7 +42,7 @@ public:
 		}
 
 		//Add the texture
-		this->_loadedTextures[filename] = texture;
+		_loadedTextures[filename] = texture;
 		printf("Loading texture from file '%s'\n", (char*)filename.c_str());
 		return texture;
 	}
@@ -50,9 +50,9 @@ public:
 	sf::Texture* getTexture(std::string filename)
 	{
 		//Do we already have this loaded ?
-		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture*>::iterator it = _loadedTextures.find(filename);
 
-		if (it != this->_loadedTextures.end())
+		if (it != _loadedTextures.end())
 		{
 			//element found;
 			return it->second;	//Return the texture*
@@ -65,9 +65,9 @@ public:
 	sf::Texture* loadTexture(std::string filename, int sizeX, int sizeY, sf::Uint8* pixels)
 	{
 		//Do we already have this loaded ?
-		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture*>::iterator it = _loadedTextures.find(filename);
 
-		if (it != this->_loadedTextures.end())
+		if (it != _loadedTextures.end())
 		{
 			//element found;
 			return it->second;	//Return the texture*
@@ -79,7 +79,7 @@ public:
 		texture->update(pixels);
 
 		//Add the texture
-		this->_loadedTextures[filename] = texture;
+		_loadedTextures[filename] = texture;
 		printf("Loading texture from file '%s'\n", (char*)filename.c_str());
 		return texture;
 	}
@@ -87,14 +87,14 @@ public:
 	void unloadTexture(std::string filename)
 	{
 		//Do we already have this loaded ?
-		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture*>::iterator it = _loadedTextures.find(filename);
 
-		if (it != this->_loadedTextures.end())
+		if (it != _loadedTextures.end())
 		{
 			//element found;
 			sf::Texture* texture = it->second;
 			//Removing it from the array
-			this->_loadedTextures.erase(filename);
+			_loadedTextures.erase(filename);
 			//Cleaning memory
 			delete texture;
 		}

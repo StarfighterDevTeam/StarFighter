@@ -11,14 +11,14 @@ Stroboscopic::Stroboscopic(sf::Time decade_time, GameObject* parent) : GameObjec
 
 	//getting a one-framed animation (the current frame and animation)
 	Animation* anim = new Animation();
-	anim->setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
-	setAnimationLine(parent->m_currentAnimationIndex);
+	anim->setSpriteSheet(*m_defaultAnimation.getSpriteSheet());
+	SetAnimationLine(parent->m_currentAnimationIndex);
 	anim->addFrame(m_currentAnimation->getFrame(parent->m_currentFrame));
 
-	this->m_currentAnimation = anim;
-	this->play(*m_currentAnimation);
+	m_currentAnimation = anim;
+	play(*m_currentAnimation);
 
-	this->setRotation(parent->getRotation());
+	setRotation(parent->getRotation());
 }
 
 Stroboscopic::~Stroboscopic()
@@ -26,7 +26,7 @@ Stroboscopic::~Stroboscopic()
 	m_alpha = 255;
 }
 
-void Stroboscopic::update(sf::Time deltaTime)
+void Stroboscopic::Update(sf::Time deltaTime)
 {
 	Uint8 decay = (Uint8)(ceil(deltaTime.asSeconds() * 255 / m_decay_time.asSeconds()));
 	if (m_alpha - decay > 0)
@@ -36,10 +36,10 @@ void Stroboscopic::update(sf::Time deltaTime)
 	else
 	{
 		m_alpha = 0;
-		m_GarbageMe = true;
+		m_garbageMe = true;
 	}
 
 	setColor(Color(255, 255, 255, m_alpha));
 
-	AnimatedSprite::update(deltaTime);
+	AnimatedSprite::Update(deltaTime);
 }

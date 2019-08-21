@@ -1,7 +1,7 @@
 #include "Game.h"
 #define stringify(x)  #x
 
-const char* GameObjectTypeValues[] =
+const char* ColliderTypeValues[] =
 {
 	stringify(BackgroundObject),
 	stringify(PlayerShip),
@@ -166,23 +166,23 @@ sf::RenderWindow* Game::getMainWindow()
 	return m_window;
 }
 
-void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
+void Game::addToScene(GameObject *object, LayerType layer, ColliderType type)
 {
 	object->m_layer = layer;
-	object->m_collider_type = type;
+	object->m_collider = type;
 
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
 	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
-		AddGameObjectToVector(object, &this->m_sceneGameObjectsTyped[(int)type]);
-		AddGameObjectToVector(object, &this->m_sceneGameObjectsLayered[(int)layer]);
-		AddGameObjectToVector(object, &this->m_sceneGameObjects);
+		AddGameObjectToVector(object, &m_sceneGameObjectsTyped[(int)type]);
+		AddGameObjectToVector(object, &m_sceneGameObjectsLayered[(int)layer]);
+		AddGameObjectToVector(object, &m_sceneGameObjects);
 	}
 	else
 	{
-		throw invalid_argument(TextUtils::format("Game eror: Unable to add GameObject '%s' to layer '%d'", object->getName().c_str(), (int)layer));
+		throw invalid_argument(TextUtils::format("Game eror: Unable to add GameObject '%s' to layer '%d'", object->GetTextureName().c_str(), (int)layer));
 	}
 }
 
@@ -205,7 +205,7 @@ void Game::addToFeedbacks(SFText* text)
 {
 	if (text)
 	{
-		AddSFTextToVector(text, &this->m_sceneFeedbackSFTexts);
+		AddSFTextToVector(text, &m_sceneFeedbackSFTexts);
 	}
 }
 
@@ -224,7 +224,7 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 	m_sceneFeedbackSFPanels.remove(panel);
 }
 
-void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type)
+void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, ColliderType new_type)
 {
 	assert(((int)new_layer >= 0 && (int)new_layer < NBVAL_Layer) && (new_type >= 0 && new_type < NBVAL_GameObject));
 	{
@@ -233,27 +233,56 @@ void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, Gam
 	}
 }
 
-void Game::updateScene(Time deltaTime)
+void Game::UpdateScene(Time deltaTime)
 {
-	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
-
 	//TODO: Updating screen resolution
 	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
-	//Clean garbage
-	cleanGarbage();
-
 	//Checking colisions
-	colisionChecksV2();
+	CheckCollisions();
 
-	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
+	//Update GameObjects, interface and feedbacks
+	UpdateObjects(deltaTime);
+
+	//Update music transitions
+	ManageMusicTransitions(deltaTime);
+
+	//Update view
+	m_mainScreen.setView(m_view);
+}
+
+
+
+void Game::UpdateObjects(Time deltaTime)
+{
+	//Update objects and delete "garbage" objects
+	vector<GameObject*> temp_sceneGameObjects;
+	for (GameObject* object : m_sceneGameObjects)
+	{
+		temp_sceneGameObjects.push_back(object);
+	}
+	m_sceneGameObjects.clear();
+	for (GameObject* object : temp_sceneGameObjects)
+	{
+		if (object->m_garbageMe == true)
+		{
+			delete object;
+		}
+		else
+		{
+			object->Update(deltaTime);
+			m_sceneGameObjects.push_back(object);
+		}
+	}
+
+	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
-		if (this->m_sceneGameObjects[i] == NULL)
+		if (m_sceneGameObjects[i] == NULL)
 			continue;
 
-		this->m_sceneGameObjects[i]->update(deltaTime);
+		m_sceneGameObjects[i]->Update(deltaTime);
 	}
 
 	//SFTextPop (text feedbacks)
@@ -263,17 +292,8 @@ void Game::updateScene(Time deltaTime)
 		if (m_sceneFeedbackSFTexts[i] == NULL)
 			continue;
 
-		m_sceneFeedbackSFTexts[i]->update(deltaTime);
+		m_sceneFeedbackSFTexts[i]->Update(deltaTime);
 	}
-
-	//Collect the dust
-	collectGarbage();
-
-	//Update music transitions
-	ManageMusicTransitions(deltaTime);
-
-	//Update view
-	m_mainScreen.setView(m_view);
 }
 
 void Game::drawScene()
@@ -284,21 +304,21 @@ void Game::drawScene()
 	{
 		if (i == FeedbacksLayer)
 		{
-			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
+			for (std::list<RectangleShape*>::iterator it = m_sceneFeedbackBars.begin(); it != m_sceneFeedbackBars.end(); it++)
 			{
 				if (*it == NULL)
 					continue;
 
 				m_mainScreen.draw(*(*it));
 			}
-			for (std::list<Text*>::iterator it = this->m_sceneFeedbackTexts.begin(); it != this->m_sceneFeedbackTexts.end(); it++)
+			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
 			{
 				if (*it == NULL)
 					continue;
 
 				m_mainScreen.draw(*(*it));
 			}
-			for (std::vector<SFText*>::iterator it = this->m_sceneFeedbackSFTexts.begin(); it != this->m_sceneFeedbackSFTexts.end(); it++)
+			for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
 			{
 				if (*it == NULL)
 					continue;
@@ -311,14 +331,14 @@ void Game::drawScene()
 		}
 		else if (i == PanelLayer)
 		{
-			for (std::list<SFPanel*>::iterator it = this->m_sceneFeedbackSFPanels.begin(); it != this->m_sceneFeedbackSFPanels.end(); it++)
+			for (std::list<SFPanel*>::iterator it = m_sceneFeedbackSFPanels.begin(); it != m_sceneFeedbackSFPanels.end(); it++)
 			{
 				(*(*it)).Draw(m_mainScreen);
 			}
 		}
 		else
 		{
-			for (std::vector<GameObject*>::iterator it = this->m_sceneGameObjectsLayered[i].begin(); it != this->m_sceneGameObjectsLayered[i].end(); it++)
+			for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
 			{
 				if (*it == NULL)
 					continue;
@@ -338,19 +358,19 @@ void Game::drawScene()
 	m_window->draw(temp);
 }
 
-void Game::colisionChecksV2()
+void Game::CheckCollisions()
 {
 	sf::Clock dt;
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[ColliderType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[ColliderType::PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[ColliderType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[ColliderType::EnemyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -426,37 +446,37 @@ void Game::TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer)
 	}
 }
 
-void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collider_type)
+void Game::TransferColliderTypedTempToSceneObjectsTyped(ColliderType collider)
 {
 	size_t current_index = 0;
 	size_t current_object = 0;
 
-	const size_t vectorSlaveSize = m_sceneGameObjectsTypedTemp[collider_type].size();
+	const size_t vectorSlaveSize = m_sceneGameObjectsTypedTemp[collider].size();
 	for (size_t i = 0; i < vectorSlaveSize; i++)
 	{
-		if (m_sceneGameObjectsTypedTemp[collider_type][i] == NULL)
+		if (m_sceneGameObjectsTypedTemp[collider][i] == NULL)
 			continue;
 
-		const size_t vectorMasterSize = m_sceneGameObjectsTyped[collider_type].size();
+		const size_t vectorMasterSize = m_sceneGameObjectsTyped[collider].size();
 		for (size_t j = current_index; j < vectorMasterSize; j++)
 		{
-			if (m_sceneGameObjectsTyped[collider_type][j] == NULL)
+			if (m_sceneGameObjectsTyped[collider][j] == NULL)
 			{
 				//cut from old type
-				GameObjectType old_collider_type = m_sceneGameObjectsTypedTemp[collider_type][i]->m_collider_type;
-				size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider_type].size();
+				ColliderType old_collider = m_sceneGameObjectsTypedTemp[collider][i]->m_collider;
+				size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider].size();
 				for (size_t l = 0; l < previousVectorSize; l++)
 				{
-					if (m_sceneGameObjectsTyped[old_collider_type][l] == m_sceneGameObjectsTypedTemp[collider_type][i])
+					if (m_sceneGameObjectsTyped[old_collider][l] == m_sceneGameObjectsTypedTemp[collider][i])
 					{
-						m_sceneGameObjectsTyped[old_collider_type][l] = NULL;
+						m_sceneGameObjectsTyped[old_collider][l] = NULL;
 						continue;
 					}
 				}
 
 				//then insert in new type
-				m_sceneGameObjectsTypedTemp[collider_type][i]->m_collider_type = collider_type;
-				m_sceneGameObjectsTyped[collider_type][j] = m_sceneGameObjectsTypedTemp[collider_type][i];
+				m_sceneGameObjectsTypedTemp[collider][i]->m_collider = collider;
+				m_sceneGameObjectsTyped[collider][j] = m_sceneGameObjectsTypedTemp[collider][i];
 				current_index = j + 1;
 				current_object++;
 
@@ -470,122 +490,22 @@ void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collide
 	for (size_t k = current_object; k < vectorSlaveSize; k++)
 	{
 		//cut from old type
-		GameObjectType old_collider_type = m_sceneGameObjectsTypedTemp[collider_type][k]->m_collider_type;
-		size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider_type].size();
+		ColliderType old_collider = m_sceneGameObjectsTypedTemp[collider][k]->m_collider;
+		size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider].size();
 		for (size_t l = 0; l < previousVectorSize; l++)
 		{
-			if (m_sceneGameObjectsTyped[old_collider_type][l] == m_sceneGameObjectsTypedTemp[collider_type][k])
+			if (m_sceneGameObjectsTyped[old_collider][l] == m_sceneGameObjectsTypedTemp[collider][k])
 			{
-				m_sceneGameObjectsTyped[old_collider_type][l] = NULL;
+				m_sceneGameObjectsTyped[old_collider][l] = NULL;
 			}
 		}
 
 		//then insert in new type
-		m_sceneGameObjectsTypedTemp[collider_type][k]->m_collider_type = collider_type;
-		m_sceneGameObjectsTyped[collider_type].push_back(m_sceneGameObjectsTypedTemp[collider_type][k]);
+		m_sceneGameObjectsTypedTemp[collider][k]->m_collider = collider;
+		m_sceneGameObjectsTyped[collider].push_back(m_sceneGameObjectsTypedTemp[collider][k]);
 	}
 }
 
-void Game::cleanGarbage()
-{
-	sf::Clock dt;
-	dt.restart();
-
-	// On traite les demandes de changements de type
-	size_t sceneGameObjectsLayeredTempSize[NBVAL_Layer];
-	for (int layer = 0; layer < NBVAL_Layer; layer++)
-	{
-		TransferGameObjectLayeredTempToSceneObjectsLayered((LayerType)layer);
-		m_sceneGameObjectsLayeredTemp[layer].clear();
-	}
-
-	size_t sceneGameObjectsTypedTempSize[NBVAL_GameObject];
-	for (int type = 0; type < NBVAL_GameObject; type++)
-	{
-		TransferGameObjectTypedTempToSceneObjectsTyped((GameObjectType)type);
-		m_sceneGameObjectsTypedTemp[type].clear();
-	}
-
-	// On mémorise les size, pour éviter d'appeler des fonctions à chaque itération
-	const size_t garbageSize = m_garbage.size();
-	const size_t sceneGameObjectsSize = m_sceneGameObjects.size();
-	//Size layer
-	size_t sceneGameObjectsLayeredSize[NBVAL_Layer];
-	for (int layer = 0; layer < NBVAL_Layer; layer++)
-	{
-		sceneGameObjectsLayeredSize[layer] = m_sceneGameObjectsLayered[layer].size();
-	}
-	//Size ind type
-	size_t sceneGameObjectsTypedSize[NBVAL_GameObject];
-	for (int layer = 0; layer < NBVAL_GameObject; layer++)
-	{
-		sceneGameObjectsTypedSize[layer] = m_sceneGameObjectsTyped[layer].size();
-	}
-
-	//Scene GameObjects
-	for (size_t i = 0; i < garbageSize; i++)
-	{
-		GameObject*    pCurGameObject = m_garbage[i];
-
-		// On remet à NULL lorsqu'on a trouvé un élément à dégager
-		for (size_t j = 0; j < sceneGameObjectsSize; j++)
-		{
-			if (m_sceneGameObjects[j] == pCurGameObject)
-			{
-				m_sceneGameObjects[j] = NULL;
-				break;
-			}
-		}
-
-		// "layered"...
-		const int layer = pCurGameObject->m_layer;
-		for (size_t j = 0; j < sceneGameObjectsLayeredSize[layer]; j++)
-		{
-			if (m_sceneGameObjectsLayered[layer][j] == pCurGameObject)
-			{
-				m_sceneGameObjectsLayered[layer][j] = NULL;
-				break;
-			}
-		}
-
-		// "typed"
-		const int type = pCurGameObject->m_collider_type;
-		for (size_t j = 0; j < sceneGameObjectsTypedSize[type]; j++)
-		{
-			if (m_sceneGameObjectsTyped[type][j] == pCurGameObject)
-			{
-				m_sceneGameObjectsTyped[type][j] = NULL;
-				break;
-			}
-		}
-
-		//destructor function ??
-
-		// A la fin, on delete l'élément
-		delete pCurGameObject;
-	}
-
-	//Texts and feedbacks
-	size_t garbageTextsSize = m_garbageTexts.size();
-	for (size_t i = 0; i < garbageTextsSize; i++)
-	{
-		SFText*    pSFText = m_garbageTexts[i];
-
-		size_t VectorTextsSize = m_sceneFeedbackSFTexts.size();
-		for (size_t j = 0; j < VectorTextsSize; j++)
-		{
-			if (m_sceneFeedbackSFTexts[j] == pSFText)
-			{
-				m_sceneFeedbackSFTexts[j] = NULL;
-				break;
-			}
-		}
-
-		delete pSFText;
-	}
-
-	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
-}
 
 void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector)
 {
@@ -649,72 +569,14 @@ void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)
 	vector->push_back(pSFText);
 }
 
-void Game::collectGarbage()
-{
-	sf::Clock dt;
-	dt.restart();
-
-	m_garbage.clear();
-	m_garbageTexts.clear();
-
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjects.begin(); it != m_sceneGameObjects.end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
-		{
-			m_garbage.push_back(*it);
-			continue;
-		}
-
-		if (!(**it).m_isOnScene)
-		{
-			//objects that are spawning out of screen are not deleted
-			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= m_map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= m_map_size.y))
-			{
-				(**it).m_isOnScene = true;
-			}
-		}
-
-		//Content that went on scene and then exited have to be deleted
-		if (!(**it).m_DontGarbageMe && (**it).m_isOnScene)
-		{
-			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > m_map_size.x
-				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > m_map_size.y)
-			{
-				m_garbage.push_back(*it);
-				continue;
-			}
-		}
-	}
-
-	//Texts and feedbacks
-	for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
-		{
-			m_garbageTexts.push_back(*it);
-			continue;
-		}
-	}
-
-	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
-}
-
-GameObject* Game::GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object, float dist_max, float angle_delta_max)
+GameObject* Game::GetClosestObjectTyped(const GameObject* ref_obj, ColliderType type_of_closest_object, float dist_max, float angle_delta_max)
 {
 	const sf::Vector2f ref_position = ref_obj->getPosition();
 
 	return GetClosestObjectTyped(ref_position, type_of_closest_object, dist_max, angle_delta_max);
 }
 
-GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectType type_of_closest_object, float dist_max, float angle_delta_max)
+GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, ColliderType type_of_closest_object, float dist_max, float angle_delta_max)
 {
 	float shortest_distance = -1;
 	GameObject* returned_obj = NULL;
@@ -723,7 +585,7 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectT
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->m_isOnScene && !(*it)->m_ghost && (*it)->m_visible)
+		if ((*it)->m_visible == true)
 		{
 			const float a = position.x - (*it)->getPosition().x;
 			const float b = position.y - (*it)->getPosition().y;
@@ -734,7 +596,7 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectT
 			{
 				if (dist_max < 0 || distance_to_ref < dist_max)
 				{
-					float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
+					float angle_delta = GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
 					if (angle_delta < 0)
 						angle_delta = -angle_delta;
 
@@ -754,7 +616,7 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, GameObjectT
 	return returned_obj;
 }
 
-std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
+std::vector<GameObject*> Game::GetSceneGameObjectsTyped(ColliderType type)
 {
 	return m_sceneGameObjectsTyped[type];
 }
@@ -767,4 +629,16 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
+}
+
+bool Game::AddStarSector(sf::Vector2i star_sector_index)
+{
+	for (sf::Vector2i index : m_star_sectors_known)
+	{
+		if (star_sector_index == index)
+			return false;
+	}
+
+	m_star_sectors_known.push_back(star_sector_index);
+	return true;
 }

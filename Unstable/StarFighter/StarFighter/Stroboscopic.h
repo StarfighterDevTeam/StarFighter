@@ -10,7 +10,7 @@ class Stroboscopic : public GameObject
 public :
 	Stroboscopic(sf::Time decade_time, GameObject* parent);
 	virtual ~Stroboscopic();
-	void update(sf::Time deltaTime) override;
+	void Update(sf::Time deltaTime) override;
 
 	Uint8 m_alpha;
 	sf::Time m_decay_time;

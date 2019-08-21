@@ -11,7 +11,7 @@ Star::Star(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vecto
 	m_color = color;
 }
 
-void Star::update(sf::Time deltaTime)
+void Star::Update(sf::Time deltaTime)
 {
 	//pulse
 	if (m_pulse_periodicity > 0)
@@ -25,5 +25,5 @@ void Star::update(sf::Time deltaTime)
 		setColor(sf::Color(255, 255, 255, m_color.a * (1 - 0.20 * cos(m_pulse_clock * 2 * M_PI / m_pulse_periodicity))));
 	}
 
-	GameObject::update(deltaTime);
+	GameObject::Update(deltaTime);
 }

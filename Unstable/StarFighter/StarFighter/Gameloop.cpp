@@ -38,7 +38,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		star_generator->Update(deltaTime);
 	}
 	
-	(*CurrentGame).updateScene(deltaTime);
+	(*CurrentGame).UpdateScene(deltaTime);
 
 	UpdateCamera(deltaTime);
 }

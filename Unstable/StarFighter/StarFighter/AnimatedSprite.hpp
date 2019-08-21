@@ -40,7 +40,7 @@ class AnimatedSprite : public sf::Drawable, public sf::Transformable
 public:
 	explicit AnimatedSprite(sf::Time frameTime = sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES), bool paused = false, bool looped = true);
 
-	void update(sf::Time deltaTime);
+	void Update(sf::Time deltaTime);
 	void setAnimation(const Animation& animation, bool keep_frame_index = false);
 	void setFrameTime(sf::Time time);
 	void play();
