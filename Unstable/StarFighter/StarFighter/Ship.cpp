@@ -7,7 +7,7 @@ using namespace sf;
 // ----------------SHIP ---------------
 Ship::Ship()
 {
-	
+	m_star_sector_index = sf::Vector2i(0, 0);
 }
 
 void Ship::Init()

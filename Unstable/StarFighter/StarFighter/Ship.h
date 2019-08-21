@@ -67,6 +67,9 @@ public :
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 
+	//StarGenerator
+	sf::Vector2i m_star_sector_index;
+
 private:
 	bool m_moving;
 	bool m_movingX;

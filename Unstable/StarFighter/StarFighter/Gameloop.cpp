@@ -11,31 +11,31 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_map_size = m_background->m_size;
 
 	//ship
-	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3, 1);
+	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha1.png", sf::Vector2f(84, 69*3), sf::Vector2f(42, 42), 3, 1);
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 
 	//star generator
 	for (int i = 0; i < 3; i++)
 	{
-		m_star_generator.push_back(new StarGenerator());
+		//m_star_generator.push_back(new StarGenerator());
 	}
 }
 
 Gameloop::~Gameloop()
 {
 	delete m_background;
-	for (int i = 0; i < 3; i++)
+	for (StarGenerator* star_generator : m_star_generator)
 	{
-		delete m_star_generator[i];
+		delete star_generator;
 	}
 	m_star_generator.clear();
 }
 
 void Gameloop::Update(sf::Time deltaTime)
 {
-	for (int i = 0; i < 3; i++)
+	for (StarGenerator* star_generator : m_star_generator)
 	{
-		m_star_generator[i]->Update(deltaTime);
+		star_generator->Update(deltaTime);
 	}
 	
 	(*CurrentGame).updateScene(deltaTime);

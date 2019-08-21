@@ -111,7 +111,7 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 		{
 			case Music_Main:
 			{
-				m_next_music_name = makePath("Music/Main.ogg");
+				m_next_music_name = makePath("Music/03-TheSonofFlynn.ogg");
 				break;
 			}
 		}

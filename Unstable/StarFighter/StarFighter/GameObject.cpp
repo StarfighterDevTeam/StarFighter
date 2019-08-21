@@ -653,3 +653,9 @@ bool GameObject::IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf:
 
 	return is_inside_area;
 }
+
+
+void SetStarSectorIndex(sf::Vector2i sector_index)
+{
+
+}

@@ -121,6 +121,9 @@ public:
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
 	sf::Vector2f m_previous_speed;
+
+	//Star Generator
+	void SetStarSectorIndex(sf::Vector2i sector_index);
 };
 
 #endif // GameObject_H_INCLUDED

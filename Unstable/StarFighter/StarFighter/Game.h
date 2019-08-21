@@ -18,6 +18,8 @@
 #include "SFPanel.h"
 #include "SFTextPop.h"
 
+#define STAR_SECTOR_SIZE			400
+
 class Ship;
 
 enum SFX_Bank

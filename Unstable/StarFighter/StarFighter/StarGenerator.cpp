@@ -17,8 +17,9 @@ void StarGenerator::Update(sf::Time deltaTime)
 	if (m_generator_clock > m_generator_threshold)
 	{
 		//randomization
-		float speed = RandomizeFloatBetweenValues(sf::Vector2f(50, 400));
-		float position = RandomizeFloatBetweenValues(sf::Vector2f(0, 1));
+		//float speed = RandomizeFloatBetweenValues(sf::Vector2f(50, 400));
+		float position_x = RandomizeFloatBetweenValues(sf::Vector2f(0, 1));
+		float position_y = RandomizeFloatBetweenValues(sf::Vector2f(0, 1));
 		Uint8 r = RandomizeIntBetweenValues(0, 5) > 0 ? 0 : 255;
 		//Uint8 g = RandomizeIntBetweenValues(0, 1) > 0 ? 0 : 255;
 		Uint8 b = RandomizeIntBetweenValues(0, 1) > 0 && r > 0 ? 0 : 255;
@@ -27,7 +28,7 @@ void StarGenerator::Update(sf::Time deltaTime)
 		float pulse_periodicity = RandomizeFloatBetweenValues(sf::Vector2f(0.5, 2));
 
 		//spawn
-		Star* star = new Star(sf::Vector2f(position * (*CurrentGame).m_map_size.x, (*CurrentGame).m_map_size.y + size * 0.5), sf::Vector2f(0, -speed), color, sf::Vector2f(size, size), pulse_periodicity);
+		Star* star = new Star(sf::Vector2f(position_x * (*CurrentGame).m_map_size.x, position_y * (*CurrentGame).m_map_size.y), sf::Vector2f(0, 0), color, sf::Vector2f(size, size), pulse_periodicity);
 		(*CurrentGame).addToScene(star, StarLayer, BackgroundObject);
 
 		//reset
