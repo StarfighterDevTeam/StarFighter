@@ -60,6 +60,11 @@ Game::Game(RenderWindow* window)
 	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 	addToScene(m_background, BackgroundLayer, BackgroundObject);
+
+	//Star Hunter
+	m_current_star_sector.m_index = sf::Vector2i(0, 0);
+	m_current_star_sector.m_status = Sector_Current;
+	UpdateSectorList(true);
 }
 
 Game::~Game()
@@ -237,6 +242,12 @@ void Game::UpdateScene(Time deltaTime)
 	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
+	//Update quad-tree classification of objects
+	UpdateSectorList();
+
+	if (m_sceneGameObjects.size() > 200)
+		printf("");
+
 	//Checking colisions
 	CheckCollisions();
 
@@ -343,7 +354,6 @@ void Game::drawScene()
 				if ((*(*it)).m_visible)
 				{
 					m_mainScreen.draw((*(*it)));
-
 				}
 			}
 		}
@@ -461,14 +471,43 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	addToFeedbacks(pop_feedback);
 }
 
-bool Game::AddStarSector(sf::Vector2i star_sector_index)
+bool Game::CreateStarSector(sf::Vector2i star_sector_index, StarSectorStatus status)
 {
-	for (sf::Vector2i index : m_star_sectors_known)
+	for (StarSector sector : m_star_sectors_known)
 	{
-		if (star_sector_index == index)
+		if (sector.m_index == star_sector_index)
 			return false;
 	}
 
-	m_star_sectors_known.push_back(star_sector_index);
+	m_star_sectors_known.push_back(StarSector(star_sector_index, status));
+
 	return true;
+}
+
+void Game::UpdateSectorList(bool force_update)
+{
+	//update needed?
+	GameObject* player = (GameObject*)m_playerShip;
+	if (force_update == true || m_current_star_sector.m_index != player->m_star_sector_index)
+	{
+		if (player != NULL)
+			m_current_star_sector.m_index = player->m_star_sector_index;
+
+		m_star_sectors_managed.clear();
+		
+		printf(">>> SECTORS UPDATE !!\n");
+		int nb_sectors_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 1;
+		int nb_sectors_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 1;
+		for (int i = 0; i < nb_sectors_x; i++)
+		{
+			for (int j = 0; j < nb_sectors_y; j++)
+			{
+				m_star_sectors_managed.push_back(StarSector(sf::Vector2i(i + m_current_star_sector.m_index.x - (nb_sectors_x / 2), j + m_current_star_sector.m_index.y - (nb_sectors_y / 2)), (i == nb_sectors_x / 2 && j == nb_sectors_y / 2) ? Sector_Current : Sector_OnScreen));
+				printf("i: %d, j: %d", i + m_current_star_sector.m_index.x - (nb_sectors_x / 2), j + m_current_star_sector.m_index.y - (nb_sectors_y / 2));
+				if (i == nb_sectors_x / 2 && j == nb_sectors_y / 2)
+					printf(" current");
+				printf("\n");
+			}
+		}
+	}
 }

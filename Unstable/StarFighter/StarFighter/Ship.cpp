@@ -25,7 +25,7 @@ void Ship::Init()
 	m_is_asking_SFPanel = SFPanel_None;
 
 	//Star Hunter
-	SetStarSectorIndex(sf::Vector2i(0, 0));
+	SetStarSectorIndex((*CurrentGame).m_current_star_sector.m_index);
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 }
 
@@ -88,7 +88,7 @@ void Ship::Update(sf::Time deltaTime)
 	//}
 
 	UpdateStarSectorIndex();
-	printf("Sector: %d, %d, position: %f, %f\n", m_star_sector_index.x, m_star_sector_index.y, m_position.x, m_position.y);
+	//printf("Sector: %d, %d, position: %f, %f\n", m_star_sector_index.x, m_star_sector_index.y, m_position.x, m_position.y);
 }
 
 void Ship::UpdateRotation()

@@ -39,6 +39,23 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
+enum StarSectorStatus
+{
+	Sector_Current,//player is inside this sector
+	Sector_OnScreen,//player is not inside the sector, but it can be seen on screen
+	Sector_Incoming,//the sector cannot be seen on screen, but is adjacent to a partial or full sector
+	Sector_Far,//other sectors
+};
+
+struct StarSector
+{
+public:
+	StarSector(){};
+	StarSector(sf::Vector2i index, StarSectorStatus status){ m_index = index; m_status = status; }
+	StarSectorStatus m_status;
+	sf::Vector2i m_index;
+};
+
 using namespace sf;
 
 struct Game
@@ -108,9 +125,11 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//Star Hunter
-	bool AddStarSector(sf::Vector2i star_sector_index);
+	bool CreateStarSector(sf::Vector2i star_sector_index, StarSectorStatus status = Sector_Far);
+	void UpdateSectorList(bool force_update = false);
 
 	GameObject* m_background;
+	StarSector m_current_star_sector;
 
 private:
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
@@ -128,7 +147,8 @@ private:
 	std::vector<SFText*> m_garbageTexts;
 
 	//Star Hunter
-	vector<sf::Vector2i> m_star_sectors_known;
+	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
+	vector<StarSector> m_star_sectors_managed;//all sectors that are close enough to need an updated
 };
 
 #endif // GAME_H_INCLUDED

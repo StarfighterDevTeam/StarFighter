@@ -18,6 +18,7 @@ class Loot;
 
 enum LayerType {
 	BackgroundLayer,
+	SectorLayer,
 	StarLayer,	
 	PlayerStroboscopicLayer,
 	PlayerShipLayer,
