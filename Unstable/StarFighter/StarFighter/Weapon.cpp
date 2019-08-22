@@ -23,12 +23,13 @@ Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, Co
 	m_lock_rectangle.setOutlineThickness(-2);
 	m_lock_rectangle.setFillColor(sf::Color(0, 0, 0, 0));
 
+	m_range = REF_WINDOW_RESOLUTION_X * 3;
+
 	switch (weapon_type)
 	{
 		case Weapon_Laser:
 		{
-			m_rate_of_fire = 0.05;
-			m_range = 600;
+			m_rate_of_fire = 0.1;
 			break;
 		}
 	}
@@ -54,8 +55,8 @@ void Weapon::Fire()
 void Weapon::Update(sf::Time deltaTime)
 {
 	//position offset
-	m_position.x = m_owner->m_position.x + cos(- m_owner->m_heading * M_PI / 180 + M_PI_2) * 42;
-	m_position.y = m_owner->m_position.y + sin(- m_owner->m_heading * M_PI / 180 + M_PI_2) * 42;
+	m_position.x = m_owner->m_position.x + cos(- m_owner->m_heading * M_PI / 180 + M_PI_2) * m_owner->m_size.y * 0.5;
+	m_position.y = m_owner->m_position.y + sin(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_owner->m_size.y * 0.5;
 
 	//heading
 	m_heading = m_owner->m_heading + m_heading_offset;
