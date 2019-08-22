@@ -13,8 +13,8 @@ Gameloop::Gameloop()
 
 	//star
 	StarGenerator* generator = new StarGenerator();
-	generator->CreateStar();
-
+	//generator->CreateStar();
+	//Star* star = generator->CreateStar(sf::Vector2i(0, -2));
 	//star generator
 	//for (int i = 0; i < 3; i++)
 	//{
@@ -76,5 +76,6 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 
 void Gameloop::PopulateSector(sf::Vector2i sector_index)
 {
+	//if (sector_index == sf::Vector2i(1, 0))
 	Star* new_star = StarGenerator::CreateStar(sector_index);
 }

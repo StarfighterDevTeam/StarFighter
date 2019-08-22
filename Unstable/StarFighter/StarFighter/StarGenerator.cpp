@@ -48,7 +48,7 @@ Star* StarGenerator::CreateStar()
 	Uint8 b = RandomizeIntBetweenValues(0, 1) > 0 && r > 0 ? 0 : 255;
 	sf::Color color = sf::Color(r, 0, b, 150);
 	float size = RandomizeFloatBetweenValues(sf::Vector2f(4, 12));
-	float pulse_periodicity = RandomizeFloatBetweenValues(sf::Vector2f(0.5, 2));
+	float pulse_periodicity = RandomizeFloatBetweenValues(sf::Vector2f(0.2, 1));
 
 	//spawn
 	Star* star = new Star(sf::Vector2f(position_x * (*CurrentGame).m_map_size.x, position_y * (*CurrentGame).m_map_size.y), sf::Vector2f(0, 0), color, sf::Vector2f(size, size), pulse_periodicity);
@@ -64,7 +64,7 @@ Star* StarGenerator::CreateStar(sf::Vector2i sector_index)
 	star->SetStarSectorIndex(sector_index);
 
 	star->m_position.x += STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));
-	star->m_position.y += STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));
+	star->m_position.y -= STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));
 
 	return star;
 }

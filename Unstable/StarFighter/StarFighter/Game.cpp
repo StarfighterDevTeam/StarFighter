@@ -303,7 +303,8 @@ void Game::UpdateObjects(Time deltaTime)
 			if (object == player || object == m_background)
 				object->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 			else
-				object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, object->m_position.y - (- player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+				object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - (object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+				//object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - object->m_position.y - (- player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 
 			addToScene(object, object->m_layer, object->m_collider);
 		}
