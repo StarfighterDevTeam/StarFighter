@@ -19,6 +19,8 @@ public:
 	void Draw();
 	void UpdateCamera(sf::Time deltaTime);
 
+	void PopulateSector(sf::Vector2i sector_index);
+
 	vector<StarGenerator*> m_star_generator;
 
 private:

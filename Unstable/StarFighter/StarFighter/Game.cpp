@@ -200,6 +200,7 @@ void Game::addToScene(GameObject *object, LayerType layer, ColliderType type)
 {
 	object->m_layer = layer;
 	object->m_collider = type;
+	object->m_removeMe = false;
 
 	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_ColliderType))
 	{
@@ -501,13 +502,6 @@ bool Game::AddToStarSectorsKnown(sf::Vector2i star_sector_index, StarSectorStatu
 	return true;
 }
 
-bool Game::CreateNewSector(sf::Vector2i star_sector_index)
-{
-	//TODO: create sector procedural content
-	//printf("Sector %d, %d created (nb of sectors known: %d).\n", star_sector_index.x, star_sector_index.y, m_star_sectors_known.size());
-	return true;
-}
-
 void Game::UpdateSectorList(bool force_update)
 {
 	//update needed?
@@ -534,7 +528,7 @@ void Game::UpdateSectorList(bool force_update)
 				
 				if (AddToStarSectorsKnown(sector) == true)
 				{
-					CreateNewSector(sector.m_index);//new sector discovered needs to be created
+					m_star_sectors_to_create.push_back(sector.m_index);//new sector discovered needs to be created
 				}
 
 				//printf("i: %d, j: %d", i + m_current_star_sector.m_index.x - (nb_sectors_x / 2), j + m_current_star_sector.m_index.y - (nb_sectors_y / 2));
@@ -550,7 +544,7 @@ void Game::UpdateSectorList(bool force_update)
 		for (StarSector old_sector : old_star_sectors_managed)
 		{
 			bool found = false;
-			for (StarSector new_sector : m_star_sectors_known)
+			for (StarSector new_sector : m_star_sectors_managed)
 			{
 				if (old_sector.m_index == new_sector.m_index)
 				{
@@ -565,7 +559,7 @@ void Game::UpdateSectorList(bool force_update)
 			}
 		}
 
-		for (StarSector new_sector : m_star_sectors_known)
+		for (StarSector new_sector : m_star_sectors_managed)
 		{
 			bool found = false;
 			for (StarSector old_sector : old_star_sectors_managed)
@@ -583,37 +577,42 @@ void Game::UpdateSectorList(bool force_update)
 			}
 		}
 
-
-		/*
 		//Sectors to remove from scene
 		for (sf::Vector2i index : sector_index_to_remove)
 		{
 			vector<GameObject*> vector_objects;
 			for (GameObject* object : m_sceneGameObjects)
 			{
+				if (object == m_background)
+					continue;
+
 				if (object->m_star_sector_index == index && object->m_garbageMe == false)
 				{
 					if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
 					{
 						object->m_removeMe = true;
 						vector_objects.push_back(object);
+						//printf("game object removed and stored.\n");
 					}
 					else
 						object->m_garbageMe = true;
 				}
 			}
 
-			//m_sceneGameObjectsStored.insert(pair<Vector2i, vector<GameObject*> >(index, vector_objects));
+			if (vector_objects.empty() == false)
+				m_sceneGameObjectsStored.insert(pair<Vector2i, vector<GameObject*> >(index, vector_objects));
 		}
 		
 		//Sectors to insert insert into scene
 		for (sf::Vector2i index : sector_index_to_add)
 		{
-			//for (GameObject* object : m_sceneGameObjectsStored[index])
-			//	addToScene(object, object->m_layer, object->m_collider);
-
-			//m_sceneGameObjectsStored.erase(index);
+			for (GameObject* object : m_sceneGameObjectsStored[index])
+			{
+				addToScene(object, object->m_layer, object->m_collider);
+				//printf("game object restored.\n");
+			}
+				
+			m_sceneGameObjectsStored.erase(index);
 		}
-		*/
 	}
 }

@@ -40,6 +40,13 @@ void Gameloop::Update(sf::Time deltaTime)
 	
 	(*CurrentGame).UpdateScene(deltaTime);
 
+	//create procedural content for new sectors
+	for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_to_create)
+	{
+		PopulateSector(sector_index);
+	}
+	(*CurrentGame).m_star_sectors_to_create.clear();
+
 	//UpdateCamera(deltaTime);
 }
 
@@ -65,4 +72,9 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, y);
 	if (b >(*CurrentGame).m_map_size.y - y)
 		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, (*CurrentGame).m_map_size.y - y);
+}
+
+void Gameloop::PopulateSector(sf::Vector2i sector_index)
+{
+	Star* new_star = StarGenerator::CreateStar(sector_index);
 }

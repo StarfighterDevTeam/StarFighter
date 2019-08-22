@@ -128,10 +128,10 @@ public:
 	bool AddToStarSectorsKnown(sf::Vector2i star_sector_index, StarSectorStatus status = Sector_Far);
 	bool AddToStarSectorsKnown(StarSector sector);
 	void UpdateSectorList(bool force_update = false);
-	bool CreateNewSector(sf::Vector2i star_sector_index);
 
 	GameObject* m_background;
 	StarSector m_current_star_sector;
+	vector<sf::Vector2i> m_star_sectors_to_create;//all sectors that are close enough to need an updated
 
 	//DEBUG
 	GameObject* m_sector_debug_current;
@@ -146,7 +146,7 @@ private:
 	RenderWindow* m_window;
 
 	vector<GameObject*> m_sceneGameObjects;
-	map<sf::Vector2i, vector<GameObject*> > m_sceneGameObjectsStored;
+	map<sf::Vector2i, vector<GameObject*>, Vector2iComp > m_sceneGameObjectsStored;
 	
 	list<RectangleShape*> m_sceneFeedbackBars;
 	list<Text*> m_sceneFeedbackTexts;
@@ -160,6 +160,7 @@ private:
 	//Star Hunter
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
 	vector<StarSector> m_star_sectors_managed;//all sectors that are close enough to need an updated
+	
 };
 
 #endif // GAME_H_INCLUDED

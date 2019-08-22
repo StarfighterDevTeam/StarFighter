@@ -56,3 +56,15 @@ Star* StarGenerator::CreateStar()
 
 	return star;
 }
+
+Star* StarGenerator::CreateStar(sf::Vector2i sector_index)
+{
+	Star* star = CreateStar();
+
+	star->SetStarSectorIndex(sector_index);
+
+	star->m_position.x += STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));
+	star->m_position.y += STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));
+
+	return star;
+}

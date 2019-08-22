@@ -99,4 +99,9 @@ void ScaleVector(sf::Vector2f* vector, float target_value);
 float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 float GetVectorLength(sf::Vector2f vector);
 
+struct Vector2iComp
+{
+	bool operator() (sf::Vector2i l, sf::Vector2i r) { return (l.x < r.x || l.x == r.x && l.y < r.y);; }
+};
+
 #endif // GLOBALS_H_INCLUDED
