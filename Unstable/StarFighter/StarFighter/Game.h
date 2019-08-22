@@ -147,6 +147,8 @@ private:
 
 	vector<GameObject*> m_sceneGameObjects;
 	map<sf::Vector2i, vector<GameObject*>, Vector2iComp > m_sceneGameObjectsStored;
+
+	bool IsSectorKnown(sf::Vector2i index);
 	
 	list<RectangleShape*> m_sceneFeedbackBars;
 	list<Text*> m_sceneFeedbackTexts;
@@ -160,7 +162,6 @@ private:
 	//Star Hunter
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
 	vector<StarSector> m_star_sectors_managed;//all sectors that are close enough to need an updated
-	
 };
 
 #endif // GAME_H_INCLUDED

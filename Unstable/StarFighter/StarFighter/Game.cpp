@@ -616,4 +616,20 @@ void Game::UpdateSectorList(bool force_update)
 			m_sceneGameObjectsStored.erase(index);
 		}
 	}
+
+	//TO BE DONE: be able to find a sector known from its sf::Vector2i key.
+	IsSectorKnown(sf::Vector2i(1, 0));
+}
+
+bool Game::IsSectorKnown(sf::Vector2i index)
+{
+	for_each(m_sceneGameObjectsStored.begin(), m_sceneGameObjectsStored.end(), [index](pair<sf::Vector2i, vector<GameObject* > > sector_index)
+	{
+		if (sector_index.first == index)
+		{
+			
+		}
+	});
+
+	return false;
 }

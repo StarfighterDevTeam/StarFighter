@@ -92,9 +92,10 @@ void Ship::Update(sf::Time deltaTime)
 
 	if (inputs_direction.y > 0)
 		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(max_braking, current_inertia_angle);
+	
 	else if (inputs_direction.y == 0)
 		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(idle_decelleration, current_inertia_angle);
-
+		
 	braking_vector.x = abs(m_speed.x) > abs(braking_vector.x) ? braking_vector.x : -m_speed.x;//braking cannot exceed speed (that would make us go backward)
 	braking_vector.y = abs(m_speed.y) > abs(braking_vector.y) ? braking_vector.y : -m_speed.y;
 
@@ -103,6 +104,9 @@ void Ship::Update(sf::Time deltaTime)
 	NormalizeVector(&m_speed, max_speed);
 
 	setRotation(m_heading);
+
+	//thruster animation
+	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
 	
 	////Action input
 	//UpdateInputStates();
