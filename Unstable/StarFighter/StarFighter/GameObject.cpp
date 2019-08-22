@@ -267,6 +267,14 @@ void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, f
 	m_speed.y = absolute_speed * cos(curAngle);
 }
 
+sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
+{
+	sf::Vector2f speed;
+	speed.x = -absolute_speed * sin(curAngle);
+	speed.y = absolute_speed * cos(curAngle);
+	return speed;
+}
+
 //Star Hunter
 void GameObject::SetStarSectorIndex(sf::Vector2i sector_index)
 {

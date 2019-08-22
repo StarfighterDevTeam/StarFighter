@@ -64,6 +64,7 @@ public:
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static int GaussianBlurDistribution(int x);
 	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
+	static sf::Vector2f GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
 
 	string GetTextureName();
 	GameObject* Clone();

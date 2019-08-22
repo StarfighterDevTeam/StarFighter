@@ -13,7 +13,8 @@
 enum PlayerActions
 {
 	Action_Idle,
-	Action_Firing,
+	Action_Speeding,
+	Action_Braking,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,
@@ -58,6 +59,8 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	//StarGenerator
+	float m_heading;
+	float m_acceleration;
 	
 
 private:

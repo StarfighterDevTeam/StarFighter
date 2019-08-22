@@ -354,7 +354,7 @@ void Game::drawScene()
 				sector_debug->SetStarSectorIndex(sector.m_index);
 				sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - (sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 
-				m_mainScreen.draw(*sector_debug);
+				//m_mainScreen.draw(*sector_debug);
 			}
 		}
 		else

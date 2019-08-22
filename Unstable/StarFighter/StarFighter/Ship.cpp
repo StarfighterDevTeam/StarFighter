@@ -27,6 +27,7 @@ void Ship::Init()
 	//Star Hunter
 	SetStarSectorIndex((*CurrentGame).m_current_star_sector.m_index);
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+	m_heading = 0;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -55,6 +56,13 @@ void Ship::Update(sf::Time deltaTime)
 	if ((*CurrentGame).m_window_has_focus)
 	{
 		inputs_direction = InputGuy::getDirections();
+
+		if (InputGuy::isSpeeding() == true)
+			inputs_direction.y = -1;
+		else if (InputGuy::isBraking() == true)
+			inputs_direction.y = 1;
+		else if (sf::Joystick::isConnected(0) == true)
+			inputs_direction.y = 0;
 	}
 
 	if (!m_disable_inputs)
@@ -64,19 +72,48 @@ void Ship::Update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	m_speed.x = inputs_direction.x * SHIP_MAX_SPEED;
-	m_speed.y = inputs_direction.y * SHIP_MAX_SPEED;
+	//m_speed.x = inputs_direction.x * SHIP_MAX_SPEED;
+	//m_speed.y = inputs_direction.y * SHIP_MAX_SPEED;
+
+	m_acceleration = 0;
+	static float max_acceleration = 2000;
+	if (inputs_direction.y < 0)
+		m_acceleration = max_acceleration * inputs_direction.y;
+	
+	static float turn_speed = 100;
+	m_heading += inputs_direction.x * turn_speed * deltaTime.asSeconds();
+
+	sf::Vector2f acceleration_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration, m_heading * M_PI / 180);
+
+	static float max_braking = 3000;
+	static float idle_decelleration = 1000;
+	sf::Vector2f braking_vector = sf::Vector2f(0, 0);
+	float current_inertia_angle = GetAngleRadForVector(m_speed);
+
+	if (inputs_direction.y > 0)
+		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(max_braking, current_inertia_angle);
+	else if (inputs_direction.y == 0)
+		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(idle_decelleration, current_inertia_angle);
+
+	braking_vector.x = abs(m_speed.x) > abs(braking_vector.x) ? braking_vector.x : -m_speed.x;//braking cannot exceed speed (that would make us go backward)
+	braking_vector.y = abs(m_speed.y) > abs(braking_vector.y) ? braking_vector.y : -m_speed.y;
+
+	m_speed += (acceleration_vector + braking_vector) * deltaTime.asSeconds();
+	static float max_speed = 800;
+	NormalizeVector(&m_speed, max_speed);
+
+	setRotation(m_heading);
 	
 	////Action input
 	//UpdateInputStates();
-	//if (m_inputs_states[Action_Firing] == Input_Tap)
+	//if (m_inputs_states[Action_Speeding] == Input_Tap)
 	//{
 	//	//do some action
 	//	//(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	//}
 	//
 
-	UpdateRotation();
+	//UpdateRotation();
 
 	GameObject::Update(deltaTime);
 
@@ -133,11 +170,13 @@ void Ship::UpdateInputStates()
 {
 	if ((*CurrentGame).m_window_has_focus)
 	{
-		GetInputState(InputGuy::isFiring(), Action_Firing);
+		GetInputState(InputGuy::isSpeeding(), Action_Speeding);
+		GetInputState(InputGuy::isBraking(), Action_Braking);
 	}
 	else
 	{
-		GetInputState(false, Action_Firing);
+		GetInputState(false, Action_Speeding);
+		GetInputState(false, Action_Braking);
 	}
 }
 
