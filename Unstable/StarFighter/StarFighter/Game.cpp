@@ -201,7 +201,7 @@ void Game::addToScene(GameObject *object, LayerType layer, ColliderType type)
 	object->m_layer = layer;
 	object->m_collider = type;
 
-	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
+	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_ColliderType))
 	{
 		m_sceneGameObjectsTyped[(int)type].push_back(object);
 		m_sceneGameObjectsLayered[(int)layer].push_back(object);
@@ -282,17 +282,20 @@ void Game::UpdateObjects(Time deltaTime)
 	//Update objects and delete "garbage" objects
 	vector<GameObject*> temp_sceneGameObjects;
 	for (GameObject* object : m_sceneGameObjects)
-	{
 		temp_sceneGameObjects.push_back(object);
-	}
 	m_sceneGameObjects.clear();
+	for (int i = 0; i < NBVAL_Layer; i++)
+		m_sceneGameObjectsLayered[i].clear();
+	for (int i = 0; i < NBVAL_ColliderType; i++)
+		m_sceneGameObjectsTyped[i].clear();
+
 	for (GameObject* object : temp_sceneGameObjects)
 	{
 		if (object->m_garbageMe == true)
 		{
 			delete object;
 		}
-		else
+		else if (object->m_removeMe == false)//if true, it has been stored in m_sceneGameObjectsStored already, therefore there is no memory leak if we don't push it back
 		{
 			object->Update(deltaTime);
 
@@ -301,7 +304,7 @@ void Game::UpdateObjects(Time deltaTime)
 			else
 				object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, object->m_position.y - (- player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 
-			m_sceneGameObjects.push_back(object);
+			addToScene(object, object->m_layer, object->m_collider);
 		}
 	}
 
@@ -322,41 +325,7 @@ void Game::drawScene()
 
 	for (int i = 0; i < NBVAL_Layer; i++)
 	{
-		if (i == FeedbacksLayer)
-		{
-			for (std::list<RectangleShape*>::iterator it = m_sceneFeedbackBars.begin(); it != m_sceneFeedbackBars.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				m_mainScreen.draw(*(*it));
-			}
-			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				m_mainScreen.draw(*(*it));
-			}
-			for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				if ((*(*it)).m_visible)
-				{
-					m_mainScreen.draw(*(*it));
-				}
-			}
-		}
-		else if (i == HUDLayer)
-		{
-			for (std::list<SFPanel*>::iterator it = m_sceneFeedbackSFPanels.begin(); it != m_sceneFeedbackSFPanels.end(); it++)
-			{
-				(*(*it)).Draw(m_mainScreen);
-			}
-		}
-		else if (i == SectorLayer)
+		if (i == SectorLayer)
 		{
 			//DEBUG
 			GameObject* player = (GameObject*)m_playerShip;
@@ -388,14 +357,12 @@ void Game::drawScene()
 		}
 		else
 		{
-			for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
+			for (GameObject* it : m_sceneGameObjectsLayered[i])
+			//for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
 			{
-				if (*it == NULL)
-					continue;
-
-				if ((*(*it)).m_visible)
+				if (it->m_visible == true)
 				{
-					m_mainScreen.draw((*(*it)));
+					m_mainScreen.draw(*it);
 				}
 			}
 		}
@@ -424,7 +391,7 @@ void Game::CheckCollisions()
 		{
 			if (*it2 == NULL)
 				continue;
-			
+
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
@@ -550,6 +517,9 @@ void Game::UpdateSectorList(bool force_update)
 		if (player != NULL)
 			m_current_star_sector.m_index = player->m_star_sector_index;
 
+		vector<StarSector> old_star_sectors_managed;
+		for (StarSector sector : m_star_sectors_managed)
+			old_star_sectors_managed.push_back(sector);
 		m_star_sectors_managed.clear();
 		
 		//printf(">>> SECTORS UPDATE !!\n");
@@ -573,5 +543,77 @@ void Game::UpdateSectorList(bool force_update)
 				//printf("\n");
 			}
 		}
+
+		//delta between old and new manageable sectors
+		vector<sf::Vector2i> sector_index_to_add;
+		vector<sf::Vector2i> sector_index_to_remove;
+		for (StarSector old_sector : old_star_sectors_managed)
+		{
+			bool found = false;
+			for (StarSector new_sector : m_star_sectors_known)
+			{
+				if (old_sector.m_index == new_sector.m_index)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (found == false)
+			{
+				sector_index_to_remove.push_back(old_sector.m_index);
+			}
+		}
+
+		for (StarSector new_sector : m_star_sectors_known)
+		{
+			bool found = false;
+			for (StarSector old_sector : old_star_sectors_managed)
+			{
+				if (old_sector.m_index == new_sector.m_index)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (found == false)
+			{
+				sector_index_to_add.push_back(new_sector.m_index);
+			}
+		}
+
+
+		/*
+		//Sectors to remove from scene
+		for (sf::Vector2i index : sector_index_to_remove)
+		{
+			vector<GameObject*> vector_objects;
+			for (GameObject* object : m_sceneGameObjects)
+			{
+				if (object->m_star_sector_index == index && object->m_garbageMe == false)
+				{
+					if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
+					{
+						object->m_removeMe = true;
+						vector_objects.push_back(object);
+					}
+					else
+						object->m_garbageMe = true;
+				}
+			}
+
+			//m_sceneGameObjectsStored.insert(pair<Vector2i, vector<GameObject*> >(index, vector_objects));
+		}
+		
+		//Sectors to insert insert into scene
+		for (sf::Vector2i index : sector_index_to_add)
+		{
+			//for (GameObject* object : m_sceneGameObjectsStored[index])
+			//	addToScene(object, object->m_layer, object->m_collider);
+
+			//m_sceneGameObjectsStored.erase(index);
+		}
+		*/
 	}
 }

@@ -35,8 +35,8 @@ enum ColliderType {
 	PlayerFire,
 	EnemyFire,
 	EnemyShip,
-	HUDLayer,
-	NBVAL_GameObject
+	HUDObject,
+	NBVAL_ColliderType
 };
 
 class GameObject : public AnimatedSprite
@@ -69,7 +69,8 @@ public:
 	GameObject* Clone();
 
 	bool m_visible;
-	bool m_garbageMe;
+	bool m_garbageMe;//object to be deleted
+	bool m_removeMe;//object to be removed from m_sceneGameObjects
 	ColliderType m_collider;
 	LayerType m_layer;
 	sf::Vector2f m_size;

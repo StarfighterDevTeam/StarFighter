@@ -98,6 +98,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_position = position;
 	m_visible = true;
 	m_garbageMe = false;
+	m_removeMe = false;
 	m_radius = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	m_rotation_speed = 0.f;
 }

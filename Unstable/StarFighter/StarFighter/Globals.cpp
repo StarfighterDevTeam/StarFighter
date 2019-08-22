@@ -315,3 +315,13 @@ float GetVectorLength(sf::Vector2f vector)
 	s = floor(s);
 	return s;
 }
+
+bool operator< (const Vector2int& l, const Vector2int& r)
+{
+	return (l.x < r.x || l.x == r.x && l.y < r.y);
+}
+
+bool operator< (const sf::Vector2i& l, const sf::Vector2i& r)
+{
+	return (l.x < r.x || l.x == r.x && l.y < r.y);
+}

@@ -144,15 +144,18 @@ private:
 	bool isVectorEmpty(vector <GameObject*>* vector);
 
 	RenderWindow* m_window;
-	std::list<RectangleShape*> m_sceneFeedbackBars;
-	std::list<Text*> m_sceneFeedbackTexts;
-	std::list<SFPanel*> m_sceneFeedbackSFPanels;
-	std::vector<SFText*> m_sceneFeedbackSFTexts;
-	std::vector<GameObject*> m_sceneGameObjects;
-	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
-	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
-	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
-	std::vector<SFText*> m_garbageTexts;
+
+	vector<GameObject*> m_sceneGameObjects;
+	map<sf::Vector2i, vector<GameObject*> > m_sceneGameObjectsStored;
+	
+	list<RectangleShape*> m_sceneFeedbackBars;
+	list<Text*> m_sceneFeedbackTexts;
+	list<SFPanel*> m_sceneFeedbackSFPanels;
+	vector<SFText*> m_sceneFeedbackSFTexts;
+	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
+	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
+	vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_ColliderType];
+	vector<SFText*> m_garbageTexts;
 
 	//Star Hunter
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player

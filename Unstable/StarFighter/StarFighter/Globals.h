@@ -20,6 +20,12 @@ const char* getSavesPath();
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 std::string StringCut(std::string str, const size_t length);
 
+struct Vector2int
+{
+	int x;
+	int y;	
+};
+
 #ifdef __APPLE__
 	#define PLAYER_SAVE_FILE						"SaveFile.txt"
 #else
