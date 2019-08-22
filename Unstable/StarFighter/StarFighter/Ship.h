@@ -7,6 +7,8 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
+#include "Weapon.h";
+
 #define SHIP_MAX_SPEED				500.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
@@ -15,6 +17,7 @@ enum PlayerActions
 	Action_Idle,
 	Action_Speeding,
 	Action_Braking,
+	Action_Firing,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,
@@ -58,10 +61,9 @@ public :
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 
-	//StarGenerator
-	float m_heading;
+	//Star Hunter
 	float m_acceleration;
-	
+	vector<Weapon*> m_weapons;
 
 private:
 	bool m_moving;

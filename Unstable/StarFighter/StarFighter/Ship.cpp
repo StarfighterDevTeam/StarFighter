@@ -7,7 +7,7 @@ using namespace sf;
 // ----------------SHIP ---------------
 Ship::Ship()
 {
-	m_star_sector_index = sf::Vector2i(0, 0);
+	
 }
 
 void Ship::Init()
@@ -27,7 +27,7 @@ void Ship::Init()
 	//Star Hunter
 	SetStarSectorIndex((*CurrentGame).m_current_star_sector.m_index);
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
-	m_heading = 0;
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(0, m_size.y * 0.5)));
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -103,8 +103,6 @@ void Ship::Update(sf::Time deltaTime)
 	static float max_speed = 800;
 	NormalizeVector(&m_speed, max_speed);
 
-	setRotation(m_heading);
-
 	//thruster animation
 	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
 	
@@ -118,6 +116,14 @@ void Ship::Update(sf::Time deltaTime)
 	//
 
 	//UpdateRotation();
+	for (Weapon* weapon : m_weapons)
+	{
+		weapon->Update(deltaTime);
+
+		if (InputGuy::isFiring() == true)
+			if (weapon->IsReadyToFire() == true)
+				weapon->Fire();
+	}
 
 	GameObject::Update(deltaTime);
 
@@ -176,11 +182,13 @@ void Ship::UpdateInputStates()
 	{
 		GetInputState(InputGuy::isSpeeding(), Action_Speeding);
 		GetInputState(InputGuy::isBraking(), Action_Braking);
+		GetInputState(InputGuy::isBraking(), Action_Firing);
 	}
 	else
 	{
 		GetInputState(false, Action_Speeding);
 		GetInputState(false, Action_Braking);
+		GetInputState(false, Action_Firing);
 	}
 }
 

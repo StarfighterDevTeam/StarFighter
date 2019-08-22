@@ -306,6 +306,12 @@ float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2
 	return GetVectorLength(current_diff);
 }
 
+float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
+{
+	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
+	return GetVectorLengthSquared(current_diff);
+}
+
 float GetVectorLength(sf::Vector2f vector)
 {
 	const float a = vector.x;
@@ -314,4 +320,38 @@ float GetVectorLength(sf::Vector2f vector)
 	s = sqrt(s);
 	s = floor(s);
 	return s;
+}
+
+float GetVectorLengthSquared(sf::Vector2f vector)
+{
+	const float a = vector.x;
+	const float b = vector.y;
+	float s = (a * a) + (b * b);
+
+	return s;
+}
+
+void Bound(float& input, float min, float max)
+{
+	if (min > max)
+	{
+		float _min = min;
+		min = max;
+		max = _min;
+	}
+
+	if (input < min)
+		input = min;
+
+	if (input > max)
+		input = max;
+}
+
+void BoundAngle(float& input, float max_angle)
+{
+	while (input < 0)
+		input += max_angle;
+
+	if (input > max_angle)
+		input = fmod(input, max_angle);
 }

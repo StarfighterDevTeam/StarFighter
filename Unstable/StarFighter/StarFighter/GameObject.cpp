@@ -71,6 +71,7 @@ void GameObject::SetAnimationLine(int animation, bool keep_frame_index)
 	anim = NULL;
 	play(*m_currentAnimation, keep_frame_index);
 	m_currentAnimationIndex = animation;
+	m_heading = 0;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
@@ -157,6 +158,9 @@ void GameObject::Update(sf::Time deltaTime)
 	m_position.y -= m_speed.y * deltaTime.asSeconds();
 
 	UpdateStarSectorIndex();
+
+	BoundAngle(m_heading, 360);
+	setRotation(m_heading);
 
 	if (m_frameNumber > 1)
 	{

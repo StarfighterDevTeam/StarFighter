@@ -83,6 +83,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+	float m_heading;
 
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;

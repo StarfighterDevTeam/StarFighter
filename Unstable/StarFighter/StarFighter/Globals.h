@@ -97,7 +97,11 @@ float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_
 bool NormalizeVector(sf::Vector2f* vector, float max_value);
 void ScaleVector(sf::Vector2f* vector, float target_value);
 float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 float GetVectorLength(sf::Vector2f vector);
+float GetVectorLengthSquared(sf::Vector2f vector);
+void Bound(float& input, float min, float max);
+void BoundAngle(float& input, float max_angle);
 
 struct Vector2iComp
 {
