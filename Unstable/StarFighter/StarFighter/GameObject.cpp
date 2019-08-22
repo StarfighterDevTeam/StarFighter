@@ -16,9 +16,9 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	Init(position, speed, texture, 1);
 }
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, int stroke_size)
 {
-	Init(position, speed, color, size);
+	Init(position, speed, color, size, stroke_size);
 }
 
 string GameObject::GetTextureName()
@@ -126,9 +126,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, int stroke_size)
 {
-	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
+	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, stroke_size);
 	ostringstream ss;
 	ss << "rectangle_" << (int)size.x << "x" << (int)size.y << "_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
 	string textureName = ss.str();
@@ -153,7 +153,9 @@ void GameObject::Update(sf::Time deltaTime)
 	m_previous_speed = m_speed;
 	
 	m_position.x += m_speed.x * deltaTime.asSeconds();
-	m_position.y += m_speed.y * deltaTime.asSeconds();
+	m_position.y -= m_speed.y * deltaTime.asSeconds();
+
+	UpdateStarSectorIndex();
 
 	if (m_frameNumber > 1)
 	{
@@ -275,8 +277,8 @@ void GameObject::SetStarSectorIndex(sf::Vector2i sector_index)
 
 void GameObject::UpdateStarSectorIndex()
 {
-	float a = (m_position.x / STAR_SECTOR_SIZE);
-	float b = m_position.x / STAR_SECTOR_SIZE + 0.5;
-	m_star_sector_index.x = (int)((m_position.x / STAR_SECTOR_SIZE) + 0.5);
-	m_star_sector_index.y = -(int)((m_position.y / STAR_SECTOR_SIZE) + 0.5);
+	float a = (m_position.y / STAR_SECTOR_SIZE);
+	float b = m_position.y / STAR_SECTOR_SIZE + 0.5;
+	m_star_sector_index.x = (int)(m_position.x / STAR_SECTOR_SIZE + (m_position.x >= 0 ? 0.5 : -0.5));
+	m_star_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
 }

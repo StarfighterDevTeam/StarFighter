@@ -37,7 +37,7 @@ std::string StringCut(std::string str, const size_t length);
 
 #define ICON_SHIP_PNG							"Icons/ShipModel_icon.png"
 
-#define STAR_SECTOR_SIZE			400
+#define STAR_SECTOR_SIZE						300
 
 #define	GHOST_ALPHA_VALUE						120
 

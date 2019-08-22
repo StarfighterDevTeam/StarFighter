@@ -86,8 +86,6 @@ void Ship::Update(sf::Time deltaTime)
 	//{
 	//	m_SFTargetPanel->Update(deltaTime);
 	//}
-
-	UpdateStarSectorIndex();
 	//printf("Sector: %d, %d, position: %f, %f\n", m_star_sector_index.x, m_star_sector_index.y, m_position.x, m_position.y);
 }
 

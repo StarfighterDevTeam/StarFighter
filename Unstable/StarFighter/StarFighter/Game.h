@@ -125,11 +125,19 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//Star Hunter
-	bool CreateStarSector(sf::Vector2i star_sector_index, StarSectorStatus status = Sector_Far);
+	bool AddToStarSectorsKnown(sf::Vector2i star_sector_index, StarSectorStatus status = Sector_Far);
+	bool AddToStarSectorsKnown(StarSector sector);
 	void UpdateSectorList(bool force_update = false);
+	bool CreateNewSector(sf::Vector2i star_sector_index);
 
 	GameObject* m_background;
 	StarSector m_current_star_sector;
+
+	//DEBUG
+	GameObject* m_sector_debug_current;
+	GameObject* m_sector_debug_onscreen;
+	GameObject* m_sector_debug_incoming;
+	GameObject* m_sector_debug_far;
 
 private:
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
