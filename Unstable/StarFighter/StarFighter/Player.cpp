@@ -60,7 +60,7 @@ void Player::Update(sf::Time deltaTime)
 				weapon->Fire();
 	}
 
-	GameObject::Update(deltaTime);
+	Ship::Update(deltaTime);
 }
 
 void Player::UpdateInputStates()

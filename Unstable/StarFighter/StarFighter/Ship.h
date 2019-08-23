@@ -24,6 +24,9 @@ public :
 
 	//Star Hunter
 	void ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction);
+	void Update(sf::Time deltaTime) override;
+	void GetHitByAmmo(GameObject* ammo) override;
+
 	float m_acceleration;
 	float m_speed_max;
 	float m_max_acceleration;
@@ -31,6 +34,8 @@ public :
 	float m_max_braking;
 	float m_idle_decelleration;
 	vector<Weapon*> m_weapons;
+
+	float m_hit_feedback_timer;
 };
 
 #endif // SHIP_H_INCLUDED

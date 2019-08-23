@@ -7,7 +7,7 @@ using namespace sf;
 // ----------------SHIP ---------------
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	
+	m_hit_feedback_timer = 0;
 }
 
 Ship::~Ship()
@@ -44,6 +44,20 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
 }
 
+void Ship::Update(sf::Time deltaTime)
+{
+	if (m_hit_feedback_timer > 0)
+		m_hit_feedback_timer -= deltaTime.asSeconds();
+
+	if (m_hit_feedback_timer > 0)
+		setColor(sf::Color::Yellow);
+	else
+		setColor(sf::Color::White);
+
+	GameObject::Update(deltaTime);
+}
+
+
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 {
 	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
@@ -53,4 +67,10 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 		m_stroboscopic_effect_clock.restart();
 	}
+}
+
+void Ship::GetHitByAmmo(GameObject* ammo)
+{
+	ammo->m_garbageMe;
+	m_hit_feedback_timer = 0.05;
 }

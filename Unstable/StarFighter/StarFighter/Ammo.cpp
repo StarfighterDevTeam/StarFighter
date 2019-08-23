@@ -12,14 +12,23 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 	sf::Vector2f textureSize;
 	int frameNumber = 1;
 	int animationNumber = 1;
+
 	switch (m_ammo_type)
 	{
 		case Ammo_LaserGreen:
 		{
 			m_speed_max = 2000;
 			m_acceleration = 10000;
-			textureName = "2D/laser_blue.png";
 			textureSize = sf::Vector2f(6, 32);
+			textureName = "2D/laser_green.png";
+			break;
+		}
+		case Ammo_LaserRed:
+		{
+			m_speed_max = 2000;
+			m_acceleration = 10000;
+			textureSize = sf::Vector2f(6, 32);
+			textureName = "2D/laser_red.png";
 			break;
 		}
 	}

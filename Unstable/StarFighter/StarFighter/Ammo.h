@@ -8,6 +8,7 @@ class Weapon;
 enum AmmoType
 {
 	Ammo_LaserGreen,
+	Ammo_LaserRed,
 };
 
 class Ammo : public GameObject

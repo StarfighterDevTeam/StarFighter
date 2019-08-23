@@ -381,26 +381,27 @@ void Game::CheckCollisions()
 	sf::Clock dt;
 	dt.restart();
 
-	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[ColliderType::PlayerShipObject].begin(); it1 != m_sceneGameObjectsTyped[ColliderType::PlayerShipObject].end(); it1++)
+	for (GameObject* player_ship : m_sceneGameObjectsTyped[PlayerShipObject])
 	{
-		if (*it1 == NULL)
-			continue;
-
-		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[ColliderType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[ColliderType::EnemyFire].end(); it2++)
+		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
 		{
-			if (*it2 == NULL)
-				continue;
-
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (SimpleCollision::AreColliding(player_ship, enemy_ammo) == true)
 			{
-				//Do something 
-				
+				player_ship->GetHitByAmmo(enemy_ammo);
 			}
 		}
 	}
-	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
+
+	for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
+	{
+		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShip])
+		{
+			if (SimpleCollision::AreColliding(player_ammo, enemy_ship) == true)
+			{
+				enemy_ship->GetHitByAmmo(player_ammo);
+			}
+		}
+	}
 }
 
 void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)

@@ -31,6 +31,8 @@ Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 			textureName = "2D/V_Alpha2_red.png";
 			textureSize = sf::Vector2f(68*3, 84);
 			frameNumber = 3;
+
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, EnemyFire, EnemyFireLayer, sf::Vector2f(0, m_size.y * 0.5)));
 			break;
 		}
 	}
@@ -47,5 +49,15 @@ void Enemy::Update(sf::Time deltaTime)
 {
 	ApplyFlightModel(deltaTime, sf::Vector2f(1, -1));
 
-	GameObject::Update(deltaTime);
+	for (Weapon* weapon : m_weapons)
+	{
+		weapon->Update(deltaTime);
+
+		if (weapon->IsReadyToFire() == true)
+		{
+			//weapon->Fire();
+		}	
+	}
+
+	Ship::Update(deltaTime);
 }

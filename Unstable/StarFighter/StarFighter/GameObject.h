@@ -96,6 +96,8 @@ public:
 	void UpdateStarSectorIndex();
 
 	sf::Vector2i m_star_sector_index;
+
+	virtual void GetHitByAmmo(GameObject* ammo);
 };
 
 #endif // GameObject_H_INCLUDED
