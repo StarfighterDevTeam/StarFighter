@@ -3,7 +3,6 @@
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber, animationNumber);
-	setOrigin(origin.x, origin.y);
 }
 
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()

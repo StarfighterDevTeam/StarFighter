@@ -71,6 +71,6 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 void Ship::GetHitByAmmo(GameObject* ammo)
 {
-	ammo->m_garbageMe;
+	ammo->m_garbageMe = true;
 	m_hit_feedback_timer = 0.05;
 }

@@ -29,10 +29,10 @@ Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 			m_idle_decelleration = 1000;
 
 			textureName = "2D/V_Alpha2_red.png";
-			textureSize = sf::Vector2f(68*3, 84);
+			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, EnemyFire, EnemyFireLayer, sf::Vector2f(0, m_size.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, EnemyFire, EnemyFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 	}
@@ -55,7 +55,7 @@ void Enemy::Update(sf::Time deltaTime)
 
 		if (weapon->IsReadyToFire() == true)
 		{
-			//weapon->Fire();
+			weapon->Fire();
 		}	
 	}
 

@@ -29,7 +29,7 @@ Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, Co
 	{
 		case Weapon_Laser:
 		{
-			m_rate_of_fire = 0.1;
+			m_rate_of_fire = 1;
 			break;
 		}
 	}
