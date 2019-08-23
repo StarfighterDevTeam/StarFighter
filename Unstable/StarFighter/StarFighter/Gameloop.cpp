@@ -18,7 +18,6 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene(enemy, EnemyShipLayer, EnemyShip);
 
 	player->m_marked_ships.push_back(enemy);
-	enemy->m_marker->m_visible = true;
 
 	//star
 	//StarGenerator* generator = new StarGenerator();

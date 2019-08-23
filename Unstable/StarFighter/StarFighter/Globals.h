@@ -102,6 +102,7 @@ float GetVectorLength(sf::Vector2f vector);
 float GetVectorLengthSquared(sf::Vector2f vector);
 void Bound(float& input, float min, float max);
 void BoundAngle(float& input, float max_angle);
+bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 
 struct Vector2iComp
 {

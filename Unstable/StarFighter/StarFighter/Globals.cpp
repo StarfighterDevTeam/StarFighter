@@ -268,7 +268,6 @@ float GetAngleRadForVector(sf::Vector2f vector)
 	}
 
 	angle += M_PI_2;
-	//angle = (fmod(angle, 2 * M_PI));
 
 	return angle;
 }
@@ -354,4 +353,23 @@ void BoundAngle(float& input, float max_angle)
 
 	if (input > max_angle)
 		input = fmod(input, max_angle);
+}
+
+bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size)
+{
+	const float a = coordinates.x + bounds.x / 2;
+	const float b = coordinates.x - bounds.x / 2;
+
+	const float x = area_size.x;
+
+	const float c = coordinates.y + bounds.y / 2;
+	const float d = coordinates.y - bounds.y / 2;
+
+	const float y = area_size.y;
+
+	bool is_inside_area = true;
+	if (a < 0 || b > x || c < 0 || d > y)
+		is_inside_area = false;
+
+	return is_inside_area;
 }
