@@ -7,7 +7,7 @@
 #include "Game.h"
 #include "FileLoadUtils.h"
 #include "StarGenerator.h"
-#include "Ship.h"
+#include "Player.h"
 
 class Gameloop
 {

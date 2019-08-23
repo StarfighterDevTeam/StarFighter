@@ -63,13 +63,10 @@ void Weapon::Update(sf::Time deltaTime)
 
 	//rate of fire
 	if (m_rate_of_fire_timer > 0)
-	{
 		m_rate_of_fire_timer -= deltaTime.asSeconds();
-	}
-	else
-	{
+	else	
 		m_rate_of_fire_timer = 0;
-	}
+	
 
 	//locking target
 	if (m_locked_target == NULL)

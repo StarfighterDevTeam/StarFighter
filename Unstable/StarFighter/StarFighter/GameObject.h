@@ -16,20 +16,22 @@ class Equipment;
 class Weapon;
 class Loot;
 
-enum LayerType {
+enum LayerType
+{
 	BackgroundLayer,
 	SectorLayer,
 	StarLayer,	
-	PlayerStroboscopicLayer,
-	PlayerShipLayer,
-	PlayerFireLayer,
 	EnemyShipLayer,
 	EnemyFireLayer,
+	PlayerStroboscopicLayer,
+	PlayerFireLayer,
+	PlayerShipLayer,
 	FeedbacksLayer,
 	NBVAL_Layer
 };
 
-enum ColliderType {
+enum ColliderType
+{
 	BackgroundObject,
 	PlayerShipObject,
 	PlayerFire,

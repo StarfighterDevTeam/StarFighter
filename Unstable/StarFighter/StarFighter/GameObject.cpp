@@ -290,8 +290,6 @@ void GameObject::SetStarSectorIndex(sf::Vector2i sector_index)
 
 void GameObject::UpdateStarSectorIndex()
 {
-	float a = (m_position.y / STAR_SECTOR_SIZE);
-	float b = m_position.y / STAR_SECTOR_SIZE + 0.5;
 	m_star_sector_index.x = (int)(m_position.x / STAR_SECTOR_SIZE + (m_position.x >= 0 ? 0.5 : -0.5));
 	m_star_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
 }

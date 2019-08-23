@@ -90,12 +90,14 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Gameloop.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
@@ -113,6 +115,7 @@
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="CollisionUtils.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Gameloop.h" />
@@ -121,6 +124,7 @@
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFPanelSpecific.h" />
