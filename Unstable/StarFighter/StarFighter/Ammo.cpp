@@ -17,8 +17,8 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 	{
 		case Ammo_LaserGreen:
 		{
-			m_speed_max = 400;
-			m_acceleration = 10000;
+			m_speed_max = 3000;
+			m_acceleration = 100000;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_green.png";
 			break;

@@ -29,6 +29,11 @@ Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, Co
 	{
 		case Weapon_Laser:
 		{
+			m_rate_of_fire = 0.2;
+			break;
+		}
+		case Weapon_Laser_Enemy:
+		{
 			m_rate_of_fire = 1;
 			break;
 		}
@@ -55,8 +60,8 @@ void Weapon::Fire()
 void Weapon::Update(sf::Time deltaTime)
 {
 	//position offset
-	m_position.x = m_owner->m_position.x + cos(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.y + sin(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
-	m_position.y = m_owner->m_position.y + sin(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.y - cos(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.x;;
+	m_position.x = m_owner->m_position.x + cos(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y + sin(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
+	m_position.y = m_owner->m_position.y + sin(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y - cos(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;;
 
 	//heading
 	m_heading = m_owner->m_heading + m_heading_offset;

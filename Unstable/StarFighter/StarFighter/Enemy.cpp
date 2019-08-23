@@ -32,7 +32,7 @@ Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, EnemyFire, EnemyFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser_Enemy, Ammo_LaserRed, EnemyFire, EnemyFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 	}

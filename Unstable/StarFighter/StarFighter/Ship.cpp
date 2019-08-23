@@ -18,7 +18,7 @@ Ship::~Ship()
 void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 {
 	m_acceleration = 0;
-	if (inputs_direction.y < 0)
+	if (inputs_direction.y < 0)//up
 		m_acceleration = m_max_acceleration * inputs_direction.y;
 
 	m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();

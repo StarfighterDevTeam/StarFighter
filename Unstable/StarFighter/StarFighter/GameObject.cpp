@@ -154,7 +154,7 @@ void GameObject::Update(sf::Time deltaTime)
 	m_previous_speed = m_speed;
 	
 	m_position.x += m_speed.x * deltaTime.asSeconds();
-	m_position.y -= m_speed.y * deltaTime.asSeconds();
+	m_position.y += m_speed.y * deltaTime.asSeconds();
 
 	UpdateStarSectorIndex();
 
@@ -267,14 +267,14 @@ void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int h
 void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
 	m_speed.x = -absolute_speed * sin(curAngle);
-	m_speed.y = absolute_speed * cos(curAngle);
+	m_speed.y = -absolute_speed * cos(curAngle);
 }
 
 sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
 	sf::Vector2f speed;
 	speed.x = -absolute_speed * sin(curAngle);
-	speed.y = absolute_speed * cos(curAngle);
+	speed.y = -absolute_speed * cos(curAngle);
 	return speed;
 }
 
