@@ -21,10 +21,10 @@ enum LayerType
 	BackgroundLayer,
 	SectorLayer,
 	StarLayer,	
-	EnemyShipLayer,
+	PlayerFireLayer,
 	EnemyFireLayer,
 	PlayerStroboscopicLayer,
-	PlayerFireLayer,
+	EnemyShipLayer,
 	PlayerShipLayer,
 	FeedbacksLayer,
 	NBVAL_Layer

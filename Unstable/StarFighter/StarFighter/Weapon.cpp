@@ -4,14 +4,14 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f polar_offset, float heading_offset)
+Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset)
 {
 	m_owner = owner;
 	m_weapon_type = weapon_type;
 	m_ammo_type = ammo_type;
 	m_collider = collider;
 	m_layer = layer;
-	m_polar_offset = polar_offset;
+	m_weapon_offset = weapon_offset;
 	m_heading_offset = heading_offset;
 	m_rate_of_fire_timer = 0;
 
@@ -48,15 +48,15 @@ void Weapon::Fire()
 	m_rate_of_fire_timer = m_rate_of_fire;
 
 	//position offset
-	ammo->m_position.x += ammo->m_size.y * 0.5 * cos(m_owner->m_heading * M_PI / 180 + M_PI_2);
-	ammo->m_position.y -= ammo->m_size.y * 0.5 * sin(m_owner->m_heading * M_PI / 180 + M_PI_2);
+	ammo->m_position.x += ammo->m_size.y * 0.5 * cos((m_owner->m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
+	ammo->m_position.y -= ammo->m_size.y * 0.5 * sin((m_owner->m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
 }
 
 void Weapon::Update(sf::Time deltaTime)
 {
 	//position offset
-	m_position.x = m_owner->m_position.x + cos(- m_owner->m_heading * M_PI / 180 + M_PI_2) * m_owner->m_size.y * 0.5;
-	m_position.y = m_owner->m_position.y + sin(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_owner->m_size.y * 0.5;
+	m_position.x = m_owner->m_position.x + cos(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.y + sin(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
+	m_position.y = m_owner->m_position.y + sin(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.y - cos(-(m_owner->m_heading) * M_PI / 180 + M_PI_2) * m_weapon_offset.x;;
 
 	//heading
 	m_heading = m_owner->m_heading + m_heading_offset;
@@ -130,6 +130,6 @@ bool Weapon::CanStayLocked(GameObject* object)
 	{
 		return false;
 	}
-
+	
 	return true;
 }

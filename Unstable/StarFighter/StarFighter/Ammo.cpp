@@ -17,7 +17,7 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 	{
 		case Ammo_LaserGreen:
 		{
-			m_speed_max = 2000;
+			m_speed_max = 400;
 			m_acceleration = 10000;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_green.png";
@@ -58,6 +58,7 @@ void Ammo::Update(sf::Time deltaTime)
 	else
 	{
 		//get target
+		/*
 		if (m_locked_target != NULL)
 		{
 			if (m_locked_target->m_garbageMe == false)
@@ -70,11 +71,9 @@ void Ammo::Update(sf::Time deltaTime)
 				m_locked_target = NULL;
 			}
 		}
+		*/
 
 		//apply speed
-		sf::Vector2f acceleration_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration * deltaTime.asSeconds(), (m_heading + 180) * M_PI / 180);
-		m_speed += acceleration_vector;
-
 		NormalizeVector(&m_speed, m_speed_max);
 
 		GameObject::Update(deltaTime);

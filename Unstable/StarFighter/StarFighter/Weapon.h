@@ -13,7 +13,7 @@ enum WeaponType
 class Weapon
 {
 public:
-	Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f polar_offset = sf::Vector2f(0, 0), float heading_offset = 0);
+	Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset = 0);
 	~Weapon();
 
 	void Fire();
@@ -28,7 +28,7 @@ public:
 	AmmoType m_ammo_type;
 	ColliderType m_collider;
 	LayerType m_layer;
-	sf::Vector2f m_polar_offset;//angle in degrees and length to center
+	sf::Vector2f m_weapon_offset;
 	float m_heading_offset;
 	float m_rate_of_fire;
 	float m_rate_of_fire_timer;

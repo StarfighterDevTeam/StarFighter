@@ -54,9 +54,7 @@ void Enemy::Update(sf::Time deltaTime)
 		weapon->Update(deltaTime);
 
 		if (weapon->IsReadyToFire() == true)
-		{
 			weapon->Fire();
-		}	
 	}
 
 	Ship::Update(deltaTime);

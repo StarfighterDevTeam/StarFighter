@@ -13,7 +13,7 @@ Gameloop::Gameloop()
 
 	//enemy
 	//Enemy* enemy = new Enemy(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68 * 3, 84), sf::Vector2f(34, 42), 3, 1);
-	Enemy* enemy = new Enemy(Enemy_Alpha, sf::Vector2i(2, 0), 180);
+	Enemy* enemy = new Enemy(Enemy_Alpha, sf::Vector2i(2, 0), 0);
 	(*CurrentGame).addToScene(enemy, EnemyShipLayer, EnemyShip);
 
 	//star
