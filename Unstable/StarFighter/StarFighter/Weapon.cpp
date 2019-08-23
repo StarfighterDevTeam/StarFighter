@@ -67,8 +67,8 @@ void Weapon::Update(sf::Time deltaTime)
 	else	
 		m_rate_of_fire_timer = 0;
 	
-
 	//locking target
+	/*
 	if (m_locked_target == NULL)
 	{
 		ColliderType collider = m_collider == PlayerFire ? EnemyShip : PlayerShipObject;
@@ -102,6 +102,7 @@ void Weapon::Update(sf::Time deltaTime)
 			m_locking_target_clock = 0;
 		}
 	}
+	*/
 }
 
 bool Weapon::IsReadyToFire()
