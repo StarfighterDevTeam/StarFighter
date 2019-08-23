@@ -16,7 +16,6 @@ enum EnemyType
 class Enemy : public Ship
 {
 public :
-	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading);
 	void Update(sf::Time deltaTime) override;
 

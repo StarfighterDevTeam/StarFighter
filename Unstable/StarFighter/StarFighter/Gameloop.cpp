@@ -8,13 +8,17 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_map_size = sf::Vector2f(1920, 1080);
 
 	//ship
-	(*CurrentGame).m_playerShip = new Player(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), sf::Vector2f(34, 42), 3, 1);
+	Player* player = new Player(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), sf::Vector2f(34, 42), 3, 1);
+	(*CurrentGame).m_playerShip = player;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 
 	//enemy
 	//Enemy* enemy = new Enemy(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68 * 3, 84), sf::Vector2f(34, 42), 3, 1);
 	Enemy* enemy = new Enemy(Enemy_Alpha, sf::Vector2i(2, 0), 0);
 	(*CurrentGame).addToScene(enemy, EnemyShipLayer, EnemyShip);
+
+	player->m_marked_ships.push_back(enemy);
+	enemy->m_marker->m_visible = true;
 
 	//star
 	//StarGenerator* generator = new StarGenerator();

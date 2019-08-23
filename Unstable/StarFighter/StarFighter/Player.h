@@ -27,6 +27,7 @@ public :
 	Player(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	virtual ~Player();
 	void Update(sf::Time deltaTime) override;
+	void Draw(RenderTarget& screen) override;
 	void UpdateInputStates();
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
@@ -39,6 +40,8 @@ public :
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
+
+	vector<Ship*> m_marked_ships;
 };
 
 #endif // PLAYER_H_INCLUDED

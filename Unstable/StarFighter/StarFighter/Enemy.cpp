@@ -5,15 +5,11 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Ship(position, speed, textureName, size, origin, frameNumber, animationNumber)
-{
-	
-}
-
 Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 {
 	m_enemy_type = enemy_type;
-	
+	m_marker = new Marker(this);
+
 	string textureName;
 	sf::Vector2f textureSize;
 	int frameNumber = 1;

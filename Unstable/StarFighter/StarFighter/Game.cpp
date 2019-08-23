@@ -358,13 +358,10 @@ void Game::drawScene()
 		}
 		else
 		{
-			for (GameObject* it : m_sceneGameObjectsLayered[i])
+			for (GameObject* object : m_sceneGameObjectsLayered[i])
 			//for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
 			{
-				if (it->m_visible == true)
-				{
-					m_mainScreen.draw(*it);
-				}
+				object->Draw(m_mainScreen);
 			}
 		}
 	}

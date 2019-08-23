@@ -26,6 +26,8 @@ enum LayerType
 	PlayerStroboscopicLayer,
 	EnemyShipLayer,
 	PlayerShipLayer,
+	MarkerLayer,
+
 	FeedbacksLayer,
 	NBVAL_Layer
 };
@@ -37,7 +39,6 @@ enum ColliderType
 	PlayerFire,
 	EnemyFire,
 	EnemyShip,
-	HUDObject,
 	NBVAL_ColliderType
 };
 
@@ -61,6 +62,7 @@ public:
 	~GameObject();
 
 	virtual void Update(sf::Time deltaTime);
+	virtual void Draw(RenderTarget& screen);
 	virtual void UpdateAnimation(sf::Time deltaTime);
 	void SetAnimationLine(int animation, bool keep_frame_index = false);
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);

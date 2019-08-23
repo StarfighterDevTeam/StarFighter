@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "SFTextPop.h"
 #include "Weapon.h";
+#include "Marker.h"
 
 class Ship : public GameObject
 {
@@ -36,6 +37,8 @@ public :
 	vector<Weapon*> m_weapons;
 
 	float m_hit_feedback_timer;
+
+	Marker* m_marker;
 };
 
 #endif // SHIP_H_INCLUDED
