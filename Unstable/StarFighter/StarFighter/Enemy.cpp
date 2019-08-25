@@ -43,10 +43,7 @@ Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 
 void Enemy::Update(sf::Time deltaTime)
 {
-	m_speed_max = 0;
-
 	ApplyFlightModel(deltaTime, sf::Vector2f(1, -1));
-	
 
 	for (Weapon* weapon : m_weapons)
 	{
