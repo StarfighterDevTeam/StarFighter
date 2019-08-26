@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-SFPanelSpecific::SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip) : SFPanel(size, panel_type)
+SFPanelSpecific::SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Player* playerShip) : SFPanel(size, panel_type)
 {
 	m_playerShip = playerShip;
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);

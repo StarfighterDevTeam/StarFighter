@@ -3,7 +3,7 @@
 
 #include "Includes/SimpleCollision.hpp"
 
-class Ship;
+class Player;
 class Dialog;
 class SFItemStatsPanel;
 
@@ -63,7 +63,7 @@ public:
 	sf::Text m_text;
 	bool m_visible;
 	SFPanelTypes m_panel_type;
-	Ship* m_playerShip;
+	Player* m_playerShip;
 	SFActionBox* m_actions;
 };
 

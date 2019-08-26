@@ -6,7 +6,7 @@
 class SFPanelSpecific : public SFPanel
 {
 public:
-	SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip);
+	SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Player* playerShip);
 	~SFPanelSpecific();
 	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(sf::RenderTexture& screen);

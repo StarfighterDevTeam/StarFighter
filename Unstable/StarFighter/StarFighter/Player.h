@@ -41,7 +41,7 @@ public :
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
 
-	vector<Ship*> m_marked_ships;
+	vector<AIShip*> m_marked_ships;
 };
 
 #endif // PLAYER_H_INCLUDED

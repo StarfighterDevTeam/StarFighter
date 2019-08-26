@@ -9,13 +9,13 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 {
 	m_ship_type = ship_type;
 	m_hostility = hostility;
-	m_marker = new Marker(Marker_Enemy, this);
+	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
 
 	string textureName;
 	sf::Vector2f textureSize;
 	int frameNumber = 1;
 	int animationNumber = 1;
-	ColliderType collider;
+	ColliderType collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	switch (m_ship_type)
 	{
 		case Ship_Alpha:
@@ -29,7 +29,6 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			textureName = "2D/V_Alpha2_red.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
-			collider = m_hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 
 			m_weapons.push_back(new Weapon(this, Weapon_Laser_Enemy, Ammo_LaserRed, collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
@@ -66,4 +65,15 @@ void AIShip::Update(sf::Time deltaTime)
 	}
 
 	Ship::Update(deltaTime);
+}
+
+void AIShip::SetHostility(HostilityLevel hostility)
+{
+	m_hostility = hostility;
+
+	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
+	for (Weapon* weapon : m_weapons)
+		weapon->m_collider = m_collider;
+
+	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 }

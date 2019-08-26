@@ -60,7 +60,7 @@ void Player::Update(sf::Time deltaTime)
 				weapon->Fire();
 	}
 
-	for (Ship* marked_ship : m_marked_ships)
+	for (AIShip* marked_ship : m_marked_ships)
 		marked_ship->m_marker->Update(deltaTime);
 
 	Ship::Update(deltaTime);
@@ -70,7 +70,7 @@ void Player::Draw(RenderTarget& screen)
 {
 	GameObject::Draw(screen);
 
-	for (Ship* marked_ships : m_marked_ships)
+	for (AIShip* marked_ships : m_marked_ships)
 		if (marked_ships->m_marker->m_visible == true)
 			marked_ships->m_marker->Draw(screen);
 }

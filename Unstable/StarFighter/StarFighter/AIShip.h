@@ -18,8 +18,10 @@ class AIShip : public Ship
 public :
 	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility);
 	void Update(sf::Time deltaTime) override;
+	void SetHostility(HostilityLevel hostility);
 
 	ShipType m_ship_type;
+	sf::RectangleShape m_targeting_rect;
 };
 
 #endif // AISHIP_H_INCLUDED

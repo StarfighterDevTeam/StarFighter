@@ -8,6 +8,7 @@ class Ship;
 enum MarkerType
 {
 	Marker_Enemy,
+	Marker_Ally,
 	NB_MARKER_TYPES,
 };
 
@@ -19,6 +20,7 @@ public:
 	
 	void Update(sf::Time deltaTime);
 	void Draw(RenderTarget& screen) override;
+	void SetMarkerType(MarkerType marker_type);
 
 	MarkerType m_marker_type;
 	GameObject* m_target;

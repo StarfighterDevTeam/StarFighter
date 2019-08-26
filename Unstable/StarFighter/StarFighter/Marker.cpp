@@ -6,7 +6,6 @@ using namespace sf;
 
 Marker::Marker(MarkerType marker_type, GameObject* target)
 {
-	m_marker_type = marker_type;
 	m_target = target;
 	m_visible = false;
 
@@ -14,18 +13,32 @@ Marker::Marker(MarkerType marker_type, GameObject* target)
 	m_distance_text.setCharacterSize(18);
 	m_distance_text.setStyle(sf::Text::Bold);
 
-	string textureName;
+	string textureName = "2D/marker.png";
+
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(20, 40), 1, 2);
+
+	SetMarkerType(marker_type);
+}
+
+void Marker::SetMarkerType(MarkerType marker_type)
+{
+	m_marker_type = marker_type;
 
 	switch (marker_type)
 	{
 		case Marker_Enemy:
 		{
-			textureName = "2D/marker.png";
 			m_distance_text.setColor(sf::Color::Red);
+			break;
+		}
+		case Marker_Ally:
+		{
+			m_distance_text.setColor(sf::Color::Green);
+			break;
 		}
 	}
 
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(20, 40), 1, 1);
+	SetAnimationLine((int)marker_type);
 }
 
 Marker::~Marker()

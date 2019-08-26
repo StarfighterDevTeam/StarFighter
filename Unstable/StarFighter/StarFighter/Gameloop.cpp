@@ -14,9 +14,6 @@ Gameloop::Gameloop()
 
 	//enemy
 	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
-
-	player->m_marked_ships.push_back(enemy);
-
 	AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
 
 	//star
@@ -86,6 +83,8 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility);
 
 	(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject);
+
+	(*CurrentGame).m_playerShip->m_marked_ships.push_back(ship);
 
 	return ship;
 }
