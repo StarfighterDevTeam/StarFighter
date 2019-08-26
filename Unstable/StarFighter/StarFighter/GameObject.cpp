@@ -299,7 +299,8 @@ void GameObject::UpdateStarSectorIndex()
 	m_star_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
 }
 
-void GameObject::GetHitByAmmo(GameObject* ammo)
+bool GameObject::GetHitByAmmo(GameObject* ammo)
 {
 	//see override function in class Ship
+	return false;
 }

@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 
-#include "Enemy.h"
+#include "AIShip.h"
 
 enum PlayerActions
 {

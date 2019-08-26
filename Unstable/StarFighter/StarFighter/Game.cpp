@@ -391,7 +391,7 @@ void Game::CheckCollisions()
 
 	for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
 	{
-		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShip])
+		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 		{
 			if (SimpleCollision::AreColliding(player_ammo, enemy_ship) == true)
 			{

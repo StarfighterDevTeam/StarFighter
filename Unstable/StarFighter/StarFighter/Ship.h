@@ -9,6 +9,15 @@
 #include "Weapon.h";
 #include "Marker.h"
 
+enum HostilityLevel
+{
+	Hostility_Ally,
+	Hostility_HoldFire,
+	Hostility_ReturnFire,
+	Hostility_FireAtWill,
+	NB_HOSTILITY_LEVELS,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -26,7 +35,7 @@ public :
 	//Star Hunter
 	void ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction);
 	void Update(sf::Time deltaTime) override;
-	void GetHitByAmmo(GameObject* ammo) override;
+	bool GetHitByAmmo(GameObject* ammo) override;
 
 	float m_acceleration;
 	float m_speed_max;
@@ -39,6 +48,7 @@ public :
 	float m_hit_feedback_timer;
 
 	Marker* m_marker;
+	HostilityLevel m_hostility;
 };
 
 #endif // SHIP_H_INCLUDED

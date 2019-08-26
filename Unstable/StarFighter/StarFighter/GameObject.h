@@ -22,9 +22,9 @@ enum LayerType
 	SectorLayer,
 	StarLayer,	
 	PlayerFireLayer,
-	EnemyFireLayer,
+	AIShipFireLayer,
 	PlayerStroboscopicLayer,
-	EnemyShipLayer,
+	AIShipLayer,
 	PlayerShipLayer,
 	MarkerLayer,
 
@@ -38,7 +38,7 @@ enum ColliderType
 	PlayerShipObject,
 	PlayerFire,
 	EnemyFire,
-	EnemyShip,
+	EnemyShipObject,
 	NBVAL_ColliderType
 };
 
@@ -99,7 +99,7 @@ public:
 
 	sf::Vector2i m_star_sector_index;
 
-	virtual void GetHitByAmmo(GameObject* ammo);
+	virtual bool GetHitByAmmo(GameObject* ammo);
 };
 
 #endif // GameObject_H_INCLUDED

@@ -1,22 +1,24 @@
-#include "Enemy.h"
+#include "AIShip.h"
 
 extern Game* CurrentGame;
 
 using namespace sf;
 
 // ----------------SHIP ---------------
-Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
+AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)
 {
-	m_enemy_type = enemy_type;
+	m_ship_type = ship_type;
+	m_hostility = hostility;
 	m_marker = new Marker(Marker_Enemy, this);
 
 	string textureName;
 	sf::Vector2f textureSize;
 	int frameNumber = 1;
 	int animationNumber = 1;
-	switch (m_enemy_type)
+	ColliderType collider;
+	switch (m_ship_type)
 	{
-		case Enemy_Alpha:
+		case Ship_Alpha:
 		{
 			m_speed_max = 100;
 			m_max_acceleration = 2000;
@@ -27,8 +29,9 @@ Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 			textureName = "2D/V_Alpha2_red.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
+			collider = m_hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser_Enemy, Ammo_LaserRed, EnemyFire, EnemyFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser_Enemy, Ammo_LaserRed, collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 	}
@@ -41,16 +44,25 @@ Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 	m_heading = heading;
 }
 
-void Enemy::Update(sf::Time deltaTime)
+void AIShip::Update(sf::Time deltaTime)
 {
 	ApplyFlightModel(deltaTime, sf::Vector2f(1, -1));
 
-	for (Weapon* weapon : m_weapons)
+	switch (m_hostility)
 	{
-		weapon->Update(deltaTime);
+		case Hostility_Ally:
+		case Hostility_HoldFire:
+		case Hostility_ReturnFire:
+			break;
+		case Hostility_FireAtWill:
+			for (Weapon* weapon : m_weapons)
+			{
+				weapon->Update(deltaTime);
 
-		if (weapon->IsReadyToFire() == true)
-			weapon->Fire();
+				if (weapon->IsReadyToFire() == true)
+					weapon->Fire();
+			}
+		
 	}
 
 	Ship::Update(deltaTime);

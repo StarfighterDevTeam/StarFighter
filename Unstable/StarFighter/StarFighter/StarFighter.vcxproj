@@ -90,7 +90,7 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="AIShip.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Gameloop.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -116,7 +116,7 @@
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="CollisionUtils.h" />
-    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="AIShip.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Gameloop.h" />

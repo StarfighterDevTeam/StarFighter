@@ -68,8 +68,16 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 	}
 }
 
-void Ship::GetHitByAmmo(GameObject* ammo)
+bool Ship::GetHitByAmmo(GameObject* ammo)
 {
+	if (ammo->m_collider == PlayerFire && m_hostility == Hostility_Ally)
+		return false;
+
 	ammo->m_garbageMe = true;
 	m_hit_feedback_timer = 0.05;
+
+	if (m_hostility == Hostility_ReturnFire)
+		m_hostility = Hostility_FireAtWill;
+
+	return true;
 }
