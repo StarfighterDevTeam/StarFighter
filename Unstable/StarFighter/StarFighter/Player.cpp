@@ -79,8 +79,7 @@ void Player::Draw(RenderTarget& screen)
 	GameObject::Draw(screen);
 
 	for (AIShip* marked_ships : m_marked_ships)
-		if (marked_ships->m_marker->m_visible == true)
-			marked_ships->m_marker->Draw(screen);
+		marked_ships->m_marker->Draw(screen);
 }
 
 void Player::UpdateInputStates()

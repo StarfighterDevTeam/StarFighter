@@ -9,7 +9,6 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 {
 	m_ship_type = ship_type;
 	m_hostility = hostility;
-	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
 
 	string textureName;
 	sf::Vector2f textureSize;
@@ -42,6 +41,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 	m_heading = heading;
 
+	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
 	(*CurrentGame).m_playerShip->MarkThis(this);
 }
 

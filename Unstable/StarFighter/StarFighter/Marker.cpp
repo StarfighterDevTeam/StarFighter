@@ -17,6 +17,19 @@ Marker::Marker(MarkerType marker_type, GameObject* target)
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(20, 40), 1, 2);
 
+	const float a = 6;//length
+	const float b = 2;//thickness
+	//for (int i = 0; i < 8; i++)
+	//{
+	//	m_targeting_rect[i].setSize(i % 2 == 0 ? sf::Vector2f(a, b) : sf::Vector2f(b, a));
+	//	m_targeting_rect[i].setOrigin(sf::Vector2f(m_targeting_rect[i].getSize().x * 0.5, m_targeting_rect[i].getSize().y * 0.5));
+	//	m_targeting_rect[i].setOutlineThickness(2);
+	//}
+	m_targeting_rect.setFillColor(sf::Color(0, 0, 0, 0));
+	m_targeting_rect.setSize(sf::Vector2f(target->m_size.x + 4, target->m_size.y + 4));
+	m_targeting_rect.setOrigin(sf::Vector2f(m_targeting_rect.getSize().x * 0.5, m_targeting_rect.getSize().y * 0.5));
+	m_targeting_rect.setOutlineThickness(2);
+
 	SetMarkerType(marker_type);
 }
 
@@ -24,16 +37,25 @@ void Marker::SetMarkerType(MarkerType marker_type)
 {
 	m_marker_type = marker_type;
 
+	//distance marker
 	switch (marker_type)
 	{
 		case Marker_Enemy:
 		{
 			m_distance_text.setColor(sf::Color::Red);
+			m_targeting_rect.setOutlineColor(sf::Color::Red);
+
+			//for (int i = 0; i < 8; i++)
+			//	m_targeting_rect[i].setFillColor(sf::Color::Red);
 			break;
 		}
 		case Marker_Ally:
 		{
 			m_distance_text.setColor(sf::Color::Green);
+			m_targeting_rect.setOutlineColor(sf::Color::Green);
+
+			//for (int i = 0; i < 8; i++)
+			//	m_targeting_rect[i].setFillColor(sf::Color::Green);
 			break;
 		}
 	}
@@ -108,17 +130,21 @@ void Marker::Update(sf::Time deltaTime)
 		
 		setPosition(position);
 	}
+	else
+	{
+		m_targeting_rect.setPosition(m_target->getPosition());
+	}
 
 	if (m_frameNumber > 1)
-	{
 		AnimatedSprite::Update(deltaTime);
-	}
 }
 
 void Marker::Draw(RenderTarget& screen)
 {
-	if (m_visible)
+	if (m_visible == true)
 		screen.draw(m_distance_text);
+	else
+		screen.draw(m_targeting_rect);
 
 	GameObject::Draw(screen);
 }

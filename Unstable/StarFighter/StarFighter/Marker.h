@@ -25,6 +25,8 @@ public:
 	MarkerType m_marker_type;
 	GameObject* m_target;
 	sf::Text m_distance_text;
+	//sf::RectangleShape m_targeting_rect[8];
+	sf::RectangleShape m_targeting_rect;
 };
 
 #endif // MARKER_H_INCLUDED
