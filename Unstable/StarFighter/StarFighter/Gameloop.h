@@ -20,6 +20,7 @@ public:
 	void UpdateCamera(sf::Time deltaTime);
 
 	void PopulateSector(sf::Vector2i sector_index);
+	Enemy* CreateEnemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading);
 
 	vector<StarGenerator*> m_star_generator;
 

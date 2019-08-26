@@ -13,9 +13,7 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 
 	//enemy
-	//Enemy* enemy = new Enemy(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68 * 3, 84), sf::Vector2f(34, 42), 3, 1);
-	Enemy* enemy = new Enemy(Enemy_Alpha, sf::Vector2i(2, 0), 0);
-	(*CurrentGame).addToScene(enemy, EnemyShipLayer, EnemyShip);
+	Enemy* enemy = CreateEnemy(Enemy_Alpha, sf::Vector2i(2, 0), 0);
 
 	player->m_marked_ships.push_back(enemy);
 
@@ -79,4 +77,12 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 {
 	//if (sector_index == sf::Vector2i(1, 0))
 	Star* new_star = StarGenerator::CreateStar(sector_index);
+}
+
+Enemy* Gameloop::CreateEnemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
+{
+	Enemy* enemy = new Enemy(enemy_type, sector_index, heading);
+	(*CurrentGame).addToScene(enemy, EnemyShipLayer, EnemyShip);
+
+	return enemy;
 }

@@ -8,7 +8,7 @@ using namespace sf;
 Enemy::Enemy(EnemyType enemy_type, sf::Vector2i sector_index, float heading)
 {
 	m_enemy_type = enemy_type;
-	m_marker = new Marker(this);
+	m_marker = new Marker(Marker_Enemy, this);
 
 	string textureName;
 	sf::Vector2f textureSize;
