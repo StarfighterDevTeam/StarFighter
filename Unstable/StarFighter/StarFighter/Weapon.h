@@ -8,7 +8,7 @@ class Ship;
 enum WeaponType
 {
 	Weapon_Laser,
-	Weapon_Laser_Enemy,
+	Weapon_Missile,
 };
 
 class Weapon

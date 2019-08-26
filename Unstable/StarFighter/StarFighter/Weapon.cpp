@@ -23,18 +23,18 @@ Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, Co
 	m_lock_rectangle.setOutlineThickness(-2);
 	m_lock_rectangle.setFillColor(sf::Color(0, 0, 0, 0));
 
-	m_range = REF_WINDOW_RESOLUTION_X * 3;
-
 	switch (weapon_type)
 	{
 		case Weapon_Laser:
 		{
 			m_rate_of_fire = 0.2;
+			m_range = REF_WINDOW_RESOLUTION_X * 3;
 			break;
 		}
-		case Weapon_Laser_Enemy:
+		case Weapon_Missile:
 		{
 			m_rate_of_fire = 1;
+			m_range = REF_WINDOW_RESOLUTION_X * 4;
 			break;
 		}
 	}

@@ -270,13 +270,13 @@ void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int h
 	}
 }
 
-void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
+void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle)
 {
 	m_speed.x = -absolute_speed * sin(curAngle);
 	m_speed.y = -absolute_speed * cos(curAngle);
 }
 
-sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
+sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle)
 {
 	sf::Vector2f speed;
 	speed.x = -absolute_speed * sin(curAngle);

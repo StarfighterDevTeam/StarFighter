@@ -17,23 +17,34 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 	{
 		case Ammo_LaserGreen:
 		{
+			m_speed_min = 3000;
 			m_speed_max = 3000;
-			m_acceleration = 100000;
+			m_acceleration = 0;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_green.png";
 			break;
 		}
 		case Ammo_LaserRed:
 		{
+			m_speed_min = 400;
 			m_speed_max = 400;
-			m_acceleration = 10000;
+			m_acceleration = 0;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_red.png";
 			break;
 		}
+		case Ammo_Missile:
+		{
+			m_speed_min = 10;
+			m_speed_max = 3000;
+			m_acceleration = 600;
+			textureSize = sf::Vector2f(6, 32);
+			textureName = "2D/missile.png";
+			break;
+		}
 	}
 
-	m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_speed_max, (heading + 180) * M_PI / 180);
+	m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_speed_min, (heading + 180) * M_PI / 180);
 	m_lifespan = range / m_speed_max;
 
 	Init(position, m_speed, textureName, textureSize, frameNumber, animationNumber);
@@ -72,6 +83,12 @@ void Ammo::Update(sf::Time deltaTime)
 			}
 		}
 		*/
+
+		//m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();
+
+		sf::Vector2f acceleration_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration, m_heading * M_PI / 180);
+		m_speed -= acceleration_vector * deltaTime.asSeconds();
+		NormalizeVector(&m_speed, m_speed_max);
 
 		//apply speed
 		NormalizeVector(&m_speed, m_speed_max);

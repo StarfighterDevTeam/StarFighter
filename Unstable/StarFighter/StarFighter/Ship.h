@@ -38,8 +38,8 @@ public :
 	bool GetHitByAmmo(GameObject* ammo) override;
 
 	float m_acceleration;
-	float m_speed_max;
 	float m_max_acceleration;
+	float m_speed_max;
 	float m_turn_speed;
 	float m_max_braking;
 	float m_idle_decelleration;

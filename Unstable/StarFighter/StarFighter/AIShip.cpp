@@ -29,13 +29,13 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser_Enemy, Ammo_LaserRed, collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 	}
 
 	SetStarSectorIndex(sector_index);
-	m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_speed_max, (heading + 180) * M_PI / 180);
+	//m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_speed_max, heading * M_PI / 180);
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 

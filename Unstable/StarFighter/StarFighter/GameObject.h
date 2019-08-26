@@ -65,8 +65,8 @@ public:
 	void SetAnimationLine(int animation, bool keep_frame_index = false);
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static int GaussianBlurDistribution(int x);
-	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
-	static sf::Vector2f GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
+	void SetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle);
+	static sf::Vector2f GetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle);
 
 	string GetTextureName();
 	GameObject* Clone();

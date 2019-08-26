@@ -9,6 +9,7 @@ enum AmmoType
 {
 	Ammo_LaserGreen,
 	Ammo_LaserRed,
+	Ammo_Missile,
 };
 
 class Ammo : public GameObject
@@ -19,8 +20,9 @@ public:
 
 	AmmoType m_ammo_type;
 
-	float m_speed_max;
 	float m_acceleration;
+	float m_speed_min;
+	float m_speed_max;
 	float m_lifespan;
 	GameObject* m_locked_target;
 
