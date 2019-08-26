@@ -346,6 +346,20 @@ void Bound(float& input, float min, float max)
 		input = max;
 }
 
+void BoundAbsoluteValue(float& input, float max_value)
+{
+	if (input < 0)
+	{
+		if (input < - max_value)
+			input = max_value;
+	}
+	else
+	{
+		if (input > max_value)
+			input = max_value;
+	}
+}
+
 void BoundAngle(float& input, float max_angle)
 {
 	while (input < 0)

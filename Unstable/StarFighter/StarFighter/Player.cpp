@@ -190,3 +190,35 @@ void Player::MarkThis(AIShip* target)
 {
 	m_marked_ships.push_back(target);
 }
+
+AIShip* Player::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
+{
+	float shortest_distance = -1;
+	AIShip* target = NULL;
+
+	for (AIShip* marked_ship : m_marked_ships)
+	{
+		if (marked_ship->m_garbageMe == true || marked_ship->m_collider != EnemyShipObject)
+			continue;
+
+		const float a = getPosition().x - marked_ship->getPosition().x;
+		const float b = getPosition().y - marked_ship->getPosition().y;
+
+		float distance_to_ref = (a * a) + (b * b);
+		if (distance_to_ref < shortest_distance || shortest_distance < 0)
+		{
+			if (distance_to_ref < dist_max * dist_max)
+			{
+				float angle_delta = GetAngleDegToTargetPosition(ref_object->getPosition(), ref_object->getRotation(), marked_ship->getPosition());
+
+				if (abs(angle_delta) < angle_delta_max)
+				{
+					shortest_distance = distance_to_ref;
+					target = marked_ship;
+				}
+			}
+		}
+	}
+	
+	return target;
+}

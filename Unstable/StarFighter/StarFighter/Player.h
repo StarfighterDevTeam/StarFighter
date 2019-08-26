@@ -42,6 +42,7 @@ public :
 
 	//Star Hunter
 	void MarkThis(AIShip* target) override;
+	AIShip* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
 	vector<AIShip*> m_marked_ships;
 };
 

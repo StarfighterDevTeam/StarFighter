@@ -23,7 +23,9 @@ public:
 	float m_acceleration;
 	float m_speed_min;
 	float m_speed_max;
+	float m_turn_speed;
 	float m_lifespan;
+	bool m_radar_homing;
 	GameObject* m_locked_target;
 
 	void Update(sf::Time deltaTime) override;

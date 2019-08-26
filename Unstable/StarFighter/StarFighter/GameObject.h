@@ -95,6 +95,7 @@ public:
 	void SetStarSectorIndex(sf::Vector2i sector_index);
 	void UpdateStarSectorIndex();
 	virtual void MarkThis(AIShip* target);
+	virtual AIShip* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual bool GetHitByAmmo(GameObject* ammo);
 
 	sf::Vector2i m_star_sector_index;

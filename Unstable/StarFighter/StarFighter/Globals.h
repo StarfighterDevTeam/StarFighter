@@ -101,6 +101,7 @@ float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f po
 float GetVectorLength(sf::Vector2f vector);
 float GetVectorLengthSquared(sf::Vector2f vector);
 void Bound(float& input, float min, float max);
+void BoundAbsoluteValue(float& input, float max_value);
 void BoundAngle(float& input, float max_angle);
 bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 
