@@ -46,9 +46,6 @@ public :
 	vector<Weapon*> m_weapons;
 
 	float m_hit_feedback_timer;
-
-	Marker* m_marker;
-	HostilityLevel m_hostility;
 };
 
 #endif // SHIP_H_INCLUDED

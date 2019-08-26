@@ -17,11 +17,14 @@ class AIShip : public Ship
 {
 public :
 	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility);
+	~AIShip();
 	void Update(sf::Time deltaTime) override;
 	void SetHostility(HostilityLevel hostility);
+	bool GetHitByAmmo(GameObject* ammo) override;
 
 	ShipType m_ship_type;
-	sf::RectangleShape m_targeting_rect;
+	Marker* m_marker;
+	HostilityLevel m_hostility;
 };
 
 #endif // AISHIP_H_INCLUDED

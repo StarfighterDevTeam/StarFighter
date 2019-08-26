@@ -301,6 +301,12 @@ void GameObject::UpdateStarSectorIndex()
 
 bool GameObject::GetHitByAmmo(GameObject* ammo)
 {
-	//see override function in class Ship
+	//see override function in class Ship and AIShip
 	return false;
+}
+
+
+void GameObject::MarkThis(AIShip* target)
+{
+	//see override function in class Player
 }

@@ -8,12 +8,11 @@ using namespace sf;
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_hit_feedback_timer = 0;
-	m_marker = NULL;
 }
 
 Ship::~Ship()
 {
-	delete m_marker;
+	
 }
 
 void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
@@ -70,14 +69,8 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 bool Ship::GetHitByAmmo(GameObject* ammo)
 {
-	if (ammo->m_collider == PlayerFire && m_hostility == Hostility_Ally)
-		return false;
-
 	ammo->m_garbageMe = true;
 	m_hit_feedback_timer = 0.05;
-
-	if (m_hostility == Hostility_ReturnFire)
-		m_hostility = Hostility_FireAtWill;
 
 	return true;
 }

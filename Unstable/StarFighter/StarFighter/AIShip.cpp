@@ -41,6 +41,13 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 
 	m_heading = heading;
+
+	(*CurrentGame).m_playerShip->MarkThis(this);
+}
+
+AIShip::~AIShip()
+{
+	delete m_marker;
 }
 
 void AIShip::Update(sf::Time deltaTime)
@@ -76,4 +83,15 @@ void AIShip::SetHostility(HostilityLevel hostility)
 		weapon->m_collider = m_collider;
 
 	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
+}
+
+bool AIShip::GetHitByAmmo(GameObject* ammo)
+{
+	if (ammo->m_collider == PlayerFire && m_hostility == Hostility_Ally)
+		return false;
+
+	if (m_hostility == Hostility_ReturnFire)
+		m_hostility = Hostility_FireAtWill;
+
+	return Ship::GetHitByAmmo(ammo);
 }

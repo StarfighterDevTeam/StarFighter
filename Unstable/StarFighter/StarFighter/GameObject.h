@@ -12,9 +12,7 @@
 using namespace std;
 using namespace sf;
 
-class Equipment;
-class Weapon;
-class Loot;
+class AIShip;
 
 enum LayerType
 {
@@ -96,10 +94,12 @@ public:
 	//Star Hunter
 	void SetStarSectorIndex(sf::Vector2i sector_index);
 	void UpdateStarSectorIndex();
+	virtual void MarkThis(AIShip* target);
+	virtual bool GetHitByAmmo(GameObject* ammo);
 
 	sf::Vector2i m_star_sector_index;
 
-	virtual bool GetHitByAmmo(GameObject* ammo);
+	
 };
 
 #endif // GameObject_H_INCLUDED

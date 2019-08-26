@@ -200,7 +200,7 @@ void Game::addToScene(GameObject *object, LayerType layer, ColliderType type)
 	object->m_layer = layer;
 	object->m_collider = type;
 	object->m_removeMe = false;
-
+		
 	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_ColliderType))
 	{
 		m_sceneGameObjectsTyped[(int)type].push_back(object);

@@ -36,6 +36,7 @@ Player::~Player()
 
 void Player::Update(sf::Time deltaTime)
 {
+	//controls
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
 	{
@@ -51,6 +52,7 @@ void Player::Update(sf::Time deltaTime)
 
 	ApplyFlightModel(deltaTime, inputs_direction);
 
+	//weapons
 	for (Weapon* weapon : m_weapons)
 	{
 		weapon->Update(deltaTime);
@@ -60,8 +62,14 @@ void Player::Update(sf::Time deltaTime)
 				weapon->Fire();
 	}
 
+	//markers
 	for (AIShip* marked_ship : m_marked_ships)
+	{
+		if (marked_ship->m_removeMe == true)
+			marked_ship->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
+
 		marked_ship->m_marker->Update(deltaTime);
+	}
 
 	Ship::Update(deltaTime);
 }
@@ -175,4 +183,9 @@ bool Player::LoadShip(Player* ship)
 void Player::SetControllerType(ControlerType contoller)
 {
 	m_controllerType = contoller;
+}
+
+void Player::MarkThis(AIShip* target)
+{
+	m_marked_ships.push_back(target);
 }

@@ -81,10 +81,6 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)
 {
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility);
-
 	(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject);
-
-	(*CurrentGame).m_playerShip->m_marked_ships.push_back(ship);
-
 	return ship;
 }

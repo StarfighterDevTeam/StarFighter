@@ -85,7 +85,7 @@ public:
 	float m_vspeed;
 	sf::Vector2f m_scale_factor;
 
-	Player* m_playerShip;
+	GameObject* m_playerShip;
 	bool m_pause;
 	bool m_window_has_focus;
 

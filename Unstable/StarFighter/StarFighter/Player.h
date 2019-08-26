@@ -33,14 +33,15 @@ public :
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	int SaveShip(Player* ship);
 	bool LoadShip(Player* ship);
-
-	bool m_actions_states[NBVAL_PlayerActions];
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 	void SetControllerType(ControlerType contoller);
 
+	bool m_actions_states[NBVAL_PlayerActions];
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
 
+	//Star Hunter
+	void MarkThis(AIShip* target) override;
 	vector<AIShip*> m_marked_ships;
 };
 
