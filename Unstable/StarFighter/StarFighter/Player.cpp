@@ -76,10 +76,10 @@ void Player::Update(sf::Time deltaTime)
 
 void Player::Draw(RenderTarget& screen)
 {
-	GameObject::Draw(screen);
-
 	for (AIShip* marked_ships : m_marked_ships)
 		marked_ships->m_marker->Draw(screen);
+
+	GameObject::Draw(screen);
 }
 
 void Player::UpdateInputStates()
