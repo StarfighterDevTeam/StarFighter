@@ -291,23 +291,22 @@ void Game::UpdateObjects(Time deltaTime)
 
 	for (GameObject* object : temp_sceneGameObjects)
 	{
-		if (object->m_garbageMe == true)
-		{
+		if (object == m_playerShip)
+			addToScene(object, object->m_layer, object->m_collider);//update player ship at the end of the list
+		else if (object->m_garbageMe == true)
 			delete object;
-		}
 		else if (object->m_removeMe == false)//if true, it has been stored in m_sceneGameObjectsStored already, therefore there is no memory leak if we don't push it back
 		{
 			object->Update(deltaTime);
 
-			if (object == player || object == m_background)
-				object->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
-			else
+			if (object != player && object != m_background)
 				object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - (object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-				//object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - object->m_position.y - (- player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-
+				
 			addToScene(object, object->m_layer, object->m_collider);
 		}
 	}
+
+	m_playerShip->Update(deltaTime);
 
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
