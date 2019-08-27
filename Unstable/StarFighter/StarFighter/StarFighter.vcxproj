@@ -98,12 +98,14 @@
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Marker.cpp" />
+    <ClCompile Include="Planet.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
     <ClCompile Include="SFTextPop.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="SpatialObject.cpp" />
     <ClCompile Include="Star.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="StarGenerator.cpp" />
@@ -126,6 +128,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Marker.h" />
+    <ClInclude Include="Planet.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SFPanel.h" />
@@ -133,6 +136,7 @@
     <ClInclude Include="SFText.h" />
     <ClInclude Include="SFTextPop.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="SpatialObject.h" />
     <ClInclude Include="Star.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="StarGenerator.h" />

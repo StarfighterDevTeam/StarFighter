@@ -7,18 +7,10 @@
 #include "Game.h"
 #include "SFTextPop.h"
 #include "Weapon.h";
-#include "Marker.h"
+#include "SpatialObject.h"
+#include "Planet.h"
 
-enum HostilityLevel
-{
-	Hostility_Ally,
-	Hostility_HoldFire,
-	Hostility_ReturnFire,
-	Hostility_FireAtWill,
-	NB_HOSTILITY_LEVELS,
-};
-
-class Ship : public GameObject
+class Ship : public SpatialObject
 {
 public :
 	Ship(){};

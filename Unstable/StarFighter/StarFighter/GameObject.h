@@ -12,12 +12,14 @@
 using namespace std;
 using namespace sf;
 
+class SpatialObject;
 class AIShip;
 
 enum LayerType
 {
 	BackgroundLayer,
 	SectorLayer,
+	Planet_Layer,
 	StarLayer,	
 	PlayerFireLayer,
 	AIShipFireLayer,
@@ -94,8 +96,8 @@ public:
 	//Star Hunter
 	void SetStarSectorIndex(sf::Vector2i sector_index);
 	void UpdateStarSectorIndex();
-	virtual void MarkThis(AIShip* target);
-	virtual AIShip* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
+	virtual void MarkThis(SpatialObject* target);
+	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual bool GetHitByAmmo(GameObject* ammo);
 
 	sf::Vector2i m_star_sector_index;

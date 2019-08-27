@@ -306,12 +306,12 @@ bool GameObject::GetHitByAmmo(GameObject* ammo)
 }
 
 
-void GameObject::MarkThis(AIShip* target)
+void GameObject::MarkThis(SpatialObject* target)
 {
 	//see override function in class Player
 }
 
-AIShip* GameObject::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
+SpatialObject* GameObject::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
 {
 	return NULL;
 	//see override function in class Player

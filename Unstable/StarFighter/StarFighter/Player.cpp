@@ -66,12 +66,12 @@ void Player::Update(sf::Time deltaTime)
 	}
 
 	//markers
-	for (AIShip* marked_ship : m_marked_ships)
+	for (SpatialObject* marked_object : m_marked_objects)
 	{
-		if (marked_ship->m_removeMe == true)
-			marked_ship->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
+		if (marked_object->m_removeMe == true)
+			marked_object->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
 
-		marked_ship->m_marker->Update(deltaTime);
+		marked_object->m_marker->Update(deltaTime);
 	}
 
 	Ship::Update(deltaTime);
@@ -79,8 +79,8 @@ void Player::Update(sf::Time deltaTime)
 
 void Player::Draw(RenderTarget& screen)
 {
-	for (AIShip* marked_ships : m_marked_ships)
-		marked_ships->m_marker->Draw(screen);
+	for (SpatialObject* marked_objects : m_marked_objects)
+		marked_objects->m_marker->Draw(screen);
 
 	GameObject::Draw(screen);
 }
@@ -187,35 +187,35 @@ void Player::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
-void Player::MarkThis(AIShip* target)
+void Player::MarkThis(SpatialObject* target)
 {
-	m_marked_ships.push_back(target);
+	m_marked_objects.push_back(target);
 }
 
-AIShip* Player::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
+SpatialObject* Player::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
 {
 	float shortest_distance = -1;
-	AIShip* target = NULL;
+	SpatialObject* target = NULL;
 
-	for (AIShip* marked_ship : m_marked_ships)
+	for (SpatialObject* marked_object : m_marked_objects)
 	{
-		if (marked_ship->m_garbageMe == true || marked_ship->m_collider != EnemyShipObject)
+		if (marked_object->m_garbageMe == true || marked_object->m_collider != EnemyShipObject)
 			continue;
 
-		const float a = ref_object->m_position.x - marked_ship->m_position.x;
-		const float b = ref_object->m_position.y - marked_ship->m_position.y;
+		const float a = ref_object->m_position.x - marked_object->m_position.x;
+		const float b = ref_object->m_position.y - marked_object->m_position.y;
 
 		float distance_to_ref = (a * a) + (b * b);
 		if (distance_to_ref < shortest_distance || shortest_distance < 0)
 		{
 			if (distance_to_ref < dist_max * dist_max)
 			{
-				float angle_delta = GetAngleDegToTargetPosition(ref_object->m_position, ref_object->m_heading, marked_ship->m_position);
+				float angle_delta = GetAngleDegToTargetPosition(ref_object->m_position, ref_object->m_heading, marked_object->m_position);
 
 				if (abs(angle_delta) < angle_delta_max)
 				{
 					shortest_distance = distance_to_ref;
-					target = marked_ship;
+					target = marked_object;
 				}
 			}
 		}

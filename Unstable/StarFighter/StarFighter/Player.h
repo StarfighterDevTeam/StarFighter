@@ -41,9 +41,9 @@ public :
 	ControlerType m_controllerType;
 
 	//Star Hunter
-	void MarkThis(AIShip* target) override;
-	AIShip* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
-	vector<AIShip*> m_marked_ships;
+	void MarkThis(SpatialObject* target) override;
+	SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
+	vector<SpatialObject*> m_marked_objects;
 };
 
 #endif // PLAYER_H_INCLUDED

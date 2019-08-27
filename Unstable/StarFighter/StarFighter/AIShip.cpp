@@ -79,13 +79,10 @@ void AIShip::Update(sf::Time deltaTime)
 
 void AIShip::SetHostility(HostilityLevel hostility)
 {
-	m_hostility = hostility;
+	SpatialObject::SetHostility(hostility);
 
-	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
 	for (Weapon* weapon : m_weapons)
 		weapon->m_collider = m_collider;
-
-	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 }
 
 bool AIShip::GetHitByAmmo(GameObject* ammo)

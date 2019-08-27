@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : SpatialObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_hit_feedback_timer = 0;
 }
@@ -53,7 +53,7 @@ void Ship::Update(sf::Time deltaTime)
 	else
 		setColor(sf::Color::White);
 
-	GameObject::Update(deltaTime);
+	SpatialObject::Update(deltaTime);
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)

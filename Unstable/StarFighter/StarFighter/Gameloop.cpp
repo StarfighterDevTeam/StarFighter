@@ -13,9 +13,11 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 
 	//enemy
-	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_HoldFire);
-	//AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_ReturnFire);
-	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
+	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
+	AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_ReturnFire);
+	AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
+
+	Planet* planet = CreatePlanet(Planet_Alpha, sf::Vector2i(-2, 1), Hostility_Ally);
 
 	//star
 	//StarGenerator* generator = new StarGenerator();
@@ -84,4 +86,11 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility);
 	(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject);
 	return ship;
+}
+
+Planet* Gameloop::CreatePlanet(PlanetType planet_type, sf::Vector2i sector_index, HostilityLevel hostility)
+{
+	Planet* planet = new Planet(planet_type, sector_index, hostility);
+	(*CurrentGame).addToScene(planet, Planet_Layer, BackgroundObject);
+	return planet;
 }
