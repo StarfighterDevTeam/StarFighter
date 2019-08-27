@@ -40,9 +40,10 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 		{
 			m_speed_min = 10;
 			m_speed_max = 2000;
-			m_acceleration = 800;
-			m_radar_homing_range = 600;
-			m_turn_speed = 40;
+			m_acceleration = 2000;
+			m_radar_homing_range = 900;
+			m_radar_homing_angle_max = 45;
+			m_turn_speed = 50;
 			textureSize = sf::Vector2f(24, 42);
 			textureName = "2D/missile.png";
 			break;
@@ -53,8 +54,12 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 	m_lifespan = range / m_speed_max;
 
 	Init(position, m_speed, textureName, textureSize, frameNumber, animationNumber);
-
+	
 	m_heading = heading;
+	
+	//update position and rotation "manually" because they won't be updated during the frame of their creation
+	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	setRotation(m_heading);
 }
 
 Ammo::~Ammo()
@@ -73,35 +78,38 @@ void Ammo::Update(sf::Time deltaTime)
 	}
 	else
 	{
-		const float radar_homing_angle = 180;
-
 		//target still in homing radar?
 		if (m_locked_target != NULL)
 		{
-			const float dx = m_locked_target->getPosition().x - getPosition().x;
-			const float dy = m_locked_target->getPosition().y - getPosition().y;
-			if (dx*dx + dy*dy > m_radar_homing_range * m_radar_homing_range || GetAngleDegToTargetPosition(getPosition(), m_heading, m_locked_target->getPosition()) > radar_homing_angle)
+			const float dx = m_locked_target->m_position.x - m_position.x;
+			const float dy = m_locked_target->m_position.y - m_position.y;
+			if (dx*dx + dy*dy > m_radar_homing_range * m_radar_homing_range || abs(GetAngleDegToTargetPosition(m_position, m_heading, m_locked_target->m_position)) > m_radar_homing_angle_max)
 				m_locked_target = NULL;
 		}
 
 		//find a new target?
 		if (m_radar_homing_range > 0 && m_locked_target == NULL)
-			m_locked_target = (GameObject*)(*CurrentGame).m_playerShip->GetTargetableEnemyShip(this, m_radar_homing_range, radar_homing_angle);
+			m_locked_target = (GameObject*)(*CurrentGame).m_playerShip->GetTargetableEnemyShip(this, m_radar_homing_range, m_radar_homing_angle_max);
 
 		//track target
+		const float speed = GetVectorLength(m_speed) + m_acceleration * deltaTime.asSeconds();
 		if (m_locked_target != NULL)
 		{
-			//get ride of deleted target
+			//get rid of deleted target
 			if (m_locked_target->m_garbageMe == false)
 			{
-				float delta_angle = GetAngleDegToTargetPosition(getPosition(), m_heading, m_locked_target->getPosition());
-
-				if (abs(delta_angle) <= m_turn_speed * deltaTime.asSeconds())
-					m_heading += delta_angle;
-				else if (delta_angle > 0)
-					m_heading += m_turn_speed * deltaTime.asSeconds();
-				else 
-					m_heading -= m_turn_speed * deltaTime.asSeconds();
+				const float turn_speed = m_turn_speed * speed / m_speed_max;
+				const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, m_locked_target->m_position);
+				
+				if (delta_angle != 0)
+				{
+					if (abs(delta_angle) <= m_turn_speed * deltaTime.asSeconds())
+						m_heading += delta_angle;
+					else if (delta_angle > 0)
+						m_heading += m_turn_speed * deltaTime.asSeconds();
+					else
+						m_heading -= m_turn_speed * deltaTime.asSeconds();						
+				}
 			}
 			else
 			{
@@ -109,14 +117,11 @@ void Ammo::Update(sf::Time deltaTime)
 			}
 		}
 
-		//sf::Vector2f acceleration_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration, m_heading * M_PI / 180);
-		//m_speed -= acceleration_vector * deltaTime.asSeconds();
-		m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration, (m_heading + 180) * M_PI / 180);
+		m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(speed, (m_heading + 180) * M_PI / 180);
 		NormalizeVector(&m_speed, m_speed_max);
 
 		GameObject::Update(deltaTime);
 	}
-
 }
 
 void Ammo::Draw(RenderTarget& screen)
@@ -124,7 +129,7 @@ void Ammo::Draw(RenderTarget& screen)
 	screen.draw(*this);
 
 	//Debug radar homing
-	if (m_radar_homing_range > 0)
+	if (m_locked_target != NULL)
 	{
 		sf::Vector2f vector = m_speed;
 		ScaleVector(&vector, m_radar_homing_range);

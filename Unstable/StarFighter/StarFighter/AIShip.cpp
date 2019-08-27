@@ -35,11 +35,14 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	}
 
 	SetStarSectorIndex(sector_index);
-	//m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_speed_max, heading * M_PI / 180);
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 
 	m_heading = heading;
+
+	//update position and rotation "manually" because they won't be updated during the frame of their creation
+	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	setRotation(m_heading);
 
 	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
 	(*CurrentGame).m_playerShip->MarkThis(this);

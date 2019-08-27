@@ -238,7 +238,7 @@ float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f positi
 	float angle;
 	angle = acos(a / distance_to_obj);
 
-	if (b < 0)
+	if (b > 0)
 	{
 		angle = -angle;
 	}
@@ -269,7 +269,7 @@ float GetAngleRadForVector(sf::Vector2f vector)
 
 	angle += M_PI_2;
 
-	return angle;
+	return angle;//PI = down, PI/2 = right
 }
 
 bool NormalizeVector(sf::Vector2f* vector, float max_value)

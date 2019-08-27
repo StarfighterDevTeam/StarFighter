@@ -69,7 +69,7 @@ void Marker::Update(sf::Time deltaTime)
 	{	
 		//orientation of the marker
 		const float angle = GetAngleRadBetweenPositions(m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
-		setRotation((angle - M_PI) * 180 / M_PI);
+		setRotation(- angle * 180 / M_PI);
 
 		//position of the marker
 		sf::Vector2f position;

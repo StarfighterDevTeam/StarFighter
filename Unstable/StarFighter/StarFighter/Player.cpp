@@ -201,15 +201,15 @@ AIShip* Player::GetTargetableEnemyShip(const GameObject* ref_object, const float
 		if (marked_ship->m_garbageMe == true || marked_ship->m_collider != EnemyShipObject)
 			continue;
 
-		const float a = getPosition().x - marked_ship->getPosition().x;
-		const float b = getPosition().y - marked_ship->getPosition().y;
+		const float a = ref_object->m_position.x - marked_ship->m_position.x;
+		const float b = ref_object->m_position.y - marked_ship->m_position.y;
 
 		float distance_to_ref = (a * a) + (b * b);
 		if (distance_to_ref < shortest_distance || shortest_distance < 0)
 		{
 			if (distance_to_ref < dist_max * dist_max)
 			{
-				float angle_delta = GetAngleDegToTargetPosition(ref_object->getPosition(), ref_object->getRotation(), marked_ship->getPosition());
+				float angle_delta = GetAngleDegToTargetPosition(ref_object->m_position, ref_object->m_heading, marked_ship->m_position);
 
 				if (abs(angle_delta) < angle_delta_max)
 				{
