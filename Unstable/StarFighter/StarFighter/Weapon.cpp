@@ -33,7 +33,7 @@ Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, Co
 		}
 		case Weapon_Missile:
 		{
-			m_rate_of_fire = 1;
+			m_rate_of_fire = 0.8;
 			m_range = REF_WINDOW_RESOLUTION_X * 4;
 			break;
 		}
