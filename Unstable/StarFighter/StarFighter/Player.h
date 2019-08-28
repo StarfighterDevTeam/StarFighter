@@ -21,6 +21,12 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
+enum MissionType
+{
+	Mission_GoTo_Easy,
+	NB_MISSION_TYPES,
+};
+
 class Player : public Ship
 {
 public :
@@ -43,6 +49,7 @@ public :
 	//Star Hunter
 	void MarkThis(SpatialObject* target) override;
 	SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
+
 	vector<SpatialObject*> m_marked_objects;
 };
 
