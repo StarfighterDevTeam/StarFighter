@@ -1,22 +1,17 @@
 #ifndef PLANET_H_INCLUDED
 #define PLANET_H_INCLUDED
 
-#include "SpatialObject.h"
+#include "Marker.h"
 
-enum PlanetType
-{
-	Planet_Alpha,
-	NB_PLANET_TYPES,
-};
+#define NB_PLANET_TYPES		18
 
 class Planet : public SpatialObject
 {
 public :
 	Planet(){};
-	Planet(PlanetType planet_type, sf::Vector2i sector_index, HostilityLevel hostility);
+	Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility);
 	virtual ~Planet();
-
-	PlanetType m_planet_type;
+	void SetHostility(HostilityLevel hostility) override;
 };
 
 #endif // PLANET_H_INCLUDED

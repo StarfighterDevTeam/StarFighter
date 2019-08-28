@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+
 #include "Ship.h";
 
 enum ShipType

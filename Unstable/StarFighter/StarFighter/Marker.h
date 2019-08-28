@@ -1,9 +1,7 @@
 #ifndef MARKER_H_INCLUDED
 #define MARKER_H_INCLUDED
 
-#include "Game.h"
-
-class Ship;
+#include "SpatialObject.h"
 
 enum MarkerType
 {
@@ -15,7 +13,7 @@ enum MarkerType
 class Marker : public GameObject
 {
 public:
-	Marker(MarkerType marker_type, GameObject* target);
+	Marker(MarkerType marker_type, SpatialObject* target);
 	~Marker();
 	
 	void Update(sf::Time deltaTime);
@@ -23,9 +21,10 @@ public:
 	void SetMarkerType(MarkerType marker_type);
 
 	MarkerType m_marker_type;
-	GameObject* m_target;
+	SpatialObject* m_target;
 	sf::Text m_distance_text;
 	sf::RectangleShape m_targeting_rect[8];
+	bool m_onScreen;
 };
 
 #endif // MARKER_H_INCLUDED

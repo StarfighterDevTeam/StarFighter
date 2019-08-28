@@ -81,6 +81,10 @@ void AIShip::SetHostility(HostilityLevel hostility)
 {
 	SpatialObject::SetHostility(hostility);
 
+	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
+
+	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
+
 	for (Weapon* weapon : m_weapons)
 		weapon->m_collider = m_collider;
 }

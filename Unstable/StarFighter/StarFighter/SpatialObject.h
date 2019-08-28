@@ -1,7 +1,9 @@
 #ifndef SPATIALOBJECT_H_INCLUDED
 #define SPATIALOBJECT_H_INCLUDED
 
-#include "Marker.h"
+#include "Game.h"
+
+class Marker;
 
 enum HostilityLevel
 {

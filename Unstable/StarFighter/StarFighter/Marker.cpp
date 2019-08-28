@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Marker::Marker(MarkerType marker_type, GameObject* target)
+Marker::Marker(MarkerType marker_type, SpatialObject* target)
 {
 	m_target = target;
 	m_visible = false;
@@ -62,10 +62,15 @@ Marker::~Marker()
 
 void Marker::Update(sf::Time deltaTime)
 {
-	//is target on screen? if yes, marker doesn't need to be visible
-	m_visible = IsInsideArea(m_target->m_size, m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y)) == false;
+	m_visible = m_target->m_hostility != Hostility_HoldFire;
 
-	if (m_visible == true)
+	if (m_visible == false)
+		return;
+
+	//is target on screen? if yes, marker doesn't need to be visible
+	m_onScreen = IsInsideArea(m_target->m_size, m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y)) == false;
+
+	if (m_onScreen == true)
 	{	
 		//orientation of the marker
 		const float angle = GetAngleRadBetweenPositions(m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
@@ -138,7 +143,6 @@ void Marker::Update(sf::Time deltaTime)
 
 		m_targeting_rect[6].setPosition(sf::Vector2f(m_target->getPosition().x + size * 0.5 - (L * 0.5), m_target->getPosition().y + m_target->m_size.y * 0.5));
 		m_targeting_rect[7].setPosition(sf::Vector2f(m_target->getPosition().x + size * 0.5, m_target->getPosition().y + size * 0.5 - (L * 0.5)));
-
 	}
 
 	if (m_frameNumber > 1)
@@ -147,7 +151,10 @@ void Marker::Update(sf::Time deltaTime)
 
 void Marker::Draw(RenderTarget& screen)
 {
-	if (m_visible == true)
+	if (m_visible == false)
+		return;
+
+	if (m_onScreen == true)
 		screen.draw(m_distance_text);
 	else
 		for (int i = 0; i < 8; i++)

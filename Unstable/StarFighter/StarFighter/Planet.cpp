@@ -4,17 +4,16 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Planet::Planet(PlanetType planet_type, sf::Vector2i sector_index, HostilityLevel hostility)
+Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility)
 {
-	m_planet_type = planet_type;
 	m_hostility = hostility;
 
 	ColliderType collider = BackgroundObject;
 
 	SetStarSectorIndex(sector_index);
 
-	Init(m_position, sf::Vector2f(0, 0) , "2D/planet.png", sf::Vector2f(138, 138), 1, 17);
-	SetAnimationLine((int)planet_type);
+	Init(m_position, sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(138, 138), 1, NB_PLANET_TYPES);
+	SetAnimationLine(planet_type);
 	m_heading = 0;
 
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
@@ -28,4 +27,11 @@ Planet::Planet(PlanetType planet_type, sf::Vector2i sector_index, HostilityLevel
 Planet::~Planet()
 {
 	
+}
+
+void Planet::SetHostility(HostilityLevel hostility)
+{
+	SpatialObject::SetHostility(hostility);
+
+	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 }

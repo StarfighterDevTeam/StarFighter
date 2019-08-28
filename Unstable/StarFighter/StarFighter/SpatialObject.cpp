@@ -22,6 +22,4 @@ void SpatialObject::Update(sf::Time deltaTime)
 void SpatialObject::SetHostility(HostilityLevel hostility)
 {
 	m_hostility = hostility;
-	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
-	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 }

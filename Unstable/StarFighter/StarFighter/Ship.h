@@ -6,8 +6,8 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+
 #include "Weapon.h";
-#include "SpatialObject.h"
 #include "Planet.h"
 
 class Ship : public SpatialObject
