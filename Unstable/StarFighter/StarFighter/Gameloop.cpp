@@ -48,8 +48,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		PopulateSector(sector_index);
 	}
 	(*CurrentGame).m_star_sectors_to_create.clear();
-
-	//UpdateCamera(deltaTime);
 }
 
 void Gameloop::Draw()
@@ -113,7 +111,7 @@ Mission* Gameloop::CreateMission()
 		{
 			mission = new Mission((MissionType)m);
 			
-			sf::Vector2i index = sf::Vector2i(10, 10);
+			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(5, 10), RandomizeIntBetweenValues(5, 10));
 			Planet* planet = CreatePlanet(index, Hostility_Ally);
 			mission->m_marked_objectives.push_back(planet);
 

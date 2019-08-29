@@ -79,8 +79,10 @@ void Player::Update(sf::Time deltaTime)
 
 void Player::Draw(RenderTarget& screen)
 {
-	for (SpatialObject* marked_objects : m_marked_objects)
-		marked_objects->m_marker->Draw(screen);
+	for (int i = 0; i < NB_MARKER_TYPES; i++)
+		for (SpatialObject* marked_object : m_marked_objects)
+			if ((int)marked_object->m_marker->m_marker_type == i)
+				marked_object->m_marker->Draw(screen);
 
 	GameObject::Draw(screen);
 }
@@ -195,17 +197,23 @@ void Player::MarkThis(SpatialObject* target)
 bool Player::AcceptMission(Mission* mission)
 {
 	int i = 0;
+	int j = 0;
 	for (Mission* player_mission : m_missions)
+	{
 		if (player_mission->m_status == MissionStatus_Accepted || player_mission->m_status == MissionStatus_Current)
 			i++;
 
+		if (player_mission->m_status == MissionStatus_Current)
+			j++;
+	}
+		
 	if (i >= NB_MISSIONS_ACCEPTED_MAX)//can't accept because the mission backlog is full
 		return false;
 		
 	mission->m_status = MissionStatus_Accepted;
 	m_missions.push_back(mission);
 
-	if (i == 1)
+	if (j == 0)
 		SetCurrentMission(mission);
 
 	return true;
@@ -215,7 +223,7 @@ bool Player::AcceptMission(Mission* mission)
 void Player::SetCurrentMission(Mission* mission)
 {
 	mission->m_status = MissionStatus_Current;
-
+	
 	//mission markers
 	for (SpatialObject* objective : mission->m_marked_objectives)
 		AddMissionMarker(objective);
@@ -232,7 +240,6 @@ void Player::RemoveMissionMarker(SpatialObject* target)
 {
 	target->m_marker->SetMarkerType(target->m_marker->m_marker_type);
 }
-
 
 void Player::CancelMission(Mission* mission)
 {

@@ -5,10 +5,10 @@
 
 enum MarkerType
 {
-	Marker_Enemy,
 	Marker_Ally,
+	Marker_Enemy,
 	Marker_Mission,
-	NB_MARKER_TYPES,
+	NB_MARKER_TYPES,//by order of draw priority, from lowest to highest
 };
 
 class Marker : public GameObject
