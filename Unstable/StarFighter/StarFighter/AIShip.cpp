@@ -50,7 +50,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 AIShip::~AIShip()
 {
-	delete m_marker;
+
 }
 
 void AIShip::Update(sf::Time deltaTime)

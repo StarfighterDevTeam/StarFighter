@@ -18,7 +18,7 @@ Gameloop::Gameloop()
 	AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
 	Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
 
-	GenerateMission();
+	CreateMission();
 
 	//star
 	//StarGenerator* generator = new StarGenerator();
@@ -102,29 +102,25 @@ Planet* Gameloop::CreatePlanet(int planet_type, sf::Vector2i sector_index, Hosti
 	return planet;
 }
 
-void Gameloop::GenerateMission()
+Mission* Gameloop::CreateMission()
 {
 	int m = RandomizeIntBetweenValues(0, (int)(NB_MISSION_TYPES - 1));
+	Mission* mission = NULL;
 
 	switch (m)
 	{
 		case Mission_GoTo_Easy:
 		{
+			mission = new Mission((MissionType)m);
+			
 			sf::Vector2i index = sf::Vector2i(10, 10);
 			Planet* planet = CreatePlanet(index, Hostility_Ally);
-			AddMissionMarker(planet);
+			mission->m_marked_objectives.push_back(planet);
+
+			Player* player = (Player*)(*CurrentGame).m_playerShip;
+			player->AcceptMission(mission);
 		}
 	}
-}
 
-void Gameloop::AddMissionMarker(SpatialObject* target)
-{
-	target->m_marker->m_isMission = true;
-	target->m_marker->m_distance_text.setColor(sf::Color::Blue);
-	target->m_marker->SetAnimationLine((int)Marker_Mission);
-}
-
-void Gameloop::RemoveMissionMarker(SpatialObject* target)
-{
-	target->m_marker->SetMarkerType(target->m_marker->m_marker_type);
+	return mission;
 }

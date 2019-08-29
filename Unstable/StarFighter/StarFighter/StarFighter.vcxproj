@@ -98,6 +98,7 @@
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Marker.cpp" />
+    <ClCompile Include="Mission.cpp" />
     <ClCompile Include="Planet.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SFPanel.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Marker.h" />
+    <ClInclude Include="Mission.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />

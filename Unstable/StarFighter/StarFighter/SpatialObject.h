@@ -22,7 +22,6 @@ public :
 	virtual ~SpatialObject();
 
 	void Update(sf::Time deltaTime) override;
-
 	virtual void SetHostility(HostilityLevel hostility);
 
 	Marker* m_marker;

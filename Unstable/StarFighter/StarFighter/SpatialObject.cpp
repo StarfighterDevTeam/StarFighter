@@ -11,7 +11,7 @@ SpatialObject::SpatialObject(sf::Vector2f position, sf::Vector2f speed, std::str
 
 SpatialObject::~SpatialObject()
 {
-	
+	delete m_marker;
 }
 
 void SpatialObject::Update(sf::Time deltaTime)

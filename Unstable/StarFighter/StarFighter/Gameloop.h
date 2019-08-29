@@ -24,9 +24,7 @@ public:
 	Planet* CreatePlanet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility);
 	Planet* CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostility);
 
-	void GenerateMission();
-	void AddMissionMarker(SpatialObject* target);
-	void RemoveMissionMarker(SpatialObject* target);
+	Mission* CreateMission();
 
 	vector<StarGenerator*> m_star_generator;
 

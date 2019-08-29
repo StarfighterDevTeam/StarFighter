@@ -1,7 +1,9 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 
-#include "AIShip.h"
+#include "Mission.h"
+
+#define NB_MISSIONS_ACCEPTED_MAX		5
 
 enum PlayerActions
 {
@@ -19,12 +21,6 @@ enum PlayerInputStates
 	Input_Release,//0
 	Input_Tap,//1
 	Input_Hold,//2
-};
-
-enum MissionType
-{
-	Mission_GoTo_Easy,
-	NB_MISSION_TYPES,
 };
 
 class Player : public Ship
@@ -49,8 +45,15 @@ public :
 	//Star Hunter
 	void MarkThis(SpatialObject* target) override;
 	SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
+	bool AcceptMission(Mission* mission);
+	void SetCurrentMission(Mission* mission);
+	void RemoveMission(Mission* mission);
+	void CancelMission(Mission* mission);
+	void AddMissionMarker(SpatialObject* target);
+	void RemoveMissionMarker(SpatialObject* target);
 
 	vector<SpatialObject*> m_marked_objects;
+	vector<Mission*> m_missions;
 };
 
 #endif // PLAYER_H_INCLUDED

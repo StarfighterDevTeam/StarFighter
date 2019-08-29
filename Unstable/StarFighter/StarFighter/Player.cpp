@@ -33,7 +33,8 @@ Player::Player(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Player::~Player()
 {
-
+	for (Mission* mission : m_missions)
+		delete mission;
 }
 
 void Player::Update(sf::Time deltaTime)
@@ -189,6 +190,76 @@ void Player::SetControllerType(ControlerType contoller)
 void Player::MarkThis(SpatialObject* target)
 {
 	m_marked_objects.push_back(target);
+}
+
+bool Player::AcceptMission(Mission* mission)
+{
+	int i = 0;
+	for (Mission* player_mission : m_missions)
+		if (player_mission->m_status == MissionStatus_Accepted || player_mission->m_status == MissionStatus_Current)
+			i++;
+
+	if (i >= NB_MISSIONS_ACCEPTED_MAX)//can't accept because the mission backlog is full
+		return false;
+		
+	mission->m_status = MissionStatus_Accepted;
+	m_missions.push_back(mission);
+
+	if (i == 1)
+		SetCurrentMission(mission);
+
+	return true;
+}
+
+
+void Player::SetCurrentMission(Mission* mission)
+{
+	mission->m_status = MissionStatus_Current;
+
+	//mission markers
+	for (SpatialObject* objective : mission->m_marked_objectives)
+		AddMissionMarker(objective);
+}
+
+void Player::AddMissionMarker(SpatialObject* target)
+{
+	target->m_marker->m_isMission = true;
+	target->m_marker->m_distance_text.setColor(sf::Color::Blue);
+	target->m_marker->SetAnimationLine((int)Marker_Mission);
+}
+
+void Player::RemoveMissionMarker(SpatialObject* target)
+{
+	target->m_marker->SetMarkerType(target->m_marker->m_marker_type);
+}
+
+
+void Player::CancelMission(Mission* mission)
+{
+	if (mission->m_status == MissionStatus_Current)
+	{
+		for (SpatialObject* objective : mission->m_marked_objectives)
+			RemoveMissionMarker(objective);
+
+		mission->m_status = MissionStatus_Accepted;
+	}
+}
+
+void Player::RemoveMission(Mission* mission)
+{
+	if (mission->m_status == MissionStatus_Current)
+		CancelMission(mission);
+
+	//Delete mission
+	vector<Mission*> old_missions;
+	for (Mission* it_mission : m_missions)
+		old_missions.push_back(it_mission);
+	m_missions.clear();
+	for (Mission* it_mission : old_missions)
+		if (it_mission != mission)
+			m_missions.push_back(it_mission);
+
+	delete mission;
 }
 
 SpatialObject* Player::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
