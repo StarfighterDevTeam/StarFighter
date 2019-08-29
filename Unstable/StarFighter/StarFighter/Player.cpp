@@ -40,6 +40,8 @@ Player::~Player()
 void Player::Update(sf::Time deltaTime)
 {
 	//controls
+	UpdateInputStates();
+
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
 	{
@@ -75,6 +77,62 @@ void Player::Update(sf::Time deltaTime)
 	}
 
 	Ship::Update(deltaTime);
+
+	//cycling mission
+	if (	m_inputs_states[Action_CyclingMission] == Input_Tap)
+		CycleMission();
+}
+
+bool Player::CycleMission()
+{
+	Mission* current_mission = NULL;
+	Mission* new_current_mission = NULL;
+
+	//browse to find current mission and try to cycle towards the next acceptable mission in the list
+	for (Mission* mission : m_missions)
+	{
+		if (mission->m_status == MissionStatus_Current)
+			current_mission = mission;
+
+		if (current_mission != NULL && mission->m_status == MissionStatus_Accepted)
+		{ 
+			CancelMission(current_mission);
+			SetCurrentMission(mission);
+			return true;
+		}
+	}
+
+	//no current mission = cycle to the first acceptable mission
+	if (current_mission == NULL)
+	{
+		for (Mission* mission : m_missions)
+		{
+			if (mission->m_status == MissionStatus_Accepted)
+			{
+				SetCurrentMission(mission);
+				return true;
+			}
+		}
+
+		//no mission can be accepted, don't bother searching anymore
+		return false;
+	}
+	//not found yet, cycle another time from the beginning this time
+	else if (new_current_mission == NULL)
+	{
+		for (Mission* mission : m_missions)
+		{
+			if (mission->m_status == MissionStatus_Accepted)
+			{
+				CancelMission(current_mission);
+				SetCurrentMission(mission);
+				return true;
+			}
+		}
+	}
+
+	//can't cycle = we stay on the same current mission
+	return false;
 }
 
 void Player::Draw(RenderTarget& screen)
@@ -93,13 +151,15 @@ void Player::UpdateInputStates()
 	{
 		GetInputState(InputGuy::isSpeeding(), Action_Speeding);
 		GetInputState(InputGuy::isBraking(), Action_Braking);
-		GetInputState(InputGuy::isBraking(), Action_Firing);
+		GetInputState(InputGuy::isFiring(), Action_Firing);
+		GetInputState(InputGuy::isCyclingMission(), Action_CyclingMission);
 	}
 	else
 	{
 		GetInputState(false, Action_Speeding);
 		GetInputState(false, Action_Braking);
 		GetInputState(false, Action_Firing);
+		GetInputState(false, Action_CyclingMission);
 	}
 }
 

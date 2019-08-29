@@ -26,6 +26,7 @@ public:
 	static bool isSpeeding(ControlerType device = AllControlDevices);
 	static bool isBraking(ControlerType device = AllControlDevices);
 	static bool isFiring(ControlerType device = AllControlDevices);
+	static bool isCyclingMission(ControlerType device = AllControlDevices);
 	static bool isChangingResolution();
 	static bool isUsingDebugCommand();
 	static bool isRestartingScript();

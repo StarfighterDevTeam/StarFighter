@@ -11,6 +11,7 @@ enum PlayerActions
 	Action_Speeding,
 	Action_Braking,
 	Action_Firing,
+	Action_CyclingMission,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,
@@ -35,8 +36,8 @@ public :
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	int SaveShip(Player* ship);
 	bool LoadShip(Player* ship);
-	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 	void SetControllerType(ControlerType contoller);
+	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 
 	bool m_actions_states[NBVAL_PlayerActions];
 	bool m_disable_inputs;
@@ -49,6 +50,7 @@ public :
 	void SetCurrentMission(Mission* mission);
 	void RemoveMission(Mission* mission);
 	void CancelMission(Mission* mission);
+	bool CycleMission();
 	void AddMissionMarker(SpatialObject* target);
 	void RemoveMissionMarker(SpatialObject* target);
 

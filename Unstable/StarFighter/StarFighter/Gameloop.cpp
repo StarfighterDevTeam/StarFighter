@@ -19,6 +19,7 @@ Gameloop::Gameloop()
 	Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
 
 	CreateMission();
+	CreateMission();
 
 	//star
 	//StarGenerator* generator = new StarGenerator();
@@ -112,7 +113,7 @@ Mission* Gameloop::CreateMission()
 			mission = new Mission((MissionType)m);
 			
 			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(5, 10), RandomizeIntBetweenValues(5, 10));
-			Planet* planet = CreatePlanet(index, Hostility_Ally);
+			Planet* planet = CreatePlanet(index, Hostility_HoldFire);
 			mission->m_marked_objectives.push_back(planet);
 
 			Player* player = (Player*)(*CurrentGame).m_playerShip;
