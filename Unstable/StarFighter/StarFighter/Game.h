@@ -39,21 +39,16 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
-enum StarSectorStatus
-{
-	Sector_Current,//player is inside this sector
-	Sector_OnScreen,//player is not inside the sector, but it can be seen on screen
-	Sector_Incoming,//the sector cannot be seen on screen, but is adjacent to a partial or full sector
-	Sector_Far,//other sectors
-};
-
 struct StarSector
 {
 public:
-	StarSector(){};
-	StarSector(sf::Vector2i index, StarSectorStatus status){ m_index = index; m_status = status; }
-	StarSectorStatus m_status;
+	//StarSector(){ m_hazard_level = 1; };
+	StarSector(sf::Vector2i index){m_index = index;}
+	StarSector(sf::Vector2i index, int id){ m_index = index; m_id = id;}
+
 	sf::Vector2i m_index;
+	int m_hazard_level;
+	int m_id;
 };
 
 using namespace sf;
@@ -125,19 +120,21 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//Star Hunter
-	bool AddToStarSectorsKnown(sf::Vector2i star_sector_index, StarSectorStatus status = Sector_Far);
-	bool AddToStarSectorsKnown(StarSector sector);
-	void UpdateSectorList(bool force_update = false);
+	bool AddToStarSectorsKnown(sf::Vector2i star_sector_index);
+	void UpdateSectorList(bool force_update);
+	int GetSectorId(sf::Vector2i index);
 
 	GameObject* m_background;
-	StarSector m_current_star_sector;
-	vector<sf::Vector2i> m_star_sectors_to_create;//all sectors that are close enough to need an updated
+
+	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
+	vector<sf::Vector2i> m_star_sectors_managed;//all sectors that are close enough to need an updated
+	vector<sf::Vector2i> m_star_sectors_to_create;//all sectors that have just been created and need content creation
+	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
+	sf::Vector2i m_previous_star_sector_index;
 
 	//DEBUG
 	GameObject* m_sector_debug_current;
 	GameObject* m_sector_debug_onscreen;
-	GameObject* m_sector_debug_incoming;
-	GameObject* m_sector_debug_far;
 
 private:
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
@@ -146,9 +143,6 @@ private:
 	RenderWindow* m_window;
 
 	vector<GameObject*> m_sceneGameObjects;
-	map<sf::Vector2i, vector<GameObject*>, Vector2iComp > m_sceneGameObjectsStored;
-
-	bool IsSectorKnown(sf::Vector2i index);
 	
 	list<RectangleShape*> m_sceneFeedbackBars;
 	list<Text*> m_sceneFeedbackTexts;
@@ -158,10 +152,6 @@ private:
 	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
 	vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_ColliderType];
 	vector<SFText*> m_garbageTexts;
-
-	//Star Hunter
-	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
-	vector<StarSector> m_star_sectors_managed;//all sectors that are close enough to need an updated
 };
 
 #endif // GAME_H_INCLUDED

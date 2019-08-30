@@ -11,6 +11,7 @@ Gameloop::Gameloop()
 	Player* player = new Player(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), sf::Vector2f(34, 42), 3, 1);
 	(*CurrentGame).m_playerShip = player;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
+	(*CurrentGame).UpdateSectorList(true);
 
 	//enemy
 	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
@@ -79,6 +80,8 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 {
 	//if (sector_index == sf::Vector2i(1, 0))
 	Star* new_star = StarGenerator::CreateStar(sector_index);
+
+	CreatePlanet(sector_index, Hostility_Ally);
 }
 
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)

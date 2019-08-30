@@ -61,29 +61,20 @@ Game::Game(RenderWindow* window)
 	addToScene(m_background, BackgroundLayer, BackgroundObject);
 
 	//Star Hunter
-	m_current_star_sector.m_index = sf::Vector2i(0, 0);
-	m_current_star_sector.m_status = Sector_Current;
-	AddToStarSectorsKnown(m_current_star_sector);
-	UpdateSectorList(true);
+	//AddToStarSectorsKnown(m_current_star_sector);
+	//UpdateSectorList(true);
 
 	//DEBUG
 	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
 	m_sector_debug_onscreen = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Green, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
-	m_sector_debug_incoming = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Magenta, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
-	m_sector_debug_far = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Red, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
-
 }
 
 Game::~Game()
 {
 	delete m_background;
 
-
-
 	delete m_sector_debug_current;
 	delete m_sector_debug_onscreen;
-	delete m_sector_debug_incoming;
-	delete m_sector_debug_far;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -258,7 +249,7 @@ void Game::UpdateScene(Time deltaTime)
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
 	//Update quad-tree classification of objects
-	UpdateSectorList();
+	UpdateSectorList(false);
 
 	//Checking colisions
 	CheckCollisions();
@@ -333,32 +324,18 @@ void Game::drawScene()
 			for (StarSector sector : m_star_sectors_managed)
 			{
 				GameObject* sector_debug;
-				switch (sector.m_status)
-				{
-				case Sector_Current:
+				if (sector.m_index == m_playerShip->m_star_sector_index)
 					sector_debug = m_sector_debug_current;
-					break;
-				case Sector_OnScreen:
+				else
 					sector_debug = m_sector_debug_onscreen;
-					break;
-				case Sector_Incoming:
-					sector_debug = m_sector_debug_incoming;
-					break;
-				case Sector_Far:
-					sector_debug = m_sector_debug_far;
-					break;
-				}
 
 				sector_debug->SetStarSectorIndex(sector.m_index);
-				sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - (sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-
-				//m_mainScreen.draw(*sector_debug);
+				sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 			}
 		}
 		else
 		{
 			for (GameObject* object : m_sceneGameObjectsLayered[i])
-			//for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
 			{
 				object->Draw(m_mainScreen);
 			}
@@ -478,72 +455,65 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	addToFeedbacks(pop_feedback);
 }
 
-bool Game::AddToStarSectorsKnown(StarSector sector)
-{
-	return AddToStarSectorsKnown(sector.m_index, sector.m_status);
-}
-
-bool Game::AddToStarSectorsKnown(sf::Vector2i star_sector_index, StarSectorStatus status)
+bool Game::AddToStarSectorsKnown(sf::Vector2i star_sector_index)
 {
 	for (StarSector sector : m_star_sectors_known)
 	{
 		if (sector.m_index == star_sector_index)
 		{
-			sector.m_status = status;
 			return false;
 		}
 	}
 
-	m_star_sectors_known.push_back(StarSector(star_sector_index, status));
+	m_star_sectors_known.push_back(StarSector(star_sector_index, m_star_sectors_known.size()));
 
 	return true;
 }
 
 void Game::UpdateSectorList(bool force_update)
 {
-	//update needed?
 	GameObject* player = (GameObject*)m_playerShip;
-	if (true)// force_update == true || m_current_star_sector.m_index != player->m_star_sector_index)
-	{
-		if (player != NULL)
-			m_current_star_sector.m_index = player->m_star_sector_index;
 
-		vector<StarSector> old_star_sectors_managed;
-		for (StarSector sector : m_star_sectors_managed)
-			old_star_sectors_managed.push_back(sector);
+	//update needed?
+	if (force_update == true || m_previous_star_sector_index != player->m_star_sector_index)
+	{
+		m_previous_star_sector_index = player->m_star_sector_index;
+
+		vector<sf::Vector2i> old_star_sectors_managed;
+		for (sf::Vector2i index : m_star_sectors_managed)
+			old_star_sectors_managed.push_back(index);
 		m_star_sectors_managed.clear();
 		
-		//printf(">>> SECTORS UPDATE !!\n");
 		int nb_sectors_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 3;
 		int nb_sectors_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 3;
 		for (int i = 0; i < nb_sectors_x; i++)
 		{
 			for (int j = 0; j < nb_sectors_y; j++)
 			{
-				StarSector sector(sf::Vector2i(i + m_current_star_sector.m_index.x - (nb_sectors_x / 2), j + m_current_star_sector.m_index.y - (nb_sectors_y / 2)), (i == nb_sectors_x / 2 && j == nb_sectors_y / 2) ? Sector_Current : Sector_OnScreen);
-				m_star_sectors_managed.push_back(sector);
+				sf::Vector2i index;
+				index.x = i + m_playerShip->m_star_sector_index.x - (nb_sectors_x / 2);
+				index.y = j + m_playerShip->m_star_sector_index.y - (nb_sectors_y / 2);
+				//StarSector sector(sf::Vector2i(i + m_playerShip->m_star_sector_index.x - (nb_sectors_x / 2), j + m_playerShip->m_star_sector_index.y - (nb_sectors_y / 2)), (i == nb_sectors_x / 2 && j == nb_sectors_y / 2) ? Sector_Current : Sector_OnScreen);
+				m_star_sectors_managed.push_back(index);
 				
-				if (AddToStarSectorsKnown(sector) == true)
+				if (GetSectorId(index) == -1)
 				{
-					m_star_sectors_to_create.push_back(sector.m_index);//new sector discovered needs to be created
+					m_star_sectors_to_create.push_back(index);//new sector discovered needs to be created
+					m_star_sectors_known.push_back(StarSector(index, m_star_sectors_known.size()));
+					old_star_sectors_managed.push_back(index);//this will prevent from reaching out for this sector in stored content, since it's a new content that will not be found in storage
 				}
-
-				//printf("i: %d, j: %d", i + m_current_star_sector.m_index.x - (nb_sectors_x / 2), j + m_current_star_sector.m_index.y - (nb_sectors_y / 2));
-				//if (i == nb_sectors_x / 2 && j == nb_sectors_y / 2)
-				//	printf(" current");
-				//printf("\n");
 			}
 		}
 
 		//delta between old and new manageable sectors
 		vector<sf::Vector2i> sector_index_to_add;
 		vector<sf::Vector2i> sector_index_to_remove;
-		for (StarSector old_sector : old_star_sectors_managed)
+		for (sf::Vector2i old_index : old_star_sectors_managed)
 		{
 			bool found = false;
-			for (StarSector new_sector : m_star_sectors_managed)
+			for (sf::Vector2i new_index : m_star_sectors_managed)
 			{
-				if (old_sector.m_index == new_sector.m_index)
+				if (old_index == new_index)
 				{
 					found = true;
 					break;
@@ -552,16 +522,16 @@ void Game::UpdateSectorList(bool force_update)
 
 			if (found == false)
 			{
-				sector_index_to_remove.push_back(old_sector.m_index);
+				sector_index_to_remove.push_back(old_index);
 			}
 		}
 
-		for (StarSector new_sector : m_star_sectors_managed)
+		for (sf::Vector2i new_index : m_star_sectors_managed)
 		{
 			bool found = false;
-			for (StarSector old_sector : old_star_sectors_managed)
+			for (sf::Vector2i old_index : old_star_sectors_managed)
 			{
-				if (old_sector.m_index == new_sector.m_index)
+				if (old_index == new_index)
 				{
 					found = true;
 					break;
@@ -570,7 +540,7 @@ void Game::UpdateSectorList(bool force_update)
 
 			if (found == false)
 			{
-				sector_index_to_add.push_back(new_sector.m_index);
+				sector_index_to_add.push_back(new_index);
 			}
 		}
 
@@ -597,35 +567,31 @@ void Game::UpdateSectorList(bool force_update)
 			}
 
 			if (vector_objects.empty() == false)
-				m_sceneGameObjectsStored.insert(pair<Vector2i, vector<GameObject*> >(index, vector_objects));
+			{
+				int id = GetSectorId(index);
+				m_sceneGameObjectsStored.insert(pair<int, vector<GameObject*> > (id, vector_objects));
+			}
 		}
 		
 		//Sectors to insert insert into scene
 		for (sf::Vector2i index : sector_index_to_add)
 		{
-			for (GameObject* object : m_sceneGameObjectsStored[index])
-			{
-				addToScene(object, object->m_layer, object->m_collider);
-				//printf("game object restored.\n");
-			}
-				
-			m_sceneGameObjectsStored.erase(index);
-		}
-	}
+			int id = GetSectorId(index);
 
-	//TO BE DONE: be able to find a sector known from its sf::Vector2i key.
-	IsSectorKnown(sf::Vector2i(1, 0));
+			for (GameObject* object : m_sceneGameObjectsStored[id])
+				addToScene(object, object->m_layer, object->m_collider);
+			//printf("game object restored.\n");
+				
+			m_sceneGameObjectsStored.erase(id);
+		}	
+	}
 }
 
-bool Game::IsSectorKnown(sf::Vector2i index)
+int Game::GetSectorId(sf::Vector2i index)
 {
-	for_each(m_sceneGameObjectsStored.begin(), m_sceneGameObjectsStored.end(), [index](pair<sf::Vector2i, vector<GameObject* > > sector_index)
-	{
-		if (sector_index.first == index)
-		{
-			
-		}
-	});
+	for (StarSector sector : m_star_sectors_known)
+		if (sector.m_index == index)
+			return sector.m_id;
 
-	return false;
+	return -1;
 }

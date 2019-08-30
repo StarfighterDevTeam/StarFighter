@@ -15,7 +15,7 @@ Player::Player(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 	}
 
 	//Star Hunter
-	SetStarSectorIndex((*CurrentGame).m_current_star_sector.m_index);
+	SetStarSectorIndex(sf::Vector2i(0, 0));
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
