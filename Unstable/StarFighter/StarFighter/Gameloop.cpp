@@ -81,7 +81,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	//if (sector_index == sf::Vector2i(1, 0))
 	Star* new_star = StarGenerator::CreateStar(sector_index);
 
-	CreatePlanet(sector_index, Hostility_Ally);
+	//To be done
 }
 
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)
