@@ -285,14 +285,6 @@ sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(const float abs
 }
 
 //Star Hunter
-void GameObject::SetStarSectorIndex(sf::Vector2i sector_index)
-{
-	m_star_sector_index = sector_index;
-
-	m_position.x = 1.f * m_star_sector_index.x * STAR_SECTOR_SIZE;
-	m_position.y = 1.f * m_star_sector_index.y * STAR_SECTOR_SIZE;
-}
-
 void GameObject::UpdateStarSectorIndex()
 {
 	m_star_sector_index.x = (int)(m_position.x / STAR_SECTOR_SIZE + (m_position.x >= 0 ? 0.5 : -0.5));

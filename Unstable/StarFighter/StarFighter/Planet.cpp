@@ -10,7 +10,7 @@ Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostil
 
 	ColliderType collider = BackgroundObject;
 
-	SetStarSectorIndex(sector_index);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	Init(m_position, sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(138, 138), 1, NB_PLANET_TYPES);
 	SetAnimationLine(planet_type);

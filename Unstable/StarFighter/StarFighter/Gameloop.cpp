@@ -9,7 +9,7 @@ Gameloop::Gameloop()
 
 	//ship
 	Player* player = new Player(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), sf::Vector2f(34, 42), 3, 1);
-	(*CurrentGame).m_playerShip = player;
+	//(*CurrentGame).m_playerShip = player;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 	(*CurrentGame).UpdateSectorList(true);
 
@@ -78,7 +78,6 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 
 void Gameloop::PopulateSector(sf::Vector2i sector_index)
 {
-	//if (sector_index == sf::Vector2i(1, 0))
 	Star* new_star = StarGenerator::CreateStar(sector_index);
 
 	//To be done

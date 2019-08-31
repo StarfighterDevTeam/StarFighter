@@ -34,7 +34,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		}
 	}
 
-	SetStarSectorIndex(sector_index);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 

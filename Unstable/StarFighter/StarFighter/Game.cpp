@@ -286,7 +286,7 @@ void Game::UpdateObjects(Time deltaTime)
 			addToScene(object, object->m_layer, object->m_collider);//update player ship at the end of the list
 		else if (object->m_garbageMe == true)
 			delete object;
-		else if (object->m_removeMe == false)//if true, it has been stored in m_sceneGameObjectsStored already, therefore there is no memory leak if we don't push it back
+		else if (object->m_removeMe == false)//if true, we trust it has already been stored in m_sceneGameObjectsStored, therefore there is no memory leak if we don't push it back
 		{
 			object->Update(deltaTime);
 
@@ -329,7 +329,7 @@ void Game::drawScene()
 				else
 					sector_debug = m_sector_debug_onscreen;
 
-				sector_debug->SetStarSectorIndex(sector.m_index);
+				SetStarSectorIndex(sector_debug, sector.m_index);
 				sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 			}
 		}
@@ -579,8 +579,10 @@ void Game::UpdateSectorList(bool force_update)
 			int id = GetSectorId(index);
 
 			for (GameObject* object : m_sceneGameObjectsStored[id])
+			{
 				addToScene(object, object->m_layer, object->m_collider);
-			//printf("game object restored.\n");
+				//printf("game object restored.\n");
+			}
 				
 			m_sceneGameObjectsStored.erase(id);
 		}	
@@ -594,4 +596,33 @@ int Game::GetSectorId(sf::Vector2i index)
 			return sector.m_id;
 
 	return -1;
+}
+
+void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index)
+{
+	object->m_star_sector_index = sector_index;
+
+	object->m_position.x = 1.f * sector_index.x * STAR_SECTOR_SIZE;
+	object->m_position.y = 1.f * sector_index.y * STAR_SECTOR_SIZE;
+
+	if (object != m_playerShip)
+	{
+		//need a manual storage? (if the sector is beyond "managed sectors" i.e. ~ off-screen)
+		for (sf::Vector2i index : m_star_sectors_managed)
+			if (sector_index == index)
+				return;
+
+		//sector unknown? give it an id first
+		int id = GetSectorId(sector_index);
+		if (id == -1)
+		{
+			id = m_star_sectors_known.size();
+			m_star_sectors_known.push_back(StarSector(sector_index, id));
+		}
+		
+		//store it
+		m_sceneGameObjectsStored[id].push_back(object);
+		object->m_removeMe = true;	
+		//printf("manuel storage\n");
+	}
 }

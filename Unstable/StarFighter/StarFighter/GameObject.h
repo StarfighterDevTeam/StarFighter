@@ -94,7 +94,6 @@ public:
 	sf::Vector2f m_previous_speed;
 
 	//Star Hunter
-	void SetStarSectorIndex(sf::Vector2i sector_index);
 	void UpdateStarSectorIndex();
 	virtual void MarkThis(SpatialObject* target);
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
