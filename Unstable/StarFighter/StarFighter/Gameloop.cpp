@@ -8,7 +8,7 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_map_size = sf::Vector2f(1920, 1080);
 
 	//ship
-	Player* player = new Player(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), sf::Vector2f(34, 42), 3, 1);
+	Player* player = new Player(sf::Vector2i(0, 0));
 	//(*CurrentGame).m_playerShip = player;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 	(*CurrentGame).UpdateSectorList(true);
@@ -20,11 +20,6 @@ Gameloop::Gameloop()
 	//AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_HoldFire);
 	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
 	//Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
-
-
-
-	//CreateMission();
-	//CreateMission();
 
 	//star
 	//StarGenerator* generator = new StarGenerator();
@@ -90,7 +85,8 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)
 {
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility);
-	(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject);
+	if (ship->m_removeMe == false)
+		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject);
 	return ship;
 }
 
@@ -103,7 +99,8 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostili
 Planet* Gameloop::CreatePlanet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility)
 {
 	Planet* planet = new Planet(planet_type, sector_index, hostility);
-	(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject);
+	if (planet->m_removeMe == false)
+		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject);
 	return planet;
 }
 

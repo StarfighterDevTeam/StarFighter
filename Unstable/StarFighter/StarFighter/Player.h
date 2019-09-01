@@ -27,7 +27,7 @@ enum PlayerInputStates
 class Player : public Ship
 {
 public :
-	Player(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Player(sf::Vector2i sector_index);
 	virtual ~Player();
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;

@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Player::Player(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Ship(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Player::Player(sf::Vector2i sector_index)
 {
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
@@ -16,7 +16,11 @@ Player::Player(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 	//Star Hunter
 	(*CurrentGame).m_playerShip = this;
-	(*CurrentGame).SetStarSectorIndex(this, sf::Vector2i(0, 0));
+
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), 3, 1);
+
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
+
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));

@@ -14,7 +14,11 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	sf::Vector2f textureSize;
 	int frameNumber = 1;
 	int animationNumber = 1;
-	ColliderType collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
+	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
+
+	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
+	m_layer = AIShipLayer;
+
 	switch (m_ship_type)
 	{
 		case Ship_Alpha:
@@ -29,14 +33,14 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 	}
 
-	(*CurrentGame).SetStarSectorIndex(this, sector_index);
-
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
+
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	m_heading = heading;
 
