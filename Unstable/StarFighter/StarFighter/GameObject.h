@@ -35,6 +35,7 @@ enum LayerType
 enum ColliderType
 {
 	BackgroundObject,
+	PlanetObject,
 	PlayerShipObject,
 	PlayerFire,
 	EnemyFire,
@@ -100,8 +101,6 @@ public:
 	virtual bool GetHitByAmmo(GameObject* ammo);
 
 	sf::Vector2i m_star_sector_index;
-
-	
 };
 
 #endif // GameObject_H_INCLUDED

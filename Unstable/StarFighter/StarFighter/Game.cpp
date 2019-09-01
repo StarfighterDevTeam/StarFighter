@@ -252,7 +252,7 @@ void Game::UpdateScene(Time deltaTime)
 	UpdateSectorList(false);
 
 	//Checking colisions
-	CheckCollisions();
+	CollisionChecks();
 
 	//Update GameObjects, interface and feedbacks
 	UpdateObjects(deltaTime);
@@ -349,32 +349,21 @@ void Game::drawScene()
 	m_window->draw(temp);
 }
 
-void Game::CheckCollisions()
+void Game::CollisionChecks()
 {
 	sf::Clock dt;
 	dt.restart();
 
 	for (GameObject* player_ship : m_sceneGameObjectsTyped[PlayerShipObject])
-	{
 		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
-		{
 			if (SimpleCollision::AreColliding(player_ship, enemy_ammo) == true)
-			{
 				player_ship->GetHitByAmmo(enemy_ammo);
-			}
-		}
-	}
 
 	for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
-	{
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
-		{
 			if (SimpleCollision::AreColliding(player_ammo, enemy_ship) == true)
-			{
 				enemy_ship->GetHitByAmmo(player_ammo);
-			}
-		}
-	}
+
 }
 
 void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)

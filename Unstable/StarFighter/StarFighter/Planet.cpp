@@ -8,8 +8,6 @@ Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostil
 {
 	m_hostility = hostility;
 
-	ColliderType collider = BackgroundObject;
-
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	Init(m_position, sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(138, 138), 1, NB_PLANET_TYPES);
@@ -22,11 +20,37 @@ Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostil
 
 	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
 	(*CurrentGame).m_playerShip->MarkThis(this);
+
+	//gravity
+	m_gravity_range = 200;
+	m_gravity_strength = 500;
+
+	m_orbit_circle.setRadius(m_gravity_range);
+	m_orbit_circle.setOrigin(sf::Vector2f(m_gravity_range, m_gravity_range));
+	m_orbit_circle.setOutlineColor(sf::Color(128, 128, 128, 128));
+	m_orbit_circle.setOutlineThickness(2);
+	m_orbit_circle.setFillColor(sf::Color::Transparent);
+	m_orbit_circle.setPointCount(128);
 }
 
 Planet::~Planet()
 {
 	
+}
+
+void Planet::Update(sf::Time deltaTime)
+{
+	SpatialObject::Update(deltaTime);
+
+	m_orbit_circle.setPosition(getPosition());
+}
+
+void Planet::Draw(RenderTarget& screen)
+{
+	SpatialObject::Draw(screen);
+
+	if (m_visible == true)
+		screen.draw(m_orbit_circle);
 }
 
 void Planet::SetHostility(HostilityLevel hostility)

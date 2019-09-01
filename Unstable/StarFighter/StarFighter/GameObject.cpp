@@ -297,7 +297,6 @@ bool GameObject::GetHitByAmmo(GameObject* ammo)
 	return false;
 }
 
-
 void GameObject::MarkThis(SpatialObject* target)
 {
 	//see override function in class Player

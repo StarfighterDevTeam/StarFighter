@@ -269,7 +269,7 @@ float GetAngleRadForVector(sf::Vector2f vector)
 
 	angle += M_PI_2;
 
-	return angle;//PI = down, PI/2 = right
+	return angle;//PI = down, PI/2 = right, 0=up
 }
 
 bool NormalizeVector(sf::Vector2f* vector, float max_value)

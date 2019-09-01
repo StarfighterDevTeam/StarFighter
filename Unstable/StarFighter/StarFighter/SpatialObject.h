@@ -26,6 +26,7 @@ public :
 
 	Marker* m_marker;
 	HostilityLevel m_hostility;
+
 };
 
 #endif // SPATIALOBJECT_H_INCLUDED

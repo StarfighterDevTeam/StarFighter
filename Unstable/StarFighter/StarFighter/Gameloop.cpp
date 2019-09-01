@@ -103,7 +103,7 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostili
 Planet* Gameloop::CreatePlanet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility)
 {
 	Planet* planet = new Planet(planet_type, sector_index, hostility);
-	(*CurrentGame).addToScene(planet, Planet_Layer, BackgroundObject);
+	(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject);
 	return planet;
 }
 
@@ -117,7 +117,7 @@ Mission* Gameloop::CreateMission(MissionType mission_type)
 		{
 			mission = new Mission(mission_type);
 
-			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(5, 10), RandomizeIntBetweenValues(5, 10));
+			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(3, 4), RandomizeIntBetweenValues(3, 4));
 			Planet* planet = CreatePlanet(index, Hostility_HoldFire);
 			mission->m_marked_objectives.push_back(planet);
 

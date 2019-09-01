@@ -72,7 +72,7 @@ public:
 	void UpdateObjects(Time deltaTime);
 	void UpdateScene(Time deltaTime);
 	void drawScene();
-	void CheckCollisions();
+	void CollisionChecks();
 
 	sf::RenderTexture m_mainScreen;
 	sf::Vector2i m_screen_size;
@@ -125,6 +125,8 @@ public:
 	int GetSectorId(sf::Vector2i index);
 	void SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index);
 
+	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
+	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
 	GameObject* m_background;
 
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
@@ -149,8 +151,6 @@ private:
 	list<Text*> m_sceneFeedbackTexts;
 	list<SFPanel*> m_sceneFeedbackSFPanels;
 	vector<SFText*> m_sceneFeedbackSFTexts;
-	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
-	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
 	vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_ColliderType];
 	vector<SFText*> m_garbageTexts;
 };
