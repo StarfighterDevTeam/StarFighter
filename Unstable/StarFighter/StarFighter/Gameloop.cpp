@@ -13,14 +13,18 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 	(*CurrentGame).UpdateSectorList(true);
 
-	//enemy
-	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
-	AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_HoldFire);
-	AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
-	Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
+	CreateMission(Mission_GoTo_Easy);
 
-	CreateMission();
-	CreateMission();
+	//enemy
+	//AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
+	//AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_HoldFire);
+	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
+	//Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
+
+
+
+	//CreateMission();
+	//CreateMission();
 
 	//star
 	//StarGenerator* generator = new StarGenerator();
@@ -103,25 +107,32 @@ Planet* Gameloop::CreatePlanet(int planet_type, sf::Vector2i sector_index, Hosti
 	return planet;
 }
 
-Mission* Gameloop::CreateMission()
+Mission* Gameloop::CreateMission(MissionType mission_type)
 {
-	int m = RandomizeIntBetweenValues(0, (int)(NB_MISSION_TYPES - 1));
 	Mission* mission = NULL;
 
-	switch (m)
+	switch (mission_type)
 	{
 		case Mission_GoTo_Easy:
 		{
-			mission = new Mission((MissionType)m);
-			
+			mission = new Mission(mission_type);
+
 			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(5, 10), RandomizeIntBetweenValues(5, 10));
 			Planet* planet = CreatePlanet(index, Hostility_HoldFire);
 			mission->m_marked_objectives.push_back(planet);
 
 			Player* player = (Player*)(*CurrentGame).m_playerShip;
 			player->AcceptMission(mission);
+			break;
 		}
 	}
 
 	return mission;
+}
+
+Mission* Gameloop::CreateMission()
+{
+	int m = RandomizeIntBetweenValues(0, (int)(NB_MISSION_TYPES - 1));
+	
+	return CreateMission((MissionType)m);
 }
