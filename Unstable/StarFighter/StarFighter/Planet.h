@@ -16,7 +16,7 @@ public :
 	void Draw(RenderTarget& screen) override;
 
 	float m_gravity_range;
-	float m_gravity_strength;
+	float m_gravity_period;
 	CircleShape m_orbit_circle;
 };
 

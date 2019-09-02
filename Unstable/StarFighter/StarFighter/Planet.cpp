@@ -26,7 +26,7 @@ Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostil
 
 	//gravity
 	m_gravity_range = 200;
-	m_gravity_strength = 500;
+	m_gravity_period = 5;
 
 	m_orbit_circle.setRadius(m_gravity_range);
 	m_orbit_circle.setOrigin(sf::Vector2f(m_gravity_range, m_gravity_range));

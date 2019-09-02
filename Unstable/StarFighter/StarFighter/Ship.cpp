@@ -9,6 +9,7 @@ Ship::Ship()
 {
 	m_hit_feedback_timer = 0;
 	m_isOrbiting = NULL;
+	m_orbit_angle = 0;
 }
 
 Ship::~Ship()
@@ -44,6 +45,44 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
 }
 
+void Ship::UpdateOrbit(sf::Time deltaTime)
+{
+	//gravity?
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[PlanetObject])
+	{
+		if (m_isOrbiting != NULL && m_isOrbiting != object)
+			continue;
+
+		Planet* planet = (Planet*)object;
+		const float dx = m_position.x - planet->m_position.x;
+		const float dy = m_position.y - planet->m_position.y;
+
+		if (dx*dx + dy*dy <= (planet->m_gravity_range + m_size.y * 0.5) * (planet->m_gravity_range + m_size.y * 0.5))//range for leaving orbit
+			if (m_isOrbiting != NULL || dx*dx + dy*dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
+			{
+				if (m_isOrbiting == NULL)
+				{
+					m_orbit_angle = GetVectorAngleRad(sf::Vector2f(dx, -dy)) - M_PI_2;
+					m_orbit_cw = (m_speed.x > 0 && dy > 0) || (m_speed.x < 0 && dy < 0) ? 1 : -1;//clockwise gravitation
+				}
+
+				m_isOrbiting = planet;
+
+				m_orbit_angle -= deltaTime.asSeconds() * m_orbit_cw * 2 * M_PI * 1 / planet->m_gravity_period;
+				BoundAngle(m_orbit_angle, 2 * M_PI);
+
+				//m_speed = sf::Vector2f(0, 0);
+				m_position.x = planet->m_position.x + planet->m_gravity_range * cos(m_orbit_angle);
+				m_position.y = planet->m_position.y + planet->m_gravity_range * sin(m_orbit_angle);
+			}
+		else if (m_isOrbiting != NULL)
+			m_isOrbiting = NULL;
+
+		if (m_isOrbiting != NULL)
+			break;
+	}
+}
+
 void Ship::Update(sf::Time deltaTime)
 {
 	//hit feedback
@@ -55,42 +94,7 @@ void Ship::Update(sf::Time deltaTime)
 	else
 		setColor(sf::Color::White);
 
-	//gravity?
-	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[PlanetObject])
-	{
-		if (m_isOrbiting != NULL && m_isOrbiting != object)
-			continue;
-
-		Planet* planet = (Planet*)object;
-		float dx = m_position.x - planet->m_position.x;
-		float dy = m_position.y - planet->m_position.y;
-		
-		if (dx*dx + dy*dy <= (planet->m_gravity_range + m_size.y * 0.5) * (planet->m_gravity_range + m_size.y * 0.5))//range for leaving orbit
-		{
-			if (m_isOrbiting != NULL || dx*dx + dy*dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
-			{
-				if (m_isOrbiting == NULL)
-					printf("Enter orbit\n");
-				m_isOrbiting = planet;
-				
-				/*
-				int cw = (m_speed.x > 0 && dy > 0) || (m_speed.x < 0 && dy < 0) ? 1 : -1;//clockwise gravitation
-				float angle = GetVectorAngleRad(sf::Vector2f(dx, dy)) - M_PI_2;
-				m_speed = sf::Vector2f(0, 0);
-				m_position.x = planet->m_position.x + planet->m_gravity_range * cos(angle);
-				m_position.y = planet->m_position.y + planet->m_gravity_range * sin(angle);
-				*/
-			}
-		}
-		else if (m_isOrbiting != NULL)
-		{
-			printf("Leave orbit\n");
-			m_isOrbiting = NULL;
-		}
-
-		if (m_isOrbiting != NULL)
-			break;
-	}
+	UpdateOrbit(deltaTime);
 
 	SpatialObject::Update(deltaTime);
 }

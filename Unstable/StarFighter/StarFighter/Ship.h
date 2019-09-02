@@ -27,6 +27,7 @@ public :
 	void ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction);
 	void Update(sf::Time deltaTime) override;
 	bool GetHitByAmmo(GameObject* ammo) override;
+	void UpdateOrbit(sf::Time deltaTime);
 
 	float m_acceleration;
 	float m_max_acceleration;
@@ -38,6 +39,8 @@ public :
 
 	float m_hit_feedback_timer;
 	Planet* m_isOrbiting;
+	float m_orbit_angle;
+	int m_orbit_cw;
 };
 
 #endif // SHIP_H_INCLUDED
