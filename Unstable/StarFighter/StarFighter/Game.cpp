@@ -272,18 +272,11 @@ void Game::UpdateObjects(Time deltaTime)
 
 	//Update objects and delete "garbage" objects
 	vector<GameObject*> temp_sceneGameObjects;
-	for (GameObject* object : m_sceneGameObjects)
-		temp_sceneGameObjects.push_back(object);
-	m_sceneGameObjects.clear();
-	for (int i = 0; i < NBVAL_Layer; i++)
-		m_sceneGameObjectsLayered[i].clear();
-	for (int i = 0; i < NBVAL_ColliderType; i++)
-		m_sceneGameObjectsTyped[i].clear();
 
-	for (GameObject* object : temp_sceneGameObjects)
+	for (GameObject* object : m_sceneGameObjects)
 	{
 		if (object == m_playerShip)
-			addToScene(object, object->m_layer, object->m_collider);//update player ship at the end of the list
+			temp_sceneGameObjects.push_back(object);//update player ship at the end of the list
 		else if (object->m_garbageMe == true)
 			delete object;
 		else if (object->m_removeMe == false)//if true, we trust it has already been stored in m_sceneGameObjectsStored, therefore there is no memory leak if we don't push it back
@@ -292,10 +285,19 @@ void Game::UpdateObjects(Time deltaTime)
 
 			if (object != player && object != m_background)
 				object->setPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - (object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-				
-			addToScene(object, object->m_layer, object->m_collider);
+		
+			temp_sceneGameObjects.push_back(object);
 		}
 	}
+
+	m_sceneGameObjects.clear();//the objects that are not copied in temp are not lost in memory leak, they have been stored during UpdateSectorList and flagged with m_removeMe = true
+	for (int i = 0; i < NBVAL_Layer; i++)
+		m_sceneGameObjectsLayered[i].clear();
+	for (int i = 0; i < NBVAL_ColliderType; i++)
+		m_sceneGameObjectsTyped[i].clear();
+
+	for (GameObject* object : temp_sceneGameObjects)
+		addToScene(object, object->m_layer, object->m_collider);
 
 	m_playerShip->Update(deltaTime);
 
