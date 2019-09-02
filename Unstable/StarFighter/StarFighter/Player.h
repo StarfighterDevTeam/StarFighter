@@ -3,7 +3,7 @@
 
 #include "Mission.h"
 
-#define NB_MISSIONS_ACCEPTED_MAX		5
+#define NB_MISSIONS_MAX		5
 
 enum PlayerActions
 {
@@ -49,9 +49,7 @@ public :
 	bool AcceptMission(Mission* mission);
 	void SetCurrentMission(Mission* mission);
 	void RemoveMission(Mission* mission);
-	void CancelMission(Mission* mission);
-	void CompleteMission(Mission* mission);
-	void FailMission(Mission* mission);
+	void EndMission(Mission* mission, MissionStatus status);
 	bool CycleMission();
 	void AddMissionMarker(SpatialObject* target);
 	void RemoveMissionMarker(SpatialObject* target);

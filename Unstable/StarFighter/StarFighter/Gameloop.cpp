@@ -17,7 +17,7 @@ Gameloop::Gameloop()
 	//sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), player->m_sector_index.y + RandomizeIntBetweenValues(10, 15));
 	sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(0, 0), player->m_sector_index.y + RandomizeIntBetweenValues(3, 4));
 	Planet* planet = CreatePlanet(index, Hostility_HoldFire, 1, 1);
-	Mission* mission = new Mission(Mission_GoTo, planet);
+	Mission* mission = new Mission(Mission_GoTo, planet, planet);
 	player->AcceptMission(mission);
 
 	//enemy
@@ -146,7 +146,7 @@ Mission* Gameloop::CreateMission(sf::Vector2i origin_sector_index)
 		//printf("found index: %d, %d\n", found_index.x, found_index.y);
 	}
 
-	return new Mission(Mission_GoTo, planet);
+	return new Mission(Mission_GoTo, planet, planet);
 }
 
 Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
@@ -155,7 +155,7 @@ Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
 
 	int id = (*CurrentGame).GetSectorId(sector_index);
 	if (id == -1)
-		planet = CreatePlanet(sector_index, Hostility_Ally, 0, 0);
+		planet = CreatePlanet(sector_index, Hostility_HoldFire, 0, 0);
 	else
 	{
 		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])

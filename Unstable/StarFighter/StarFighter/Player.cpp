@@ -92,16 +92,33 @@ void Player::Update(sf::Time deltaTime)
 
 void Player::UpdateMissions()
 {
+	vector<Mission*> missions_to_delete;
+	vector<Mission*> missions_to_add;
+	
 	for (Mission* mission : m_missions)
 		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
 			switch (mission->m_mission_type)
 				case Mission_GoTo:
 				{
 					if (m_isOrbiting == mission->m_marked_objectives.front())
-						CompleteMission(mission);
+					{
+						EndMission(mission, MissionStatus_Complete);
+
+						for (Mission* planet_mission : m_isOrbiting->m_missions)
+							missions_to_add.push_back(planet_mission);
+
+						if (m_isOrbiting == mission->m_owner)
+							missions_to_delete.push_back(mission);
+					}
 						
 					break;
 				}
+
+	for (Mission* mission : missions_to_delete)
+		RemoveMission(mission);
+
+	for (Mission* mission : missions_to_add)
+		AcceptMission(mission);
 }
 
 bool Player::CycleMission()
@@ -117,7 +134,7 @@ bool Player::CycleMission()
 
 		if (current_mission != NULL && mission->m_status == MissionStatus_Accepted)
 		{ 
-			CancelMission(current_mission);
+			EndMission(current_mission, MissionStatus_Accepted);
 			SetCurrentMission(mission);
 			return true;
 		}
@@ -145,7 +162,7 @@ bool Player::CycleMission()
 		{
 			if (mission->m_status == MissionStatus_Accepted)
 			{
-				CancelMission(current_mission);
+				EndMission(current_mission, MissionStatus_Accepted);
 				SetCurrentMission(mission);
 				return true;
 			}
@@ -277,26 +294,18 @@ void Player::MarkThis(SpatialObject* target)
 
 bool Player::AcceptMission(Mission* mission)
 {
-	int i = 0;
-	int j = 0;
-	for (Mission* player_mission : m_missions)
-	{
-		if (player_mission->m_status == MissionStatus_Accepted || player_mission->m_status == MissionStatus_Current)
-			i++;
-
-		if (player_mission->m_status == MissionStatus_Current)
-			j++;
-	}
-		
-	if (i >= NB_MISSIONS_ACCEPTED_MAX)//can't accept because the mission backlog is full
+	if (m_missions.size() >= NB_MISSIONS_MAX)
 		return false;
-		
+
 	mission->m_status = MissionStatus_Accepted;
 	m_missions.push_back(mission);
 
-	if (j == 0)
-		SetCurrentMission(mission);
+	for (Mission* player_mission : m_missions)
+		if (player_mission->m_status == MissionStatus_Current)
+			return true;
 
+	//if we don't have a current mission, set this new accepted mission as current mission
+	SetCurrentMission(mission);
 	return true;
 }
 
@@ -322,18 +331,7 @@ void Player::RemoveMissionMarker(SpatialObject* target)
 	target->m_marker->SetMarkerType(target->m_marker->m_marker_type);
 }
 
-void Player::CancelMission(Mission* mission)
-{
-	if (mission->m_status == MissionStatus_Current)
-	{
-		for (SpatialObject* objective : mission->m_marked_objectives)
-			RemoveMissionMarker(objective);
-
-		mission->m_status = MissionStatus_Accepted;
-	}
-}
-
-void Player::CompleteMission(Mission* mission)
+void Player::EndMission(Mission* mission, MissionStatus status)
 {
 	if (mission->m_status == MissionStatus_Current)
 	{
@@ -343,26 +341,13 @@ void Player::CompleteMission(Mission* mission)
 		CycleMission();
 	}
 
-	mission->m_status = MissionStatus_Complete;
-}
-
-void Player::FailMission(Mission* mission)
-{
-	if (mission->m_status == MissionStatus_Current)
-	{
-		for (SpatialObject* objective : mission->m_marked_objectives)
-			RemoveMissionMarker(objective);
-
-		CycleMission();
-	}
-
-	mission->m_status = MissionStatus_Failed;
+	mission->m_status = status;
 }
 
 void Player::RemoveMission(Mission* mission)
 {
 	if (mission->m_status == MissionStatus_Current)
-		CancelMission(mission);
+		EndMission(mission, mission->m_status);
 
 	//Delete mission
 	vector<Mission*> old_missions;

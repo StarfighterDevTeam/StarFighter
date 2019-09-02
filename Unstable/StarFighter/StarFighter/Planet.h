@@ -21,7 +21,6 @@ public :
 	float m_gravity_period;
 	CircleShape m_orbit_circle;
 
-	int m_nb_missions;
 	vector<Mission*> m_missions;
 };
 
