@@ -136,22 +136,22 @@ Mission* Gameloop::CreateMission(Planet* owner)
 	int s = 1;
 	while (planet == NULL)
 	{
-		//"snale" search for an existing planet or an unknown sector
+		//"snail" search for an existing planet or an unknown sector
 		s *= (i == 0 || i % 2 == 1) ? 1 : -1;
 		i++;
 
 		if (i % 2 == 0)
-			for (int y = 0; y < (i / 2) * abs(s); y++)
+			for (int y = 0; y < 2; y++)//y < (i / 2) * abs(s)
 			{
-				found_index.y += s;
+				found_index.y += y * s * (i / 2) * abs(s);//found_index.y += s
 				planet = GetPlanetForMission(starting_index + found_index);
 				if (planet != NULL)
 					break;
 			}
 		else
-			for (int x = 0; x < (1 + ((i + 1) / 2) - 1) * abs(s); x++)
+			for (int x = 0; x < 2; x++)//x < (1 + ((i + 1) / 2) - 1) * abs(s)
 			{
-				found_index.x += s;
+				found_index.x += x * s * (1 + ((i + 1) / 2) - 1) * abs(s);//found_index.x += s; 
 				planet = GetPlanetForMission(starting_index + found_index);
 				if (planet != NULL)
 					break;
