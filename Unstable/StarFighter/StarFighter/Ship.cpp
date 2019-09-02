@@ -21,7 +21,7 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 {
 	m_acceleration = 0;
 	if (inputs_direction.y < 0)//up
-		m_acceleration = m_max_acceleration * inputs_direction.y;
+		m_acceleration = m_acceleration_max * inputs_direction.y;
 
 	m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();
 
@@ -58,25 +58,36 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 		const float dy = m_position.y - planet->m_position.y;
 
 		if (dx*dx + dy*dy <= (planet->m_gravity_range + m_size.y * 0.5) * (planet->m_gravity_range + m_size.y * 0.5))//range for leaving orbit
+		{
 			if (m_isOrbiting != NULL || dx*dx + dy*dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
 			{
-				if (m_isOrbiting == NULL)
+				if (m_isOrbiting == NULL || m_acceleration != 0)
 				{
 					m_orbit_angle = GetVectorAngleRad(sf::Vector2f(dx, -dy)) - M_PI_2;
 					m_orbit_cw = (m_speed.x > 0 && dy > 0) || (m_speed.x < 0 && dy < 0) ? 1 : -1;//clockwise gravitation
 				}
 
 				m_isOrbiting = planet;
+				planet->m_orbit_circle.setOutlineColor(sf::Color(128, 128, 128, 60));
 
 				m_orbit_angle -= deltaTime.asSeconds() * m_orbit_cw * 2 * M_PI * 1 / planet->m_gravity_period;
 				BoundAngle(m_orbit_angle, 2 * M_PI);
 
 				//m_speed = sf::Vector2f(0, 0);
-				m_position.x = planet->m_position.x + planet->m_gravity_range * cos(m_orbit_angle);
-				m_position.y = planet->m_position.y + planet->m_gravity_range * sin(m_orbit_angle);
+				sf::Vector2f position;
+				position.x = planet->m_position.x + planet->m_gravity_range * cos(m_orbit_angle);
+				position.y = planet->m_position.y + planet->m_gravity_range * sin(m_orbit_angle);
+
+				sf::Vector2f speed = sf::Vector2f(3 * (position.x - m_position.x), 3 * (position.y - m_position.y));
+				m_position += speed * deltaTime.asSeconds();
 			}
+		}
 		else if (m_isOrbiting != NULL)
+		{
+			m_isOrbiting->m_orbit_circle.setOutlineColor(sf::Color(128, 128, 128, 25));
 			m_isOrbiting = NULL;
+			NormalizeVector(&m_speed, m_speed_max);
+		}
 
 		if (m_isOrbiting != NULL)
 			break;
@@ -94,6 +105,7 @@ void Ship::Update(sf::Time deltaTime)
 	else
 		setColor(sf::Color::White);
 
+	//orbit
 	UpdateOrbit(deltaTime);
 
 	SpatialObject::Update(deltaTime);

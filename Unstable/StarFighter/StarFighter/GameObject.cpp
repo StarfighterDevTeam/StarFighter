@@ -307,3 +307,8 @@ SpatialObject* GameObject::GetTargetableEnemyShip(const GameObject* ref_object, 
 	return NULL;
 	//see override function in class Player
 }
+
+void GameObject::SetPosition(sf::Vector2f position)
+{
+	setPosition(position);
+}

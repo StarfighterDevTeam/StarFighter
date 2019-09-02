@@ -26,11 +26,11 @@ Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostil
 
 	//gravity
 	m_gravity_range = 200;
-	m_gravity_period = 5;
+	m_gravity_period = 8;
 
 	m_orbit_circle.setRadius(m_gravity_range);
 	m_orbit_circle.setOrigin(sf::Vector2f(m_gravity_range, m_gravity_range));
-	m_orbit_circle.setOutlineColor(sf::Color(128, 128, 128, 128));
+	m_orbit_circle.setOutlineColor(sf::Color(128, 128, 128, 40));
 	m_orbit_circle.setOutlineThickness(2);
 	m_orbit_circle.setFillColor(sf::Color::Transparent);
 	m_orbit_circle.setPointCount(128);
@@ -39,13 +39,6 @@ Planet::Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostil
 Planet::~Planet()
 {
 	
-}
-
-void Planet::Update(sf::Time deltaTime)
-{
-	SpatialObject::Update(deltaTime);
-
-	m_orbit_circle.setPosition(getPosition());
 }
 
 void Planet::Draw(RenderTarget& screen)
@@ -61,4 +54,11 @@ void Planet::SetHostility(HostilityLevel hostility)
 	SpatialObject::SetHostility(hostility);
 
 	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
+}
+
+void Planet::SetPosition(sf::Vector2f position)
+{
+	GameObject::SetPosition(position);
+
+	m_orbit_circle.setPosition(getPosition());
 }

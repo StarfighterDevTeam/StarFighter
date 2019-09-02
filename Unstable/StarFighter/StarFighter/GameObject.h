@@ -19,8 +19,8 @@ enum LayerType
 {
 	BackgroundLayer,
 	SectorLayer,
-	Planet_Layer,
 	StarLayer,	
+	Planet_Layer,
 	PlayerFireLayer,
 	AIShipFireLayer,
 	PlayerStroboscopicLayer,
@@ -99,6 +99,7 @@ public:
 	virtual void MarkThis(SpatialObject* target);
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual bool GetHitByAmmo(GameObject* ammo);
+	virtual void SetPosition(sf::Vector2f position);
 
 	sf::Vector2i m_star_sector_index;
 };

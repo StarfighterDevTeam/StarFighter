@@ -24,7 +24,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		case Ship_Alpha:
 		{
 			m_speed_max = 100;
-			m_max_acceleration = 2000;
+			m_acceleration_max = 2000;
 			m_turn_speed = 160;
 			m_max_braking = 3000;
 			m_idle_decelleration = 1000;

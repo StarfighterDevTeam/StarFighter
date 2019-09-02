@@ -30,7 +30,7 @@ public :
 	void UpdateOrbit(sf::Time deltaTime);
 
 	float m_acceleration;
-	float m_max_acceleration;
+	float m_acceleration_max;
 	float m_speed_max;
 	float m_turn_speed;
 	float m_max_braking;

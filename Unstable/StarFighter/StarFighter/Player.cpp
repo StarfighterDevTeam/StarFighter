@@ -30,7 +30,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 
 	//Flight model
 	m_speed_max = 800;
-	m_max_acceleration = 2000;
+	m_acceleration_max = 2000;
 	m_turn_speed = 160;
 	m_max_braking = 3000;
 	m_idle_decelleration = 1000;
