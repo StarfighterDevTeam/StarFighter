@@ -214,8 +214,8 @@ sf::Color GrayScaleColor(sf::Color input_color, float ratio)
 
 float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
 {
-	float angle = GetAngleRadBetweenPositions(target_position, ref_position) * 180.f / M_PI;
-	float delta_angle = angle - ref_rotation_in_deg;
+	float angle = GetVectorAngleRad(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI;
+	float delta_angle = ref_rotation_in_deg - angle;
 	if (delta_angle > 180)
 		delta_angle -= 180.f * 2;
 	else if (delta_angle < -180)
@@ -224,45 +224,20 @@ float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_
 	return delta_angle;
 }
 
-float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
-{
-	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
-	float target_angle = GetAngleRadForVector(diff);
-
-	const float a = diff.x;
-	const float b = diff.y;
-
-	float distance_to_obj = (a * a) + (b * b);
-	distance_to_obj = sqrt(distance_to_obj);
-
-	float angle;
-	angle = acos(a / distance_to_obj);
-
-	if (b > 0)
-	{
-		angle = -angle;
-	}
-
-	angle += M_PI_2;
-
-	return angle;
-}
-
-float GetAngleRadForVector(sf::Vector2f vector)
+float GetVectorAngleRad(sf::Vector2f vector)
 {
 	const float a = vector.x;
 	const float b = vector.y;
 
 	if (a == 0 && b == 0)
-		return 0.f;
+		return 0;
 
 	float distance_to_obj = (a * a) + (b * b);
 	distance_to_obj = sqrt(distance_to_obj);
 
-	float angle;
-	angle = acos(a / distance_to_obj);
+	float angle = acos(a / distance_to_obj);
 
-	if (b < 0)
+	if (b > 0)
 	{
 		angle = -angle;
 	}

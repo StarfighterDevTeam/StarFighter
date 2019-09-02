@@ -26,7 +26,7 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 	sf::Vector2f acceleration_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration, m_heading * M_PI / 180);
 
 	sf::Vector2f braking_vector = sf::Vector2f(0, 0);
-	float current_inertia_angle = GetAngleRadForVector(m_speed);
+	float current_inertia_angle = GetVectorAngleRad(m_speed);
 
 	if (inputs_direction.y > 0)
 		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_max_braking, current_inertia_angle);

@@ -104,11 +104,11 @@ void Ammo::Update(sf::Time deltaTime)
 				if (delta_angle != 0)
 				{
 					if (abs(delta_angle) <= m_turn_speed * deltaTime.asSeconds())
-						m_heading += delta_angle;
+						m_heading -= delta_angle;
 					else if (delta_angle > 0)
-						m_heading += m_turn_speed * deltaTime.asSeconds();
+						m_heading -= m_turn_speed * deltaTime.asSeconds();
 					else
-						m_heading -= m_turn_speed * deltaTime.asSeconds();						
+						m_heading += m_turn_speed * deltaTime.asSeconds();						
 				}
 			}
 			else

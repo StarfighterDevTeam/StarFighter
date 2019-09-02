@@ -85,8 +85,10 @@ void Marker::Update(sf::Time deltaTime)
 	if (m_onScreen == false)
 	{	
 		//orientation of the marker
-		const float angle = GetAngleRadBetweenPositions(m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
-		setRotation(- angle * 180 / M_PI);
+		const float dx = m_target->getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5;
+		const float dy = m_target->getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5;
+		const float angle = GetVectorAngleRad(sf::Vector2f(dx, -dy));
+		setRotation(angle * 180 / M_PI);
 
 		//position of the marker
 		sf::Vector2f position;
@@ -98,8 +100,6 @@ void Marker::Update(sf::Time deltaTime)
 		
 		//compute the line equation to the target and stich it to the adequate screen border
 		const float a = REF_WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_X;//as in y=ax+b
-		const float dx = m_target->getPosition().x - (REF_WINDOW_RESOLUTION_X * 0.5);
-		const float dy = m_target->getPosition().y - (REF_WINDOW_RESOLUTION_Y * 0.5);
 		const float a2 = dx != 0 ? dy / dx : 0;
 		const float b2 = m_target->getPosition().y - (a2 * m_target->getPosition().x);
 
