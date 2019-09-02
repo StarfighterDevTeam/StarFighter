@@ -11,7 +11,7 @@ class Planet : public SpatialObject
 {
 public :
 	Planet(){};
-	Planet(sf::Vector2i sector_index, HostilityLevel hostility);
+	Planet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions);
 	virtual ~Planet();
 	void SetHostility(HostilityLevel hostility) override;
 	void Draw(RenderTarget& screen) override;
@@ -21,6 +21,7 @@ public :
 	float m_gravity_period;
 	CircleShape m_orbit_circle;
 
+	int m_nb_missions;
 	vector<Mission*> m_missions;
 };
 

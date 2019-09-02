@@ -93,7 +93,7 @@ void Player::Update(sf::Time deltaTime)
 void Player::UpdateMissions()
 {
 	vector<Mission*> missions_to_delete;
-	vector<Mission*> missions_to_add;
+	vector<Planet*> planet_missions_to_add;
 	
 	for (Mission* mission : m_missions)
 		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
@@ -102,12 +102,13 @@ void Player::UpdateMissions()
 				{
 					if (m_isOrbiting == mission->m_marked_objectives.front())
 					{
+						//Mission complete
 						EndMission(mission, MissionStatus_Complete);
 
-						for (Mission* planet_mission : m_isOrbiting->m_missions)
-							missions_to_add.push_back(planet_mission);
+						planet_missions_to_add.push_back(m_isOrbiting);//get planet's missions (debug)
+						m_isOrbiting->SetHostility(Hostility_Ally);//completing a mission makes this planet our friend
 
-						if (m_isOrbiting == mission->m_owner)
+						if (m_isOrbiting == mission->m_owner)//delete mission
 							missions_to_delete.push_back(mission);
 					}
 						
@@ -117,8 +118,14 @@ void Player::UpdateMissions()
 	for (Mission* mission : missions_to_delete)
 		RemoveMission(mission);
 
-	for (Mission* mission : missions_to_add)
-		AcceptMission(mission);
+	for (Planet* planet : planet_missions_to_add)
+		if (planet->m_nb_missions > 0)
+		{
+			if (m_missions.size() >= NB_MISSIONS_MAX)
+				break;
+			
+			(*CurrentGame).m_planet_missions_to_create.push_back(planet);
+		}
 }
 
 bool Player::CycleMission()
@@ -357,6 +364,17 @@ void Player::RemoveMission(Mission* mission)
 	for (Mission* it_mission : old_missions)
 		if (it_mission != mission)
 			m_missions.push_back(it_mission);
+
+	if (mission->m_owner != NULL)
+	{
+		vector<Mission*> old_planet_missions;
+		for (Mission* it_mission : mission->m_owner->m_missions)
+			old_planet_missions.push_back(it_mission);
+		mission->m_owner->m_missions.clear();
+		for (Mission* it_mission : old_planet_missions)
+			if (it_mission != mission)
+				mission->m_owner->m_missions.push_back(it_mission);
+	}
 
 	delete mission;
 }

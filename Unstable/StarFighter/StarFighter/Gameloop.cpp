@@ -54,6 +54,25 @@ void Gameloop::Update(sf::Time deltaTime)
 		PopulateSector(sector_index);
 	}
 	(*CurrentGame).m_star_sectors_to_create.clear();
+
+	//create procedural missions for planets
+	for (Planet* planet : (*CurrentGame).m_planet_missions_to_create)
+	{
+		Player* player = (Player*)(*CurrentGame).m_playerShip;
+
+		if (player->m_missions.size() >= NB_MISSIONS_MAX)
+			break;
+
+		if (planet->m_nb_missions == 0)
+			continue;
+
+		Mission* new_mission = CreateMission(planet);
+		planet->m_missions.push_back(new_mission);
+		planet->m_nb_missions--;
+
+		player->AcceptMission(new_mission);
+	}
+	(*CurrentGame).m_planet_missions_to_create.clear();
 }
 
 void Gameloop::Draw()
@@ -97,24 +116,19 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 
 Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions_min, int nb_missions_max)
 {
-	Planet* planet = new Planet(sector_index, hostility);
+	int nb_missions = RandomizeIntBetweenValues(nb_missions_min, nb_missions_max);
+
+	Planet* planet = new Planet(sector_index, hostility, nb_missions);
 	if (planet->m_removeMe == false)
 		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject);
-
-	if (nb_missions_min > 0)
-	{
-		int nb_missions = RandomizeIntBetweenValues(nb_missions_min, nb_missions_max);
-		for (int i = 0; i < nb_missions; i++)
-			planet->m_missions.push_back(CreateMission(planet->m_sector_index));
-	}
 
 	return planet;
 }
 
-Mission* Gameloop::CreateMission(sf::Vector2i origin_sector_index)
+Mission* Gameloop::CreateMission(Planet* owner)
 {
 	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
-	sf::Vector2i starting_index = sf::Vector2i(origin_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), origin_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
+	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 	sf::Vector2i found_index = starting_index;
 
 	Planet* planet = NULL;
@@ -146,7 +160,7 @@ Mission* Gameloop::CreateMission(sf::Vector2i origin_sector_index)
 		//printf("found index: %d, %d\n", found_index.x, found_index.y);
 	}
 
-	return new Mission(Mission_GoTo, planet, planet);
+	return new Mission(Mission_GoTo, planet, owner);
 }
 
 Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
@@ -155,7 +169,7 @@ Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
 
 	int id = (*CurrentGame).GetSectorId(sector_index);
 	if (id == -1)
-		planet = CreatePlanet(sector_index, Hostility_HoldFire, 0, 0);
+		planet = CreatePlanet(sector_index, Hostility_HoldFire, 1, 1);
 	else
 	{
 		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])

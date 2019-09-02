@@ -19,6 +19,7 @@
 #include "SFTextPop.h"
 
 class Ship;
+class Planet;
 
 enum SFX_Bank
 {
@@ -132,6 +133,7 @@ public:
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
 	vector<sf::Vector2i> m_star_sectors_managed;//all sectors that are close enough to need an updated
 	vector<sf::Vector2i> m_star_sectors_to_create;//all sectors that have just been created and need content creation
+	vector<Planet*> m_planet_missions_to_create;//all planets that are requesting a mission creation from Gameloop
 	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
 	sf::Vector2i m_previous_star_sector_index;
 

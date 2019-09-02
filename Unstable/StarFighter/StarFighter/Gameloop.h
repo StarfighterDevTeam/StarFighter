@@ -22,7 +22,7 @@ public:
 	void PopulateSector(sf::Vector2i sector_index);
 	AIShip* CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility);
 	Planet* CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions_min, int nb_missions_max);
-	Mission* CreateMission(sf::Vector2i origin_sector_index);
+	Mission* CreateMission(Planet* owner);
 	Planet* GetPlanetForMission(sf::Vector2i sector_index);
 
 	vector<StarGenerator*> m_star_generator;

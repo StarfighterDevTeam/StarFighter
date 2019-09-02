@@ -4,9 +4,10 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Planet::Planet(sf::Vector2i sector_index, HostilityLevel hostility)
+Planet::Planet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions)
 {
 	m_hostility = hostility;
+	m_nb_missions = nb_missions;
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(138, 138), 1, NB_PLANET_TYPES);
 	SetAnimationLine(RandomizeIntBetweenValues(0, NB_PLANET_TYPES - 1));

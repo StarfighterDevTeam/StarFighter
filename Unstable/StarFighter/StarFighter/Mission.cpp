@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Mission::Mission(MissionType mission_type, SpatialObject* target, SpatialObject* owner)
+Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 {
 	m_mission_type = mission_type;
 	m_status = MissionStatus_Accepted;

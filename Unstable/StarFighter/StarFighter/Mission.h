@@ -20,13 +20,13 @@ enum MissionType
 class Mission
 {
 public :
-	Mission(MissionType mission_type, SpatialObject* target, SpatialObject* owner);
+	Mission(MissionType mission_type, SpatialObject* target, Planet* owner);
 	~Mission(){};
 
 	MissionStatus m_status;
 	MissionType m_mission_type;
 	vector<SpatialObject*> m_marked_objectives;
-	SpatialObject* m_owner;
+	Planet* m_owner;
 };
 
 #endif // MISSION_H_INCLUDED
