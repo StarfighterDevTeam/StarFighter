@@ -177,6 +177,8 @@ Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
 			if (object->m_collider == PlanetObject)
 			{
 				planet = (Planet*)object;
+				if (planet->m_nb_missions == 0)
+					planet->m_nb_missions++;
 				break;
 			}
 		}
