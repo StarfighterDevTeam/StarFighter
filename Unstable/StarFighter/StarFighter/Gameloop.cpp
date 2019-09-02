@@ -13,8 +13,12 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 	(*CurrentGame).UpdateSectorList(true);
 
-	CreateMission(Mission_GoTo_Easy);
-	CreateMission(Mission_GoTo_Easy);
+	//Init first mission
+	//sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), player->m_sector_index.y + RandomizeIntBetweenValues(10, 15));
+	sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(0, 0), player->m_sector_index.y + RandomizeIntBetweenValues(3, 4));
+	Planet* planet = CreatePlanet(index, Hostility_HoldFire, 1, 1);
+	Mission* mission = new Mission(Mission_GoTo, planet);
+	player->AcceptMission(mission);
 
 	//enemy
 	//AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
@@ -91,46 +95,81 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 	return ship;
 }
 
-Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostility)
+Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions_min, int nb_missions_max)
 {
-	int r = RandomizeIntBetweenValues(0, NB_PLANET_TYPES);
-	return CreatePlanet(r, sector_index, hostility);
-}
-
-Planet* Gameloop::CreatePlanet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility)
-{
-	Planet* planet = new Planet(planet_type, sector_index, hostility);
+	Planet* planet = new Planet(sector_index, hostility);
 	if (planet->m_removeMe == false)
 		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject);
+
+	if (nb_missions_min > 0)
+	{
+		int nb_missions = RandomizeIntBetweenValues(nb_missions_min, nb_missions_max);
+		for (int i = 0; i < nb_missions; i++)
+			planet->m_missions.push_back(CreateMission(planet->m_sector_index));
+	}
+
 	return planet;
 }
 
-Mission* Gameloop::CreateMission(MissionType mission_type)
+Mission* Gameloop::CreateMission(sf::Vector2i origin_sector_index)
 {
-	Mission* mission = NULL;
+	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	sf::Vector2i starting_index = sf::Vector2i(origin_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), origin_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
+	sf::Vector2i found_index = starting_index;
 
-	switch (mission_type)
+	Planet* planet = NULL;
+	int i = 0;
+	int s = 1;
+	while (planet == NULL)
 	{
-		case Mission_GoTo_Easy:
-		{
-			mission = new Mission(mission_type);
+		//"snale" search for an existing planet or an unknown sector
+		s *= (i == 0 || i % 2 == 1) ? 1 : -1;
+		i++;
 
-			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(2, 5), RandomizeIntBetweenValues(1, 3));
-			Planet* planet = CreatePlanet(index, Hostility_HoldFire);
-			mission->m_marked_objectives.push_back(planet);
+		if (i % 2 == 0)
+			for (int y = 0; y < (i / 2) * abs(s); y++)
+			{
+				found_index.y += s;
+				planet = GetPlanetForMission(starting_index + found_index);
+				if (planet != NULL)
+					break;
+			}
+		else
+			for (int x = 0; x < (1 + ((i + 1) / 2) - 1) * abs(s); x++)
+			{
+				found_index.x += s;
+				planet = GetPlanetForMission(starting_index + found_index);
+				if (planet != NULL)
+					break;
+			}
 
-			Player* player = (Player*)(*CurrentGame).m_playerShip;
-			player->AcceptMission(mission);
-			break;
-		}
+		//printf("found index: %d, %d\n", found_index.x, found_index.y);
 	}
 
-	return mission;
+	return new Mission(Mission_GoTo, planet);
 }
 
-Mission* Gameloop::CreateMission()
+Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
 {
-	int m = RandomizeIntBetweenValues(0, (int)(NB_MISSION_TYPES - 1));
-	
-	return CreateMission((MissionType)m);
+	Planet* planet = NULL;
+
+	int id = (*CurrentGame).GetSectorId(sector_index);
+	if (id == -1)
+		planet = CreatePlanet(sector_index, Hostility_Ally, 0, 0);
+	else
+	{
+		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])
+		{
+			if (object->m_collider == PlanetObject)
+			{
+				planet = (Planet*)object;
+				break;
+			}
+		}
+
+		if ((*CurrentGame).m_sceneGameObjectsStored[id].empty() == true)
+			(*CurrentGame).m_sceneGameObjectsStored.erase(id);
+	}
+
+	return planet;
 }

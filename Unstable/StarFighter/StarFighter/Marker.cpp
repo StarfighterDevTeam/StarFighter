@@ -125,14 +125,14 @@ void Marker::Update(sf::Time deltaTime)
 		else if (dy > 0)//down
 		{
 			position.y = REF_WINDOW_RESOLUTION_Y - offset;
-			position.x = (position.y - b2) / a2;
+			position.x = a2 != 0 ? (position.y - b2) / a2 : REF_WINDOW_RESOLUTION_X * 0.5;
 
 			m_distance_text.setPosition(sf::Vector2f(position.x - text_width * 0.5, position.y - offset - m_distance_text.getCharacterSize()));
 		}
 		else//up
 		{
 			position.y = offset;
-			position.x = (position.y - b2) / a2;
+			position.x = a2 != 0 ? (position.y - b2) / a2 : REF_WINDOW_RESOLUTION_X * 0.5;
 
 			m_distance_text.setPosition(sf::Vector2f(position.x - m_distance_text.getGlobalBounds().width * 0.5, position.y + offset));
 		}

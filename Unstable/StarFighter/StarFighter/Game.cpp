@@ -326,7 +326,7 @@ void Game::drawScene()
 			for (StarSector sector : m_star_sectors_managed)
 			{
 				GameObject* sector_debug;
-				if (sector.m_index == m_playerShip->m_star_sector_index)
+				if (sector.m_index == m_playerShip->m_sector_index)
 					sector_debug = m_sector_debug_current;
 				else
 					sector_debug = m_sector_debug_onscreen;
@@ -466,9 +466,9 @@ void Game::UpdateSectorList(bool force_update)
 	GameObject* player = (GameObject*)m_playerShip;
 
 	//update needed?
-	if (force_update == true || m_previous_star_sector_index != player->m_star_sector_index)
+	if (force_update == true || m_previous_star_sector_index != player->m_sector_index)
 	{
-		m_previous_star_sector_index = player->m_star_sector_index;
+		m_previous_star_sector_index = player->m_sector_index;
 
 		vector<sf::Vector2i> old_star_sectors_managed;
 		for (sf::Vector2i index : m_star_sectors_managed)
@@ -482,9 +482,9 @@ void Game::UpdateSectorList(bool force_update)
 			for (int j = 0; j < nb_sectors_y; j++)
 			{
 				sf::Vector2i index;
-				index.x = i + m_playerShip->m_star_sector_index.x - (nb_sectors_x / 2);
-				index.y = j + m_playerShip->m_star_sector_index.y - (nb_sectors_y / 2);
-				//StarSector sector(sf::Vector2i(i + m_playerShip->m_star_sector_index.x - (nb_sectors_x / 2), j + m_playerShip->m_star_sector_index.y - (nb_sectors_y / 2)), (i == nb_sectors_x / 2 && j == nb_sectors_y / 2) ? Sector_Current : Sector_OnScreen);
+				index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
+				index.y = j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2);
+				//StarSector sector(sf::Vector2i(i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2), j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2)), (i == nb_sectors_x / 2 && j == nb_sectors_y / 2) ? Sector_Current : Sector_OnScreen);
 				m_star_sectors_managed.push_back(index);
 				
 				if (GetSectorId(index) == -1)
@@ -544,7 +544,7 @@ void Game::UpdateSectorList(bool force_update)
 				if (object == m_background)
 					continue;
 
-				if (object->m_star_sector_index == index && object->m_garbageMe == false)
+				if (object->m_sector_index == index && object->m_garbageMe == false)
 				{
 					if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
 					{
@@ -591,7 +591,7 @@ int Game::GetSectorId(sf::Vector2i index)
 
 void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index)
 {
-	object->m_star_sector_index = sector_index;
+	object->m_sector_index = sector_index;
 
 	object->m_position.x = 1.f * sector_index.x * STAR_SECTOR_SIZE;
 	object->m_position.y = 1.f * sector_index.y * STAR_SECTOR_SIZE;

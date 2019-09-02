@@ -95,7 +95,7 @@ void Player::UpdateMissions()
 	for (Mission* mission : m_missions)
 		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
 			switch (mission->m_mission_type)
-				case Mission_GoTo_Easy:
+				case Mission_GoTo:
 				{
 					if (m_isOrbiting == mission->m_marked_objectives.front())
 						CompleteMission(mission);

@@ -101,7 +101,7 @@ public:
 	virtual bool GetHitByAmmo(GameObject* ammo);
 	virtual void SetPosition(sf::Vector2f position);
 
-	sf::Vector2i m_star_sector_index;
+	sf::Vector2i m_sector_index;
 };
 
 #endif // GameObject_H_INCLUDED

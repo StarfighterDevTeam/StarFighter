@@ -287,8 +287,8 @@ sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(const float abs
 //Star Hunter
 void GameObject::UpdateStarSectorIndex()
 {
-	m_star_sector_index.x = (int)(m_position.x / STAR_SECTOR_SIZE + (m_position.x >= 0 ? 0.5 : -0.5));
-	m_star_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
+	m_sector_index.x = (int)(m_position.x / STAR_SECTOR_SIZE + (m_position.x >= 0 ? 0.5 : -0.5));
+	m_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
 }
 
 bool GameObject::GetHitByAmmo(GameObject* ammo)

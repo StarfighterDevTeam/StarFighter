@@ -3,13 +3,15 @@
 
 #include "Marker.h"
 
+class Mission;
+
 #define NB_PLANET_TYPES		18
 
 class Planet : public SpatialObject
 {
 public :
 	Planet(){};
-	Planet(int planet_type, sf::Vector2i sector_index, HostilityLevel hostility);
+	Planet(sf::Vector2i sector_index, HostilityLevel hostility);
 	virtual ~Planet();
 	void SetHostility(HostilityLevel hostility) override;
 	void Draw(RenderTarget& screen) override;
@@ -18,6 +20,9 @@ public :
 	float m_gravity_range;
 	float m_gravity_period;
 	CircleShape m_orbit_circle;
+
+	int m_nb_missions;
+	vector<Mission*> m_missions;
 };
 
 #endif // PLANET_H_INCLUDED

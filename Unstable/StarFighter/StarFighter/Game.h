@@ -43,8 +43,8 @@ struct StarSector
 {
 public:
 	//StarSector(){ m_hazard_level = 1; };
-	StarSector(sf::Vector2i index){m_index = index;}
-	StarSector(sf::Vector2i index, int id){ m_index = index; m_id = id;}
+	StarSector(sf::Vector2i index){ m_index = index; }
+	StarSector(sf::Vector2i index, int id) : StarSector(index) {m_id = id;}
 
 	sf::Vector2i m_index;
 	int m_hazard_level;

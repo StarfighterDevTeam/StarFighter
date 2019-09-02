@@ -13,14 +13,14 @@ enum MissionStatus
 
 enum MissionType
 {
-	Mission_GoTo_Easy,
+	Mission_GoTo,
 	NB_MISSION_TYPES,
 };
 
 class Mission
 {
 public :
-	Mission(MissionType mission_type);
+	Mission(MissionType mission_type, SpatialObject* target);
 	~Mission(){};
 
 	MissionStatus m_status;
