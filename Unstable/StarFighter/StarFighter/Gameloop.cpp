@@ -14,6 +14,7 @@ Gameloop::Gameloop()
 	(*CurrentGame).UpdateSectorList(true);
 
 	CreateMission(Mission_GoTo_Easy);
+	CreateMission(Mission_GoTo_Easy);
 
 	//enemy
 	//AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
@@ -114,7 +115,7 @@ Mission* Gameloop::CreateMission(MissionType mission_type)
 		{
 			mission = new Mission(mission_type);
 
-			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(1, 1));
+			sf::Vector2i index = sf::Vector2i(RandomizeIntBetweenValues(2, 5), RandomizeIntBetweenValues(1, 3));
 			Planet* planet = CreatePlanet(index, Hostility_HoldFire);
 			mission->m_marked_objectives.push_back(planet);
 

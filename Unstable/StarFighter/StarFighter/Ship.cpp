@@ -61,15 +61,18 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 		{
 			if (m_isOrbiting != NULL || dx*dx + dy*dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
 			{
+				/*
 				if (m_isOrbiting == NULL || m_acceleration != 0)
 				{
 					m_orbit_angle = GetVectorAngleRad(sf::Vector2f(dx, -dy)) - M_PI_2;
 					m_orbit_cw = (m_speed.x > 0 && dy > 0) || (m_speed.x < 0 && dy < 0) ? 1 : -1;//clockwise gravitation
 				}
+				*/
 
 				m_isOrbiting = planet;
 				planet->m_orbit_circle.setOutlineColor(sf::Color(128, 128, 128, 60));
 
+				/*
 				m_orbit_angle -= deltaTime.asSeconds() * m_orbit_cw * 2 * M_PI * 1 / planet->m_gravity_period;
 				BoundAngle(m_orbit_angle, 2 * M_PI);
 
@@ -80,6 +83,7 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 
 				sf::Vector2f speed = sf::Vector2f(3 * (position.x - m_position.x), 3 * (position.y - m_position.y));
 				m_position += speed * deltaTime.asSeconds();
+				*/
 			}
 		}
 		else if (m_isOrbiting != NULL)

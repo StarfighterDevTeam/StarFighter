@@ -50,9 +50,12 @@ public :
 	void SetCurrentMission(Mission* mission);
 	void RemoveMission(Mission* mission);
 	void CancelMission(Mission* mission);
+	void CompleteMission(Mission* mission);
+	void FailMission(Mission* mission);
 	bool CycleMission();
 	void AddMissionMarker(SpatialObject* target);
 	void RemoveMissionMarker(SpatialObject* target);
+	void UpdateMissions();
 
 	vector<SpatialObject*> m_marked_objects;
 	vector<Mission*> m_missions;

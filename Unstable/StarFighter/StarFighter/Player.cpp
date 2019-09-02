@@ -84,8 +84,24 @@ void Player::Update(sf::Time deltaTime)
 	Ship::Update(deltaTime);
 
 	//cycling mission
-	if (	m_inputs_states[Action_CyclingMission] == Input_Tap)
+	if (m_inputs_states[Action_CyclingMission] == Input_Tap)
 		CycleMission();
+
+	UpdateMissions();
+}
+
+void Player::UpdateMissions()
+{
+	for (Mission* mission : m_missions)
+		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
+			switch (mission->m_mission_type)
+				case Mission_GoTo_Easy:
+				{
+					if (m_isOrbiting == mission->m_marked_objectives.front())
+						CompleteMission(mission);
+						
+					break;
+				}
 }
 
 bool Player::CycleMission()
@@ -315,6 +331,32 @@ void Player::CancelMission(Mission* mission)
 
 		mission->m_status = MissionStatus_Accepted;
 	}
+}
+
+void Player::CompleteMission(Mission* mission)
+{
+	if (mission->m_status == MissionStatus_Current)
+	{
+		for (SpatialObject* objective : mission->m_marked_objectives)
+			RemoveMissionMarker(objective);
+
+		CycleMission();
+	}
+
+	mission->m_status = MissionStatus_Complete;
+}
+
+void Player::FailMission(Mission* mission)
+{
+	if (mission->m_status == MissionStatus_Current)
+	{
+		for (SpatialObject* objective : mission->m_marked_objectives)
+			RemoveMissionMarker(objective);
+
+		CycleMission();
+	}
+
+	mission->m_status = MissionStatus_Failed;
 }
 
 void Player::RemoveMission(Mission* mission)
