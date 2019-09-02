@@ -160,7 +160,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		//printf("found index: %d, %d\n", found_index.x, found_index.y);
 	}
 
-	return new Mission(Mission_GoTo, planet, owner);
+	return new Mission(Mission_GoTo, planet, planet);
 }
 
 Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
