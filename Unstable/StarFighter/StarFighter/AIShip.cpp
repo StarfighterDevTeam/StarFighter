@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)
+AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility) : Ship()
 {
 	m_ship_type = ship_type;
 	m_hostility = hostility;

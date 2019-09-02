@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Player::Player(sf::Vector2i sector_index)
+Player::Player(sf::Vector2i sector_index) : Ship()
 {
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;

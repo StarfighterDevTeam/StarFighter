@@ -5,9 +5,10 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : SpatialObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Ship::Ship()
 {
 	m_hit_feedback_timer = 0;
+	m_isOrbiting = NULL;
 }
 
 Ship::~Ship()
@@ -57,39 +58,41 @@ void Ship::Update(sf::Time deltaTime)
 	//gravity?
 	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[PlanetObject])
 	{
+		if (m_isOrbiting != NULL && m_isOrbiting != object)
+			continue;
+
 		Planet* planet = (Planet*)object;
 		float dx = m_position.x - planet->m_position.x;
 		float dy = m_position.y - planet->m_position.y;
-		if (dx*dx + dy*dy < planet->m_gravity_range * planet->m_gravity_range)
+		
+		if (dx*dx + dy*dy <= (planet->m_gravity_range + m_size.y * 0.5) * (planet->m_gravity_range + m_size.y * 0.5))//range for leaving orbit
 		{
-			/*
-			bool clockwise = (m_speed.x > 0 && dy < 0) || (m_speed.x < 0 && dy > 0);
-
-			float angle = GetAngleRadForVector(sf::Vector2f(dx, dy));
-			angle = deltaTime.asSeconds();
-			m_speed.x = planet->m_gravity_range * cos(angle);
-			m_speed.y = planet->m_gravity_range * sin(angle);
-			*/
-
-			//centrifuge
-			/*
-			sf::Vector2f centrifuge_force = clockwise == true ? sf::Vector2f(m_speed.y, -m_speed.x) : sf::Vector2f(-m_speed.y, m_speed.x);
-			float centrifuge_strenght = planet->m_gravity_strength;
-			ScaleVector(&centrifuge_force, centrifuge_strenght);
-			m_speed += centrifuge_force * deltaTime.asSeconds();
-
-			//gravity
-			float angle = GetAngleRadForVector(sf::Vector2f(dx, dy));
-			sf::Vector2f gravity_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(planet->m_gravity_strength, angle);
-			gravity_speed.y = -gravity_speed.y;
-			m_speed += gravity_speed * deltaTime.asSeconds();
-			printf("gravity");
-			*/
+			if (m_isOrbiting != NULL || dx*dx + dy*dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
+			{
+				if (m_isOrbiting == NULL)
+					printf("Enter orbit\n");
+				m_isOrbiting = planet;
+				
+				/*
+				int cw = (m_speed.x > 0 && dy > 0) || (m_speed.x < 0 && dy < 0) ? 1 : -1;//clockwise gravitation
+				float angle = GetVectorAngleRad(sf::Vector2f(dx, dy)) - M_PI_2;
+				m_speed = sf::Vector2f(0, 0);
+				m_position.x = planet->m_position.x + planet->m_gravity_range * cos(angle);
+				m_position.y = planet->m_position.y + planet->m_gravity_range * sin(angle);
+				*/
+			}
 		}
+		else if (m_isOrbiting != NULL)
+		{
+			printf("Leave orbit\n");
+			m_isOrbiting = NULL;
+		}
+
+		if (m_isOrbiting != NULL)
+			break;
 	}
 
 	SpatialObject::Update(deltaTime);
-
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)

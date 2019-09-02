@@ -13,8 +13,7 @@
 class Ship : public SpatialObject
 {
 public :
-	Ship(){};
-	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Ship();
 	virtual ~Ship();
 
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
@@ -38,6 +37,7 @@ public :
 	vector<Weapon*> m_weapons;
 
 	float m_hit_feedback_timer;
+	Planet* m_isOrbiting;
 };
 
 #endif // SHIP_H_INCLUDED
