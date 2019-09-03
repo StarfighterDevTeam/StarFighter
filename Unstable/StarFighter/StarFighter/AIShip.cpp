@@ -24,7 +24,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	{
 		case Ship_Alpha:
 		{
-			m_speed_max = 100;
+			m_speed_max = 1000;
 			m_acceleration_max = 2000;
 			m_turn_speed = 160;
 			m_max_braking = 3000;
@@ -60,17 +60,31 @@ AIShip::~AIShip()
 
 void AIShip::Update(sf::Time deltaTime)
 {
-	ApplyFlightModel(deltaTime, sf::Vector2f(1, -1));
-
-	Ship::Update(deltaTime);
+	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
+	bool input_fire = false;
 
 	//weapons
 	switch (m_roe)
 	{
-	case ROE_HoldFire:
-	case ROE_ReturnFire:
-		break;
-	case ROE_FireAtWill:
+		case ROE_HoldFire:
+		case ROE_ReturnFire:
+			break;
+		case ROE_FireAtWill:
+		{
+			input_fire = true;
+
+			//chase player
+			GoTo((*CurrentGame).m_playerShip->m_position, deltaTime, inputs_direction);
+
+			break;
+		}
+	}
+
+	ApplyFlightModel(deltaTime, inputs_direction);
+
+	Ship::Update(deltaTime);
+
+	if (input_fire == true)
 		for (Weapon* weapon : m_weapons)
 		{
 			weapon->Update(deltaTime);
@@ -79,7 +93,6 @@ void AIShip::Update(sf::Time deltaTime)
 				if (weapon->IsReadyToFire() == true)
 					weapon->Fire();
 		}
-	}
 }
 
 void AIShip::SetHostility(Hostility hostility)
@@ -105,4 +118,20 @@ bool AIShip::GetHitByAmmo(GameObject* ammo)
 		m_roe = ROE_FireAtWill;
 
 	return Ship::GetHitByAmmo(ammo);
+}
+
+void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)
+{
+	const float dx = m_position.x - position.x;
+	const float dy = m_position.y - position.y;
+	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
+	//const float angle = GetVectorAngleRad(sf::Vector2f(-dx, -dy));
+
+	if (delta_angle < 0)
+		inputs_direction.x = 1;
+	else if (delta_angle > 0)
+		inputs_direction.x = -1;
+
+	if (dx * dx + dy * dy > 0)
+		inputs_direction.y = -1;
 }
