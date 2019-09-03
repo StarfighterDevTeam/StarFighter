@@ -17,7 +17,7 @@ Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, Co
 
 	m_locked_target = NULL;
 	m_locking_target_clock = 0;
-	m_locking_angle_coverage = 60;
+	m_locking_angle_coverage = 30;
 
 	m_lock_rectangle.setOutlineColor(sf::Color::Green);
 	m_lock_rectangle.setOutlineThickness(-2);
@@ -47,7 +47,7 @@ Weapon::~Weapon()
 
 void Weapon::Fire()
 {
-	Ammo* ammo = new Ammo(m_ammo_type, m_position, m_heading, m_range, m_collider, m_locked_target);
+	Ammo* ammo = new Ammo(m_ammo_type, m_position, m_heading, m_range, m_collider);
 	(*CurrentGame).addToScene(ammo, m_layer, m_collider, true);
 
 	m_rate_of_fire_timer = m_rate_of_fire;
@@ -137,4 +137,14 @@ bool Weapon::CanStayLocked(GameObject* object)
 	}
 	
 	return true;
+}
+
+bool Weapon::IsTargetAligned(GameObject* target)
+{
+	const float dx = target->m_position.x - m_position.x;
+	const float dy = target->m_position.y - m_position.y;
+	if (dx*dx + dy*dy <= m_range * m_range && abs(GetAngleDegToTargetPosition(m_position, m_heading, target->m_position)) <= m_locking_angle_coverage)
+		return true;
+	else
+		return false;
 }

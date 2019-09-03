@@ -21,6 +21,7 @@ public:
 	void Update(sf::Time deltaTime);
 	bool IsReadyToFire();
 	bool CanStayLocked(GameObject* object);
+	bool IsTargetAligned(GameObject* target);
 
 	GameObject* m_owner;
 	sf::Vector2f m_position;

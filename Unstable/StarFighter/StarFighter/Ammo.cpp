@@ -4,10 +4,10 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, ColliderType collider, GameObject* locked_target)
+Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, ColliderType collider)
 {
 	m_ammo_type = ammo_type;
-	m_locked_target = locked_target;
+	m_locked_target = NULL;
 	string textureName;
 	sf::Vector2f textureSize;
 	int frameNumber = 1;

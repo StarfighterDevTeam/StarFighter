@@ -74,9 +74,10 @@ void AIShip::Update(sf::Time deltaTime)
 		for (Weapon* weapon : m_weapons)
 		{
 			weapon->Update(deltaTime);
-
-			if (weapon->IsReadyToFire() == true)
-				weapon->Fire();
+			GameObject* target = m_hostility == Hostility_Ally ? (*CurrentGame).m_playerShip : (*CurrentGame).m_playerShip;//todo: find appropriate target
+			if (weapon->IsTargetAligned(target) == true)
+				if (weapon->IsReadyToFire() == true)
+					weapon->Fire();
 		}
 	}
 }
