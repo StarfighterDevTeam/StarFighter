@@ -132,6 +132,8 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	else if (delta_angle > 0)
 		inputs_direction.x = -1;
 
-	if (dx * dx + dy * dy > 0)
+	if (dx * dx + dy * dy > 200 * 200 && abs(delta_angle) < 45)
 		inputs_direction.y = -1;
+	else if (abs(delta_angle) > 90)
+		inputs_direction.y = 1;
 }
