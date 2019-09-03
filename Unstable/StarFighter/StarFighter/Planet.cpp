@@ -54,6 +54,12 @@ Planet::~Planet()
 	
 }
 
+void Planet::Update(sf::Time deltaTime)
+{
+	if (m_frameNumber > 1)
+		AnimatedSprite::Update(deltaTime);
+}
+
 void Planet::Draw(RenderTarget& screen)
 {
 	SpatialObject::Draw(screen);

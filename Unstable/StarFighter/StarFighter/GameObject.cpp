@@ -162,9 +162,7 @@ void GameObject::Update(sf::Time deltaTime)
 	setRotation(m_heading);
 
 	if (m_frameNumber > 1)
-	{
 		AnimatedSprite::Update(deltaTime);
-	}
 }
 
 void GameObject::Draw(RenderTarget& screen)
