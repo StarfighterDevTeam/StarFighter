@@ -541,7 +541,7 @@ void Game::UpdateSectorList(bool force_update)
 		//Sectors to remove from scene
 		for (sf::Vector2i index : sector_index_to_remove)
 		{
-			vector<GameObject*> vector_objects;
+			int id = GetSectorId(index);
 			for (GameObject* object : m_sceneGameObjects)
 			{
 				if (object == m_background)
@@ -552,18 +552,12 @@ void Game::UpdateSectorList(bool force_update)
 					if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
 					{
 						object->m_removeMe = true;
-						vector_objects.push_back(object);
+						m_sceneGameObjectsStored[id].push_back(object);
 						//printf("game object removed and stored.\n");
 					}
 					else
 						object->m_garbageMe = true;
 				}
-			}
-
-			if (vector_objects.empty() == false)
-			{
-				int id = GetSectorId(index);
-				m_sceneGameObjectsStored.insert(pair<int, vector<GameObject*> > (id, vector_objects));
 			}
 		}
 		
