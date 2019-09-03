@@ -10,7 +10,6 @@ class Mission;
 class Planet : public SpatialObject
 {
 public :
-	Planet(){};
 	Planet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions);
 	virtual ~Planet();
 	void SetHostility(HostilityLevel hostility) override;
@@ -23,6 +22,7 @@ public :
 
 	int m_nb_missions;
 	vector<Mission*> m_missions;
+	int m_planet_id;
 };
 
 #endif // PLANET_H_INCLUDED

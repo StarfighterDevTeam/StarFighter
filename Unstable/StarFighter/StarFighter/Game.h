@@ -136,6 +136,7 @@ public:
 	vector<Planet*> m_planet_missions_to_create;//all planets that are requesting a mission creation from Gameloop
 	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
 	sf::Vector2i m_previous_star_sector_index;
+	map<int, Planet*> m_planet_ids;
 
 	//DEBUG
 	GameObject* m_sector_debug_current;

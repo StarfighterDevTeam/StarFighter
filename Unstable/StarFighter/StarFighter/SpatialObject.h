@@ -27,6 +27,7 @@ public :
 	Marker* m_marker;
 	HostilityLevel m_hostility;
 
+	sf::Text m_id_text;
 };
 
 #endif // SPATIALOBJECT_H_INCLUDED

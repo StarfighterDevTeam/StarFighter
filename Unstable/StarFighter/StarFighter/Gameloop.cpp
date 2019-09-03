@@ -15,7 +15,7 @@ Gameloop::Gameloop()
 
 	//Init first mission
 	//sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), player->m_sector_index.y + RandomizeIntBetweenValues(10, 15));
-	sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(0, 0), player->m_sector_index.y + RandomizeIntBetweenValues(3, 4));
+	sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(1, 1));
 	Planet* planet = CreatePlanet(index, Hostility_HoldFire, 1, 1);
 	Mission* mission = new Mission(Mission_GoTo, planet, planet);
 	player->AcceptMission(mission);
