@@ -120,7 +120,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
 	{
 		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
-		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject, true);
 
 		m_stroboscopic_effect_clock.restart();
 	}

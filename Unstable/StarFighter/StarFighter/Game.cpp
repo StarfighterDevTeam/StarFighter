@@ -58,7 +58,7 @@ Game::Game(RenderWindow* window)
 	//background
 	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
-	addToScene(m_background, BackgroundLayer, BackgroundObject);
+	addToScene(m_background, BackgroundLayer, BackgroundObject, false);
 
 	//Star Hunter
 	//AddToStarSectorsKnown(m_current_star_sector);
@@ -186,13 +186,17 @@ sf::RenderWindow* Game::getMainWindow()
 	return m_window;
 }
 
-void Game::addToScene(GameObject *object, LayerType layer, ColliderType type)
+void Game::addToScene(GameObject *object, LayerType layer, ColliderType type, bool created_by_updated_object)
 {
 	object->m_layer = layer;
 	object->m_collider = type;
 	object->m_removeMe = false;
 		
-	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_ColliderType))
+	if (created_by_updated_object == true)
+	{
+		m_temp_sceneGameObjects.push_back(object);
+	}
+	else if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_ColliderType))
 	{
 		m_sceneGameObjectsTyped[(int)type].push_back(object);
 		m_sceneGameObjectsLayered[(int)layer].push_back(object);
@@ -271,22 +275,14 @@ void Game::UpdateObjects(Time deltaTime)
 	GameObject* player = (GameObject*)m_playerShip;
 
 	//Update objects and delete "garbage" objects
-	vector<GameObject*> temp_sceneGameObjects;
-
 	for (GameObject* object : m_sceneGameObjects)
 	{
-		if (object == m_playerShip)
-			temp_sceneGameObjects.push_back(object);//update player ship at the end of the list
-		else if (object->m_garbageMe == true)
+		if (object->m_garbageMe == true)
 			delete object;
 		else if (object->m_removeMe == false)//if true, we trust it has already been stored in m_sceneGameObjectsStored, therefore there is no memory leak if we don't push it back
 		{
 			object->Update(deltaTime);
-
-			if (object != player && object != m_background)
-				object->SetPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, - (object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-		
-			temp_sceneGameObjects.push_back(object);
+			m_temp_sceneGameObjects.push_back(object);
 		}
 	}
 
@@ -296,10 +292,16 @@ void Game::UpdateObjects(Time deltaTime)
 	for (int i = 0; i < NBVAL_ColliderType; i++)
 		m_sceneGameObjectsTyped[i].clear();
 
-	for (GameObject* object : temp_sceneGameObjects)
-		addToScene(object, object->m_layer, object->m_collider);
+	for (GameObject* object : m_temp_sceneGameObjects)
+	{
+		addToScene(object, object->m_layer, object->m_collider, false);
 
-	m_playerShip->Update(deltaTime);
+		if (object != player && object != m_background)//set position of objects on screen relative to the player
+			object->SetPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	}
+	m_temp_sceneGameObjects.clear();
+
+	player->UpdateMarkers(deltaTime);
 
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
@@ -571,7 +573,7 @@ void Game::UpdateSectorList(bool force_update)
 
 			for (GameObject* object : m_sceneGameObjectsStored[id])
 			{
-				addToScene(object, object->m_layer, object->m_collider);
+				addToScene(object, object->m_layer, object->m_collider, false);
 				//printf("game object restored.\n");
 			}
 				

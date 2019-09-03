@@ -29,7 +29,7 @@ void StarGenerator::Update(sf::Time deltaTime)
 
 		//spawn
 		Star* star = new Star(sf::Vector2f(position_x * (*CurrentGame).m_map_size.x, position_y * (*CurrentGame).m_map_size.y), sf::Vector2f(0, 0), color, sf::Vector2f(size, size), pulse_periodicity);
-		(*CurrentGame).addToScene(star, StarLayer, BackgroundObject);
+		(*CurrentGame).addToScene(star, StarLayer, BackgroundObject, false);
 
 		//reset
 		m_generator_clock = 0.f;
@@ -52,7 +52,7 @@ Star* StarGenerator::CreateStar()
 
 	//spawn
 	Star* star = new Star(sf::Vector2f(position_x * (*CurrentGame).m_map_size.x, position_y * (*CurrentGame).m_map_size.y), sf::Vector2f(0, 0), color, sf::Vector2f(size, size), pulse_periodicity);
-	(*CurrentGame).addToScene(star, StarLayer, BackgroundObject);
+	(*CurrentGame).addToScene(star, StarLayer, BackgroundObject, false);
 
 	return star;
 }

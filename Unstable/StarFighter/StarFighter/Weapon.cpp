@@ -48,7 +48,7 @@ Weapon::~Weapon()
 void Weapon::Fire()
 {
 	Ammo* ammo = new Ammo(m_ammo_type, m_position, m_heading, m_range, m_collider, m_locked_target);
-	(*CurrentGame).addToScene(ammo, m_layer, m_collider);
+	(*CurrentGame).addToScene(ammo, m_layer, m_collider, true);
 
 	m_rate_of_fire_timer = m_rate_of_fire;
 

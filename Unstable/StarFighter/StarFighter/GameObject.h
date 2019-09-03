@@ -100,6 +100,7 @@ public:
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual bool GetHitByAmmo(GameObject* ammo);
 	virtual void SetPosition(sf::Vector2f position);
+	virtual void UpdateMarkers(sf::Time deltaTime);
 
 	sf::Vector2i m_sector_index;
 };

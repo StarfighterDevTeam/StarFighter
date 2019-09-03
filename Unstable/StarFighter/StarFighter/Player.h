@@ -45,6 +45,7 @@ public :
 
 	//Star Hunter
 	void MarkThis(SpatialObject* target) override;
+	void UpdateMarkers(sf::Time deltaTime) override;
 	SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
 	bool AcceptMission(Mission* mission);
 	void SetCurrentMission(Mission* mission);

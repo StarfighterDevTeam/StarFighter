@@ -312,3 +312,8 @@ void GameObject::SetPosition(sf::Vector2f position)
 {
 	setPosition(position);
 }
+
+void GameObject::UpdateMarkers(sf::Time deltaTime)
+{
+	//see override function in class Player
+}

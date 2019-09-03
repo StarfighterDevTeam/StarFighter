@@ -79,11 +79,16 @@ Marker::~Marker()
 
 void Marker::Update(sf::Time deltaTime)
 {
+	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
+
+	//update target's position respect to the player, as it may not be set because of the far distance (m_removeMe == true)
+	m_target->setPosition(sf::Vector2f(m_target->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_target->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+
 	//is target on screen? if yes, marker doesn't need to be visible
 	m_onScreen = IsInsideArea(m_target->m_size, m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y)) == true;
 
 	if (m_onScreen == false)
-	{	
+	{
 		//orientation of the marker
 		const float dx = m_target->getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5;
 		const float dy = m_target->getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5;
@@ -92,11 +97,7 @@ void Marker::Update(sf::Time deltaTime)
 
 		//position of the marker
 		sf::Vector2f position;
-		GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 		const float offset = m_size.y * 0.5 + 10;
-		
-		//update target's position respect to the player, as it may not be updated anymore because of the far distance (m_removeMe == true)
-		m_target->setPosition(sf::Vector2f(m_target->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_target->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 		
 		//compute the line equation to the target and stich it to the adequate screen border
 		const float a = REF_WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_X;//as in y=ax+b

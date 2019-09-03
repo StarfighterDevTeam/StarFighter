@@ -60,7 +60,7 @@ public:
 	Game(RenderWindow* window);
 	~Game();
 	RenderWindow* getMainWindow();
-	void addToScene(GameObject *object, LayerType layer, ColliderType type);
+	void addToScene(GameObject *object, LayerType layer, ColliderType type, bool created_by_updated_object);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
 	void addToFeedbacks(SFText* text);
@@ -128,6 +128,7 @@ public:
 
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
+	vector<GameObject*> m_temp_sceneGameObjects;
 	GameObject* m_background;
 
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player

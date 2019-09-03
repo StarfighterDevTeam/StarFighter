@@ -61,24 +61,24 @@ void AIShip::Update(sf::Time deltaTime)
 {
 	ApplyFlightModel(deltaTime, sf::Vector2f(1, -1));
 
+	Ship::Update(deltaTime);
+
+	//weapons
 	switch (m_hostility)
 	{
-		case Hostility_Ally:
-		case Hostility_HoldFire:
-		case Hostility_ReturnFire:
-			break;
-		case Hostility_FireAtWill:
-			for (Weapon* weapon : m_weapons)
-			{
-				weapon->Update(deltaTime);
+	case Hostility_Ally:
+	case Hostility_HoldFire:
+	case Hostility_ReturnFire:
+		break;
+	case Hostility_FireAtWill:
+		for (Weapon* weapon : m_weapons)
+		{
+			weapon->Update(deltaTime);
 
-				if (weapon->IsReadyToFire() == true)
-					weapon->Fire();
-			}
-		
+			if (weapon->IsReadyToFire() == true)
+				weapon->Fire();
+		}
 	}
-
-	Ship::Update(deltaTime);
 }
 
 void AIShip::SetHostility(HostilityLevel hostility)

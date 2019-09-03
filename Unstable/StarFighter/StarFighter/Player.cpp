@@ -74,12 +74,8 @@ void Player::Update(sf::Time deltaTime)
 
 	//markers
 	for (SpatialObject* marked_object : m_marked_objects)
-	{
 		if (marked_object->m_removeMe == true)
 			marked_object->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
-
-		marked_object->m_marker->Update(deltaTime);
-	}
 
 	Ship::Update(deltaTime);
 
@@ -297,6 +293,12 @@ void Player::SetControllerType(ControlerType contoller)
 void Player::MarkThis(SpatialObject* target)
 {
 	m_marked_objects.push_back(target);
+}
+
+void Player::UpdateMarkers(sf::Time deltaTime)
+{
+	for (SpatialObject* marked_object : m_marked_objects)
+		marked_object->m_marker->Update(deltaTime);
 }
 
 bool Player::AcceptMission(Mission* mission)
