@@ -19,7 +19,7 @@ void SpatialObject::Update(sf::Time deltaTime)
 	GameObject::Update(deltaTime);
 }
 
-void SpatialObject::SetHostility(HostilityLevel hostility)
+void SpatialObject::SetHostility(Hostility hostility)
 {
 	m_hostility = hostility;
 }

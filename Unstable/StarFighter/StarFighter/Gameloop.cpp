@@ -16,12 +16,12 @@ Gameloop::Gameloop()
 	//Init first mission
 	//sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), player->m_sector_index.y + RandomizeIntBetweenValues(10, 15));
 	sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(1, 1));
-	Planet* planet = CreatePlanet(index, Hostility_HoldFire, 1, 1);
+	Planet* planet = CreatePlanet(index, Hostility_Ally, 1, 1);
 	Mission* mission = new Mission(Mission_GoTo, planet, planet);
 	player->AcceptMission(mission);
 
 	//enemy
-	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_ReturnFire);
+	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_ReturnFire);
 	//AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_HoldFire);
 	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally);
 	//Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
@@ -106,15 +106,15 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	//To be done
 }
 
-AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility)
+AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe)
 {
-	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility);
+	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe);
 	if (ship->m_removeMe == false)
 		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, false);
 	return ship;
 }
 
-Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions_min, int nb_missions_max)
+Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_min, int nb_missions_max)
 {
 	int nb_missions = RandomizeIntBetweenValues(nb_missions_min, nb_missions_max);
 
@@ -169,7 +169,7 @@ Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
 
 	int id = (*CurrentGame).GetSectorId(sector_index);
 	if (id == -1)
-		planet = CreatePlanet(sector_index, Hostility_HoldFire, 1, 1);
+		planet = CreatePlanet(sector_index, Hostility_Ally, 1, 1);
 	else
 	{
 		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])

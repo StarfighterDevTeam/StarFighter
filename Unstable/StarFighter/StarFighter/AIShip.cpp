@@ -5,10 +5,11 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility) : Ship()
+AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe) : Ship()
 {
 	m_ship_type = ship_type;
 	m_hostility = hostility;
+	m_roe = roe;
 
 	string textureName;
 	sf::Vector2f textureSize;
@@ -64,13 +65,12 @@ void AIShip::Update(sf::Time deltaTime)
 	Ship::Update(deltaTime);
 
 	//weapons
-	switch (m_hostility)
+	switch (m_roe)
 	{
-	case Hostility_Ally:
-	case Hostility_HoldFire:
-	case Hostility_ReturnFire:
+	case ROE_HoldFire:
+	case ROE_ReturnFire:
 		break;
-	case Hostility_FireAtWill:
+	case ROE_FireAtWill:
 		for (Weapon* weapon : m_weapons)
 		{
 			weapon->Update(deltaTime);
@@ -82,12 +82,11 @@ void AIShip::Update(sf::Time deltaTime)
 	}
 }
 
-void AIShip::SetHostility(HostilityLevel hostility)
+void AIShip::SetHostility(Hostility hostility)
 {
 	SpatialObject::SetHostility(hostility);
 
 	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
-
 	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 
 	for (Weapon* weapon : m_weapons)
@@ -99,8 +98,11 @@ bool AIShip::GetHitByAmmo(GameObject* ammo)
 	if (ammo->m_collider == PlayerFire && m_hostility == Hostility_Ally)
 		return false;
 
-	if (m_hostility == Hostility_ReturnFire)
-		m_hostility = Hostility_FireAtWill;
+	if (ammo->m_collider == EnemyFire && m_hostility == Hostility_Enemy)
+		return false;
+
+	if (m_roe == ROE_ReturnFire)
+		m_roe = ROE_FireAtWill;
 
 	return Ship::GetHitByAmmo(ammo);
 }

@@ -171,7 +171,7 @@ void Marker::Draw(RenderTarget& screen)
 	if (m_visible == false)
 		return;
 
-	bool display_hostility = m_target->m_hostility != Hostility_HoldFire;
+	bool display_hostility = (m_target->m_hostility == Hostility_Ally || m_target->m_roe == ROE_FireAtWill);
 
 	if (m_onScreen == true)
 	{

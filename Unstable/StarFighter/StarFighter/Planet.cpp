@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Planet::Planet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions)
+Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
 {
 	m_hostility = hostility;
 	m_nb_missions = nb_missions;
@@ -65,7 +65,7 @@ void Planet::Draw(RenderTarget& screen)
 	}
 }
 
-void Planet::SetHostility(HostilityLevel hostility)
+void Planet::SetHostility(Hostility hostility)
 {
 	SpatialObject::SetHostility(hostility);
 

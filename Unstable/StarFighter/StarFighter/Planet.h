@@ -10,9 +10,9 @@ class Mission;
 class Planet : public SpatialObject
 {
 public :
-	Planet(sf::Vector2i sector_index, HostilityLevel hostility, int nb_missions);
+	Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions);
 	virtual ~Planet();
-	void SetHostility(HostilityLevel hostility) override;
+	void SetHostility(Hostility hostility) override;
 	void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
 

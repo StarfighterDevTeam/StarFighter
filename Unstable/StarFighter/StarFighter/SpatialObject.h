@@ -5,13 +5,19 @@
 
 class Marker;
 
-enum HostilityLevel
+enum Hostility
 {
 	Hostility_Ally,
-	Hostility_HoldFire,
-	Hostility_ReturnFire,
-	Hostility_FireAtWill,
-	NB_HOSTILITY_LEVELS,
+	Hostility_Enemy,
+	NB_HOSTILITY_TYPES,
+};
+
+enum RuleOfEngagement
+{
+	ROE_HoldFire,
+	ROE_ReturnFire,
+	ROE_FireAtWill,
+	NB_ROE_TYPES,
 };
 
 class SpatialObject : public GameObject
@@ -22,10 +28,11 @@ public :
 	virtual ~SpatialObject();
 
 	void Update(sf::Time deltaTime) override;
-	virtual void SetHostility(HostilityLevel hostility);
+	virtual void SetHostility(Hostility hostility);
 
 	Marker* m_marker;
-	HostilityLevel m_hostility;
+	Hostility m_hostility;
+	RuleOfEngagement m_roe;
 
 	sf::Text m_id_text;
 };

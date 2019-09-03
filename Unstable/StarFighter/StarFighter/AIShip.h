@@ -17,10 +17,10 @@ enum ShipType
 class AIShip : public Ship
 {
 public :
-	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, HostilityLevel hostility);
+	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe);
 	~AIShip();
 	void Update(sf::Time deltaTime) override;
-	void SetHostility(HostilityLevel hostility) override;
+	void SetHostility(Hostility hostility) override;
 	bool GetHitByAmmo(GameObject* ammo) override;
 
 	ShipType m_ship_type;
