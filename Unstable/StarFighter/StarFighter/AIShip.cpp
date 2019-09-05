@@ -8,15 +8,15 @@ using namespace sf;
 AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe) : Ship()
 {
 	m_ship_type = ship_type;
-	m_hostility = hostility;
+	SetHostility(hostility);
 	m_roe = roe;
 
 	string textureName;
 	sf::Vector2f textureSize;
 	int frameNumber = 1;
 	int animationNumber = 1;
-	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 
+	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
 
@@ -48,9 +48,6 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
 	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 	setRotation(m_heading);
-
-	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
-	(*CurrentGame).m_playerShip->MarkThis(this);
 }
 
 AIShip::~AIShip()
@@ -100,10 +97,17 @@ void AIShip::SetHostility(Hostility hostility)
 	SpatialObject::SetHostility(hostility);
 
 	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
-	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
+	
+	if (m_marker_target != NULL)
+		m_marker_target->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 
 	for (Weapon* weapon : m_weapons)
-		weapon->m_collider = m_collider;
+		weapon->m_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
+}
+
+bool AIShip::CheckMarkingConditions()
+{
+	return m_hostility == Hostility_Ally || m_roe == ROE_FireAtWill;
 }
 
 bool AIShip::GetHitByAmmo(GameObject* ammo)
@@ -115,7 +119,7 @@ bool AIShip::GetHitByAmmo(GameObject* ammo)
 		return false;
 
 	if (m_roe == ROE_ReturnFire)
-		m_roe = ROE_FireAtWill;
+		SetROE(ROE_FireAtWill);
 
 	return Ship::GetHitByAmmo(ammo);
 }

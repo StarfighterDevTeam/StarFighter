@@ -16,6 +16,7 @@ public :
 	void SetHostility(Hostility hostility) override;
 	void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
+	bool CheckMarkingConditions() override;
 
 	float m_gravity_range;
 	float m_gravity_period;

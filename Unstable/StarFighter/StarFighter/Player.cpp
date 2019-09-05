@@ -178,11 +178,15 @@ bool Player::CycleMission()
 
 void Player::Draw(RenderTarget& screen)
 {
-	for (int i = 0; i < NB_MARKER_TYPES; i++)
-		for (SpatialObject* marked_object : m_marked_objects)
-			if ((int)marked_object->m_marker->m_marker_type == i)
-				marked_object->m_marker->Draw(screen);
+	for (SpatialObject* marked_object : m_marked_objects)
+	{
+		if (marked_object->m_marker_target != NULL)
+			marked_object->m_marker_target->Draw(screen);
 
+		if (marked_object->m_marker_mission != NULL)
+			marked_object->m_marker_mission->Draw(screen);
+	}
+			
 	GameObject::Draw(screen);
 }
 
@@ -290,15 +294,80 @@ void Player::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
-void Player::MarkThis(SpatialObject* target)
+void Player::MarkThis(SpatialObject* target, bool isMission)
 {
+	if (isMission == true && target->m_marker_mission == NULL)
+			target->m_marker_mission = new Marker(Marker_Mission, target);
+	else if (isMission == false && target->m_marker_target == NULL)
+		target->m_marker_target = new Marker(target->m_hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy, target);
+
+	for (SpatialObject* object : m_marked_objects)
+		if (object == target)
+			return;
+
 	m_marked_objects.push_back(target);
+}
+
+
+void Player::UnmarkThis(SpatialObject* target, bool isMission)
+{
+	if (isMission == true)
+	{
+		delete target->m_marker_mission;
+		target->m_marker_mission = NULL;
+	}
+	else
+	{
+		delete target->m_marker_target;
+		target->m_marker_target = NULL;
+	}
+
+	//remove marked object if no marker is left on it
+	vector<SpatialObject*> tmp_marked_objects;
+	for (SpatialObject* object : m_marked_objects)
+		if (object == target)
+		{
+			if (target->m_marker_mission != NULL || target->m_marker_target != NULL)
+				return;
+			else
+			{
+				//store if necessary (object will not be managed anymore by the Ship, and it may not have been garbaged as it should have, because it was marked
+				for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_managed)
+				{
+					if (sector_index == object->m_sector_index)
+						return;
+					else
+					{
+						object->m_removeMe = true;
+						int id = (*CurrentGame).GetSectorId(object->m_sector_index);
+						(*CurrentGame).m_sceneGameObjectsStored[id].push_back(object);
+					}
+				}
+			}
+		}
+		else
+			tmp_marked_objects.push_back(object);
+
+	m_marked_objects.clear();
+	for (SpatialObject* object : tmp_marked_objects)
+		m_marked_objects.push_back(object);
 }
 
 void Player::UpdateMarkers(sf::Time deltaTime)
 {
 	for (SpatialObject* marked_object : m_marked_objects)
-		marked_object->m_marker->Update(deltaTime);
+	{
+		if (marked_object->m_marker_target != NULL)
+			marked_object->m_marker_target->Update(deltaTime);
+
+		if (marked_object->m_marker_mission != NULL)
+			marked_object->m_marker_mission->Update(deltaTime);
+	}
+}
+
+int Player::GetMarkedObjectsCount()
+{
+	return m_marked_objects.size();
 }
 
 bool Player::AcceptMission(Mission* mission)
@@ -330,14 +399,12 @@ void Player::SetCurrentMission(Mission* mission)
 
 void Player::AddMissionMarker(SpatialObject* target)
 {
-	target->m_marker->m_isMission = true;
-	target->m_marker->m_distance_text.setColor(sf::Color::Blue);
-	target->m_marker->SetAnimationLine((int)Marker_Mission);
+	(*CurrentGame).m_playerShip->MarkThis(target, Marker_Mission);
 }
 
 void Player::RemoveMissionMarker(SpatialObject* target)
 {
-	target->m_marker->SetMarkerType(target->m_marker->m_marker_type);
+	(*CurrentGame).m_playerShip->UnmarkThis(target, true);
 }
 
 void Player::EndMission(Mission* mission, MissionStatus status)

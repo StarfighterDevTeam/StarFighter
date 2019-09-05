@@ -125,17 +125,22 @@ public:
 	void UpdateSectorList(bool force_update);
 	int GetSectorId(sf::Vector2i index);
 	void SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index);
+	void DebugDrawGameObjectsStats();
+	void DebugDrawSectors();
 
+	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
 	vector<GameObject*> m_temp_sceneGameObjects;
+	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
+
 	GameObject* m_background;
 
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
 	vector<sf::Vector2i> m_star_sectors_managed;//all sectors that are close enough to need an updated
 	vector<sf::Vector2i> m_star_sectors_to_create;//all sectors that have just been created and need content creation
 	vector<Planet*> m_planet_missions_to_create;//all planets that are requesting a mission creation from Gameloop
-	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
+	
 	sf::Vector2i m_previous_star_sector_index;
 	map<int, Planet*> m_planet_ids;
 
@@ -148,8 +153,6 @@ private:
 	bool isVectorEmpty(vector <GameObject*>* vector);
 
 	RenderWindow* m_window;
-
-	vector<GameObject*> m_sceneGameObjects;
 	
 	list<RectangleShape*> m_sceneFeedbackBars;
 	list<Text*> m_sceneFeedbackTexts;

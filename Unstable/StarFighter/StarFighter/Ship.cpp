@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-Ship::Ship()
+Ship::Ship() : SpatialObject()
 {
 	m_hit_feedback_timer = 0;
 	m_isOrbiting = NULL;

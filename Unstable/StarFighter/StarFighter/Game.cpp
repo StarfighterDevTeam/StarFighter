@@ -268,8 +268,6 @@ void Game::UpdateScene(Time deltaTime)
 	m_mainScreen.setView(m_view);
 }
 
-
-
 void Game::UpdateObjects(Time deltaTime)
 {
 	GameObject* player = (GameObject*)m_playerShip;
@@ -323,20 +321,7 @@ void Game::drawScene()
 		if (i == SectorLayer)
 		{
 			//DEBUG
-			GameObject* player = (GameObject*)m_playerShip;
-			
-			for (StarSector sector : m_star_sectors_managed)
-			{
-				GameObject* sector_debug;
-				if (sector.m_index == m_playerShip->m_sector_index)
-					sector_debug = m_sector_debug_current;
-				else
-					sector_debug = m_sector_debug_onscreen;
-
-				SetStarSectorIndex(sector_debug, sector.m_index);
-				sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-				//sector_debug->Draw(m_mainScreen);
-			}
+			//DebugDrawSectors();
 		}
 		else
 		{
@@ -346,6 +331,9 @@ void Game::drawScene()
 			}
 		}
 	}
+
+	//DEBUG
+	DebugDrawGameObjectsStats();
 
 	m_mainScreen.display();
 	sf::Sprite temp(m_mainScreen.getTexture());
@@ -551,9 +539,11 @@ void Game::UpdateSectorList(bool force_update)
 				{
 					if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
 					{
-						object->m_removeMe = true;
-						m_sceneGameObjectsStored[id].push_back(object);
-						//printf("game object removed and stored.\n");
+						if (object->IsMarked() == false)
+						{
+							object->m_removeMe = true;
+							m_sceneGameObjectsStored[id].push_back(object);
+						}
 					}
 					else
 						object->m_garbageMe = true;
@@ -612,5 +602,67 @@ void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index)
 		m_sceneGameObjectsStored[id].push_back(object);
 		object->m_removeMe = true;	
 		//printf("manuel storage\n");
+	}
+}
+
+void Game::DebugDrawSectors()
+{
+	GameObject* player = (GameObject*)m_playerShip;
+
+	for (StarSector sector : m_star_sectors_managed)
+	{
+		GameObject* sector_debug;
+		if (sector.m_index == m_playerShip->m_sector_index)
+			sector_debug = m_sector_debug_current;
+		else
+			sector_debug = m_sector_debug_onscreen;
+
+		SetStarSectorIndex(sector_debug, sector.m_index);
+		sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+		sector_debug->Draw(m_mainScreen);
+	}
+}
+
+void Game::DebugDrawGameObjectsStats()
+{
+	int a = 0;
+	for (GameObject* object : m_sceneGameObjects)
+		if (object->m_layer != StarLayer && object != m_playerShip && object != m_background && object->m_collider != PlayerFire && object->m_collider != EnemyFire)
+			a++;
+
+	int b = m_playerShip->GetMarkedObjectsCount();
+
+	int c = 0;
+	for (map<int, vector<GameObject*> >::iterator it = m_sceneGameObjectsStored.begin(); it != m_sceneGameObjectsStored.end(); it++)
+		for (GameObject* object : it->second)
+			if (object->m_layer != StarLayer && object != m_playerShip && object != m_background)
+				c++;
+
+	for (int i = 0; i < 3; i++)
+	{
+		sf::Text text;
+		text.setFont(*m_font[Font_Arial]);
+		text.setCharacterSize(20);
+		text.setColor(sf::Color::White);
+
+		if (i == 0)
+		{
+			text.setString("Spatial objects updated: " + to_string(a));
+			text.setPosition(sf::Vector2f(50, 50));
+		}
+
+		if (i == 1)
+		{
+			text.setPosition(sf::Vector2f(50, 100));
+			text.setString("Marked objects: " + to_string(b));
+		}
+
+		if (i == 2)
+		{
+			text.setPosition(sf::Vector2f(50, 150));
+			text.setString("Stored objects: " + to_string(c));
+		}
+
+		m_mainScreen.draw(text);
 	}
 }

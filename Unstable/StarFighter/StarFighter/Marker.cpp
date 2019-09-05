@@ -38,11 +38,7 @@ Marker::Marker(MarkerType marker_type, SpatialObject* target)
 
 void Marker::SetMarkerType(MarkerType marker_type)
 {
-	if (marker_type == Marker_Mission)
-		return;
-
 	m_marker_type = marker_type;
-	m_isMission = false;
 
 	//distance marker
 	sf::Color text_color;
@@ -61,13 +57,17 @@ void Marker::SetMarkerType(MarkerType marker_type)
 			targeting_rect_color = sf::Color::Green;
 			break;
 		}
+		case Marker_Mission:
+		{
+			text_color = sf::Color::Blue;
+			targeting_rect_color = sf::Color::Blue;
+			break;
+		}
 	}
 
 	m_distance_text.setColor(text_color);
-
-	if (marker_type != Marker_Mission)
-		for (int i = 0; i < 8; i++)
-			m_targeting_rect[i].setFillColor(targeting_rect_color);
+	for (int i = 0; i < 8; i++)
+		m_targeting_rect[i].setFillColor(targeting_rect_color);
 
 	SetAnimationLine((int)marker_type);
 }
@@ -171,18 +171,17 @@ void Marker::Draw(RenderTarget& screen)
 	if (m_visible == false)
 		return;
 
-	bool display_hostility = (m_target->m_hostility == Hostility_Ally || m_target->m_roe == ROE_FireAtWill);
+	//bool display_hostility = (m_target->m_hostility == Hostility_Ally || m_target->m_roe == ROE_FireAtWill);
 
 	if (m_onScreen == true)
 	{
-		if (display_hostility == true)
+		if (m_marker_type != Marker_Mission)
 			for (int i = 0; i < 8; i++)
 				screen.draw(m_targeting_rect[i]);
-
-		if (m_isMission == true)
+		else
 			screen.draw(m_mission_rect);
 	}
-	else if (display_hostility == true || m_isMission == true)
+	else
 	{
 		screen.draw(m_distance_text);
 		GameObject::Draw(screen);

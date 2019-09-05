@@ -96,11 +96,14 @@ public:
 
 	//Star Hunter
 	void UpdateStarSectorIndex();
-	virtual void MarkThis(SpatialObject* target);
+	virtual void MarkThis(SpatialObject* target, bool isMission);
+	virtual void UnmarkThis(SpatialObject* target, bool isMission);
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual bool GetHitByAmmo(GameObject* ammo);
 	virtual void SetPosition(sf::Vector2f position);
 	virtual void UpdateMarkers(sf::Time deltaTime);
+	virtual bool IsMarked();
+	virtual int GetMarkedObjectsCount();
 
 	sf::Vector2i m_sector_index;
 };

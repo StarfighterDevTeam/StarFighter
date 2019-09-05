@@ -23,14 +23,17 @@ enum RuleOfEngagement
 class SpatialObject : public GameObject
 {
 public :
-	SpatialObject(){};
-	SpatialObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	SpatialObject();
 	virtual ~SpatialObject();
 
 	void Update(sf::Time deltaTime) override;
 	virtual void SetHostility(Hostility hostility);
+	virtual bool CheckMarkingConditions();
+	void SetROE(RuleOfEngagement roe);
+	bool IsMarked() override;
 
-	Marker* m_marker;
+	Marker* m_marker_target;
+	Marker* m_marker_mission;
 	Hostility m_hostility;
 	RuleOfEngagement m_roe;
 

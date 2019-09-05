@@ -21,6 +21,7 @@ public :
 	~AIShip();
 	void Update(sf::Time deltaTime) override;
 	void SetHostility(Hostility hostility) override;
+	bool CheckMarkingConditions() override;
 	bool GetHitByAmmo(GameObject* ammo) override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 

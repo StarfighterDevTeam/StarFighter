@@ -295,7 +295,12 @@ bool GameObject::GetHitByAmmo(GameObject* ammo)
 	return false;
 }
 
-void GameObject::MarkThis(SpatialObject* target)
+void GameObject::MarkThis(SpatialObject* target, bool isMission)
+{
+	//see override function in class Player
+}
+
+void GameObject::UnmarkThis(SpatialObject* target, bool isMission)
 {
 	//see override function in class Player
 }
@@ -306,6 +311,12 @@ SpatialObject* GameObject::GetTargetableEnemyShip(const GameObject* ref_object, 
 	//see override function in class Player
 }
 
+bool GameObject::IsMarked()
+{
+	return false;
+	//see override function in class SpatialObject
+}
+
 void GameObject::SetPosition(sf::Vector2f position)
 {
 	setPosition(position);
@@ -313,5 +324,11 @@ void GameObject::SetPosition(sf::Vector2f position)
 
 void GameObject::UpdateMarkers(sf::Time deltaTime)
 {
+	//see override function in class Player
+}
+
+int GameObject::GetMarkedObjectsCount()
+{
+	return 0;
 	//see override function in class Player
 }

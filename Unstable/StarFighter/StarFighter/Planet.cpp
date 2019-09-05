@@ -6,7 +6,7 @@ using namespace sf;
 
 Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
 {
-	m_hostility = hostility;
+	SetHostility(hostility);
 	m_nb_missions = nb_missions;
 	do
 	{
@@ -26,9 +26,6 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
 	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 	setRotation(m_heading);
-
-	m_marker = new Marker(hostility != Hostility_Ally ? Marker_Enemy : Marker_Ally, this);
-	(*CurrentGame).m_playerShip->MarkThis(this);
 
 	//gravity
 	m_gravity_range = 200;
@@ -75,7 +72,8 @@ void Planet::SetHostility(Hostility hostility)
 {
 	SpatialObject::SetHostility(hostility);
 
-	m_marker->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
+	if (m_marker_target != NULL)
+		m_marker_target->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 }
 
 void Planet::SetPosition(sf::Vector2f position)
@@ -84,4 +82,9 @@ void Planet::SetPosition(sf::Vector2f position)
 
 	m_orbit_circle.setPosition(getPosition());
 	m_id_text.setPosition(sf::Vector2f(getPosition().x - m_id_text.getGlobalBounds().width * 0.5, getPosition().y - m_id_text.getCharacterSize() * 0.65));
+}
+
+bool Planet::CheckMarkingConditions()
+{
+	return true;
 }

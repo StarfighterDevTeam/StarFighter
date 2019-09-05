@@ -27,7 +27,6 @@ public:
 	sf::RectangleShape m_targeting_rect[8];
 	sf::RectangleShape m_mission_rect;
 	bool m_onScreen;
-	bool m_isMission;
 };
 
 #endif // MARKER_H_INCLUDED
