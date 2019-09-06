@@ -27,7 +27,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_speed_max = 1000;
 			m_acceleration_max = 2000;
 			m_turn_speed = 160;
-			m_max_braking = 3000;
+			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
 
 			textureName = "2D/V_Alpha2_red.png";
@@ -38,12 +38,13 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			break;
 		}
 	}
+	UpdateWeaponRangeAndAngleCoverage();
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 	m_move_destination = m_position;
-	m_fire_target = NULL;
+	m_target = NULL;
 
 	m_heading = heading;
 
@@ -68,27 +69,31 @@ void AIShip::Update(sf::Time deltaTime)
 	{
 		case ROE_HoldFire:
 		case ROE_ReturnFire:
+		{
+			m_target = NULL;
 			break;
+		}
 		case ROE_FireAtWill:
 		{
 			input_fire = true;
 
-			//chase player
-			m_move_destination = (*CurrentGame).m_playerShip->m_position;
+			if (m_target != NULL)
+				m_target = KeepTarget();
+
+			if (m_target == NULL)
+				m_target = GetTargetableEnemyShip(m_range_max, 360);
+
 			break;
 		}
 	}
 
-	//Move
+	//Move strategy
+	if (m_target != NULL)
+		m_move_destination = m_target->m_position;
+
+	//Apply move strategy
 	GoTo(m_move_destination, deltaTime, inputs_direction);
 	ApplyFlightModel(deltaTime, inputs_direction);
-
-	//Fire
-	if (m_fire_target != NULL)
-		m_fire_target = KeepTarget();
-
-	if (m_fire_target == NULL)
-		m_fire_target = GetTarget();
 
 	Ship::Update(deltaTime);
 
@@ -96,8 +101,8 @@ void AIShip::Update(sf::Time deltaTime)
 		for (Weapon* weapon : m_weapons)
 		{
 			weapon->Update(deltaTime);
-			if (m_fire_target != NULL)
-				if (weapon->IsTargetAligned(m_fire_target) == true)
+			if (m_target != NULL)
+				if (weapon->IsTargetAligned(m_target) == true)
 					if (weapon->IsReadyToFire() == true)
 						weapon->Fire();
 		}
@@ -164,17 +169,17 @@ void AIShip::Draw(RenderTarget& screen)
 	}
 }
 
-SpatialObject* AIShip::GetTarget()
-{
-	SpatialObject* target = (SpatialObject*)(*CurrentGame).m_playerShip;
-	return target;
-}
-
-
 SpatialObject* AIShip::KeepTarget()
 {
-	if (0)
-		m_fire_target = NULL;
+	const float a = m_position.x - m_target->m_position.x;
+	const float b = m_position.y - m_target->m_position.y;
 
-	return m_fire_target;
+	float distance_to_ref = (a * a) + (b * b);
+	if (distance_to_ref > m_range_max * m_range_max)
+		m_target = NULL;
+
+	if (m_target != NULL && abs(GetAngleDegToTargetPosition(m_position, m_heading, m_target->m_position) > 90))
+		m_target = NULL;
+
+	return m_target;
 }

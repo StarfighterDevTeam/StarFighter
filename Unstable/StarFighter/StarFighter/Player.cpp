@@ -27,12 +27,13 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
+	UpdateWeaponRangeAndAngleCoverage();
 
 	//Flight model
 	m_speed_max = 800;
 	m_acceleration_max = 2000;
 	m_turn_speed = 160;
-	m_max_braking = 3000;
+	m_braking_max = 3000;
 	m_idle_decelleration = 1000;
 }
 

@@ -89,7 +89,7 @@ void Ammo::Update(sf::Time deltaTime)
 
 		//find a new target?
 		if (m_radar_homing_range > 0 && m_locked_target == NULL)
-			m_locked_target = (GameObject*)(*CurrentGame).m_playerShip->GetTargetableEnemyShip(this, m_radar_homing_range, m_radar_homing_angle_max);
+			m_locked_target = (*CurrentGame).m_playerShip->GetTargetableEnemyShip(this, m_radar_homing_range, m_radar_homing_angle_max);
 
 		//track target
 		const float speed = GetVectorLength(m_speed) + m_acceleration * deltaTime.asSeconds();

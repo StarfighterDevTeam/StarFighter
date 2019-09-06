@@ -10,6 +10,8 @@ Ship::Ship() : SpatialObject()
 	m_hit_feedback_timer = 0;
 	m_isOrbiting = NULL;
 	m_orbit_angle = 0;
+	m_range_max = 0;
+	m_angle_coverage_max = 0;
 }
 
 Ship::~Ship()
@@ -31,7 +33,7 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 	float current_inertia_angle = GetVectorAngleRad(m_speed);
 
 	if (inputs_direction.y > 0)
-		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_max_braking, current_inertia_angle);
+		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_braking_max, current_inertia_angle);
 	else if (inputs_direction.y == 0)
 		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_idle_decelleration, current_inertia_angle);
 
@@ -43,6 +45,17 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 
 	//thruster animation
 	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
+}
+
+void Ship::UpdateWeaponRangeAndAngleCoverage()
+{
+	m_range_max = 0;
+	for (Weapon* weapon : m_weapons)
+		m_range_max = MaxBetweenValues(sf::Vector2f(m_range_max, weapon->m_range));
+
+	m_angle_coverage_max = 0;
+	for (Weapon* weapon : m_weapons)
+		m_angle_coverage_max = MaxBetweenValues(sf::Vector2f(m_angle_coverage_max, weapon->m_locking_angle_coverage));
 }
 
 void Ship::UpdateOrbit(sf::Time deltaTime)

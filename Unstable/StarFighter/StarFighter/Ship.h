@@ -27,14 +27,17 @@ public :
 	void Update(sf::Time deltaTime) override;
 	bool GetHitByAmmo(GameObject* ammo) override;
 	void UpdateOrbit(sf::Time deltaTime);
+	void UpdateWeaponRangeAndAngleCoverage();
 
 	float m_acceleration;
 	float m_acceleration_max;
 	float m_speed_max;
 	float m_turn_speed;
-	float m_max_braking;
+	float m_braking_max;
 	float m_idle_decelleration;
 	vector<Weapon*> m_weapons;
+	float m_range_max;
+	float m_angle_coverage_max;
 
 	float m_hit_feedback_timer;
 	Planet* m_isOrbiting;

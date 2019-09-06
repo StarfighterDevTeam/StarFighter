@@ -31,6 +31,7 @@ public :
 	virtual bool CheckMarkingConditions();
 	void SetROE(RuleOfEngagement roe);
 	bool IsMarked() override;
+	SpatialObject* GetTargetableEnemyShip(const float dist_max, const float angle_delta_max);
 
 	Marker* m_marker_target;
 	Marker* m_marker_mission;
