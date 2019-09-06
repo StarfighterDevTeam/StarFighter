@@ -14,16 +14,16 @@ enum WeaponType
 class Weapon
 {
 public:
-	Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset = 0);
+	Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset = 0);
 	~Weapon();
 
 	void Fire();
 	void Update(sf::Time deltaTime);
 	bool IsReadyToFire();
-	bool CanStayLocked(GameObject* object);
-	bool IsTargetAligned(GameObject* target);
+	bool CanStayLocked(SpatialObject* object);
+	bool IsTargetAligned(SpatialObject* target);
 
-	GameObject* m_owner;
+	SpatialObject* m_owner;
 	sf::Vector2f m_position;
 	float m_heading;
 	WeaponType m_weapon_type;
@@ -35,7 +35,7 @@ public:
 	float m_rate_of_fire;
 	float m_rate_of_fire_timer;
 	float m_range;
-	GameObject* m_locked_target;
+	SpatialObject* m_locked_target;
 	float m_locking_target_clock;
 	float m_locking_angle_coverage;
 

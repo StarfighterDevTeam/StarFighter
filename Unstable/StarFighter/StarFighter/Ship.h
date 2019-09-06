@@ -7,7 +7,6 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
-#include "Weapon.h";
 #include "Planet.h"
 
 class Ship : public SpatialObject

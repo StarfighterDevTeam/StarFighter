@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Weapon::Weapon(GameObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset)
+Weapon::Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset)
 {
 	m_owner = owner;
 	m_weapon_type = weapon_type;
@@ -117,7 +117,7 @@ bool Weapon::IsReadyToFire()
 	return rate_of_fire;
 }
 
-bool Weapon::CanStayLocked(GameObject* object)
+bool Weapon::CanStayLocked(SpatialObject* object)
 {
 	if (object->m_visible == false || object->m_garbageMe == true)
 	{
@@ -139,7 +139,7 @@ bool Weapon::CanStayLocked(GameObject* object)
 	return true;
 }
 
-bool Weapon::IsTargetAligned(GameObject* target)
+bool Weapon::IsTargetAligned(SpatialObject* target)
 {
 	const float dx = target->m_position.x - m_position.x;
 	const float dy = target->m_position.y - m_position.y;

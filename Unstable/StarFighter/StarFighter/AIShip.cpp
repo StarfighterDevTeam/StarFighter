@@ -42,6 +42,8 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
+	m_move_destination = m_position;
+	m_fire_target = NULL;
 
 	m_heading = heading;
 
@@ -60,7 +62,8 @@ void AIShip::Update(sf::Time deltaTime)
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	bool input_fire = false;
 
-	//weapons
+	//AI - move & shoot strategies
+	m_move_destination = m_position;
 	switch (m_roe)
 	{
 		case ROE_HoldFire:
@@ -71,13 +74,21 @@ void AIShip::Update(sf::Time deltaTime)
 			input_fire = true;
 
 			//chase player
-			GoTo((*CurrentGame).m_playerShip->m_position, deltaTime, inputs_direction);
-
+			m_move_destination = (*CurrentGame).m_playerShip->m_position;
 			break;
 		}
 	}
 
+	//Move
+	GoTo(m_move_destination, deltaTime, inputs_direction);
 	ApplyFlightModel(deltaTime, inputs_direction);
+
+	//Fire
+	if (m_fire_target != NULL)
+		m_fire_target = KeepTarget();
+
+	if (m_fire_target == NULL)
+		m_fire_target = GetTarget();
 
 	Ship::Update(deltaTime);
 
@@ -85,10 +96,10 @@ void AIShip::Update(sf::Time deltaTime)
 		for (Weapon* weapon : m_weapons)
 		{
 			weapon->Update(deltaTime);
-			GameObject* target = m_hostility == Hostility_Ally ? (*CurrentGame).m_playerShip : (*CurrentGame).m_playerShip;//todo: find appropriate target
-			if (weapon->IsTargetAligned(target) == true)
-				if (weapon->IsReadyToFire() == true)
-					weapon->Fire();
+			if (m_fire_target != NULL)
+				if (weapon->IsTargetAligned(m_fire_target) == true)
+					if (weapon->IsReadyToFire() == true)
+						weapon->Fire();
 		}
 }
 
@@ -140,4 +151,30 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 		inputs_direction.y = -1;
 	else if (abs(delta_angle) > 90)
 		inputs_direction.y = 1;
+}
+
+void AIShip::Draw(RenderTarget& screen)
+{
+	SpatialObject::Draw(screen);
+
+	if (m_position != m_move_destination)
+	{
+		sf::Vector2f destination = sf::Vector2f(m_move_destination.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_move_destination.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5);
+		DebugDrawSegment(getPosition(), destination, sf::Color::Magenta, (*CurrentGame).m_mainScreen);
+	}
+}
+
+SpatialObject* AIShip::GetTarget()
+{
+	SpatialObject* target = (SpatialObject*)(*CurrentGame).m_playerShip;
+	return target;
+}
+
+
+SpatialObject* AIShip::KeepTarget()
+{
+	if (0)
+		m_fire_target = NULL;
+
+	return m_fire_target;
 }

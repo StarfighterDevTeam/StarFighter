@@ -362,3 +362,16 @@ bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f ar
 
 	return is_inside_area;
 }
+
+void DebugDrawSegment(sf::Vector2f point_a, sf::Vector2f point_b, sf::Color color, RenderTarget& screen)
+{
+	sf::Vertex line[2];
+
+	line[0].position = point_a;
+	line[1].position = point_b;
+
+	line[0].color = color;
+	line[1].color = color;
+
+	screen.draw(line, 2, sf::Lines);
+}

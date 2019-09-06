@@ -1,7 +1,7 @@
 #ifndef PLANET_H_INCLUDED
 #define PLANET_H_INCLUDED
 
-#include "Marker.h"
+#include "Weapon.h"
 
 class Mission;
 

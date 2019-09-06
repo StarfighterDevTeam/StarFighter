@@ -103,6 +103,7 @@ void Bound(float& input, float min, float max);
 void BoundAbsoluteValue(float& input, float max_value);
 void BoundAngle(float& input, float max_angle);
 bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
+void DebugDrawSegment(sf::Vector2f point_a, sf::Vector2f point_b, sf::Color color, RenderTarget& screen);
 
 struct Vector2iComp
 {

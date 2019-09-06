@@ -133,14 +133,7 @@ void Ammo::Draw(RenderTarget& screen)
 	{
 		sf::Vector2f vector = m_speed;
 		ScaleVector(&vector, m_radar_homing_range);
-		sf::Vertex line[2];
 
-		line[0].position = getPosition();
-		line[1].position = sf::Vector2f(getPosition().x + vector.x, getPosition().y - vector.y);
-
-		line[0].color = sf::Color::Red;
-		line[1].color = sf::Color::Red;
-
-		screen.draw(line, 2, sf::Lines);
+		DebugDrawSegment(getPosition(), sf::Vector2f(getPosition().x + vector.x, getPosition().y - vector.y), sf::Color::Red, (*CurrentGame).m_mainScreen);
 	}
 }
