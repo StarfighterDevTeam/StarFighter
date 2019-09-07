@@ -15,7 +15,7 @@ enum AmmoType
 class Ammo : public GameObject
 {
 public:
-	Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, ColliderType collider);
+	Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider);
 	~Ammo();
 
 	AmmoType m_ammo_type;
@@ -28,6 +28,8 @@ public:
 	float m_radar_homing_range;
 	float m_radar_homing_angle_max;
 	SpatialObject* m_locked_target;
+	int m_damage;
+	FXType m_FX_type;
 
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;

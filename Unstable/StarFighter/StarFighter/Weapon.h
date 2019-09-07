@@ -38,6 +38,7 @@ public:
 	SpatialObject* m_locked_target;
 	float m_locking_target_clock;
 	float m_locking_angle_coverage;
+	int m_damage;
 
 	RectangleShape m_lock_rectangle;
 };

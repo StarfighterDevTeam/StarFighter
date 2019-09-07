@@ -29,12 +29,14 @@ Weapon::Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type,
 		{
 			m_rate_of_fire = 0.2;
 			m_range = REF_WINDOW_RESOLUTION_X * 0.4;
+			m_damage = 1;
 			break;
 		}
 		case Weapon_Missile:
 		{
 			m_rate_of_fire = 0.8;
 			m_range = REF_WINDOW_RESOLUTION_X * 4;
+			m_damage = 5;
 			break;
 		}
 	}
@@ -47,7 +49,7 @@ Weapon::~Weapon()
 
 void Weapon::Fire()
 {
-	Ammo* ammo = new Ammo(m_ammo_type, m_position, m_heading, m_range, m_collider);
+	Ammo* ammo = new Ammo(m_ammo_type, m_position, m_heading, m_range, m_damage, m_collider);
 	(*CurrentGame).addToScene(ammo, m_layer, m_collider, true);
 
 	m_rate_of_fire_timer = m_rate_of_fire;

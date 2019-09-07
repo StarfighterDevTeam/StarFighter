@@ -35,6 +35,8 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_turn_speed = 160;
 	m_braking_max = 3000;
 	m_idle_decelleration = 1000;
+
+	m_health = 50;
 }
 
 Player::~Player()
@@ -331,20 +333,25 @@ void Player::UnmarkThis(SpatialObject* target, bool isMission)
 		if (object == target)
 		{
 			if (target->m_marker_mission != NULL || target->m_marker_target != NULL)
-				return;
+				continue;
 			else
 			{
+				bool found = false;
 				//store if necessary (object will not be managed anymore by the Ship, and it may not have been garbaged as it should have, because it was marked
 				for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_managed)
 				{
 					if (sector_index == object->m_sector_index)
-						return;
-					else
 					{
-						object->m_removeMe = true;
-						int id = (*CurrentGame).GetSectorId(object->m_sector_index);
-						(*CurrentGame).m_sceneGameObjectsStored[id].push_back(object);
+						found = true;
+						break;
 					}
+				}
+
+				if (found == false)
+				{
+					object->m_removeMe = true;
+					int id = (*CurrentGame).GetSectorId(object->m_sector_index);
+					(*CurrentGame).m_sceneGameObjectsStored[id].push_back(object);
 				}
 			}
 		}
@@ -509,4 +516,11 @@ void Player::DebugDrawMissions()
 
 		(*CurrentGame).m_mainScreen.draw(body_text);
 	}
+}
+
+void Player::Death()
+{
+	m_health = 50;
+
+	Ship::Death();
 }

@@ -144,5 +144,24 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 	ammo->m_garbageMe = true;
 	m_hit_feedback_timer = 0.05;
 
+	//Apply damage
+	Ammo* ammo_ = (Ammo*)ammo;
+	m_health -= ammo_->m_damage;
+
+	//FX hit
+	FX* new_FX = new FX(FX_Hit, m_position);
+	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+
+	//Death?
+	if (m_health <= 0)
+		Death();
+
 	return true;
+}
+
+void Ship::Death()
+{
+	//FX death
+	FX* new_FX = new FX(FX_Death, m_position);
+	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 }

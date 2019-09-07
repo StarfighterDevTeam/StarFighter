@@ -1,7 +1,7 @@
 #ifndef SPATIALOBJECT_H_INCLUDED
 #define SPATIALOBJECT_H_INCLUDED
 
-#include "Game.h"
+#include "FX.h"
 
 class Marker;
 

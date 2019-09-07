@@ -4,9 +4,10 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, ColliderType collider)
+Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider)
 {
 	m_ammo_type = ammo_type;
+	m_damage = damage;
 	m_locked_target = NULL;
 	string textureName;
 	sf::Vector2f textureSize;
@@ -25,6 +26,7 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 			m_acceleration = 0;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_green.png";
+			m_FX_type = FX_Hit;
 			break;
 		}
 		case Ammo_LaserRed:
@@ -34,6 +36,7 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 			m_acceleration = 0;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_red.png";
+			m_FX_type = FX_Hit;
 			break;
 		}
 		case Ammo_Missile:

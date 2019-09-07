@@ -21,6 +21,7 @@ enum LayerType
 	SectorLayer,
 	StarLayer,	
 	Planet_Layer,
+	FX_Layer,
 	PlayerFireLayer,
 	AIShipFireLayer,
 	PlayerStroboscopicLayer,

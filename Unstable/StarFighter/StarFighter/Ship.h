@@ -38,6 +38,9 @@ public :
 	vector<Weapon*> m_weapons;
 	float m_range_max;
 	float m_angle_coverage_max;
+	int m_health;
+
+	virtual void Death();
 
 	float m_hit_feedback_timer;
 	Planet* m_isOrbiting;

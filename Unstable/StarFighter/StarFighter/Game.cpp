@@ -627,7 +627,7 @@ void Game::DebugDrawGameObjectsStats()
 {
 	int a = 0;
 	for (GameObject* object : m_sceneGameObjects)
-		if (object->m_layer != StarLayer && object != m_playerShip && object != m_background && object->m_collider != PlayerFire && object->m_collider != EnemyFire)
+		if (object->m_layer != StarLayer && object != m_playerShip && object->m_collider != BackgroundObject && object->m_collider != PlayerFire && object->m_collider != EnemyFire)
 			a++;
 
 	int b = m_playerShip->GetMarkedObjectsCount();

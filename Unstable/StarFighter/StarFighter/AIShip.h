@@ -26,6 +26,7 @@ public :
 	bool GetHitByAmmo(GameObject* ammo) override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	SpatialObject* KeepTarget();
+	void Death() override;
 
 	ShipType m_ship_type;
 

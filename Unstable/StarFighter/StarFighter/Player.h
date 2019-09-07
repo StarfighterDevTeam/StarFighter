@@ -57,6 +57,7 @@ public :
 	void AddMissionMarker(SpatialObject* target);
 	void RemoveMissionMarker(SpatialObject* target);
 	void UpdateMissions();
+	void Death() override;
 
 	void DebugDrawMissions();
 

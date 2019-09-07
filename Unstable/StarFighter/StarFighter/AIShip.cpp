@@ -30,6 +30,8 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
 
+			m_health = 10;
+
 			textureName = "2D/V_Alpha2_red.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
@@ -147,15 +149,19 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 	//const float angle = GetVectorAngleRad(sf::Vector2f(-dx, -dy));
 
-	if (delta_angle < 0)
-		inputs_direction.x = 1;
-	else if (delta_angle > 0)
-		inputs_direction.x = -1;
+	//move to desired position and heading
+	if (m_position != position)
+	{
+		if (delta_angle < 0)
+			inputs_direction.x = 1;
+		else if (delta_angle > 0)
+			inputs_direction.x = -1;
 
-	if (dx * dx + dy * dy > m_range_max * m_range_max && abs(delta_angle) < m_angle_coverage_max)
-		inputs_direction.y = -1;
-	else if (abs(delta_angle) > 90)
-		inputs_direction.y = 1;
+		if (dx * dx + dy * dy > m_range_max * m_range_max && abs(delta_angle) < m_angle_coverage_max)
+			inputs_direction.y = -1;
+		else if (abs(delta_angle) > 90)
+			inputs_direction.y = 1;
+	}
 }
 
 void AIShip::Draw(RenderTarget& screen)
@@ -182,4 +188,17 @@ SpatialObject* AIShip::KeepTarget()
 		m_target = NULL;
 
 	return m_target;
+}
+
+void AIShip::Death()
+{
+	m_garbageMe = true;
+
+	if (m_marker_target != NULL)
+		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
+
+	if (m_marker_mission != NULL)
+		(*CurrentGame).m_playerShip->UnmarkThis(this, true);
+
+	Ship::Death();
 }
