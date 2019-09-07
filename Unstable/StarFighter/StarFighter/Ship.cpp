@@ -12,6 +12,30 @@ Ship::Ship() : SpatialObject()
 	m_orbit_angle = 0;
 	m_range_max = 0;
 	m_angle_coverage_max = 0;
+	m_isReflectingShots = false;
+	m_shield_regen_buffer = 0;
+
+	//UI
+	m_shield_circle.setFillColor(sf::Color::Transparent);
+	m_shield_circle.setOutlineThickness(3);
+
+	m_health_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
+	m_health_container_rect.setSize(sf::Vector2f(150, 10));
+	m_health_container_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5, m_health_container_rect.getSize().y * 0.5));
+	m_health_container_rect.setOutlineThickness(1);
+	m_health_container_rect.setOutlineColor(sf::Color::White);
+
+	m_health_rect.setFillColor(sf::Color(0, 200, 0, 255));
+	m_health_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5, m_health_container_rect.getSize().y * 0.5));
+
+	m_shield_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
+	m_shield_container_rect.setSize(sf::Vector2f(150, 10));
+	m_shield_container_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5, m_shield_container_rect.getSize().y * 0.5));
+	m_shield_container_rect.setOutlineThickness(1);
+	m_shield_container_rect.setOutlineColor(sf::Color::White);
+
+	m_shield_rect.setFillColor(sf::Color(0, 0, 200, 255));
+	m_shield_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5, m_shield_container_rect.getSize().y * 0.5));
 }
 
 Ship::~Ship()
@@ -122,8 +146,16 @@ void Ship::Update(sf::Time deltaTime)
 	else
 		setColor(sf::Color::White);
 
-	//orbit
+	//Entering/Leaving planet orbit
 	UpdateOrbit(deltaTime);
+
+	//Regen shield
+	UpdateShieldRegen(deltaTime);
+
+	//Update UI
+	m_health_rect.setSize(sf::Vector2f(m_health_container_rect.getSize().x * m_health / m_health_max, m_health_container_rect.getSize().y));
+	if (m_shield_max > 0)
+		m_shield_rect.setSize(sf::Vector2f(m_shield_container_rect.getSize().x * m_shield / m_shield_max, m_shield_container_rect.getSize().y));
 
 	SpatialObject::Update(deltaTime);
 }
@@ -145,8 +177,21 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 	m_hit_feedback_timer = 0.05;
 
 	//Apply damage
-	Ammo* ammo_ = (Ammo*)ammo;
-	m_health -= ammo_->m_damage;
+	int damage = ((Ammo*)ammo)->m_damage;
+
+	if (m_shield > 0)
+		if (m_shield > damage)
+		{
+			m_shield -= damage;
+			damage = 0;
+		}
+		else
+		{
+			damage -= m_shield;
+			m_shield = 0;
+		}
+
+	m_health -= damage;
 
 	//FX hit
 	FX* new_FX = new FX(FX_Hit, m_position);
@@ -164,4 +209,56 @@ void Ship::Death()
 	//FX death
 	FX* new_FX = new FX(FX_Death, m_position);
 	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+}
+
+void Ship::UpdateShieldRegen(sf::Time deltaTime)
+{
+	if (m_shield_max == 0 || m_shield == 0)
+		return;
+
+	if (m_shield < m_shield_max)
+	{
+		m_shield_regen_buffer += m_shield_regen * deltaTime.asSeconds();
+
+		double intpart;
+		m_shield_regen_buffer = modf(m_shield_regen_buffer, &intpart);
+		m_shield += intpart;
+
+		if (m_shield > m_shield_max)
+			m_shield = m_shield_max;
+	}
+
+	//UI
+	m_shield_circle.setRadius(m_shield_range);
+	m_shield_circle.setOrigin(sf::Vector2f(m_shield_range, m_shield_range));
+	m_shield_circle.setOutlineColor(m_isReflectingShots == true ? sf::Color(0, 255, 0, 80) : sf::Color(0, 0, 255, 80));
+}
+
+void Ship::SetPosition(sf::Vector2f position)
+{
+	GameObject::SetPosition(position);
+
+	m_shield_circle.setPosition(getPosition());
+
+	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50));
+	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));
+	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5 - m_health_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5));
+	m_shield_rect.setPosition(sf::Vector2f(m_shield_container_rect.getPosition().x, m_shield_container_rect.getPosition().y));
+}
+
+void Ship::Draw(RenderTarget& screen)
+{
+	GameObject::Draw(screen);
+
+	if (m_shield > 0)
+		screen.draw(m_shield_circle);
+
+	if (m_shield_max > 0)
+	{
+		screen.draw(m_shield_container_rect);
+		screen.draw(m_shield_rect);
+	}
+		
+	screen.draw(m_health_container_rect);
+	screen.draw(m_health_rect);
 }

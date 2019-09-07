@@ -25,6 +25,8 @@ public :
 	//Star Hunter
 	void ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction);
 	void Update(sf::Time deltaTime) override;
+	void Draw(RenderTarget& screen) override;
+	void SetPosition(sf::Vector2f position) override;
 	bool GetHitByAmmo(GameObject* ammo) override;
 	void UpdateOrbit(sf::Time deltaTime);
 	void UpdateWeaponRangeAndAngleCoverage();
@@ -39,8 +41,23 @@ public :
 	float m_range_max;
 	float m_angle_coverage_max;
 	int m_health;
+	int m_health_max;
+	float m_shield_range;
+	int m_shield;
+	int m_shield_max;
+	float m_shield_regen;
+	double m_shield_regen_buffer;
+	sf::CircleShape m_shield_circle;
+
+	sf::RectangleShape m_health_rect;
+	sf::RectangleShape m_health_container_rect;
+	sf::RectangleShape m_shield_rect;
+	sf::RectangleShape m_shield_container_rect;
 
 	virtual void Death();
+	void UpdateShieldRegen(sf::Time deltaTime);
+
+	bool m_isReflectingShots;
 
 	float m_hit_feedback_timer;
 	Planet* m_isOrbiting;

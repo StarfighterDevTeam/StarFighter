@@ -30,7 +30,10 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
 
-			m_health = 10;
+			m_health_max = 10;
+			m_shield_max = 10;
+			m_shield_range = 50;
+			m_shield_regen = 1.5;
 
 			textureName = "2D/V_Alpha2_red.png";
 			textureSize = sf::Vector2f(68, 84);
@@ -41,6 +44,9 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		}
 	}
 	UpdateWeaponRangeAndAngleCoverage();
+
+	m_health = m_health_max;
+	m_shield = m_shield_max;
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 
@@ -170,7 +176,7 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 
 void AIShip::Draw(RenderTarget& screen)
 {
-	SpatialObject::Draw(screen);
+	Ship::Draw(screen);
 
 	if (m_position != m_move_destination)
 	{

@@ -71,6 +71,7 @@ public:
 	static int GaussianBlurDistribution(int x);
 	void SetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle);
 	static sf::Vector2f GetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle);
+	void Bounce();
 
 	string GetTextureName();
 	GameObject* Clone();

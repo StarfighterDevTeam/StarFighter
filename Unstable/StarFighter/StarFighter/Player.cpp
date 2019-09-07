@@ -36,7 +36,22 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_braking_max = 3000;
 	m_idle_decelleration = 1000;
 
-	m_health = 50;
+	//combat
+	m_health_max = 50;
+	m_health = m_health_max;
+	m_shield_max = 20;
+	m_shield = m_shield_max;
+	m_shield_range = 100;
+	m_shield_regen = 1.5;
+	m_isReflectingShots = true;
+
+	//UI
+	m_shield_circle.setPosition(getPosition());
+
+	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50));
+	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));
+	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5 - m_health_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5));
+	m_shield_rect.setPosition(sf::Vector2f(m_shield_container_rect.getPosition().x, m_shield_container_rect.getPosition().y));
 }
 
 Player::~Player()
@@ -190,7 +205,7 @@ void Player::Draw(RenderTarget& screen)
 			marked_object->m_marker_mission->Draw(screen);
 	}
 			
-	GameObject::Draw(screen);
+	Ship::Draw(screen);
 
 	DebugDrawMissions();
 }
@@ -520,7 +535,9 @@ void Player::DebugDrawMissions()
 
 void Player::Death()
 {
-	m_health = 50;
+	//Debug respawn
+	m_health = m_health_max;
+	m_shield = m_shield_max;
 
 	Ship::Death();
 }

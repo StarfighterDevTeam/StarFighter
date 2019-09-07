@@ -59,7 +59,7 @@ void Planet::Update(sf::Time deltaTime)
 
 void Planet::Draw(RenderTarget& screen)
 {
-	SpatialObject::Draw(screen);
+	GameObject::Draw(screen);
 
 	if (m_visible == true)
 	{
