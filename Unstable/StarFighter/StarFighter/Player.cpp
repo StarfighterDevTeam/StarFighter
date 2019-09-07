@@ -189,6 +189,8 @@ void Player::Draw(RenderTarget& screen)
 	}
 			
 	GameObject::Draw(screen);
+
+	DebugDrawMissions();
 }
 
 void Player::UpdateInputStates()
@@ -479,4 +481,32 @@ SpatialObject* Player::GetTargetableEnemyShip(const GameObject* ref_object, cons
 	}
 	
 	return target;
+}
+
+void Player::DebugDrawMissions()
+{
+	float offset_y = 50;
+	for (Mission* mission : m_missions)
+	{
+		sf::Text body_text;
+		body_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		body_text.setCharacterSize(20);
+		body_text.setStyle(sf::Text::Bold);
+		
+		if (mission->m_status == MissionStatus_Current)
+			body_text.setColor(sf::Color::White);
+		else if (mission->m_status == MissionStatus_Accepted)
+			body_text.setColor(sf::Color::Blue);
+		else if (mission->m_status == MissionStatus_Complete)
+			body_text.setColor(sf::Color::Green);
+		else if (mission->m_status == MissionStatus_Failed)
+			body_text.setColor(sf::Color::Red);
+
+		body_text.setString(mission->m_body_text);
+		body_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 300, offset_y));
+
+		offset_y += 40;
+
+		(*CurrentGame).m_mainScreen.draw(body_text);
+	}
 }

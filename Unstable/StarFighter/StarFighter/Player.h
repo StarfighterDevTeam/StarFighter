@@ -58,6 +58,8 @@ public :
 	void RemoveMissionMarker(SpatialObject* target);
 	void UpdateMissions();
 
+	void DebugDrawMissions();
+
 	vector<SpatialObject*> m_marked_objects;
 	vector<Mission*> m_missions;
 };

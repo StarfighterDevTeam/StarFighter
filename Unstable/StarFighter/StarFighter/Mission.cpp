@@ -12,4 +12,15 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 
 	if (target != NULL)
 		m_marked_objectives.push_back(target);
+
+	switch (mission_type)
+	{
+		case Mission_GoTo:
+		{
+			Planet* planet = (Planet*)target;
+			m_title_text = "GoTo Mission";
+			m_body_text = "Go to planet " + to_string(planet->m_planet_id);
+			break;
+		}
+	}
 }
