@@ -81,7 +81,7 @@ void AIShip::Update(sf::Time deltaTime)
 				m_target = KeepTarget();
 
 			if (m_target == NULL)
-				m_target = GetTargetableEnemyShip(m_range_max, 360);
+				m_target = GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X, 360);
 
 			break;
 		}
@@ -152,7 +152,7 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	else if (delta_angle > 0)
 		inputs_direction.x = -1;
 
-	if (dx * dx + dy * dy > 200 * 200 && abs(delta_angle) < 45)
+	if (dx * dx + dy * dy > m_range_max * m_range_max && abs(delta_angle) < m_angle_coverage_max)
 		inputs_direction.y = -1;
 	else if (abs(delta_angle) > 90)
 		inputs_direction.y = 1;
