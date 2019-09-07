@@ -67,6 +67,10 @@ void AIShip::Update(sf::Time deltaTime)
 
 	//AI - move & shoot strategies
 	m_move_destination = m_position;
+
+	if (m_target != NULL && m_target->m_garbageMe == true)
+		m_target = NULL;
+
 	switch (m_roe)
 	{
 		case ROE_HoldFire:

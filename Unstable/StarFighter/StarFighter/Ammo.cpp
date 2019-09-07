@@ -84,10 +84,15 @@ void Ammo::Update(sf::Time deltaTime)
 		//target still in homing radar?
 		if (m_locked_target != NULL)
 		{
-			const float dx = m_locked_target->m_position.x - m_position.x;
-			const float dy = m_locked_target->m_position.y - m_position.y;
-			if (dx*dx + dy*dy > m_radar_homing_range * m_radar_homing_range || abs(GetAngleDegToTargetPosition(m_position, m_heading, m_locked_target->m_position)) > m_radar_homing_angle_max)
+			if (m_locked_target->m_garbageMe == true)
 				m_locked_target = NULL;
+			else
+			{
+				const float dx = m_locked_target->m_position.x - m_position.x;
+				const float dy = m_locked_target->m_position.y - m_position.y;
+				if (dx*dx + dy*dy > m_radar_homing_range * m_radar_homing_range || abs(GetAngleDegToTargetPosition(m_position, m_heading, m_locked_target->m_position)) > m_radar_homing_angle_max)
+					m_locked_target = NULL;
+			}
 		}
 
 		//find a new target?
