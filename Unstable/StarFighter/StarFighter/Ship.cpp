@@ -14,6 +14,9 @@ Ship::Ship() : SpatialObject()
 	m_angle_coverage_max = 0;
 	m_isReflectingShots = false;
 	m_shield_regen_buffer = 0;
+	m_energy_regen_buffer = 0;
+	m_shield_max = 0;
+	m_energy_max = 0;
 
 	//UI
 	m_shield_circle.setFillColor(sf::Color::Transparent);
@@ -36,6 +39,15 @@ Ship::Ship() : SpatialObject()
 
 	m_shield_rect.setFillColor(sf::Color(0, 0, 200, 255));
 	m_shield_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5, m_shield_container_rect.getSize().y * 0.5));
+
+	m_energy_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
+	m_energy_container_rect.setSize(sf::Vector2f(150, 10));
+	m_energy_container_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5, m_energy_container_rect.getSize().y * 0.5));
+	m_energy_container_rect.setOutlineThickness(1);
+	m_energy_container_rect.setOutlineColor(sf::Color::White);
+
+	m_energy_rect.setFillColor(sf::Color(255, 255, 0, 255));
+	m_energy_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5, m_energy_container_rect.getSize().y * 0.5));
 }
 
 Ship::~Ship()
@@ -236,8 +248,14 @@ void Ship::InitShip()
 
 	m_health = m_health_max;
 	m_shield = m_shield_max;
+	m_energy = m_energy_max;
 
-	//position of shield, health bars, shield bars...
+	//shield circle
+	m_shield_circle.setRadius(m_shield_range);
+	m_shield_circle.setOrigin(sf::Vector2f(m_shield_range, m_shield_range));
+	m_shield_circle.setOutlineColor(m_isReflectingShots == true ? sf::Color(0, 255, 0, 80) : sf::Color(0, 0, 255, 80));
+
+	//position of UI bars (health, shield, energy)
 	SetPosition(getPosition());
 }
 
@@ -257,11 +275,21 @@ void Ship::UpdateShieldRegen(sf::Time deltaTime)
 		if (m_shield > m_shield_max)
 			m_shield = m_shield_max;
 	}
+}
 
-	//UI
-	m_shield_circle.setRadius(m_shield_range);
-	m_shield_circle.setOrigin(sf::Vector2f(m_shield_range, m_shield_range));
-	m_shield_circle.setOutlineColor(m_isReflectingShots == true ? sf::Color(0, 255, 0, 80) : sf::Color(0, 0, 255, 80));
+void Ship::UpdateEnergyRegen(sf::Time deltaTime)
+{
+	if (m_energy < m_energy_max)
+	{
+		m_energy_regen_buffer += m_energy_regen * deltaTime.asSeconds();
+
+		double intpart;
+		m_energy_regen_buffer = modf(m_energy_regen_buffer, &intpart);
+		m_energy += intpart;
+
+		if (m_energy > m_energy_max)
+			m_energy = m_energy_max;
+	}
 }
 
 void Ship::SetPosition(sf::Vector2f position)
@@ -272,8 +300,12 @@ void Ship::SetPosition(sf::Vector2f position)
 
 	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50));
 	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));
-	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5 - m_health_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5));
+	
+	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5 - m_health_container_rect.getOutlineThickness() - m_health_container_rect.getSize().y * 0.5));
 	m_shield_rect.setPosition(sf::Vector2f(m_shield_container_rect.getPosition().x, m_shield_container_rect.getPosition().y));
+	
+	m_energy_container_rect.setPosition(sf::Vector2f(getPosition().x, m_shield_container_rect.getPosition().y - m_shield_container_rect.getSize().y * 0.5 - m_shield_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5));
+	m_energy_rect.setPosition(sf::Vector2f(m_energy_container_rect.getPosition().x, m_energy_container_rect.getPosition().y));
 }
 
 void Ship::Draw(RenderTarget& screen)
@@ -281,15 +313,18 @@ void Ship::Draw(RenderTarget& screen)
 	GameObject::Draw(screen);
 
 	//health and shield
-	if (m_shield > 0)
-		screen.draw(m_shield_circle);
-
-	if (m_shield_max > 0)
+	if (m_visible == true)
 	{
-		screen.draw(m_shield_container_rect);
-		screen.draw(m_shield_rect);
+		if (m_shield > 0)
+			screen.draw(m_shield_circle);
+
+		if (m_shield_max > 0)
+		{
+			screen.draw(m_shield_container_rect);
+			screen.draw(m_shield_rect);
+		}
+
+		screen.draw(m_health_container_rect);
+		screen.draw(m_health_rect);
 	}
-		
-	screen.draw(m_health_container_rect);
-	screen.draw(m_health_rect);
 }

@@ -39,6 +39,7 @@ public:
 	float m_locking_target_clock;
 	float m_locking_angle_coverage;
 	int m_damage;
+	int m_energy_cost;
 
 	RectangleShape m_lock_rectangle;
 };

@@ -47,15 +47,22 @@ public :
 	int m_shield_max;
 	float m_shield_regen;
 	double m_shield_regen_buffer;
+	double m_energy_regen_buffer;
 	sf::CircleShape m_shield_circle;
+	int m_energy;
+	int m_energy_max;
+	float m_energy_regen;
 
 	sf::RectangleShape m_health_rect;
 	sf::RectangleShape m_health_container_rect;
 	sf::RectangleShape m_shield_rect;
 	sf::RectangleShape m_shield_container_rect;
+	sf::RectangleShape m_energy_rect;
+	sf::RectangleShape m_energy_container_rect;
 
 	virtual void Death();
 	void UpdateShieldRegen(sf::Time deltaTime);
+	void UpdateEnergyRegen(sf::Time deltaTime);
 	void InitShip();
 
 	bool m_isReflectingShots;

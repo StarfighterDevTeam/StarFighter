@@ -37,12 +37,12 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 
 	//combat
 	m_health_max = 50;
-	m_health = m_health_max;
 	m_shield_max = 20;
-	m_shield = m_shield_max;
 	m_shield_range = 100;
 	m_shield_regen = 1.5;
 	m_isReflectingShots = true;
+	m_energy_max = 100;
+	m_energy_regen = 5;
 
 	InitShip();
 }
@@ -80,7 +80,11 @@ void Player::Update(sf::Time deltaTime)
 
 		if (InputGuy::isFiring() == true)
 			if (weapon->IsReadyToFire() == true)
-				weapon->Fire();
+				if (m_energy >= weapon->m_energy_cost)
+				{
+					weapon->Fire();
+					m_energy -= weapon->m_energy_cost;
+				}
 	}
 
 	//markers
@@ -89,6 +93,9 @@ void Player::Update(sf::Time deltaTime)
 			marked_object->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
 
 	Ship::Update(deltaTime);
+
+	UpdateEnergyRegen(deltaTime);
+	m_energy_rect.setSize(sf::Vector2f(m_energy_container_rect.getSize().x * m_energy / m_energy_max, m_energy_container_rect.getSize().y));
 
 	//cycling mission
 	if (m_inputs_states[Action_CyclingMission] == Input_Tap)
@@ -200,6 +207,12 @@ void Player::Draw(RenderTarget& screen)
 	}
 			
 	Ship::Draw(screen);
+
+	if (m_visible == true)
+	{
+		screen.draw(m_energy_container_rect);
+		screen.draw(m_energy_rect);
+	}
 
 	DebugDrawMissions();
 }
