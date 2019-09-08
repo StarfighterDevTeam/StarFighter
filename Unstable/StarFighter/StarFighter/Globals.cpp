@@ -214,7 +214,7 @@ sf::Color GrayScaleColor(sf::Color input_color, float ratio)
 
 float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
 {
-	float angle = GetVectorAngleRad(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI;
+	float angle = GetAngleRadFromVector(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI;
 	float delta_angle = ref_rotation_in_deg - angle;
 	if (delta_angle > 180)
 		delta_angle -= 180.f * 2;
@@ -224,7 +224,7 @@ float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_
 	return delta_angle;
 }
 
-float GetVectorAngleRad(sf::Vector2f vector)
+float GetAngleRadFromVector(sf::Vector2f vector)
 {
 	const float a = vector.x;
 	const float b = vector.y;

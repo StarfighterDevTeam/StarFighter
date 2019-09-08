@@ -51,15 +51,15 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 
 	m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();
 
-	sf::Vector2f acceleration_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_acceleration, m_heading * M_PI / 180);
+	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration, m_heading * M_PI / 180);
 
 	sf::Vector2f braking_vector = sf::Vector2f(0, 0);
-	float current_inertia_angle = GetVectorAngleRad(m_speed);
+	float current_inertia_angle = GetAngleRadFromVector(m_speed);
 
 	if (inputs_direction.y > 0)
-		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_braking_max, current_inertia_angle);
+		braking_vector = GetVectorFromLengthAndAngle(m_braking_max, current_inertia_angle);
 	else if (inputs_direction.y == 0)
-		braking_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_idle_decelleration, current_inertia_angle);
+		braking_vector = GetVectorFromLengthAndAngle(m_idle_decelleration, current_inertia_angle);
 
 	braking_vector.x = abs(m_speed.x) > abs(braking_vector.x) ? braking_vector.x : -m_speed.x;//braking cannot exceed speed (that would make us go backward)
 	braking_vector.y = abs(m_speed.y) > abs(braking_vector.y) ? braking_vector.y : -m_speed.y;
@@ -90,7 +90,7 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 				/*
 				if (m_isOrbiting == NULL || m_acceleration != 0)
 				{
-					m_orbit_angle = GetVectorAngleRad(sf::Vector2f(dx, -dy)) - M_PI_2;
+					m_orbit_angle = GetAngleRadFromVector(sf::Vector2f(dx, -dy)) - M_PI_2;
 					m_orbit_cw = (m_speed.x > 0 && dy > 0) || (m_speed.x < 0 && dy < 0) ? 1 : -1;//clockwise gravitation
 				}
 				*/
@@ -167,8 +167,6 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 bool Ship::GetHitByAmmo(GameObject* ammo)
 {
-	ammo->m_garbageMe = true;
-
 	//Apply damage
 	int damage = ((Ammo*)ammo)->m_damage;
 
@@ -179,11 +177,19 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 			m_shield -= damage;
 			damage = 0;
 			if (m_isReflectingShots == true)
-				ammo->Bounce();
-
-			//TODO: FX hit shield
-			FX* new_FX = new FX(FX_HitShield, ammo->m_position);
-			(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+			{
+				Ammo* this_ammo = (Ammo*)ammo;
+				this_ammo->Bounce(this);
+				ammo->m_collider = ammo->m_collider == PlayerFire ? EnemyFire : PlayerFire;
+			}
+			else
+			{
+				//TODO: FX hit shield
+				FX* new_FX = new FX(FX_HitShield, ammo->m_position);
+				(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+				ammo->m_garbageMe = true;
+			}
+			
 		}
 		//shield destroyed
 		else
@@ -198,6 +204,7 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 		//FX hit
 		m_health -= damage;
 		m_hit_feedback_timer = 0.05;
+		ammo->m_garbageMe = true;
 		FX* new_FX = new FX(FX_Hit, ammo->m_position);
 		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 	}

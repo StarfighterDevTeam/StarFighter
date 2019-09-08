@@ -151,7 +151,7 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float dx = m_position.x - position.x;
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
-	//const float angle = GetVectorAngleRad(sf::Vector2f(-dx, -dy));
+	//const float angle = GetAngleRadFromVector(sf::Vector2f(-dx, -dy));
 
 	//move to desired position and heading
 	if (m_position != position)

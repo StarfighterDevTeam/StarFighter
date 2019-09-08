@@ -274,25 +274,18 @@ void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_sp
 	m_speed.y = -absolute_speed * cos(curAngle);
 }
 
-sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(const float absolute_speed, const float curAngle)
+sf::Vector2f GameObject::GetVectorFromLengthAndAngle(const float length, const float angle)
 {
-	sf::Vector2f speed;
-	speed.x = -absolute_speed * sin(curAngle);
-	speed.y = -absolute_speed * cos(curAngle);
-	return speed;
+	sf::Vector2f vector;
+	vector.x = -length * sin(angle);
+	vector.y = -length * cos(angle);
+	return vector;
 }
 
 float GameObject::GetRadius() const
 {
 	return m_radius;
 	//see override function in class Ship
-}
-
-void GameObject::Bounce()
-{
-	//TODO
-
-	//float angle = GetVectorAngleRad(m_speed);
 }
 
 //Star Hunter

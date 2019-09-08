@@ -255,11 +255,11 @@ void Game::UpdateScene(Time deltaTime)
 	//Update quad-tree classification of objects
 	UpdateSectorList(false);
 
-	//Checking colisions
-	CollisionChecks();
-
 	//Update GameObjects, interface and feedbacks
 	UpdateObjects(deltaTime);
+
+	//Checking colisions
+	CollisionChecks();
 
 	//Update music transitions
 	ManageMusicTransitions(deltaTime);

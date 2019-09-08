@@ -53,7 +53,7 @@ Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range
 		}
 	}
 
-	m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_speed_min, (heading + 180) * M_PI / 180);
+	m_speed = GetVectorFromLengthAndAngle(m_speed_min, (heading + 180) * M_PI / 180);
 	m_lifespan = range / m_speed_max;
 
 	Init(position, m_speed, textureName, textureSize, frameNumber, animationNumber);
@@ -125,7 +125,7 @@ void Ammo::Update(sf::Time deltaTime)
 			}
 		}
 
-		m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(speed, (m_heading + 180) * M_PI / 180);
+		m_speed = GetVectorFromLengthAndAngle(speed, (m_heading + 180) * M_PI / 180);
 		NormalizeVector(&m_speed, m_speed_max);
 
 		GameObject::Update(deltaTime);
@@ -144,4 +144,24 @@ void Ammo::Draw(RenderTarget& screen)
 
 		DebugDrawSegment(getPosition(), sf::Vector2f(getPosition().x + vector.x, getPosition().y - vector.y), sf::Color::Red, (*CurrentGame).m_mainScreen);
 	}
+}
+
+void Ammo::Bounce(GameObject* target)
+{
+	const float dx = m_position.x - target->m_position.x;
+	const float dy = m_position.y - target->m_position.y;
+
+	float incoming_angle = 180 + m_heading;
+	BoundAngle(incoming_angle, 360);
+
+	const float radius_angle = GetAngleRadFromVector(sf::Vector2f(dx, dy)) * 180 / M_PI;;
+
+	const int cross_product = dx * m_speed.x + dy * m_speed.y > 0 ? -1 : 1;
+
+	m_heading = radius_angle + cross_product * (radius_angle - incoming_angle);
+
+	//instant repositioning at collision point
+	m_position = target->m_position + GetVectorFromLengthAndAngle(target->GetRadius() + m_size.y * 0.5, (radius_angle - 180) * M_PI / 180);
+	SetPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	setRotation(m_heading);
 }
