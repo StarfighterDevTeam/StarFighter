@@ -11,14 +11,14 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	SetHostility(hostility);
 	m_roe = roe;
 
+	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
+	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
+	m_layer = AIShipLayer;
+
 	string textureName;
 	sf::Vector2f textureSize;
 	int frameNumber = 1;
 	int animationNumber = 1;
-
-	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
-	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
-	m_layer = AIShipLayer;
 
 	switch (m_ship_type)
 	{
@@ -43,22 +43,16 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			break;
 		}
 	}
-	UpdateWeaponRangeAndAngleCoverage();
-
-	m_health = m_health_max;
-	m_shield = m_shield_max;
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
+	m_heading = heading;
+	//setRotation(m_heading);
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 	m_move_destination = m_position;
 	m_target = NULL;
 
-	m_heading = heading;
-
-	//update position and rotation "manually" because they won't be updated during the frame of their creation
-	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-	setRotation(m_heading);
+	InitShip();
 }
 
 AIShip::~AIShip()

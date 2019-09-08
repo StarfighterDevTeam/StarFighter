@@ -27,7 +27,6 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
-	UpdateWeaponRangeAndAngleCoverage();
 
 	//Flight model
 	m_speed_max = 800;
@@ -45,13 +44,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_shield_regen = 1.5;
 	m_isReflectingShots = true;
 
-	//UI
-	m_shield_circle.setPosition(getPosition());
-
-	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50));
-	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));
-	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5 - m_health_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5));
-	m_shield_rect.setPosition(sf::Vector2f(m_shield_container_rect.getPosition().x, m_shield_container_rect.getPosition().y));
+	InitShip();
 }
 
 Player::~Player()
@@ -101,6 +94,7 @@ void Player::Update(sf::Time deltaTime)
 	if (m_inputs_states[Action_CyclingMission] == Input_Tap)
 		CycleMission();
 
+	//updating mission objectives and status
 	UpdateMissions();
 }
 

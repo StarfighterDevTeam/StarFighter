@@ -284,9 +284,9 @@ sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(const float abs
 
 void GameObject::Bounce()
 {
-	float angle = GetVectorAngleRad(m_speed);
+	//TODO
 
-	
+	//float angle = GetVectorAngleRad(m_speed);
 }
 
 //Star Hunter

@@ -29,7 +29,6 @@ public :
 	void SetPosition(sf::Vector2f position) override;
 	bool GetHitByAmmo(GameObject* ammo) override;
 	void UpdateOrbit(sf::Time deltaTime);
-	void UpdateWeaponRangeAndAngleCoverage();
 
 	float m_acceleration;
 	float m_acceleration_max;
@@ -56,6 +55,7 @@ public :
 
 	virtual void Death();
 	void UpdateShieldRegen(sf::Time deltaTime);
+	void InitShip();
 
 	bool m_isReflectingShots;
 

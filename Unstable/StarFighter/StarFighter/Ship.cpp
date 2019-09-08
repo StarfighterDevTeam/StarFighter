@@ -71,17 +71,6 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
 }
 
-void Ship::UpdateWeaponRangeAndAngleCoverage()
-{
-	m_range_max = 0;
-	for (Weapon* weapon : m_weapons)
-		m_range_max = MaxBetweenValues(sf::Vector2f(m_range_max, weapon->m_range));
-
-	m_angle_coverage_max = 0;
-	for (Weapon* weapon : m_weapons)
-		m_angle_coverage_max = MaxBetweenValues(sf::Vector2f(m_angle_coverage_max, weapon->m_locking_angle_coverage));
-}
-
 void Ship::UpdateOrbit(sf::Time deltaTime)
 {
 	//gravity?
@@ -152,7 +141,7 @@ void Ship::Update(sf::Time deltaTime)
 	//Regen shield
 	UpdateShieldRegen(deltaTime);
 
-	//Update UI
+	//Update health and shield bars size
 	m_health_rect.setSize(sf::Vector2f(m_health_container_rect.getSize().x * m_health / m_health_max, m_health_container_rect.getSize().y));
 	if (m_shield_max > 0)
 		m_shield_rect.setSize(sf::Vector2f(m_shield_container_rect.getSize().x * m_shield / m_shield_max, m_shield_container_rect.getSize().y));
@@ -184,6 +173,8 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 		{
 			m_shield -= damage;
 			damage = 0;
+			if (m_isReflectingShots == true)
+				ammo->Bounce();
 		}
 		else
 		{
@@ -209,6 +200,24 @@ void Ship::Death()
 	//FX death
 	FX* new_FX = new FX(FX_Death, m_position);
 	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+}
+
+void Ship::InitShip()
+{
+	//ship range and angle of fire max
+	m_range_max = 0;
+	for (Weapon* weapon : m_weapons)
+		m_range_max = MaxBetweenValues(sf::Vector2f(m_range_max, weapon->m_range));
+
+	m_angle_coverage_max = 0;
+	for (Weapon* weapon : m_weapons)
+		m_angle_coverage_max = MaxBetweenValues(sf::Vector2f(m_angle_coverage_max, weapon->m_locking_angle_coverage));
+
+	m_health = m_health_max;
+	m_shield = m_shield_max;
+
+	//position of shield, health bars, shield bars...
+	SetPosition(getPosition());
 }
 
 void Ship::UpdateShieldRegen(sf::Time deltaTime)
@@ -250,6 +259,7 @@ void Ship::Draw(RenderTarget& screen)
 {
 	GameObject::Draw(screen);
 
+	//health and shield
 	if (m_shield > 0)
 		screen.draw(m_shield_circle);
 
