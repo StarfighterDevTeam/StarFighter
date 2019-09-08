@@ -65,6 +65,18 @@ void AIShip::Update(sf::Time deltaTime)
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	bool input_fire = false;
 
+	//grouping with allied ships
+	m_allied_ships.clear();
+	for (GameObject* allied_ship : (*CurrentGame).m_sceneGameObjectsTyped[m_collider])
+		if (allied_ship != this)
+		{
+			const float dx = allied_ship->m_position.x - m_position.x;
+			const float dy = allied_ship->m_position.y - m_position.y;
+			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
+				m_allied_ships.push_back((SpatialObject*)allied_ship);
+		}
+
+
 	//AI - move & shoot strategies
 	m_move_destination = m_position;
 
@@ -205,4 +217,12 @@ void AIShip::Death()
 		(*CurrentGame).m_playerShip->UnmarkThis(this, true);
 
 	Ship::Death();
+}
+
+void AIShip::SetROE(RuleOfEngagement roe)
+{
+	SpatialObject::SetROE(roe);
+
+	for (SpatialObject* allied_ship : m_allied_ships)
+		allied_ship->SpatialObject::SetROE(roe);
 }

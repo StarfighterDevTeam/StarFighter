@@ -356,7 +356,6 @@ void Game::CollisionChecks()
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 			if (AreColliding(player_ammo, enemy_ship) == true)
 				enemy_ship->GetHitByAmmo(player_ammo);
-
 }
 
 bool Game::AreColliding(GameObject* objectA, GameObject* objectB)

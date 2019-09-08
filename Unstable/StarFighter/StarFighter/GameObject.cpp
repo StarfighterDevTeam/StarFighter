@@ -287,7 +287,6 @@ float GameObject::GetRadius() const
 	return m_radius;
 	//see override function in class Ship
 }
-
 //Star Hunter
 void GameObject::UpdateStarSectorIndex()
 {

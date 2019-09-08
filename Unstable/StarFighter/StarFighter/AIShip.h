@@ -27,11 +27,14 @@ public :
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	SpatialObject* KeepTarget();
 	void Death() override;
+	void SetROE(RuleOfEngagement roe) override;
 
 	ShipType m_ship_type;
 
 	sf::Vector2f m_move_destination;
 	SpatialObject* m_target;
+
+	vector<SpatialObject*> m_allied_ships;
 };
 
 #endif // AISHIP_H_INCLUDED
