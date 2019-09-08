@@ -282,6 +282,12 @@ sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(const float abs
 	return speed;
 }
 
+float GameObject::GetRadius() const
+{
+	return m_radius;
+	//see override function in class Ship
+}
+
 void GameObject::Bounce()
 {
 	//TODO

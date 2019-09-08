@@ -20,6 +20,13 @@ FX::FX(FXType FX_type, sf::Vector2f position)
 			frameNumber = 2;
 			break;
 		}
+		case FX_HitShield:
+		{
+			textureSize = sf::Vector2f(400, 295);
+			textureName = "2D/FX_explosion_S_blue.png";
+			frameNumber = 2;
+			break;
+		}
 		//case FX_Hit:
 		//{
 		//	textureSize = sf::Vector2f(256, 256);

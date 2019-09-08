@@ -6,6 +6,7 @@
 enum FXType
 {
 	FX_Hit,
+	FX_HitShield,
 	FX_Death,
 };
 

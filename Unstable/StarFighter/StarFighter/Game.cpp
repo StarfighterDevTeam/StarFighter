@@ -349,14 +349,48 @@ void Game::CollisionChecks()
 
 	for (GameObject* player_ship : m_sceneGameObjectsTyped[PlayerShipObject])
 		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
-			if (SimpleCollision::AreColliding(player_ship, enemy_ammo) == true)
+			if (AreColliding(player_ship, enemy_ammo) == true)
 				player_ship->GetHitByAmmo(enemy_ammo);
 
 	for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
-			if (SimpleCollision::AreColliding(player_ammo, enemy_ship) == true)
+			if (AreColliding(player_ammo, enemy_ship) == true)
 				enemy_ship->GetHitByAmmo(player_ammo);
 
+}
+
+bool Game::AreColliding(GameObject* objectA, GameObject* objectB)
+{
+	if (objectA->m_visible == false || objectB->m_visible == false)
+		return false;
+
+	//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
+	const float a = objectA->getPosition().x - objectB->getPosition().x;
+	const float b = objectA->getPosition().y - objectB->getPosition().y;
+	const float c = objectA->GetRadius() + objectB->GetRadius();
+
+	if (a*a + b*b > c*c)
+		return false;
+
+	if (c*c > objectA->m_radius * objectB->m_radius)
+		return true;
+
+	if (PIXEL_PERFECT_COLLISION)
+	{
+		return Collision::PixelPerfectTest(objectA, objectB, 127);
+	}
+	else
+	{
+		// No pixel perfect : are the corners included in the other sprite, or vice versa ?
+		sf::IntRect boundsA(FToIRect(objectA->getGlobalBounds()));
+		sf::IntRect boundsB(FToIRect(objectB->getGlobalBounds()));
+		return boundsA.intersects(boundsB);
+	}
+}
+
+sf::IntRect Game::FToIRect(const sf::FloatRect& f)
+{
+	return sf::IntRect((int)f.left, (int)f.top, (int)f.width, (int)f.height);
 }
 
 void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)

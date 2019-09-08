@@ -124,6 +124,11 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 	}
 }
 
+float Ship::GetRadius() const
+{
+	return m_shield == 0 ? m_radius : m_shield_range;
+}
+
 void Ship::Update(sf::Time deltaTime)
 {
 	//hit feedback
@@ -163,30 +168,39 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 bool Ship::GetHitByAmmo(GameObject* ammo)
 {
 	ammo->m_garbageMe = true;
-	m_hit_feedback_timer = 0.05;
 
 	//Apply damage
 	int damage = ((Ammo*)ammo)->m_damage;
 
 	if (m_shield > 0)
+		//shield absorbing damage
 		if (m_shield > damage)
 		{
 			m_shield -= damage;
 			damage = 0;
 			if (m_isReflectingShots == true)
 				ammo->Bounce();
+
+			//TODO: FX hit shield
+			FX* new_FX = new FX(FX_HitShield, ammo->m_position);
+			(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 		}
+		//shield destroyed
 		else
 		{
 			damage -= m_shield;
 			m_shield = 0;
 		}
 
-	m_health -= damage;
-
-	//FX hit
-	FX* new_FX = new FX(FX_Hit, m_position);
-	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+	//no shield
+	if (damage > 0)
+	{
+		//FX hit
+		m_health -= damage;
+		m_hit_feedback_timer = 0.05;
+		FX* new_FX = new FX(FX_Hit, ammo->m_position);
+		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+	}
 
 	//Death?
 	if (m_health <= 0)

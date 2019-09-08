@@ -29,6 +29,7 @@ public :
 	void SetPosition(sf::Vector2f position) override;
 	bool GetHitByAmmo(GameObject* ammo) override;
 	void UpdateOrbit(sf::Time deltaTime);
+	float GetRadius() const override;
 
 	float m_acceleration;
 	float m_acceleration_max;
