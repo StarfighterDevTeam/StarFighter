@@ -9,7 +9,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 {
 	m_ship_type = ship_type;
 	SetHostility(hostility);
-	m_roe = roe;
+	SetROE(roe);
 
 	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
@@ -75,7 +75,6 @@ void AIShip::Update(sf::Time deltaTime)
 			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
 				m_allied_ships.push_back((SpatialObject*)allied_ship);
 		}
-
 
 	//AI - move & shoot strategies
 	m_move_destination = m_position;

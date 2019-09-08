@@ -131,10 +131,12 @@ Mission* Gameloop::CreateMission(Planet* owner)
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 	sf::Vector2i found_index = starting_index;
 
+	//find sector where to create the mission
 	Planet* planet = NULL;
 	int i = 0;
 	int s = 1;
-	while (planet == NULL)
+	int id = 0;
+	while (planet == NULL && id >= 0)
 	{
 		//"snail" search for an existing planet or an unknown sector
 		s *= (i == 0 || i % 2 == 1) ? 1 : -1;
@@ -144,48 +146,68 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			for (int y = 0; y < 2; y++)//y < (i / 2) * abs(s)
 			{
 				found_index.y += y * s * (i / 2) * abs(s);//found_index.y += s
-				planet = GetPlanetForMission(starting_index + found_index);
-				if (planet != NULL)
+				id = (*CurrentGame).GetSectorId(starting_index + found_index);
+
+				if (id == -1)//unkown sector found
 					break;
+				else if (mission_type == Mission_GoTo)
+				{
+					planet = GetPlanetAtSectorId(id);//re-use an existing planet?
+					if (planet != NULL)
+						break;
+				}
 			}
 		else
 			for (int x = 0; x < 2; x++)//x < (1 + ((i + 1) / 2) - 1) * abs(s)
 			{
 				found_index.x += x * s * (1 + ((i + 1) / 2) - 1) * abs(s);//found_index.x += s; 
-				planet = GetPlanetForMission(starting_index + found_index);
-				if (planet != NULL)
-					break;
-			}
 
-		//printf("found index: %d, %d\n", found_index.x, found_index.y);
+				if (id == -1)//unkown sector found
+					break;
+				else if (mission_type == Mission_GoTo)
+				{
+					planet = GetPlanetAtSectorId(id);//re-use an existing planet?
+					if (planet != NULL)
+						break;
+				}
+			}
 	}
 
-	return new Mission(Mission_GoTo, planet, planet);
+	//printf("found index: %d, %d\n", found_index.x, found_index.y);
+
+	//create mission
+	switch (mission_type)
+	{
+		case Mission_GoTo:
+		{
+			if (id >= 0 && planet->m_nb_missions < NB_MISSIONS_MAX)
+				planet->m_nb_missions++;
+			else
+				planet = CreatePlanet(starting_index + found_index, Hostility_Ally, 1, 1);
+
+			return new Mission(mission_type, planet, planet);
+		}
+		case Mission_Bounty:
+		{
+			AIShip* ship;
+			for (int e = 0; e < 3; e++)
+				ship = CreateAIShip(Ship_Alpha, starting_index + found_index + sf::Vector2i(e, 0), 0, Hostility_Enemy, ROE_FireAtWill);
+
+			return new Mission(mission_type, ship, planet);
+		}
+	}
 }
 
-Planet* Gameloop::GetPlanetForMission(sf::Vector2i sector_index)
+Planet* Gameloop::GetPlanetAtSectorId(int id)
 {
 	Planet* planet = NULL;
 
-	int id = (*CurrentGame).GetSectorId(sector_index);
-	if (id == -1)
-		planet = CreatePlanet(sector_index, Hostility_Ally, 1, 1);
-	else
-	{
-		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])
-		{
-			if (object->m_collider == PlanetObject)
-			{
-				planet = (Planet*)object;
-				if (planet->m_nb_missions == 0)
-					planet->m_nb_missions++;
-				break;
-			}
-		}
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])
+		if (object->m_collider == PlanetObject)
+			return (Planet*)object;
 
-		if ((*CurrentGame).m_sceneGameObjectsStored[id].empty() == true)
-			(*CurrentGame).m_sceneGameObjectsStored.erase(id);
-	}
+	if ((*CurrentGame).m_sceneGameObjectsStored[id].empty() == true)
+		(*CurrentGame).m_sceneGameObjectsStored.erase(id);
 
-	return planet;
+	return NULL;
 }

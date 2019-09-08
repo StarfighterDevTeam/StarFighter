@@ -22,5 +22,12 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 			m_body_text = "Go to planet " + to_string(planet->m_planet_id);
 			break;
 		}
+		case Mission_Bounty:
+		{
+			AIShip* ship = (AIShip*)target;
+			m_title_text = "Bounty Mission";
+			m_body_text = "Go bounty hunting";
+			break;
+		}
 	}
 }

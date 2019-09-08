@@ -23,7 +23,7 @@ public:
 	AIShip* CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe);
 	Planet* CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_min, int nb_missions_max);
 	Mission* CreateMission(Planet* owner);
-	Planet* GetPlanetForMission(sf::Vector2i sector_index);
+	Planet* GetPlanetAtSectorId(int id);
 
 	vector<StarGenerator*> m_star_generator;
 

@@ -14,6 +14,7 @@ enum MissionStatus
 enum MissionType
 {
 	Mission_GoTo,
+	Mission_Bounty,
 	NB_MISSION_TYPES,
 };
 
