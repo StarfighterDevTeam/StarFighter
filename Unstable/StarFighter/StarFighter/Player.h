@@ -58,6 +58,7 @@ public :
 	void RemoveMissionMarker(SpatialObject* target);
 	void UpdateMissions();
 	void Death() override;
+	int GetGravitationRange() override;
 
 	void DebugDrawMissions();
 	void DebugDrawMoney();

@@ -183,7 +183,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 	}
 }
 
-bool Ship::GetHitByAmmo(GameObject* ammo)
+void Ship::GetHitByAmmo(GameObject* ammo)
 {
 	//Apply damage
 	int damage = ((Ammo*)ammo)->m_damage;
@@ -232,8 +232,28 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 	//Death?
 	if (m_health <= 0)
 		Death();
+}
 
-	return true;
+void Ship::GetHitByGravitation(GameObject* ship)
+{
+	const float dx = m_position.x - ship->m_position.x;
+	const float dy = m_position.y - ship->m_position.y;
+	const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
+	const float speed_deg = (angle * 180 / M_PI);
+
+	//Apply gravitation only if ship is trying to get away from the attractor
+	if (abs(GetAngleDegToTargetPosition(m_position, speed_deg, ship->m_position)) > 90)// && (dx*dx + dy*dy) > ship->GetGravitationRange() * 0.5 * ship->GetGravitationRange() * 0.5)
+	{
+		Ship* attractor = (Ship*)ship;	
+		const float dist_sqr = dx*dx + dy*dy;
+		const float range = attractor->m_gravitation_range;
+
+		const float strenght = Lerp(dist_sqr, (range * 0.5) * (range * 0.5), (range) * (range), 0, attractor->m_gravitation_strength);
+		sf::Vector2f gravity = GetVectorFromLengthAndAngle(strenght, angle);
+
+		m_speed += gravity;
+		NormalizeVector(&m_speed, m_speed_max);
+	}
 }
 
 void Ship::Death()

@@ -10,7 +10,7 @@ Gameloop::Gameloop()
 	//ship
 	Player* player = new Player(sf::Vector2i(0, 0));
 	//(*CurrentGame).m_playerShip = player;
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject, false);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, AllyShipObject, false);
 	(*CurrentGame).UpdateSectorList(true);
 
 	//Init first mission
@@ -111,7 +111,7 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 {
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe, false);
 	if (ship->m_removeMe == false)
-		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, false);
+		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
 	return ship;
 }
 

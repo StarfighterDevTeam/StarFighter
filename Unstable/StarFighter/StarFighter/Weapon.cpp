@@ -80,7 +80,7 @@ void Weapon::Update(sf::Time deltaTime)
 	/*
 	if (m_locked_target == NULL)
 	{
-		ColliderType collider = m_collider == PlayerFire ? EnemyShip : PlayerShipObject;
+		ColliderType collider = m_collider == PlayerFire ? EnemyShip : AllyShipObject;
 		GameObject* locked_target = (*CurrentGame).GetClosestObjectTyped(m_position, collider, m_range, m_locking_angle_coverage / 2);
 
 		if (locked_target != NULL)

@@ -131,7 +131,7 @@ void Player::UpdateMissions()
 							Beacon* beacon = (Beacon*)object;
 							for (AIShip* ship : beacon->m_ships_to_create)
 							{
-								(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, true);
+								(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, true);
 								ship->m_visible = true;
 								ship->SetROE(ROE_FireAtWill);
 								(*CurrentGame).m_playerShip->MarkThis(ship, true);
@@ -621,4 +621,9 @@ void Player::Death()
 	m_energy = m_energy_max;
 
 	Ship::Death();
+}
+
+int Player::GetGravitationRange()
+{
+	return m_gravitation_range;
 }

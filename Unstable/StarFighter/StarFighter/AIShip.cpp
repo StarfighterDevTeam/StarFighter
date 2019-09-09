@@ -12,7 +12,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	SetROE(roe);
 
 	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
-	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
+	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
 
 	string textureName;
@@ -46,7 +46,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		{
 			m_speed_max = 200;
 			m_acceleration_max = 2000;
-			m_turn_speed = 50;
+			m_turn_speed = 30;
 			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
 
@@ -65,7 +65,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-textureSize.x * 0.5 + 8, textureSize.y * 0.25)));
 
 			m_gravitation_range = REF_WINDOW_RESOLUTION_X;
-			m_gravitation_strength = 100;
+			m_gravitation_strength = 60;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
 
 			break;
 		}
@@ -160,7 +160,7 @@ void AIShip::SetHostility(Hostility hostility)
 {
 	SpatialObject::SetHostility(hostility);
 
-	m_collider = hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject;
+	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	
 	if (m_marker_target != NULL)
 		m_marker_target->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
@@ -174,18 +174,10 @@ bool AIShip::CheckMarkingConditions()
 	return m_hostility == Hostility_Ally || m_roe == ROE_FireAtWill;
 }
 
-bool AIShip::GetHitByAmmo(GameObject* ammo)
+void AIShip::GetHitByAmmo(GameObject* ammo)
 {
-	if (ammo->m_collider == PlayerFire && m_hostility == Hostility_Ally)
-		return false;
-
-	if (ammo->m_collider == EnemyFire && m_hostility == Hostility_Enemy)
-		return false;
-
 	if (m_roe == ROE_ReturnFire)
 		SetROE(ROE_FireAtWill);
-
-	return Ship::GetHitByAmmo(ammo);
 }
 
 void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)
@@ -256,4 +248,9 @@ void AIShip::SetROE(RuleOfEngagement roe)
 
 	for (SpatialObject* allied_ship : m_allied_ships)
 		allied_ship->SpatialObject::SetROE(roe);
+}
+
+int AIShip::GetGravitationRange()
+{
+	return m_roe == ROE_FireAtWill ? m_gravitation_range : 0;
 }

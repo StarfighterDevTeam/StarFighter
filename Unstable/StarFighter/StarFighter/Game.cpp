@@ -357,15 +357,30 @@ void Game::CollisionChecks()
 	sf::Clock dt;
 	dt.restart();
 
-	for (GameObject* player_ship : m_sceneGameObjectsTyped[PlayerShipObject])
+	for (GameObject* ally_ship : m_sceneGameObjectsTyped[AllyShipObject])
+	{
 		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
-			if (AreColliding(player_ship, enemy_ammo) == true)
-				player_ship->GetHitByAmmo(enemy_ammo);
+			if (AreColliding(ally_ship, enemy_ammo) == true)
+				ally_ship->GetHitByAmmo(enemy_ammo);
 
-	for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
-		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
+		if (ally_ship->GetGravitationRange() > 0)
+			for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyShipObject])
+				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
+					enemy->GetHitByGravitation(ally_ship);
+	}
+
+	for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
+	{
+		for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
 			if (AreColliding(player_ammo, enemy_ship) == true)
 				enemy_ship->GetHitByAmmo(player_ammo);
+
+		if (enemy_ship->GetGravitationRange() > 0)
+			for (GameObject* ally_ship : m_sceneGameObjectsTyped[AllyShipObject])
+				if (GetDistanceSquaredBetweenPositions(enemy_ship->m_position, ally_ship->m_position) <= enemy_ship->GetGravitationRange() * enemy_ship->GetGravitationRange())
+					ally_ship->GetHitByGravitation(enemy_ship);
+	}
+		
 }
 
 bool Game::AreColliding(GameObject* objectA, GameObject* objectB)

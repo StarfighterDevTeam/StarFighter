@@ -24,11 +24,12 @@ public :
 	void Draw(RenderTarget& screen) override;
 	void SetHostility(Hostility hostility) override;
 	bool CheckMarkingConditions() override;
-	bool GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByAmmo(GameObject* ammo) override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	SpatialObject* KeepTarget();
 	void Death() override;
 	void SetROE(RuleOfEngagement roe) override;
+	int GetGravitationRange() override;
 
 	ShipType m_ship_type;
 

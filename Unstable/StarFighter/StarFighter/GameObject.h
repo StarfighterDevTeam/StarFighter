@@ -38,7 +38,7 @@ enum ColliderType
 {
 	BackgroundObject,
 	PlanetObject,
-	PlayerShipObject,
+	AllyShipObject,
 	PlayerFire,
 	EnemyFire,
 	EnemyShipObject,
@@ -101,11 +101,13 @@ public:
 	virtual void MarkThis(SpatialObject* target, bool isMission);
 	virtual void UnmarkThis(SpatialObject* target, bool isMission);
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
-	virtual bool GetHitByAmmo(GameObject* ammo);
+	virtual void GetHitByAmmo(GameObject* ammo);
+	virtual void GetHitByGravitation(GameObject* ship);
 	virtual void SetPosition(sf::Vector2f position);
 	virtual void UpdateMarkers(sf::Time deltaTime);
 	virtual bool IsMarked();
 	virtual int GetMarkedObjectsCount();
+	virtual int GetGravitationRange();
 
 	sf::Vector2i m_sector_index;
 };

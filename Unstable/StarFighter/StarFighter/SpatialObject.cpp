@@ -57,7 +57,7 @@ SpatialObject* SpatialObject::GetTargetableEnemyShip(const float dist_max, const
 	float shortest_distance = -1;
 	SpatialObject* target = NULL;
 
-	ColliderType target_collider = m_collider == PlayerShipObject ? EnemyShipObject : PlayerShipObject;
+	ColliderType target_collider = m_collider == AllyShipObject ? EnemyShipObject : AllyShipObject;
 	
 	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[target_collider])
 	{

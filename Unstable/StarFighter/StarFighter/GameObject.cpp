@@ -280,10 +280,14 @@ void GameObject::UpdateStarSectorIndex()
 	m_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
 }
 
-bool GameObject::GetHitByAmmo(GameObject* ammo)
+void GameObject::GetHitByAmmo(GameObject* ammo)
 {
 	//see override function in class Ship and AIShip
-	return false;
+}
+
+void GameObject::GetHitByGravitation(GameObject* ship)
+{
+	//see override function in class Ship
 }
 
 void GameObject::MarkThis(SpatialObject* target, bool isMission)
@@ -322,4 +326,10 @@ int GameObject::GetMarkedObjectsCount()
 {
 	return 0;
 	//see override function in class Player
+}
+
+int GameObject::GetGravitationRange()
+{
+	return 0;
+	//see override function in class AIShip and Player
 }

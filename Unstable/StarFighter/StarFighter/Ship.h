@@ -27,7 +27,8 @@ public :
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
-	bool GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByGravitation(GameObject* ship) override;
 	void UpdateOrbit(sf::Time deltaTime);
 	float GetRadius() const override;
 
