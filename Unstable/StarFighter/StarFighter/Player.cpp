@@ -93,6 +93,10 @@ void Player::Update(sf::Time deltaTime)
 		if (marked_object->m_removeMe == true)
 			marked_object->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
 
+	//Gravity circle to be drawn
+	if (m_gravitation_range > 0)
+		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
+
 	Ship::Update(deltaTime);
 
 	UpdateEnergyRegen(deltaTime);

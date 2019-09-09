@@ -325,6 +325,11 @@ void Game::drawScene()
 			//DEBUG
 			//DebugDrawSectors();
 		}
+		else if (i == GravitationLayer)
+		{
+			for (CircleShape circle : m_gravity_circles)
+				m_mainScreen.draw(circle);
+		}
 		else
 		{
 			for (GameObject* object : m_sceneGameObjectsLayered[i])
@@ -333,6 +338,9 @@ void Game::drawScene()
 			}
 		}
 	}
+
+	//Reset circles to be drawn
+	m_gravity_circles.clear();
 
 	//DEBUG
 	DebugDrawGameObjectsStats();

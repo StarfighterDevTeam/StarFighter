@@ -63,6 +63,10 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-8, textureSize.y * 0.5)));
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(textureSize.x * 0.5 - 8, textureSize.y * 0.25)));
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-textureSize.x * 0.5 + 8, textureSize.y * 0.25)));
+
+			m_gravitation_range = REF_WINDOW_RESOLUTION_X;
+			m_gravitation_strength = 100;
+
 			break;
 		}
 	}
@@ -134,6 +138,10 @@ void AIShip::Update(sf::Time deltaTime)
 	//Apply move strategy
 	GoTo(m_move_destination, deltaTime, inputs_direction);
 	ApplyFlightModel(deltaTime, inputs_direction);
+
+	//Gravity circle to be drawn
+	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
+		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
 
 	Ship::Update(deltaTime);
 

@@ -17,10 +17,16 @@ Ship::Ship() : SpatialObject()
 	m_energy_regen_buffer = 0;
 	m_shield_max = 0;
 	m_energy_max = 0;
+	m_gravitation_range = 0;
 
 	//UI
 	m_shield_circle.setFillColor(sf::Color::Transparent);
 	m_shield_circle.setOutlineThickness(3);
+
+	m_gravitation_circle.setFillColor(sf::Color(255, 0, 255, 20));
+	m_gravitation_circle.setOutlineThickness(3);
+	m_gravitation_circle.setOutlineColor(sf::Color(255, 0, 255, 255));
+	m_gravitation_circle.setPointCount(256);
 
 	m_health_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
 	m_health_container_rect.setSize(sf::Vector2f(150, 10));
@@ -257,6 +263,10 @@ void Ship::InitShip()
 	m_shield_circle.setOrigin(sf::Vector2f(m_shield_range, m_shield_range));
 	m_shield_circle.setOutlineColor(m_isReflectingShots == true ? sf::Color(0, 255, 0, 80) : sf::Color(0, 0, 255, 80));
 
+	//gravitation circle
+	m_gravitation_circle.setRadius(m_gravitation_range);
+	m_gravitation_circle.setOrigin(sf::Vector2f(m_gravitation_range, m_gravitation_range));
+
 	//position of UI bars (health, shield, energy)
 	SetPosition(getPosition());
 }
@@ -299,6 +309,8 @@ void Ship::SetPosition(sf::Vector2f position)
 	GameObject::SetPosition(position);
 
 	m_shield_circle.setPosition(getPosition());
+
+	m_gravitation_circle.setPosition(getPosition());
 
 	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50));
 	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));

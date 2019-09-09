@@ -137,6 +137,7 @@ public:
 	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
 
 	GameObject* m_background;
+	vector<CircleShape> m_gravity_circles;
 
 	vector<StarSector> m_star_sectors_known;//all sectors encountered by the player
 	vector<sf::Vector2i> m_star_sectors_managed;//all sectors that are close enough to need an updated

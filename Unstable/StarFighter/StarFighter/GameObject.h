@@ -19,7 +19,8 @@ enum LayerType
 {
 	BackgroundLayer,
 	SectorLayer,
-	StarLayer,	
+	StarLayer,
+	GravitationLayer,
 	Planet_Layer,
 	FX_Layer,
 	PlayerFireLayer,
