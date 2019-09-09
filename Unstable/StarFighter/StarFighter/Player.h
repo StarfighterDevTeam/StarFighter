@@ -60,9 +60,11 @@ public :
 	void Death() override;
 
 	void DebugDrawMissions();
+	void DebugDrawMoney();
 
 	vector<SpatialObject*> m_marked_objects;
 	vector<Mission*> m_missions;
+	int m_money;
 };
 
 #endif // PLAYER_H_INCLUDED

@@ -28,6 +28,7 @@ public :
 	MissionType m_mission_type;
 	vector<SpatialObject*> m_marked_objectives;
 	Planet* m_owner;
+	int m_money_prize;
 	string m_title_text;
 	string m_body_text;
 };

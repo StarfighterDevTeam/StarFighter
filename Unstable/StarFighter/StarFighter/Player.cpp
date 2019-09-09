@@ -8,6 +8,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 {
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
+	m_money = 0;
 
 	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
 	{
@@ -244,6 +245,8 @@ void Player::Draw(RenderTarget& screen)
 	}
 
 	DebugDrawMissions();
+
+	DebugDrawMoney();
 }
 
 void Player::UpdateInputStates()
@@ -479,6 +482,9 @@ void Player::EndMission(Mission* mission, MissionStatus status)
 	}
 
 	mission->m_status = status;
+
+	if (status == MissionStatus_Complete)
+		m_money += mission->m_money_prize;
 }
 
 void Player::RemoveMission(Mission* mission)
@@ -567,6 +573,20 @@ void Player::DebugDrawMissions()
 
 		(*CurrentGame).m_mainScreen.draw(body_text);
 	}
+}
+
+void Player::DebugDrawMoney()
+{
+	sf::Text money_text;
+	money_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	money_text.setCharacterSize(20);
+	money_text.setStyle(sf::Text::Bold);
+	money_text.setColor(sf::Color::White);
+
+	money_text.setString(to_string(m_money) + " ¤");
+	money_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 120, REF_WINDOW_RESOLUTION_Y - 50));
+
+	(*CurrentGame).m_mainScreen.draw(money_text);
 }
 
 void Player::Death()

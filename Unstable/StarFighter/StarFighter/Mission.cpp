@@ -9,6 +9,7 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 	m_mission_type = mission_type;
 	m_status = MissionStatus_Accepted;
 	m_owner = owner;
+	m_money_prize = 100;
 
 	if (target != NULL)
 		m_marked_objectives.push_back(target);
