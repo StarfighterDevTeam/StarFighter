@@ -113,6 +113,7 @@ void Player::UpdateMissions()
 	for (Mission* mission : m_missions)
 		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
 			switch (mission->m_mission_type)
+			{
 				case Mission_GoTo:
 				{
 					if (m_isOrbiting == mission->m_marked_objectives.front())
@@ -126,9 +127,36 @@ void Player::UpdateMissions()
 						if (m_isOrbiting == mission->m_owner)//delete mission
 							missions_to_delete.push_back(mission);
 					}
-						
+
 					break;
 				}
+				case Mission_Bounty:
+				{
+					if (mission->m_marked_objectives.front()->m_collider == Beacon_Object)
+					{
+						//arrived at beacon?
+						Beacon* beacon = (Beacon*)mission->m_marked_objectives.front();
+						if (GetDistanceSquaredBetweenPositions(m_position, beacon->m_position) < 200 * 200)
+						{
+							UnmarkThis(beacon, true);
+							mission->m_marked_objectives.clear();
+
+							for (AIShip* ship : beacon->m_ships_to_create)
+							{
+								//(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, true);
+								ship->m_visible = true;
+								ship->SetROE(ROE_FireAtWill);
+								(*CurrentGame).m_playerShip->MarkThis(ship, true);
+								
+								mission->m_marked_objectives.push_back(ship);
+							}
+
+							delete beacon;
+						}
+					}
+					break;
+				}
+			}
 
 	for (Mission* mission : missions_to_delete)
 		RemoveMission(mission);

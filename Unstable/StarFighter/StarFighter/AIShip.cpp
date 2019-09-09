@@ -62,6 +62,9 @@ AIShip::~AIShip()
 
 void AIShip::Update(sf::Time deltaTime)
 {
+	if (m_visible == false)
+		return;
+
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	bool input_fire = false;
 

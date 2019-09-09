@@ -17,7 +17,6 @@ enum RuleOfEngagement
 	ROE_HoldFire,
 	ROE_ReturnFire,
 	ROE_FireAtWill,
-	ROE_Chasing,
 	NB_ROE_TYPES,
 };
 

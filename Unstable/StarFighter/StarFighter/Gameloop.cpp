@@ -189,11 +189,16 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		}
 		case Mission_Bounty:
 		{
-			AIShip* ship;
-			for (int e = 0; e < 3; e++)
-				ship = CreateAIShip(Ship_Alpha, starting_index + found_index + sf::Vector2i(e, 0), 0, Hostility_Enemy, ROE_FireAtWill);
+			Beacon* beacon = new Beacon(starting_index + found_index);
 
-			return new Mission(mission_type, ship, planet);
+			for (int e = 0; e < 3; e++)
+			{
+				AIShip* ship = new AIShip(Ship_Alpha, starting_index + found_index + sf::Vector2i(e, 3), 0, Hostility_Enemy, ROE_HoldFire);
+				ship->m_visible = false;
+				beacon->m_ships_to_create.push_back(ship);
+			}
+				
+			return new Mission(mission_type, beacon, planet);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 #ifndef MISSION_H_INCLUDED
 #define MISSION_H_INCLUDED
 
-#include "AIShip.h"
+#include "Beacon.h"
 
 enum MissionStatus
 {

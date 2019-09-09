@@ -89,6 +89,7 @@
     <ClCompile Include="Ammo.cpp" />
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Beacon.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="AIShip.cpp" />
     <ClCompile Include="FX.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="Ammo.h" />
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="Beacon.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="AIShip.h" />
     <ClInclude Include="FileLoadUtils.h" />
