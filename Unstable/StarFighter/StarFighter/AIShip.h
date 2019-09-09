@@ -12,6 +12,7 @@
 enum ShipType
 {
 	Ship_Alpha,
+	Ship_Cruiser,
 };
 
 class AIShip : public Ship

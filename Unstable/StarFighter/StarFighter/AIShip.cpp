@@ -35,11 +35,34 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_range = 50;
 			m_shield_regen = 1.5;
 
-			textureName = "2D/V_Alpha2_red.png";
+			textureName = hostility == Hostility_Ally ? "2D/V_Alpha2.png" : "2D/V_Alpha2_red.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			break;
+		}
+		case Ship_Cruiser:
+		{
+			m_speed_max = 200;
+			m_acceleration_max = 2000;
+			m_turn_speed = 50;
+			m_braking_max = 3000;
+			m_idle_decelleration = 1000;
+
+			m_health_max = 200;
+			m_shield_max = 100;
+			m_shield_range = 250;
+			m_shield_regen = 1.5;
+
+			textureName = hostility == Hostility_Ally ? "2D/V_Delta1.png" : "2D/V_Delta1_red.png";
+			textureSize = sf::Vector2f(288, 390);
+			frameNumber = 1;
+
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(8, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-8, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(textureSize.x * 0.5 - 8, textureSize.y * 0.25)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-textureSize.x * 0.5 + 8, textureSize.y * 0.25)));
 			break;
 		}
 	}
@@ -167,9 +190,10 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	//move to desired position and heading
 	if (m_position != position)
 	{
-		if (delta_angle < 0)
+		//if abs(delta_angle) < 1, let's not bother moving, this would only create micro movements
+		if (delta_angle < -1)
 			inputs_direction.x = 1;
-		else if (delta_angle > 0)
+		else if (delta_angle > 1)
 			inputs_direction.x = -1;
 
 		if (dx * dx + dy * dy > m_range_max * m_range_max && abs(delta_angle) < m_angle_coverage_max)
