@@ -15,5 +15,6 @@ Beacon::Beacon(sf::Vector2i sector_index) : SpatialObject()
 
 Beacon::~Beacon()
 {
-
+	for (AIShip* ship : m_ships_to_create)
+		delete ship;
 }

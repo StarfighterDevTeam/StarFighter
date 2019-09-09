@@ -42,7 +42,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_shield_regen = 1.5;
 	m_isReflectingShots = true;
 	m_energy_max = 100;
-	m_energy_regen = 5;
+	m_energy_regen = 10;
 
 	InitShip();
 }
@@ -151,6 +151,7 @@ void Player::UpdateMissions()
 								mission->m_marked_objectives.push_back(ship);
 							}
 
+							beacon->m_ships_to_create.clear();
 							delete beacon;
 						}
 					}
@@ -573,6 +574,7 @@ void Player::Death()
 	//Debug respawn
 	m_health = m_health_max;
 	m_shield = m_shield_max;
+	m_energy = m_energy_max;
 
 	Ship::Death();
 }
