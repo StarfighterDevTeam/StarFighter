@@ -19,7 +19,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), 3, 1);
 
-	(*CurrentGame).SetStarSectorIndex(this, sector_index);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index, false);
 
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
@@ -143,7 +143,7 @@ void Player::UpdateMissions()
 
 							for (AIShip* ship : beacon->m_ships_to_create)
 							{
-								//(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, true);
+								(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, true);
 								ship->m_visible = true;
 								ship->SetROE(ROE_FireAtWill);
 								(*CurrentGame).m_playerShip->MarkThis(ship, true);

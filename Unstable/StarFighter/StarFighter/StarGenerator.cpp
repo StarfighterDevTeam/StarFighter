@@ -61,7 +61,7 @@ Star* StarGenerator::CreateStar(sf::Vector2i sector_index)
 {
 	Star* star = CreateStar();
 
-	(*CurrentGame).SetStarSectorIndex(star, sector_index);
+	(*CurrentGame).SetStarSectorIndex(star, sector_index, false);
 
 	star->m_position.x += STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));
 	star->m_position.y -= STAR_SECTOR_SIZE * RandomizeFloatBetweenValues(sf::Vector2f(-0.5, 0.5));

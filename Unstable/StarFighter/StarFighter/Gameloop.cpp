@@ -108,7 +108,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe)
 {
-	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe);
+	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe, false);
 	if (ship->m_removeMe == false)
 		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, false);
 	return ship;
@@ -193,7 +193,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 
 			for (int e = 0; e < 3; e++)
 			{
-				AIShip* ship = new AIShip(Ship_Alpha, starting_index + found_index + sf::Vector2i(e, 3), 0, Hostility_Enemy, ROE_HoldFire);
+				AIShip* ship = new AIShip(Ship_Alpha, starting_index + found_index + sf::Vector2i(e, 3), 0, Hostility_Enemy, ROE_HoldFire, true);
 				ship->m_visible = false;
 				beacon->m_ships_to_create.push_back(ship);
 			}

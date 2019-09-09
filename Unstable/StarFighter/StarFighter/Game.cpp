@@ -609,14 +609,14 @@ int Game::GetSectorId(sf::Vector2i index)
 	return -1;
 }
 
-void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index)
+void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index, bool dontStoreMe)
 {
 	object->m_sector_index = sector_index;
 
 	object->m_position.x = 1.f * sector_index.x * STAR_SECTOR_SIZE;
 	object->m_position.y = 1.f * sector_index.y * STAR_SECTOR_SIZE;
 
-	if (object != m_playerShip)
+	if (object != m_playerShip && dontStoreMe == false)
 	{
 		//need a manual storage? (if the sector is beyond "managed sectors" i.e. ~ off-screen)
 		for (sf::Vector2i index : m_star_sectors_managed)
@@ -650,7 +650,7 @@ void Game::DebugDrawSectors()
 		else
 			sector_debug = m_sector_debug_onscreen;
 
-		SetStarSectorIndex(sector_debug, sector.m_index);
+		SetStarSectorIndex(sector_debug, sector.m_index, false);
 		sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 		sector_debug->Draw(m_mainScreen);
 	}

@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe) : Ship()
+AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, bool dontStoreMe) : Ship()
 {
 	m_ship_type = ship_type;
 	SetHostility(hostility);
@@ -48,7 +48,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	m_heading = heading;
 	//setRotation(m_heading);
 
-	(*CurrentGame).SetStarSectorIndex(this, sector_index);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index, dontStoreMe);
 	m_move_destination = m_position;
 	m_target = NULL;
 
@@ -62,9 +62,6 @@ AIShip::~AIShip()
 
 void AIShip::Update(sf::Time deltaTime)
 {
-	if (m_visible == false)
-		return;
-
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	bool input_fire = false;
 

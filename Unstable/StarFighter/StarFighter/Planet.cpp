@@ -21,7 +21,7 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
 	m_collider = PlanetObject;
 	m_layer = Planet_Layer;
 
-	(*CurrentGame).SetStarSectorIndex(this, sector_index);//after Init to keep m_removeMe = true if needed
+	(*CurrentGame).SetStarSectorIndex(this, sector_index, false);//after Init to keep m_removeMe = true if needed
 
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
 	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
