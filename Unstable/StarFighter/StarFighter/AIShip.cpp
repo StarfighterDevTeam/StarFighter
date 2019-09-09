@@ -98,7 +98,7 @@ void AIShip::Update(sf::Time deltaTime)
 				m_target = KeepTarget();
 
 			if (m_target == NULL)
-				m_target = GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X, 360);
+				m_target = GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X * 2, 360);
 
 			break;
 		}

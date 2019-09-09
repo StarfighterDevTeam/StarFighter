@@ -75,21 +75,21 @@ int RandomizeIntBetweenValues(int min_value, int max_value)
 	return random_value;
 }
 
-int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
+int RandomizeIntBetweenFloats(float min_value, float max_value)
 {
-	int min = floor (min_max_values.x + 0.5);
-	int max = floor (min_max_values.y + 0.5);
+	int min = floor (min_value + 0.5);
+	int max = floor (max_value + 0.5);
 	int random_value = rand() % (max - min +1);
 	random_value += min;
 
 	return random_value;
 }
 
-float RandomizeFloatBetweenValues(sf::Vector2f min_max_values)
+float RandomizeFloatBetweenValues(float min_value, float max_value)
 {
 	float random_value = (float) ((double) rand() / RAND_MAX);
-	random_value *= (min_max_values.y - min_max_values.x);
-	random_value += min_max_values.x;
+	random_value *= (max_value - min_value);
+	random_value += min_value;
 
 	return random_value;
 }
@@ -361,6 +361,14 @@ bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f ar
 		is_inside_area = false;
 
 	return is_inside_area;
+}
+
+sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle)
+{
+	sf::Vector2f vector;
+	vector.x = -length * sin(angle);
+	vector.y = -length * cos(angle);
+	return vector;
 }
 
 void DebugDrawSegment(sf::Vector2f point_a, sf::Vector2f point_b, sf::Color color, RenderTarget& screen)

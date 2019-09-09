@@ -146,7 +146,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			for (int y = 0; y < 2; y++)//y < (i / 2) * abs(s)
 			{
 				found_index.y += y * s * (i / 2) * abs(s);//found_index.y += s
-				id = (*CurrentGame).GetSectorId(starting_index + found_index);
+				id = (*CurrentGame).GetSectorId(found_index);
 
 				if (id == -1)//unkown sector found
 					break;
@@ -161,6 +161,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			for (int x = 0; x < 2; x++)//x < (1 + ((i + 1) / 2) - 1) * abs(s)
 			{
 				found_index.x += x * s * (1 + ((i + 1) / 2) - 1) * abs(s);//found_index.x += s; 
+				id = (*CurrentGame).GetSectorId(found_index);
 
 				if (id == -1)//unkown sector found
 					break;
@@ -183,17 +184,25 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			if (id >= 0 && planet->m_nb_missions < NB_MISSIONS_MAX)
 				planet->m_nb_missions++;
 			else
-				planet = CreatePlanet(starting_index + found_index, Hostility_Ally, 1, 1);
+				planet = CreatePlanet(found_index, Hostility_Ally, 1, 1);
 
 			return new Mission(mission_type, planet, planet);
 		}
 		case Mission_Bounty:
 		{
-			Beacon* beacon = new Beacon(starting_index + found_index);
+			Beacon* beacon = new Beacon(found_index);
+
+			float distance = RandomizeFloatBetweenValues(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_X * 1.8);
+			float angle = GetAngleRadFromVector(sf::Vector2f(1.f * (found_index.x - owner->m_sector_index.x), 1.f * (found_index.y - owner->m_sector_index.y)));
+			angle += RandomizeFloatBetweenValues(-0.3, 0.3);
 
 			for (int e = 0; e < 3; e++)
 			{
-				AIShip* ship = new AIShip(Ship_Alpha, starting_index + found_index + sf::Vector2i(e, 3), 0, Hostility_Enemy, ROE_HoldFire, true);
+				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
+				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
+				angle += RandomizeFloatBetweenValues(0.1, 0.3);
+
+				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, 0, Hostility_Enemy, ROE_HoldFire, true);
 				ship->m_visible = false;
 				beacon->m_ships_to_create.push_back(ship);
 			}

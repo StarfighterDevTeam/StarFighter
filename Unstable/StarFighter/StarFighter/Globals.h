@@ -83,8 +83,8 @@ int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
 int RandomizeIntBetweenValues(int min_value, int max_value);
-int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
-float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
+int RandomizeIntBetweenFloats(float min_value, float max_value);
+float RandomizeFloatBetweenValues(float min_value, float max_value);
 int RandomizeSign();
 float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
@@ -104,6 +104,7 @@ void BoundAbsoluteValue(float& input, float max_value);
 void BoundAngle(float& input, float max_angle);
 bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 void DebugDrawSegment(sf::Vector2f point_a, sf::Vector2f point_b, sf::Color color, RenderTarget& screen);
+sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle);
 
 struct Vector2iComp
 {
