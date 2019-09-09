@@ -207,7 +207,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				beacon->m_ships_to_create.push_back(ship);
 			}
 				
-			return new Mission(mission_type, beacon, planet);
+			return new Mission(mission_type, beacon, owner);
 		}
 	}
 }

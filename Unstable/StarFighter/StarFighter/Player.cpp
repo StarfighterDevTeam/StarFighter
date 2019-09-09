@@ -109,68 +109,83 @@ void Player::Update(sf::Time deltaTime)
 void Player::UpdateMissions()
 {
 	vector<Mission*> missions_to_delete;
-	vector<Planet*> planet_missions_to_add;
 	
 	for (Mission* mission : m_missions)
 		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
-			switch (mission->m_mission_type)
-			{
-				case Mission_GoTo:
+		{
+			vector<SpatialObject*> tmp_marked_objectives;
+			for (SpatialObject* object : mission->m_marked_objectives)
+				switch (object->m_collider)
 				{
-					if (m_isOrbiting == mission->m_marked_objectives.front())
+					case BeaconObject:
 					{
-						//Mission complete
-						EndMission(mission, MissionStatus_Complete);
-
-						planet_missions_to_add.push_back(m_isOrbiting);//get planet's missions (debug)
-						m_isOrbiting->SetHostility(Hostility_Ally);//completing a mission makes this planet our friend
-
-						if (m_isOrbiting == mission->m_owner)//delete mission
-							missions_to_delete.push_back(mission);
-					}
-
-					break;
-				}
-				case Mission_Bounty:
-				{
-					if (mission->m_marked_objectives.front()->m_collider == Beacon_Object)
-					{
-						//arrived at beacon?
-						Beacon* beacon = (Beacon*)mission->m_marked_objectives.front();
-						if (GetDistanceSquaredBetweenPositions(m_position, beacon->m_position) < 200 * 200)
+						if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 200 * 200)
 						{
-							UnmarkThis(beacon, true);
-							mission->m_marked_objectives.clear();
+							UnmarkThis(object, true);
 
+							//Beacon activation (spawning ships...)
+							Beacon* beacon = (Beacon*)object;
 							for (AIShip* ship : beacon->m_ships_to_create)
 							{
 								(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? PlayerShipObject : EnemyShipObject, true);
 								ship->m_visible = true;
 								ship->SetROE(ROE_FireAtWill);
 								(*CurrentGame).m_playerShip->MarkThis(ship, true);
-								
-								mission->m_marked_objectives.push_back(ship);
-							}
 
+								tmp_marked_objectives.push_back(ship);
+							}
 							beacon->m_ships_to_create.clear();
 							delete beacon;
 						}
+						else
+							tmp_marked_objectives.push_back(object);
+						break;
 					}
-					break;
+					case PlanetObject:
+					{
+						if (m_isOrbiting == object)
+							UnmarkThis(object, true);
+						else
+							tmp_marked_objectives.push_back(object);
+						break;
+					}
+					case EnemyShipObject:
+					{
+						AIShip* ship = (AIShip*)object;
+						if (ship->m_health == 0)
+						{
+							UnmarkThis(object, true);
+
+							//return to mission's owner planet
+							if (object == mission->m_marked_objectives.back() && tmp_marked_objectives.empty() == true)
+							{
+								(*CurrentGame).m_playerShip->MarkThis(mission->m_owner, true);
+								tmp_marked_objectives.push_back(mission->m_owner);
+							}
+						}
+						else
+							tmp_marked_objectives.push_back(object);
+						break;
+					}
 				}
+
+			mission->m_marked_objectives.clear();
+			for (SpatialObject* object : tmp_marked_objectives)
+				mission->m_marked_objectives.push_back(object);
+
+			//Mission complete
+			if (mission->m_marked_objectives.empty() == true)
+			{
+				EndMission(mission, MissionStatus_Complete);
+
+				mission->m_owner->m_nb_missions++;
+				(*CurrentGame).m_planet_missions_to_create.push_back(mission->m_owner);//add new missions to the planet where the mission ends
+				missions_to_delete.push_back(mission);
 			}
+		}
 
 	for (Mission* mission : missions_to_delete)
 		RemoveMission(mission);
-
-	for (Planet* planet : planet_missions_to_add)
-		if (planet->m_nb_missions > 0)
-		{
-			if (m_missions.size() >= NB_MISSIONS_MAX)
-				break;
-			
-			(*CurrentGame).m_planet_missions_to_create.push_back(planet);
-		}
 }
 
 bool Player::CycleMission()

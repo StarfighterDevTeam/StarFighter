@@ -215,6 +215,8 @@ bool Ship::GetHitByAmmo(GameObject* ammo)
 	{
 		//FX hit
 		m_health -= damage;
+		if (m_health < 0)
+			m_health = 0;
 		m_hit_feedback_timer = 0.05;
 		ammo->m_garbageMe = true;
 		FX* new_FX = new FX(FX_Hit, ammo->m_position);

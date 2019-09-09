@@ -41,7 +41,7 @@ enum ColliderType
 	PlayerFire,
 	EnemyFire,
 	EnemyShipObject,
-	Beacon_Object,
+	BeaconObject,
 	NBVAL_ColliderType
 };
 

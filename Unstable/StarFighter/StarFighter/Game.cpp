@@ -273,13 +273,15 @@ void Game::UpdateObjects(Time deltaTime)
 	GameObject* player = (GameObject*)m_playerShip;
 
 	//Update objects and delete "garbage" objects
+	m_playerShip->Update(deltaTime);
 	for (GameObject* object : m_sceneGameObjects)
 	{
 		if (object->m_garbageMe == true)
 			delete object;
 		else if (object->m_removeMe == false)//if true, we trust it has already been stored in m_sceneGameObjectsStored, therefore there is no memory leak if we don't push it back
 		{
-			object->Update(deltaTime);
+			if (object != m_playerShip)//was updated before-hand
+				object->Update(deltaTime);
 			m_temp_sceneGameObjects.push_back(object);
 		}
 	}
