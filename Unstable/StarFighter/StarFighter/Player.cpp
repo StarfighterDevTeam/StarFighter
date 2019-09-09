@@ -118,7 +118,7 @@ void Player::UpdateMissions()
 				switch (object->m_collider)
 				{
 					case BeaconObject:
-					{
+					{	
 						if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 200 * 200)
 						{
 							UnmarkThis(object, true);
@@ -143,6 +143,8 @@ void Player::UpdateMissions()
 					}
 					case PlanetObject:
 					{
+						Planet* planet = (Planet*)object;
+
 						if (m_isOrbiting == object)
 							UnmarkThis(object, true);
 						else
@@ -151,6 +153,8 @@ void Player::UpdateMissions()
 					}
 					case EnemyShipObject:
 					{
+						mission->m_body_text = "Destroy enemies. " + to_string(mission->m_marked_objectives.size()) + " left";
+
 						AIShip* ship = (AIShip*)object;
 						if (ship->m_health == 0)
 						{
@@ -161,6 +165,7 @@ void Player::UpdateMissions()
 							{
 								(*CurrentGame).m_playerShip->MarkThis(mission->m_owner, true);
 								tmp_marked_objectives.push_back(mission->m_owner);
+								mission->m_body_text = "Go back to planet " + to_string(mission->m_owner->m_planet_id) + "\nto collect prize";
 							}
 						}
 						else

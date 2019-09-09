@@ -27,7 +27,7 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 		{
 			AIShip* ship = (AIShip*)target;
 			m_title_text = "Bounty Mission";
-			m_body_text = "Go bounty hunting";
+			m_body_text = "Go to beacon";
 			break;
 		}
 	}
