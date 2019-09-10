@@ -124,6 +124,7 @@ public:
 	void DebugDrawSectors();
 	bool AreColliding(GameObject* objectA, GameObject* objectB);
 	static sf::IntRect FToIRect(const sf::FloatRect& f);
+	bool StoreObjectIfNecessary(GameObject* object);
 
 	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];

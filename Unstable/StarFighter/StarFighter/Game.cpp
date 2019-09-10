@@ -590,25 +590,7 @@ void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index, boo
 	object->m_position.y = 1.f * sector_index.y * STAR_SECTOR_SIZE;
 
 	if (object != m_playerShip && dontStoreMe == false)
-	{
-		//need a manual storage? (if the sector is beyond "managed sectors" i.e. ~ off-screen)
-		for (sf::Vector2i index : m_star_sectors_managed)
-			if (sector_index == index)
-				return;
-
-		//sector unknown? give it an id first
-		int id = GetSectorId(sector_index);
-		if (id == -1)
-		{
-			id = m_star_sectors_known.size();
-			m_star_sectors_known.push_back(StarSector(sector_index, id));
-		}
-		
-		//store it
-		m_sceneGameObjectsStored[id].push_back(object);
-		object->m_removeMe = true;	
-		//printf("manuel storage\n");
-	}
+		StoreObjectIfNecessary(object);
 }
 
 void Game::DebugDrawSectors()
@@ -671,4 +653,27 @@ void Game::DebugDrawGameObjectsStats()
 
 		m_mainScreen.draw(text);
 	}
+}
+
+bool Game::StoreObjectIfNecessary(GameObject* object)
+{
+	//need a manual storage? (if the sector is beyond "managed sectors" i.e. ~ off-screen)
+	for (sf::Vector2i index : m_star_sectors_managed)
+		if (object->m_sector_index == index)
+			return false;
+
+	//sector unknown? give it an id first
+	int id = GetSectorId(object->m_sector_index);
+	if (id == -1)
+	{
+		id = m_star_sectors_known.size();
+		m_star_sectors_known.push_back(StarSector(object->m_sector_index, id));
+	}
+
+	//store it
+	m_sceneGameObjectsStored[id].push_back(object);
+	object->m_removeMe = true;
+	//printf("manuel storage\n");
+
+	return true;
 }
