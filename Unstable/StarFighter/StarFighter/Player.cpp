@@ -592,7 +592,7 @@ void Player::DebugDrawMissions()
 		body_text.setString(mission->m_body_text);
 		body_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 300, offset_y));
 
-		offset_y += 40;
+		offset_y += 50;
 
 		(*CurrentGame).m_mainScreen.draw(body_text);
 	}

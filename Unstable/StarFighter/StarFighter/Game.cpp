@@ -465,111 +465,104 @@ void Game::UpdateSectorList(bool force_update)
 	//update needed?
 	if (force_update == true || m_previous_star_sector_index != player->m_sector_index)
 	{
-		m_previous_star_sector_index = player->m_sector_index;
+		//we need an odd number of sectors on X and Y axis
+		int nb_sectors_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 2;
+		if (nb_sectors_x % 2 == 0)
+			nb_sectors_x++;
 
-		vector<sf::Vector2i> old_star_sectors_managed;
-		for (sf::Vector2i index : m_star_sectors_managed)
-			old_star_sectors_managed.push_back(index);
-		m_star_sectors_managed.clear();
+		int nb_sectors_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 2;
+		if (nb_sectors_y % 2 == 0)
+			nb_sectors_y++;
+
+		vector<sf::Vector2i> tmp_star_sectors_managed;
+		sf::Vector2i index;
+
+		//was far from previous sector index? add it to the list of managed sectors
+		for (int j = 0; j < nb_sectors_y; j++)
+		{
+			index.y = j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2);
+			if (force_update == true || abs(index.y - m_previous_star_sector_index.y) > nb_sectors_y / 2)
+				for (int i = 0; i < nb_sectors_x; i++)
+				{
+					index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
+					tmp_star_sectors_managed.push_back(index);
+				}
+			else
+				for (int i = 0; i < nb_sectors_x; i += force_update == true ? 1 : nb_sectors_x - 1)
+				{
+					index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
+					if (force_update == true || abs(index.x - m_previous_star_sector_index.x) > nb_sectors_x / 2)
+						tmp_star_sectors_managed.push_back(index);
+				}
+		}
+
+		//update index flag
+		m_previous_star_sector_index = m_playerShip->m_sector_index;
 		
-		int nb_sectors_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 3;
-		int nb_sectors_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 3;
-		for (int i = 0; i < nb_sectors_x; i++)
-		{
-			for (int j = 0; j < nb_sectors_y; j++)
-			{
-				sf::Vector2i index;
-				index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
-				index.y = j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2);
-				//StarSector sector(sf::Vector2i(i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2), j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2)), (i == nb_sectors_x / 2 && j == nb_sectors_y / 2) ? Sector_Current : Sector_OnScreen);
-				m_star_sectors_managed.push_back(index);
-				
-				if (GetSectorId(index) == -1)
-				{
-					m_star_sectors_to_create.push_back(index);//new sector discovered needs to be created
-					m_star_sectors_known.push_back(StarSector(index, m_star_sectors_known.size()));
-					old_star_sectors_managed.push_back(index);//this will prevent from reaching out for this sector in stored content, since it's a new content that will not be found in storage
-				}
-			}
-		}
-
-		//delta between old and new manageable sectors
-		vector<sf::Vector2i> sector_index_to_add;
-		vector<sf::Vector2i> sector_index_to_remove;
-		for (sf::Vector2i old_index : old_star_sectors_managed)
-		{
-			bool found = false;
-			for (sf::Vector2i new_index : m_star_sectors_managed)
-			{
-				if (old_index == new_index)
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (found == false)
-			{
-				sector_index_to_remove.push_back(old_index);
-			}
-		}
-
-		for (sf::Vector2i new_index : m_star_sectors_managed)
-		{
-			bool found = false;
-			for (sf::Vector2i old_index : old_star_sectors_managed)
-			{
-				if (old_index == new_index)
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (found == false)
-			{
-				sector_index_to_add.push_back(new_index);
-			}
-		}
-
-		//Sectors to remove from scene
-		for (sf::Vector2i index : sector_index_to_remove)
+		//add objects from new sectors freshly added to the list of managed sectors
+		for (sf::Vector2i index : tmp_star_sectors_managed)
 		{
 			int id = GetSectorId(index);
-			for (GameObject* object : m_sceneGameObjects)
+			if (id == -1)
 			{
-				if (object == m_background)
-					continue;
-
-				if (object->m_sector_index == index && object->m_garbageMe == false)
-				{
-					if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
-					{
-						if (object->IsMarked() == false)
-						{
-							object->m_removeMe = true;
-							m_sceneGameObjectsStored[id].push_back(object);
-						}
-					}
-					else
-						object->m_garbageMe = true;
-				}
+				m_star_sectors_to_create.push_back(index);//new sector discovered needs to be created
+				m_star_sectors_known.push_back(StarSector(index, m_star_sectors_known.size()));
+				//old_star_sectors_managed.push_back(index);//this will prevent from reaching out for this sector in stored content, since it's a new content that will not be found in storage
 			}
-		}
-		
-		//Sectors to insert insert into scene
-		for (sf::Vector2i index : sector_index_to_add)
-		{
-			int id = GetSectorId(index);
 
 			for (GameObject* object : m_sceneGameObjectsStored[id])
 			{
 				addToScene(object, object->m_layer, object->m_collider, false);
 				//printf("game object restored.\n");
 			}
-				
+
 			m_sceneGameObjectsStored.erase(id);
+		}
+
+		//was managed but is now too far? remove from the list of managed sectors
+		int removed = 0;
+		for (sf::Vector2i index : m_star_sectors_managed)
+		{
+			//close enough to keep being managed
+			if (abs(index.x - player->m_sector_index.x) <= nb_sectors_x / 2 && abs(index.y - player->m_sector_index.y) <= nb_sectors_y / 2)
+				tmp_star_sectors_managed.push_back(index);
+			//too far => store it
+			else
+			{
+				removed++;
+				int id = GetSectorId(index);
+				for (GameObject* object : m_sceneGameObjects)
+				{
+					if (object == m_background || object == m_playerShip)
+						continue;
+
+					if (object->m_sector_index == index && object->m_garbageMe == false)
+					{
+						if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
+						{
+							if (object->IsMarked() == false)
+							{
+								object->m_removeMe = true;
+								m_sceneGameObjectsStored[id].push_back(object);
+							}
+						}
+						else
+							object->m_garbageMe = true;
+					}
+				}
+			}
+		}
+
+		//refresh the list of managed sectors
+		m_star_sectors_managed.clear();
+		for (sf::Vector2i index : tmp_star_sectors_managed)
+		{
+			m_star_sectors_managed.push_back(index);
 		}	
+
+		//debug assert
+		if (m_star_sectors_managed.size() != nb_sectors_x * nb_sectors_y)
+			printf("\n<!> BUG : managed sectors' count is wrong (UpdateSectorList). Expected: %d. Actual: %d)\n\n", nb_sectors_x * nb_sectors_y, m_star_sectors_managed.size());
 	}
 }
 

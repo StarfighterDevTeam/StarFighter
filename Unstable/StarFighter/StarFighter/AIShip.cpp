@@ -144,8 +144,6 @@ void AIShip::Update(sf::Time deltaTime)
 	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
 		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
 
-	printf("speed: %f\n", GetVectorLength(m_speed));
-
 	Ship::Update(deltaTime);
 
 	if (input_fire == true)
