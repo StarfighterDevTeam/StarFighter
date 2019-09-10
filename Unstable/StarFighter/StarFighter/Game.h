@@ -88,11 +88,6 @@ public:
 	sf::View m_view;
 	sf::Vector2f m_map_size;
 
-	//Utiliary methods
-	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, ColliderType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
-	GameObject* GetClosestObjectTyped(const sf::Vector2f position, ColliderType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
-	std::vector<GameObject*> GetSceneGameObjectsTyped(ColliderType type);
-
 	//Fonts
 	sf::Font* m_font[NBVAL_FontsStyle];
 

@@ -42,13 +42,6 @@ Gameloop::~Gameloop()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
-	//for (StarGenerator* star_generator : m_star_generator)
-	//{
-	//	star_generator->Update(deltaTime);
-	//}
-	
-	(*CurrentGame).UpdateScene(deltaTime);
-
 	//create procedural content for new sectors
 	for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_to_create)
 	{
@@ -74,6 +67,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		player->AcceptMission(new_mission);
 	}
 	(*CurrentGame).m_planet_missions_to_create.clear();
+	
+	//update objects
+	(*CurrentGame).UpdateScene(deltaTime);
 }
 
 void Gameloop::Draw()
@@ -128,7 +124,7 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 
 Mission* Gameloop::CreateMission(Planet* owner)
 {
-	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	MissionType mission_type = Mission_Eliminate;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 	sf::Vector2i found_index = starting_index;
 
@@ -224,9 +220,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				angle += RandomizeFloatBetweenValues(0.1, 0.3);
 
 				if (e == 0)
-					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_ReturnFire, true);
+					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_ReturnFire, false);
 				else
-					CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_ReturnFire, true);
+					ship->m_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_ReturnFire, false));
 			}
 
 			return new Mission(mission_type, ship, owner);
