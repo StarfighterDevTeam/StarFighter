@@ -7,13 +7,13 @@ using namespace sf;
 // ----------------SHIP ---------------
 AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, bool dontStoreMe) : Ship()
 {
-	m_ship_type = ship_type;
-	SetHostility(hostility);
-	SetROE(roe);
-
 	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
+
+	m_ship_type = ship_type;
+	SetHostility(hostility);
+	SetROE(roe);
 
 	string textureName;
 	sf::Vector2f textureSize;
@@ -117,6 +117,7 @@ void AIShip::Update(sf::Time deltaTime)
 			m_target = NULL;
 			break;
 		}
+		case ROE_Ambush:
 		case ROE_FireAtWill:
 		{
 			input_fire = true;
@@ -151,8 +152,13 @@ void AIShip::Update(sf::Time deltaTime)
 			weapon->Update(deltaTime);
 			if (m_target != NULL)
 				if (weapon->IsTargetAligned(m_target) == true)
+				{
 					if (weapon->IsReadyToFire() == true)
 						weapon->Fire();
+
+					if (m_roe == ROE_Ambush)
+						SetROE(ROE_FireAtWill);
+				}
 		}
 }
 
@@ -176,7 +182,7 @@ bool AIShip::CheckMarkingConditions()
 
 void AIShip::GetHitByAmmo(GameObject* ammo)
 {
-	if (m_roe == ROE_ReturnFire)
+	if (m_roe == ROE_ReturnFire || m_roe == ROE_Ambush)
 		SetROE(ROE_FireAtWill);
 
 	Ship::GetHitByAmmo(ammo);

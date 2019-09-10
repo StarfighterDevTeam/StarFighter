@@ -16,6 +16,7 @@ enum RuleOfEngagement
 {
 	ROE_HoldFire,
 	ROE_ReturnFire,
+	ROE_Ambush,
 	ROE_FireAtWill,
 	NB_ROE_TYPES,
 };

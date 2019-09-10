@@ -88,11 +88,6 @@ void Player::Update(sf::Time deltaTime)
 				}
 	}
 
-	//markers
-	for (SpatialObject* marked_object : m_marked_objects)
-		if (marked_object->m_removeMe == true)
-			marked_object->Update(deltaTime);//need to update this ship "manually" because it's not in the m_sceneGameObjects anymore
-
 	//Gravity circle to be drawn
 	if (m_gravitation_range > 0)
 		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
@@ -389,6 +384,27 @@ void Player::MarkThis(SpatialObject* target, bool isMission)
 			return;
 
 	m_marked_objects.push_back(target);
+
+	//add to game objects updated if not present
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[target->m_collider])
+		if (object == target)
+			return;
+
+	(*CurrentGame).addToScene(target, target->m_layer, target->m_collider, true);
+
+	//remove from storage
+	int id = (*CurrentGame).GetSectorId(target->m_sector_index);
+	vector<GameObject*> tmp_sceneGameObjectsStored;
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])
+		if (object != target)
+			tmp_sceneGameObjectsStored.push_back(object);
+
+	(*CurrentGame).m_sceneGameObjectsStored[id].clear();
+	if (tmp_sceneGameObjectsStored.empty() == true)
+		(*CurrentGame).m_sceneGameObjectsStored.erase(id);
+	else
+		for (GameObject* object : tmp_sceneGameObjectsStored)
+			(*CurrentGame).m_sceneGameObjectsStored[id].push_back(object);
 }
 
 
@@ -608,7 +624,7 @@ void Player::Death()
 void Player::GetHitByGravitation(GameObject* ship)
 {
 	AIShip* attractor = (AIShip*)ship;
-	if (attractor->m_roe == ROE_ReturnFire)
+	if (attractor->m_roe == ROE_ReturnFire || attractor->m_roe == ROE_Ambush)
 		attractor->SetROE(ROE_FireAtWill);
 
 	Ship::GetHitByGravitation(ship);

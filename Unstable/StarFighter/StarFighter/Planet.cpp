@@ -6,6 +6,9 @@ using namespace sf;
 
 Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
 {
+	m_collider = PlanetObject;
+	m_layer = Planet_Layer;
+
 	SetHostility(hostility);
 	m_nb_missions = nb_missions;
 	do
@@ -17,9 +20,6 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(138, 138), 1, NB_PLANET_TYPES);
 	SetAnimationLine(RandomizeIntBetweenValues(0, NB_PLANET_TYPES - 1));
 	m_heading = 0;
-
-	m_collider = PlanetObject;
-	m_layer = Planet_Layer;
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index, false);//after Init to keep m_removeMe = true if needed
 
@@ -86,5 +86,5 @@ void Planet::SetPosition(sf::Vector2f position)
 
 bool Planet::CheckMarkingConditions()
 {
-	return true;
+	return false;
 }

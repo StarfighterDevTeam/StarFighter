@@ -124,7 +124,7 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 
 Mission* Gameloop::CreateMission(Planet* owner)
 {
-	MissionType mission_type = Mission_Eliminate;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 	sf::Vector2i found_index = starting_index;
 
@@ -220,9 +220,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				angle += RandomizeFloatBetweenValues(0.1, 0.3);
 
 				if (e == 0)
-					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_ReturnFire, false);
+					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush, false);
 				else
-					ship->m_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_ReturnFire, false));
+					CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush, false);
 			}
 
 			return new Mission(mission_type, ship, owner);
