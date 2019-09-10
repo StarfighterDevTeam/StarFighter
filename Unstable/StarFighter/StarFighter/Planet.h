@@ -10,7 +10,7 @@ class Mission;
 class Planet : public SpatialObject
 {
 public :
-	Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions);
+	Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create);
 	virtual ~Planet();
 	void Update(sf::Time deltaTime) override;
 	void SetHostility(Hostility hostility) override;
@@ -22,7 +22,7 @@ public :
 	float m_gravity_period;
 	CircleShape m_orbit_circle;
 
-	int m_nb_missions;
+	int m_nb_missions_to_create;
 	vector<Mission*> m_missions;
 	int m_planet_id;
 };

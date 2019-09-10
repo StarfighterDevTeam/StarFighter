@@ -4,13 +4,15 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions)
+Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create)
 {
 	m_collider = PlanetObject;
 	m_layer = Planet_Layer;
 
 	SetHostility(hostility);
-	m_nb_missions = nb_missions;
+	m_nb_missions_to_create = nb_missions_to_create;
+
+	//set a unique planet id
 	do
 	{
 		m_planet_id = RandomizeIntBetweenValues(1001, 9999);

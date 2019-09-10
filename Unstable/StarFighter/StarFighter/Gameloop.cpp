@@ -16,7 +16,7 @@ Gameloop::Gameloop()
 	//Init first mission
 	//sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), player->m_sector_index.y + RandomizeIntBetweenValues(10, 15));
 	sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(1, 1));
-	Planet* planet = CreatePlanet(index, Hostility_Ally, 1, 1);
+	Planet* planet = CreatePlanet(index, Hostility_Ally, 0, 0);
 	Mission* mission = new Mission(Mission_GoTo, planet, planet);
 	player->AcceptMission(mission);
 
@@ -41,6 +41,8 @@ Gameloop::~Gameloop()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
+	Player* player = (Player*)(*CurrentGame).m_playerShip;
+
 	//create procedural content for new sectors
 	for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_to_create)
 	{
@@ -48,24 +50,32 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 	(*CurrentGame).m_star_sectors_to_create.clear();
 
-	//create procedural missions for planets
-	for (Planet* planet : (*CurrentGame).m_planet_missions_to_create)
+	//Get new missions from planet where're orbiting around
+	while (player->m_missions.size() < NB_MISSIONS_MAX && player->m_isOrbiting != NULL && player->m_isOrbiting->m_nb_missions_to_create > 0)
 	{
-		Player* player = (Player*)(*CurrentGame).m_playerShip;
-
-		if (player->m_missions.size() >= NB_MISSIONS_MAX)
-			break;
-
-		if (planet->m_nb_missions == 0)
-			continue;
-
-		Mission* new_mission = CreateMission(planet);
-		planet->m_missions.push_back(new_mission);
-		planet->m_nb_missions--;
-
+		Mission* new_mission = CreateMission(player->m_isOrbiting);
+		player->m_isOrbiting->m_nb_missions_to_create--;
 		player->AcceptMission(new_mission);
 	}
-	(*CurrentGame).m_planet_missions_to_create.clear();
+
+	//create procedural missions for planets
+	//for (Planet* planet : (*CurrentGame).m_planet_missions_to_create)
+	//{
+	//	Player* player = (Player*)(*CurrentGame).m_playerShip;
+	//
+	//	if (player->m_missions.size() >= NB_MISSIONS_MAX)
+	//		break;
+	//
+	//	if (planet->m_nb_missions_to_create == 0)
+	//		continue;
+	//
+	//	Mission* new_mission = CreateMission(planet);
+	//	planet->m_missions.push_back(new_mission);
+	//	planet->m_nb_missions_to_create--;
+	//
+	//	player->AcceptMission(new_mission);
+	//}
+	//(*CurrentGame).m_planet_missions_to_create.clear();
 	
 	//update objects
 	(*CurrentGame).UpdateScene(deltaTime);
@@ -110,11 +120,11 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 	return ship;
 }
 
-Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_min, int nb_missions_max)
+Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create_min, int nb_missions_to_create_max)
 {
-	int nb_missions = RandomizeIntBetweenValues(nb_missions_min, nb_missions_max);
+	int nb_missions_to_create = RandomizeIntBetweenValues(nb_missions_to_create_min, nb_missions_to_create_max);
 
-	Planet* planet = new Planet(sector_index, hostility, nb_missions);
+	Planet* planet = new Planet(sector_index, hostility, nb_missions_to_create);
 	if (planet->m_removeMe == false)
 		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject, false);
 
@@ -177,10 +187,12 @@ Mission* Gameloop::CreateMission(Planet* owner)
 	{
 		case Mission_GoTo:
 		{
-			if (id >= 0 && planet->m_nb_missions < NB_MISSIONS_MAX)
-				planet->m_nb_missions++;
+			//re-use an existing planet and add a mission to it
+			if (id >= 0)
+				planet->m_nb_missions_to_create++;
+			//sector unknown => create a planet
 			else
-				planet = CreatePlanet(found_index, Hostility_Ally, 1, 1);
+				planet = CreatePlanet(found_index, Hostility_Ally, 0, 0);
 
 			return new Mission(mission_type, planet, planet);
 		}

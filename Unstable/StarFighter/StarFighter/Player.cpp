@@ -107,6 +107,7 @@ void Player::Update(sf::Time deltaTime)
 
 void Player::UpdateMissions()
 {
+	//Update missions
 	vector<Mission*> missions_to_delete;
 	
 	for (Mission* mission : m_missions)
@@ -164,7 +165,7 @@ void Player::UpdateMissions()
 							{
 								(*CurrentGame).m_playerShip->MarkThis(mission->m_owner, true);
 								tmp_marked_objectives.push_back(mission->m_owner);
-								mission->m_body_text = "Go back to planet " + to_string(mission->m_owner->m_planet_id) + "\nto collect prize";
+								mission->m_body_text = "Go back to planet " + to_string(mission->m_owner->m_planet_id);
 							}
 						}
 						else
@@ -173,18 +174,16 @@ void Player::UpdateMissions()
 					}
 				}
 
+			//Update mission objectives remaining
 			mission->m_marked_objectives.clear();
 			for (SpatialObject* object : tmp_marked_objectives)
 				mission->m_marked_objectives.push_back(object);
 
-			//Mission complete
+			//Mission complete?
 			if (mission->m_marked_objectives.empty() == true)
 			{
 				EndMission(mission, MissionStatus_Complete);
-
-				mission->m_owner->m_nb_missions++;
-				(*CurrentGame).m_planet_missions_to_create.push_back(mission->m_owner);//add new missions to the planet where the mission ends
-			
+				mission->m_owner->m_nb_missions_to_create++;
 				missions_to_delete.push_back(mission);
 			}
 		}

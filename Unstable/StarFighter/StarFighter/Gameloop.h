@@ -21,7 +21,7 @@ public:
 
 	void PopulateSector(sf::Vector2i sector_index);
 	AIShip* CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe);
-	Planet* CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_min, int nb_missions_max);
+	Planet* CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create_min, int nb_missions_to_create_max);
 	Mission* CreateMission(Planet* owner);
 	Planet* GetPlanetAtSectorId(int id);
 
