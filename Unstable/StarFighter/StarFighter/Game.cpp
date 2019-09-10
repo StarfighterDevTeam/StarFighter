@@ -433,58 +433,6 @@ void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)
 	vector->push_back(pSFText);
 }
 
-GameObject* Game::GetClosestObjectTyped(const GameObject* ref_obj, ColliderType type_of_closest_object, float dist_max, float angle_delta_max)
-{
-	const sf::Vector2f ref_position = ref_obj->getPosition();
-
-	return GetClosestObjectTyped(ref_position, type_of_closest_object, dist_max, angle_delta_max);
-}
-
-GameObject* Game::GetClosestObjectTyped(const sf::Vector2f position, ColliderType type_of_closest_object, float dist_max, float angle_delta_max)
-{
-	float shortest_distance = -1;
-	GameObject* returned_obj = NULL;
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type_of_closest_object].begin(); it != m_sceneGameObjectsTyped[type_of_closest_object].end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		if ((*it)->m_visible == true)
-		{
-			const float a = position.x - (*it)->getPosition().x;
-			const float b = position.y - (*it)->getPosition().y;
-
-			float distance_to_ref = (a * a) + (b * b);
-			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
-			if (distance_to_ref < shortest_distance || shortest_distance < 0)
-			{
-				if (dist_max < 0 || distance_to_ref < dist_max)
-				{
-					float angle_delta = GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), position);
-					if (angle_delta < 0)
-						angle_delta = -angle_delta;
-
-					if (angle_delta_max < 0 || angle_delta < angle_delta_max)
-					{
-						shortest_distance = distance_to_ref;
-						returned_obj = (*it);
-					}
-				}
-
-				shortest_distance = distance_to_ref;
-				returned_obj = (*it);
-			}
-		}
-	}
-
-	return returned_obj;
-}
-
-std::vector<GameObject*> Game::GetSceneGameObjectsTyped(ColliderType type)
-{
-	return m_sceneGameObjectsTyped[type];
-}
-
 void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY)
 {
 	SFText* text_feedback = new SFText(m_font[font], 16, color, sf::Vector2f(position.x, position.y), team);
