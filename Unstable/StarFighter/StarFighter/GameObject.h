@@ -107,7 +107,7 @@ public:
 	virtual void UpdateMarkers(sf::Time deltaTime);
 	virtual bool IsMarked();
 	virtual int GetMarkedObjectsCount();
-	virtual int GetGravitationRange();
+	virtual float GetGravitationRange();
 
 	sf::Vector2i m_sector_index;
 };

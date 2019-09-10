@@ -31,6 +31,7 @@ public :
 	void GetHitByGravitation(GameObject* ship) override;
 	void UpdateOrbit(sf::Time deltaTime);
 	float GetRadius() const override;
+	float GetGravitationRange() override;
 
 	float m_acceleration;
 	float m_acceleration_max;

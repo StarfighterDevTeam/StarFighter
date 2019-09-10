@@ -287,7 +287,7 @@ void GameObject::GetHitByAmmo(GameObject* ammo)
 
 void GameObject::GetHitByGravitation(GameObject* ship)
 {
-	//see override function in class Ship
+	//see override function in class Ship and AIShip
 }
 
 void GameObject::MarkThis(SpatialObject* target, bool isMission)
@@ -328,7 +328,7 @@ int GameObject::GetMarkedObjectsCount()
 	//see override function in class Player
 }
 
-int GameObject::GetGravitationRange()
+float GameObject::GetGravitationRange()
 {
 	return 0;
 	//see override function in class AIShip and Player

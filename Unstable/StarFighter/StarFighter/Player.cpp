@@ -623,7 +623,11 @@ void Player::Death()
 	Ship::Death();
 }
 
-int Player::GetGravitationRange()
+void Player::GetHitByGravitation(GameObject* ship)
 {
-	return m_gravitation_range;
+	AIShip* attractor = (AIShip*)ship;
+	if (attractor->m_roe == ROE_ReturnFire)
+		attractor->SetROE(ROE_FireAtWill);
+
+	Ship::GetHitByGravitation(ship);
 }

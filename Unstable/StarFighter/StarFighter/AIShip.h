@@ -29,7 +29,6 @@ public :
 	SpatialObject* KeepTarget();
 	void Death() override;
 	void SetROE(RuleOfEngagement roe) override;
-	int GetGravitationRange() override;
 
 	ShipType m_ship_type;
 

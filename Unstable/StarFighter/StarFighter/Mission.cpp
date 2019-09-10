@@ -25,9 +25,14 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 		}
 		case Mission_Bounty:
 		{
-			AIShip* ship = (AIShip*)target;
 			m_title_text = "Bounty Mission";
 			m_body_text = "Go to beacon";
+			break;
+		}
+		case Mission_Eliminate:
+		{
+			m_title_text = "Eliminate Mission";
+			m_body_text = "Eliminate target ship";
 			break;
 		}
 	}

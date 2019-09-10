@@ -99,7 +99,7 @@ void AIShip::Update(sf::Time deltaTime)
 		{
 			const float dx = allied_ship->m_position.x - m_position.x;
 			const float dy = allied_ship->m_position.y - m_position.y;
-			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
+			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.8 * REF_WINDOW_RESOLUTION_X * 0.8)
 				m_allied_ships.push_back((SpatialObject*)allied_ship);
 		}
 
@@ -178,6 +178,8 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 {
 	if (m_roe == ROE_ReturnFire)
 		SetROE(ROE_FireAtWill);
+
+	Ship::GetHitByAmmo(ammo);
 }
 
 void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)
@@ -248,9 +250,4 @@ void AIShip::SetROE(RuleOfEngagement roe)
 
 	for (SpatialObject* allied_ship : m_allied_ships)
 		allied_ship->SpatialObject::SetROE(roe);
-}
-
-int AIShip::GetGravitationRange()
-{
-	return m_roe == ROE_FireAtWill ? m_gravitation_range : 0;
 }

@@ -242,9 +242,9 @@ void Ship::GetHitByGravitation(GameObject* ship)
 	const float speed_deg = (angle * 180 / M_PI);
 
 	//Apply gravitation only if ship is trying to get away from the attractor
-	if (abs(GetAngleDegToTargetPosition(m_position, speed_deg, ship->m_position)) > 90)// && (dx*dx + dy*dy) > ship->GetGravitationRange() * 0.5 * ship->GetGravitationRange() * 0.5)
+	Ship* attractor = (Ship*)ship;
+	if ((ship == (*CurrentGame).m_playerShip || attractor->m_roe == ROE_FireAtWill) && abs(GetAngleDegToTargetPosition(m_position, speed_deg, ship->m_position)) > 90)
 	{
-		Ship* attractor = (Ship*)ship;	
 		const float dist_sqr = dx*dx + dy*dy;
 		const float range = attractor->m_gravitation_range;
 
@@ -361,4 +361,9 @@ void Ship::Draw(RenderTarget& screen)
 		screen.draw(m_health_container_rect);
 		screen.draw(m_health_rect);
 	}
+}
+
+float Ship::GetGravitationRange()
+{
+	return m_gravitation_range;
 }
