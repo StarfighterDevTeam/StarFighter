@@ -18,7 +18,7 @@ enum ShipType
 class AIShip : public Ship
 {
 public :
-	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, bool dontStoreMe);
+	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe);
 	~AIShip();
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;

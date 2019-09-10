@@ -21,7 +21,7 @@ Gameloop::Gameloop()
 	player->AcceptMission(mission);
 
 	//enemy
-	//AIShip* cruiser = CreateAIShip(Ship_Cruiser, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_ReturnFire);
+	AIShip* cruiser = CreateAIShip(Ship_Cruiser, sf::Vector2i(10, 0), 0, Hostility_Enemy, ROE_Ambush);
 	//AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_ReturnFire);
 	//AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_Enemy, ROE_ReturnFire);
 	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally, ROE_FireAtWill);
@@ -103,9 +103,9 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	//To be done
 }
 
-AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, bool dontStoreMe)
+AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe)
 {
-	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe, dontStoreMe);
+	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe);
 	if (ship->m_removeMe == false)
 		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
 	return ship;
@@ -199,7 +199,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 				angle += RandomizeFloatBetweenValues(0.1, 0.3);
 
-				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_HoldFire, true);
+				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_HoldFire);
 				ship->m_visible = false;
 				beacon->m_ships_to_create.push_back(ship);
 			}
@@ -220,9 +220,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				angle += RandomizeFloatBetweenValues(0.1, 0.3);
 
 				if (e == 0)
-					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush, false);
+					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush);
 				else
-					CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush, false);
+					CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush);
 			}
 
 			return new Mission(mission_type, ship, owner);

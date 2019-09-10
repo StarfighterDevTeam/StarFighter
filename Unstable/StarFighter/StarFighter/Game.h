@@ -119,7 +119,7 @@ public:
 	bool AddToStarSectorsKnown(sf::Vector2i star_sector_index);
 	void UpdateSectorList(bool force_update);
 	int GetSectorId(sf::Vector2i index);
-	void SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index, bool dontStoreMe);
+	void SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index);
 	void DebugDrawGameObjectsStats();
 	void DebugDrawSectors();
 	bool AreColliding(GameObject* objectA, GameObject* objectB);

@@ -6,7 +6,7 @@ using namespace sf;
 
 Beacon::Beacon(sf::Vector2i sector_index) : SpatialObject()
 {
-	(*CurrentGame).SetStarSectorIndex(this, sector_index, false);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 	m_visible = false;
 	m_collider = BeaconObject;
 	m_layer = BackgroundLayer;

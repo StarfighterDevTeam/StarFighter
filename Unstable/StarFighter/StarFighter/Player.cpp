@@ -20,7 +20,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), 3, 1);
 
-	(*CurrentGame).SetStarSectorIndex(this, sector_index, false);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
@@ -184,6 +184,7 @@ void Player::UpdateMissions()
 
 				mission->m_owner->m_nb_missions++;
 				(*CurrentGame).m_planet_missions_to_create.push_back(mission->m_owner);//add new missions to the planet where the mission ends
+			
 				missions_to_delete.push_back(mission);
 			}
 		}

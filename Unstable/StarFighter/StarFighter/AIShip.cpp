@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, bool dontStoreMe) : Ship()
+AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe) : Ship()
 {
 	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
@@ -24,8 +24,8 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	{
 		case Ship_Alpha:
 		{
-			m_speed_max = 1000;
-			m_acceleration_max = 2000;
+			m_speed_max = 500;
+			m_acceleration_max = 1000;
 			m_turn_speed = 160;
 			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
@@ -75,7 +75,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	m_heading = heading;
 	//setRotation(m_heading);
 
-	(*CurrentGame).SetStarSectorIndex(this, sector_index, dontStoreMe);
+	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 	m_move_destination = m_position;
 	m_target = NULL;
 
@@ -143,6 +143,8 @@ void AIShip::Update(sf::Time deltaTime)
 	//Gravity circle to be drawn
 	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
 		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
+
+	printf("speed: %f\n", GetVectorLength(m_speed));
 
 	Ship::Update(deltaTime);
 
