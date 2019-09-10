@@ -477,7 +477,7 @@ void Game::UpdateSectorList(bool force_update)
 		vector<sf::Vector2i> tmp_star_sectors_managed;
 		sf::Vector2i index;
 
-		//was far from previous sector index? add it to the list of managed sectors
+		//search for nearby sectors that were far from previous player sector => add them to the list of managed sectors
 		for (int j = 0; j < nb_sectors_y; j++)
 		{
 			index.y = j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2);
@@ -496,20 +496,21 @@ void Game::UpdateSectorList(bool force_update)
 				}
 		}
 
-		//update index flag
+		//update player sector flag
 		m_previous_star_sector_index = m_playerShip->m_sector_index;
 		
-		//add objects from new sectors freshly added to the list of managed sectors
+		//manage freshly added sectors
 		for (sf::Vector2i index : tmp_star_sectors_managed)
 		{
+			//sector is unknown? => add it to the list of known sectors and populate it
 			int id = GetSectorId(index);
 			if (id == -1)
 			{
-				m_star_sectors_to_create.push_back(index);//new sector discovered needs to be created
+				m_star_sectors_to_create.push_back(index);
 				m_star_sectors_known.push_back(StarSector(index, m_star_sectors_known.size()));
-				//old_star_sectors_managed.push_back(index);//this will prevent from reaching out for this sector in stored content, since it's a new content that will not be found in storage
 			}
 
+			//bring back objects stored in this sector back into game scene
 			for (GameObject* object : m_sceneGameObjectsStored[id])
 			{
 				addToScene(object, object->m_layer, object->m_collider, false);
@@ -519,14 +520,14 @@ void Game::UpdateSectorList(bool force_update)
 			m_sceneGameObjectsStored.erase(id);
 		}
 
-		//was managed but is now too far? remove from the list of managed sectors
+		//search for sectors that were managed until now but have become now too far from current player sector => remove them from the list of managed sectors
 		int removed = 0;
 		for (sf::Vector2i index : m_star_sectors_managed)
 		{
 			//close enough to keep being managed
 			if (abs(index.x - player->m_sector_index.x) <= nb_sectors_x / 2 && abs(index.y - player->m_sector_index.y) <= nb_sectors_y / 2)
 				tmp_star_sectors_managed.push_back(index);
-			//too far => store it
+			//too far => sector objects have to be stored
 			else
 			{
 				removed++;
@@ -538,10 +539,13 @@ void Game::UpdateSectorList(bool force_update)
 
 					if (object->m_sector_index == index && object->m_garbageMe == false)
 					{
-						if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)//temporary objects such as flying ammunition don't need to be stored, they can be deleted in the process
+						//temporary objects such as flying ammunition don't need to be stored, they can be garbaged in the process
+						if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)
 						{
+							//marked objects are never stored, they keep getting updated at any distance
 							if (object->IsMarked() == false)
 							{
+								//storage with the dedicated sector id
 								object->m_removeMe = true;
 								m_sceneGameObjectsStored[id].push_back(object);
 							}
@@ -556,9 +560,7 @@ void Game::UpdateSectorList(bool force_update)
 		//refresh the list of managed sectors
 		m_star_sectors_managed.clear();
 		for (sf::Vector2i index : tmp_star_sectors_managed)
-		{
 			m_star_sectors_managed.push_back(index);
-		}	
 
 		//debug assert
 		if (m_star_sectors_managed.size() != nb_sectors_x * nb_sectors_y)
