@@ -482,6 +482,7 @@ void Game::UpdateSectorList(bool force_update)
 		{
 			index.y = j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2);
 			if (force_update == true || abs(index.y - m_previous_star_sector_index.y) > nb_sectors_y / 2)
+				//add the whole line
 				for (int i = 0; i < nb_sectors_x; i++)
 				{
 					index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
@@ -491,6 +492,7 @@ void Game::UpdateSectorList(bool force_update)
 				for (int i = 0; i < nb_sectors_x; i += force_update == true ? 1 : nb_sectors_x - 1)
 				{
 					index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
+					//add the left or right row (or the whole line if we are forcing a complete update)
 					if (force_update == true || abs(index.x - m_previous_star_sector_index.x) > nb_sectors_x / 2)
 						tmp_star_sectors_managed.push_back(index);
 				}
@@ -521,7 +523,6 @@ void Game::UpdateSectorList(bool force_update)
 		}
 
 		//search for sectors that were managed until now but have become now too far from current player sector => remove them from the list of managed sectors
-		int removed = 0;
 		for (sf::Vector2i index : m_star_sectors_managed)
 		{
 			//close enough to keep being managed
@@ -530,7 +531,6 @@ void Game::UpdateSectorList(bool force_update)
 			//too far => sector objects have to be stored
 			else
 			{
-				removed++;
 				int id = GetSectorId(index);
 				for (GameObject* object : m_sceneGameObjects)
 				{
