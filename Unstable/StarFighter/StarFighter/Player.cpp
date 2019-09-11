@@ -107,11 +107,23 @@ void Player::Update(sf::Time deltaTime)
 
 void Player::UpdateMissions()
 {
+	//Automatic cycling
+	bool found = false;
+	for (Mission* mission : m_missions)
+		if (mission->m_status == MissionStatus_Current)
+		{
+			found = true;
+			break;
+		}
+
+	if (found == false)
+		CycleMission();
+
 	//Update missions
 	vector<Mission*> missions_to_delete;
 	
 	for (Mission* mission : m_missions)
-		if (mission->m_status == MissionStatus_Accepted || mission->m_status == MissionStatus_Current)
+		if (mission->m_status == MissionStatus_Current)
 		{
 			vector<SpatialObject*> tmp_marked_objectives;
 			for (SpatialObject* object : mission->m_marked_objectives)
@@ -194,54 +206,38 @@ void Player::UpdateMissions()
 
 bool Player::CycleMission()
 {
-	Mission* current_mission = NULL;
-	Mission* new_current_mission = NULL;
-
+	vector<Mission*> missions_before;
+	vector<Mission*> missions_after;
+	
 	//browse to find current mission and try to cycle towards the next acceptable mission in the list
+	Mission* current_mission = NULL;
+	Mission* first_mission = NULL;
+
 	for (Mission* mission : m_missions)
-	{
-		if (mission->m_status == MissionStatus_Current)
+		if (mission->m_status == MissionStatus_Accepted)
+		{
+			if (current_mission == NULL && first_mission == NULL)
+				first_mission = mission;
+			else if (current_mission != NULL)
+			{
+				missions_after.push_back(mission);
+				break;
+			}
+		}
+		else if (mission->m_status == MissionStatus_Current)
 			current_mission = mission;
 
-		if (current_mission != NULL && mission->m_status == MissionStatus_Accepted)
-		{ 
-			EndMission(current_mission, MissionStatus_Accepted);
-			SetCurrentMission(mission);
-			return true;
-		}
-	}
+	//set next mission: mission after the current one in the list > first mission in the list > current mission by default
+	Mission* next_mission = missions_after.empty() == false ? missions_after.back() : first_mission != NULL ? first_mission : current_mission;
 
-	//no current mission = cycle to the first acceptable mission
-	if (current_mission == NULL)
-	{
-		for (Mission* mission : m_missions)
-		{
-			if (mission->m_status == MissionStatus_Accepted)
-			{
-				SetCurrentMission(mission);
-				return true;
-			}
-		}
-
-		//no mission can be accepted, don't bother searching anymore
+	if (next_mission == current_mission)
 		return false;
-	}
-	//not found yet, cycle another time from the beginning this time
-	else if (new_current_mission == NULL)
-	{
-		for (Mission* mission : m_missions)
-		{
-			if (mission->m_status == MissionStatus_Accepted)
-			{
-				EndMission(current_mission, MissionStatus_Accepted);
-				SetCurrentMission(mission);
-				return true;
-			}
-		}
-	}
+	
+	if (current_mission != NULL)
+		EndMission(current_mission, MissionStatus_Accepted);
 
-	//can't cycle = we stay on the same current mission
-	return false;
+	SetCurrentMission(next_mission);
+	return true;
 }
 
 void Player::Draw(RenderTarget& screen)
@@ -496,12 +492,8 @@ void Player::RemoveMissionMarker(SpatialObject* target)
 void Player::EndMission(Mission* mission, MissionStatus status)
 {
 	if (mission->m_status == MissionStatus_Current)
-	{
 		for (SpatialObject* objective : mission->m_marked_objectives)
 			RemoveMissionMarker(objective);
-
-		CycleMission();
-	}
 
 	mission->m_status = status;
 
@@ -511,9 +503,6 @@ void Player::EndMission(Mission* mission, MissionStatus status)
 
 void Player::RemoveMission(Mission* mission)
 {
-	if (mission->m_status == MissionStatus_Current)
-		EndMission(mission, mission->m_status);
-
 	//Delete mission
 	vector<Mission*> old_missions;
 	for (Mission* it_mission : m_missions)
