@@ -132,6 +132,9 @@ public:
 	vector<GameObject*> m_temp_sceneGameObjects;
 	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
 
+	int m_nb_sectors_managed_x;
+	int m_nb_sectors_managed_y;
+
 	GameObject* m_background;
 	vector<CircleShape> m_gravity_circles;
 

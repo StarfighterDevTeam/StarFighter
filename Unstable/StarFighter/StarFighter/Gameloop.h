@@ -24,6 +24,8 @@ public:
 	Planet* CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create_min, int nb_missions_to_create_max);
 	Mission* CreateMission(Planet* owner);
 	Planet* GetPlanetAtSectorId(int id);
+	bool IsSectorNearAnExistingMission(sf::Vector2i sector_index);
+	pair<Planet*, sf::Vector2i> SnailSearchSectorForMission(sf::Vector2i starting_index, MissionType mission_type);
 
 	vector<StarGenerator*> m_star_generator;
 

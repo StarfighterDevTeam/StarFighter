@@ -112,10 +112,8 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	return planet;
 }
 
-Mission* Gameloop::CreateMission(Planet* owner)
+pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i starting_index, MissionType mission_type)
 {
-	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
-	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 	sf::Vector2i found_index = starting_index;
 
 	//find sector where to create the mission
@@ -136,7 +134,14 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				id = (*CurrentGame).GetSectorId(found_index);
 
 				if (id == -1)//unkown sector found
-					break;
+				{
+					//check if we don't already have a mission in the surrounding
+					if (IsSectorNearAnExistingMission(found_index) == true)
+						id = 0;
+
+					if (id == -1)
+						break;
+				}
 				else if (mission_type == Mission_GoTo)
 				{
 					planet = GetPlanetAtSectorId(id);//re-use an existing planet?
@@ -151,7 +156,14 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				id = (*CurrentGame).GetSectorId(found_index);
 
 				if (id == -1)//unkown sector found
-					break;
+				{
+					//check if we don't already have a mission in the surrounding
+					if (IsSectorNearAnExistingMission(found_index) == true)
+						id = 0;
+
+					if (id == -1)
+						break;
+				}
 				else if (mission_type == Mission_GoTo)
 				{
 					planet = GetPlanetAtSectorId(id);//re-use an existing planet?
@@ -161,7 +173,18 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			}
 	}
 
-	//printf("found index: %d, %d\n", found_index.x, found_index.y);
+	return pair<Planet*, sf::Vector2i>(planet, found_index);
+}
+
+Mission* Gameloop::CreateMission(Planet* owner)
+{
+	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
+
+	//find sector where to create the mission
+	pair<Planet*, sf::Vector2i> found_sector = SnailSearchSectorForMission(starting_index, mission_type);
+	Planet* planet = found_sector.first;
+	sf::Vector2i found_index = found_sector.second;
 
 	//create mission
 	float distance = RandomizeFloatBetweenValues(REF_WINDOW_RESOLUTION_X * 1.5, REF_WINDOW_RESOLUTION_X * 1.8);
@@ -173,7 +196,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		case Mission_GoTo:
 		{
 			//re-use an existing planet and add a mission to it
-			if (id >= 0)
+			if (planet != NULL)
 				planet->m_nb_missions_to_create++;
 			//sector unknown => create a planet
 			else
@@ -232,6 +255,24 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			return new Mission(mission_type, ship, owner);
 		}
 	}
+}
+
+bool Gameloop::IsSectorNearAnExistingMission(sf::Vector2i sector_index)
+{
+	Player* player = (Player*)(*CurrentGame).m_playerShip;
+	for (Mission* mission : player->m_missions)
+		if (mission->m_marked_objectives.empty() == false)
+			for (SpatialObject* objective : mission->m_marked_objectives)
+			{
+				sf::Vector2i objective_index = mission->m_marked_objectives.front()->m_sector_index;
+				//minimum distance between a new mission and existing objectives can be adjusted here, and can be any value really
+				if (abs(sector_index.x - objective_index.x) < (*CurrentGame).m_nb_sectors_managed_x && abs(sector_index.y - objective_index.y) < (*CurrentGame).m_nb_sectors_managed_y)
+				{
+					return true;
+				}
+			}
+
+	return false;
 }
 
 Planet* Gameloop::GetPlanetAtSectorId(int id)

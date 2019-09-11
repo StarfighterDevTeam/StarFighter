@@ -61,8 +61,15 @@ Game::Game(RenderWindow* window)
 	addToScene(m_background, BackgroundLayer, BackgroundObject, false);
 
 	//Star Hunter
-	//AddToStarSectorsKnown(m_current_star_sector);
-	//UpdateSectorList(true);
+
+	//we need an odd number of sectors on X and Y axis
+	m_nb_sectors_managed_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 2;
+	if (m_nb_sectors_managed_x % 2 == 0)
+		m_nb_sectors_managed_x++;
+
+	m_nb_sectors_managed_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 2;
+	if (m_nb_sectors_managed_y % 2 == 0)
+		m_nb_sectors_managed_y++;
 
 	//DEBUG
 	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
@@ -469,35 +476,26 @@ void Game::UpdateSectorList(bool force_update)
 	//update needed?
 	if (force_update == true || m_previous_star_sector_index != player->m_sector_index)
 	{
-		//we need an odd number of sectors on X and Y axis
-		int nb_sectors_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 2;
-		if (nb_sectors_x % 2 == 0)
-			nb_sectors_x++;
-
-		int nb_sectors_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 2;
-		if (nb_sectors_y % 2 == 0)
-			nb_sectors_y++;
-
 		vector<sf::Vector2i> tmp_star_sectors_managed;
 		sf::Vector2i index;
 
 		//search for nearby sectors that were far from previous player sector => add them to the list of managed sectors
-		for (int j = 0; j < nb_sectors_y; j++)
+		for (int j = 0; j < m_nb_sectors_managed_y; j++)
 		{
-			index.y = j + m_playerShip->m_sector_index.y - (nb_sectors_y / 2);
-			if (force_update == true || abs(index.y - m_previous_star_sector_index.y) > nb_sectors_y / 2)
+			index.y = j + m_playerShip->m_sector_index.y - (m_nb_sectors_managed_y / 2);
+			if (force_update == true || abs(index.y - m_previous_star_sector_index.y) > m_nb_sectors_managed_y / 2)
 				//add the whole line
-				for (int i = 0; i < nb_sectors_x; i++)
+				for (int i = 0; i < m_nb_sectors_managed_x; i++)
 				{
-					index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
+					index.x = i + m_playerShip->m_sector_index.x - (m_nb_sectors_managed_x / 2);
 					tmp_star_sectors_managed.push_back(index);
 				}
 			else
-				for (int i = 0; i < nb_sectors_x; i += force_update == true ? 1 : nb_sectors_x - 1)
+				for (int i = 0; i < m_nb_sectors_managed_x; i += force_update == true ? 1 : m_nb_sectors_managed_x - 1)
 				{
-					index.x = i + m_playerShip->m_sector_index.x - (nb_sectors_x / 2);
+					index.x = i + m_playerShip->m_sector_index.x - (m_nb_sectors_managed_x / 2);
 					//add the left or right row (or the whole line if we are forcing a complete update)
-					if (force_update == true || abs(index.x - m_previous_star_sector_index.x) > nb_sectors_x / 2)
+					if (force_update == true || abs(index.x - m_previous_star_sector_index.x) > m_nb_sectors_managed_x / 2)
 						tmp_star_sectors_managed.push_back(index);
 				}
 		}
@@ -530,7 +528,7 @@ void Game::UpdateSectorList(bool force_update)
 		for (sf::Vector2i index : m_star_sectors_managed)
 		{
 			//close enough to keep being managed
-			if (abs(index.x - player->m_sector_index.x) <= nb_sectors_x / 2 && abs(index.y - player->m_sector_index.y) <= nb_sectors_y / 2)
+			if (abs(index.x - player->m_sector_index.x) <= m_nb_sectors_managed_x / 2 && abs(index.y - player->m_sector_index.y) <= m_nb_sectors_managed_y / 2)
 				tmp_star_sectors_managed.push_back(index);
 			//too far => sector objects have to be stored
 			else
@@ -567,8 +565,8 @@ void Game::UpdateSectorList(bool force_update)
 			m_star_sectors_managed.push_back(index);
 
 		//debug assert
-		if (m_star_sectors_managed.size() != nb_sectors_x * nb_sectors_y)
-			printf("\n<!> BUG : managed sectors' count is wrong (UpdateSectorList). Expected: %d. Actual: %d)\n\n", nb_sectors_x * nb_sectors_y, m_star_sectors_managed.size());
+		if (m_star_sectors_managed.size() != m_nb_sectors_managed_x * m_nb_sectors_managed_y)
+			printf("\n<!> BUG : managed sectors' count is wrong (UpdateSectorList). Expected: %d. Actual: %d)\n\n", m_nb_sectors_managed_x * m_nb_sectors_managed_y, m_star_sectors_managed.size());
 	}
 }
 
