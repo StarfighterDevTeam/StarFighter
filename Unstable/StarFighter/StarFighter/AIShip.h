@@ -34,6 +34,7 @@ public :
 
 	sf::Vector2f m_move_destination;
 	SpatialObject* m_target;
+	RuleOfEngagement m_native_ROE;
 
 	vector<SpatialObject*> m_allied_ships;
 };

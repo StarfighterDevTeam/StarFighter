@@ -613,7 +613,7 @@ void Player::Death()
 void Player::GetHitByGravitation(GameObject* ship)
 {
 	AIShip* attractor = (AIShip*)ship;
-	if (attractor->m_roe == ROE_ReturnFire || attractor->m_roe == ROE_Ambush)
+	if (attractor->m_roe == ROE_Ambush)
 		attractor->SetROE(ROE_FireAtWill);
 
 	Ship::GetHitByGravitation(ship);

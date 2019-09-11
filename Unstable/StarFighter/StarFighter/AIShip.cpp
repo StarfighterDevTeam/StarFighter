@@ -14,6 +14,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	m_ship_type = ship_type;
 	SetHostility(hostility);
 	SetROE(roe);
+	m_native_ROE = roe;
 
 	string textureName;
 	sf::Vector2f textureSize;
@@ -127,6 +128,9 @@ void AIShip::Update(sf::Time deltaTime)
 
 			if (m_target == NULL)
 				m_target = GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X * 2, 360);
+
+			if (m_target == NULL)//no target is sight => go back to native Rule of engagement
+				SetROE(m_native_ROE);
 
 			break;
 		}
