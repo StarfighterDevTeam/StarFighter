@@ -131,7 +131,7 @@ void Player::UpdateMissions()
 				{
 					case BeaconObject:
 					{	
-						if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 200 * 200)
+						if (mission->m_status == MissionStatus_Current && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 200 * 200)
 						{
 							UnmarkThis(object, true);
 
@@ -157,7 +157,7 @@ void Player::UpdateMissions()
 					{
 						Planet* planet = (Planet*)object;
 
-						if (m_isOrbiting == object)
+						if (mission->m_status == MissionStatus_Current && m_isOrbiting == object)
 							UnmarkThis(object, true);
 						else
 							tmp_marked_objectives.push_back(object);
@@ -169,14 +169,14 @@ void Player::UpdateMissions()
 						if (mission->m_mission_type == Mission_EliminateSquad)
 						{
 							//when reaching the target ship, mark and display the real number of enemy ships
-							if (object->m_roe == ROE_FireAtWill && mission->m_marked_objectives.size() == 1)
+							if (mission->m_status == MissionStatus_Current && object->m_roe == ROE_FireAtWill && mission->m_marked_objectives.size() == 1)
 								for (SpatialObject* ally : ship->m_forced_allied_ships)
 								{
 									(*CurrentGame).m_playerShip->MarkThis(ally, true);
 									tmp_marked_objectives.push_back(ally);
 								}
 
-							mission->m_body_text = "Destroy target enemies. " + to_string(mission->m_marked_objectives.size()) + " left.";
+							mission->m_body_text = "Destroy target enemies. " + (mission->m_status == MissionStatus_Current && ship->m_roe == ROE_FireAtWill ? to_string(mission->m_marked_objectives.size()) + " left." : "");
 						}
 						else if (mission->m_mission_type == Mission_EliminateBoss)
 							mission->m_body_text = "Destroy target enemy.";

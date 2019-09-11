@@ -247,11 +247,14 @@ void AIShip::SetROE(RuleOfEngagement roe)
 {
 	SpatialObject::SetROE(roe);
 
-	for (SpatialObject* allied_ship : m_dynamic_allied_ships)
-		allied_ship->SpatialObject::SetROE(roe);
+	if (roe == ROE_FireAtWill)
+	{
+		for (SpatialObject* allied_ship : m_dynamic_allied_ships)
+			allied_ship->SpatialObject::SetROE(roe);
 
-	for (SpatialObject* allied_ship : m_forced_allied_ships)
-		allied_ship->SpatialObject::SetROE(roe);
+		for (SpatialObject* allied_ship : m_forced_allied_ships)
+			allied_ship->SpatialObject::SetROE(roe);
+	}
 }
 
 void AIShip::UpdateAlliedShips()
