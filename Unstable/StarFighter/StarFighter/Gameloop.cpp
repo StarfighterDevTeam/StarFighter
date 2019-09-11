@@ -164,7 +164,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 	//printf("found index: %d, %d\n", found_index.x, found_index.y);
 
 	//create mission
-	float distance = RandomizeFloatBetweenValues(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_X * 1.8);
+	float distance = RandomizeFloatBetweenValues(REF_WINDOW_RESOLUTION_X * 1.5, REF_WINDOW_RESOLUTION_X * 1.8);
 	float angle = GetAngleRadFromVector(sf::Vector2f(1.f * (found_index.x - owner->m_sector_index.x), 1.f * (found_index.y - owner->m_sector_index.y)));
 	angle += RandomizeFloatBetweenValues(-0.3, 0.3);
 	
@@ -188,7 +188,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += RandomizeFloatBetweenValues(0.1, 0.3);
+				angle += 0.08;
 
 				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_HoldFire);
 				ship->m_visible = false;
@@ -204,7 +204,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += RandomizeFloatBetweenValues(0.1, 0.3);
+				angle += 0.08;
 
 				if (e == 0)
 					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush);
@@ -221,7 +221,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += RandomizeFloatBetweenValues(0.1, 0.3);
+				angle += 0.08;
 
 				if (e == 0)
 					ship = CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush);

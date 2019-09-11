@@ -167,22 +167,12 @@ bool InputGuy::isChangingResolution()
 
 bool InputGuy::isMuting()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
-	{
-		return true;
-	}
-
-	return false;
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::M);
 }
 
 bool InputGuy::isPausing()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-	{
-		return true;
-	}
-
-	return false;
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::P);
 }
 
 Vector2f InputGuy::getDirections(ControlerType device)
