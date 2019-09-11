@@ -93,17 +93,6 @@ void AIShip::Update(sf::Time deltaTime)
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	bool input_fire = false;
 
-	//grouping with allied ships
-	m_allied_ships.clear();
-	for (GameObject* allied_ship : (*CurrentGame).m_sceneGameObjectsTyped[m_collider])
-		if (allied_ship != this)
-		{
-			const float dx = allied_ship->m_position.x - m_position.x;
-			const float dy = allied_ship->m_position.y - m_position.y;
-			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.8 * REF_WINDOW_RESOLUTION_X * 0.8)
-				m_allied_ships.push_back((SpatialObject*)allied_ship);
-		}
-
 	//AI - move & shoot strategies
 	m_move_destination = m_position;
 
@@ -258,6 +247,44 @@ void AIShip::SetROE(RuleOfEngagement roe)
 {
 	SpatialObject::SetROE(roe);
 
-	for (SpatialObject* allied_ship : m_allied_ships)
+	for (SpatialObject* allied_ship : m_dynamic_allied_ships)
 		allied_ship->SpatialObject::SetROE(roe);
+
+	for (SpatialObject* allied_ship : m_forced_allied_ships)
+		allied_ship->SpatialObject::SetROE(roe);
+}
+
+void AIShip::UpdateAlliedShips()
+{
+	//updating forced allied ships (removing the dead)
+	vector<SpatialObject*> tmp_forced_allied_ships;
+	for (SpatialObject* ally : m_forced_allied_ships)
+		if (ally->m_garbageMe == false)
+			tmp_forced_allied_ships.push_back(ally);
+	m_forced_allied_ships.clear();
+	for (SpatialObject* ally : tmp_forced_allied_ships)
+		m_forced_allied_ships.push_back(ally);
+
+	//grouping with nearby allied ships
+	m_dynamic_allied_ships.clear();
+	for (GameObject* allied_ship : (*CurrentGame).m_sceneGameObjectsTyped[m_collider])
+		if (allied_ship != this && allied_ship->m_garbageMe == false)
+		{
+			const float dx = allied_ship->m_position.x - m_position.x;
+			const float dy = allied_ship->m_position.y - m_position.y;
+			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
+			{
+				//already a forced ally?
+				bool found = false;
+				for (SpatialObject* ally : m_forced_allied_ships)
+					if (ally == allied_ship)
+					{
+						found = true;
+						break;
+					}
+
+				if (found == false)
+					m_dynamic_allied_ships.push_back((SpatialObject*)allied_ship);
+			}
+		}
 }

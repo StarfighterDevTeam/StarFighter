@@ -29,7 +29,7 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 			m_body_text = "Go to beacon";
 			break;
 		}
-		case Mission_Eliminate:
+		case Mission_EliminateBoss:
 		{
 			m_title_text = "Eliminate Mission";
 			m_body_text = "Eliminate target ship";

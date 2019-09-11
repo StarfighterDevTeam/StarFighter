@@ -108,6 +108,7 @@ public:
 	virtual bool IsMarked();
 	virtual int GetMarkedObjectsCount();
 	virtual float GetGravitationRange();
+	virtual void UpdateAlliedShips();
 
 	sf::Vector2i m_sector_index;
 };

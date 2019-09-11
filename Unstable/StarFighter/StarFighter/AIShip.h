@@ -29,6 +29,7 @@ public :
 	SpatialObject* KeepTarget();
 	void Death() override;
 	void SetROE(RuleOfEngagement roe) override;
+	void UpdateAlliedShips() override;
 
 	ShipType m_ship_type;
 
@@ -36,7 +37,8 @@ public :
 	SpatialObject* m_target;
 	RuleOfEngagement m_native_ROE;
 
-	vector<SpatialObject*> m_allied_ships;
+	vector<SpatialObject*> m_dynamic_allied_ships;
+	vector<SpatialObject*> m_forced_allied_ships;
 };
 
 #endif // AISHIP_H_INCLUDED

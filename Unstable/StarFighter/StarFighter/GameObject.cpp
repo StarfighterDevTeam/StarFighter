@@ -333,3 +333,8 @@ float GameObject::GetGravitationRange()
 	return 0;
 	//see override function in class AIShip and Player
 }
+
+void GameObject::UpdateAlliedShips()
+{
+	//see override function in class AIShip
+}

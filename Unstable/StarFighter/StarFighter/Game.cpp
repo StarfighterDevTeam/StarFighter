@@ -367,6 +367,9 @@ void Game::CollisionChecks()
 			for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyShipObject])
 				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
 					enemy->GetHitByGravitation(ally_ship);
+
+		if (ally_ship != m_playerShip)
+			ally_ship->UpdateAlliedShips();
 	}
 
 	for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
@@ -379,8 +382,9 @@ void Game::CollisionChecks()
 			for (GameObject* ally_ship : m_sceneGameObjectsTyped[AllyShipObject])
 				if (GetDistanceSquaredBetweenPositions(enemy_ship->m_position, ally_ship->m_position) <= enemy_ship->GetGravitationRange() * enemy_ship->GetGravitationRange())
 					ally_ship->GetHitByGravitation(enemy_ship);
+
+		enemy_ship->UpdateAlliedShips();
 	}
-		
 }
 
 bool Game::AreColliding(GameObject* objectA, GameObject* objectB)

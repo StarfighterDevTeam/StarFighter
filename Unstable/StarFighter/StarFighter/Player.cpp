@@ -123,7 +123,7 @@ void Player::UpdateMissions()
 	vector<Mission*> missions_to_delete;
 	
 	for (Mission* mission : m_missions)
-		if (mission->m_status == MissionStatus_Current)
+		if (mission->m_status == MissionStatus_Current || mission->m_status == MissionStatus_Accepted)
 		{
 			vector<SpatialObject*> tmp_marked_objectives;
 			for (SpatialObject* object : mission->m_marked_objectives)
@@ -165,9 +165,22 @@ void Player::UpdateMissions()
 					}
 					case EnemyShipObject:
 					{
-						mission->m_body_text = "Destroy enemies. " + to_string(mission->m_marked_objectives.size()) + " left";
-
 						AIShip* ship = (AIShip*)object;
+						if (mission->m_mission_type == Mission_EliminateSquad)
+						{
+							//when reaching the target ship, mark and display the real number of enemy ships
+							if (object->m_roe == ROE_FireAtWill && mission->m_marked_objectives.size() == 1)
+								for (SpatialObject* ally : ship->m_forced_allied_ships)
+								{
+									(*CurrentGame).m_playerShip->MarkThis(ally, true);
+									tmp_marked_objectives.push_back(ally);
+								}
+
+							mission->m_body_text = "Destroy target enemies. " + to_string(mission->m_marked_objectives.size()) + " left.";
+						}
+						else if (mission->m_mission_type == Mission_EliminateBoss)
+							mission->m_body_text = "Destroy target enemy.";
+
 						if (ship->m_health == 0)
 						{
 							UnmarkThis(object, true);
@@ -476,24 +489,14 @@ void Player::SetCurrentMission(Mission* mission)
 	
 	//mission markers
 	for (SpatialObject* objective : mission->m_marked_objectives)
-		AddMissionMarker(objective);
-}
-
-void Player::AddMissionMarker(SpatialObject* target)
-{
-	(*CurrentGame).m_playerShip->MarkThis(target, Marker_Mission);
-}
-
-void Player::RemoveMissionMarker(SpatialObject* target)
-{
-	(*CurrentGame).m_playerShip->UnmarkThis(target, true);
+		(*CurrentGame).m_playerShip->MarkThis(objective, true);
 }
 
 void Player::EndMission(Mission* mission, MissionStatus status)
 {
 	if (mission->m_status == MissionStatus_Current)
 		for (SpatialObject* objective : mission->m_marked_objectives)
-			RemoveMissionMarker(objective);
+			(*CurrentGame).m_playerShip->UnmarkThis(objective, true);
 
 	mission->m_status = status;
 
@@ -578,9 +581,9 @@ void Player::DebugDrawMissions()
 			body_text.setColor(sf::Color::Red);
 
 		body_text.setString(mission->m_body_text);
-		body_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 300, offset_y));
+		body_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 350, offset_y));
 
-		offset_y += 50;
+		offset_y += 40;
 
 		(*CurrentGame).m_mainScreen.draw(body_text);
 	}

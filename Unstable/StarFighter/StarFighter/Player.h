@@ -54,8 +54,6 @@ public :
 	void RemoveMission(Mission* mission);
 	void EndMission(Mission* mission, MissionStatus status);
 	bool CycleMission();
-	void AddMissionMarker(SpatialObject* target);
-	void RemoveMissionMarker(SpatialObject* target);
 	void UpdateMissions();
 	void Death() override;
 	void GetHitByGravitation(GameObject* ship) override;

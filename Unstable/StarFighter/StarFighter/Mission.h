@@ -15,7 +15,8 @@ enum MissionType
 {
 	Mission_GoTo,
 	Mission_Bounty,
-	Mission_Eliminate,
+	Mission_EliminateBoss,
+	Mission_EliminateSquad,
 	NB_MISSION_TYPES,
 };
 
