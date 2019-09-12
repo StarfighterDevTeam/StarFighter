@@ -127,12 +127,26 @@ void AIShip::Update(sf::Time deltaTime)
 
 	//Move strategy
 	if (m_target != NULL)
-		m_move_destination = m_target->m_position;
+	{
+		const float dx = m_position.x - m_target->m_position.x;
+		const float dy = m_position.y - m_target->m_position.y;
+		if (dx*dx + dy*dy > m_range_max * m_range_max)
+		{
+			//move to range position with same approch angle as current angle to target
+			const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
+			sf::Vector2f vector = sf::Vector2f(dx, dy);
+			ScaleVector(&vector, m_range_max);
+			m_move_destination = m_target->m_position + vector;
 
-	//Apply move strategy
-	GoTo(m_move_destination, deltaTime, inputs_direction);
+			GoTo(m_move_destination, deltaTime, inputs_direction);
+		}
+
+		//turn towards target
+		TurnTo(m_target->m_position, deltaTime, inputs_direction);
+	}
+
 	ApplyFlightModel(deltaTime, inputs_direction);
-
+	
 	//Gravity circle to be drawn
 	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
 		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
@@ -186,22 +200,23 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float dx = m_position.x - position.x;
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
-	//const float angle = GetAngleRadFromVector(sf::Vector2f(-dx, -dy));
 
-	//move to desired position and heading
-	if (m_position != position)
-	{
-		//if abs(delta_angle) < 1, let's not bother moving, this would only create micro movements
-		if (delta_angle < -1)
-			inputs_direction.x = 1;
-		else if (delta_angle > 1)
-			inputs_direction.x = -1;
+	if (abs(delta_angle) < m_angle_coverage_max)
+		inputs_direction.y = -1;
+	else if (abs(delta_angle) > 90)
+		inputs_direction.y = 1;
+}
 
-		if (dx * dx + dy * dy > m_range_max * m_range_max && abs(delta_angle) < m_angle_coverage_max)
-			inputs_direction.y = -1;
-		else if (abs(delta_angle) > 90)
-			inputs_direction.y = 1;
-	}
+void AIShip::TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)
+{
+	const float dx = m_position.x - position.x;
+	const float dy = m_position.y - position.y;
+	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
+
+	if (delta_angle < -1)//let's not bother moving, this would only create micro movements
+		inputs_direction.x = 1;
+	else if (delta_angle > 1)
+		inputs_direction.x = -1;
 }
 
 void AIShip::Draw(RenderTarget& screen)
@@ -211,7 +226,7 @@ void AIShip::Draw(RenderTarget& screen)
 	if (m_position != m_move_destination)
 	{
 		sf::Vector2f destination = sf::Vector2f(m_move_destination.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_move_destination.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5);
-		//DebugDrawSegment(getPosition(), destination, sf::Color::Magenta, (*CurrentGame).m_mainScreen);
+		DebugDrawSegment(getPosition(), destination, sf::Color::Magenta, (*CurrentGame).m_mainScreen);
 	}
 }
 
