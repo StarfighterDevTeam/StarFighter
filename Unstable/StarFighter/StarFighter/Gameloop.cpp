@@ -45,10 +45,13 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//create procedural content for new sectors
 	for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_to_create)
-	{
 		PopulateSector(sector_index);
-	}
 	(*CurrentGame).m_star_sectors_to_create.clear();
+
+	//create procedural stars for sectors
+	for (sf::Vector2i sector_index : (*CurrentGame).m_sectors_to_add_star)
+		StarGenerator::CreateStar(sector_index);
+	(*CurrentGame).m_sectors_to_add_star.clear();
 
 	//Get new missions from planet where're orbiting around
 	while (player->m_missions.size() < NB_MISSIONS_MAX && player->m_isOrbiting != NULL && player->m_isOrbiting->m_nb_missions_to_create > 0)

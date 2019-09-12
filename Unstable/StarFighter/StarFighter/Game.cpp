@@ -506,6 +506,9 @@ void Game::UpdateSectorList(bool force_update)
 		//manage freshly added sectors
 		for (sf::Vector2i index : tmp_star_sectors_managed)
 		{
+			//add a star in the background during next Gameloop update
+			m_sectors_to_add_star.push_back(index);
+
 			//sector is unknown? => add it to the list of known sectors and populate it
 			int id = GetSectorId(index);
 			if (id == -1)
@@ -542,7 +545,7 @@ void Game::UpdateSectorList(bool force_update)
 					if (object->m_sector_index == index && object->m_garbageMe == false)
 					{
 						//temporary objects such as flying ammunition don't need to be stored, they can be garbaged in the process
-						if (object->m_collider != EnemyFire && object->m_collider != PlayerFire)
+						if (object->m_layer != StarLayer && object->m_collider != EnemyFire && object->m_collider != PlayerFire)
 						{
 							//marked objects are never stored, they keep getting updated at any distance
 							if (object->IsMarked() == false)
