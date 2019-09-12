@@ -135,7 +135,7 @@ pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i s
 
 				if (id == -1)//unkown sector found
 				{
-					//check if we don't already have a mission in the surrounding
+					//check if we don't already have a mission in the surrounding to avoid objectives overlap
 					if (IsSectorNearAnExistingMission(found_index) == true)
 						id = 0;
 
@@ -266,7 +266,7 @@ bool Gameloop::IsSectorNearAnExistingMission(sf::Vector2i sector_index)
 			{
 				sf::Vector2i objective_index = mission->m_marked_objectives.front()->m_sector_index;
 				//minimum distance between a new mission and existing objectives can be adjusted here, and can be any value really
-				if (abs(sector_index.x - objective_index.x) < (*CurrentGame).m_nb_sectors_managed_x && abs(sector_index.y - objective_index.y) < (*CurrentGame).m_nb_sectors_managed_y)
+				if (abs(sector_index.x - objective_index.x) < 3.f * REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE && abs(sector_index.y - objective_index.y) < 3.f * REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE)
 				{
 					return true;
 				}

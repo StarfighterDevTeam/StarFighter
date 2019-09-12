@@ -75,7 +75,6 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
 	m_heading = heading;
-	//setRotation(m_heading);
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 	m_move_destination = m_position;
@@ -117,7 +116,7 @@ void AIShip::Update(sf::Time deltaTime)
 				m_target = KeepTarget();
 
 			if (m_target == NULL)
-				m_target = GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X * 2, 360);
+				m_target = GetTargetableEnemyShip(m_roe == ROE_Ambush ? REF_WINDOW_RESOLUTION_X * 0.5 : REF_WINDOW_RESOLUTION_X * 2, 360);
 
 			if (m_target == NULL)//no target is sight => go back to native Rule of engagement
 				SetROE(m_native_ROE);
@@ -154,7 +153,6 @@ void AIShip::Update(sf::Time deltaTime)
 			m_move_clockwise = !m_move_clockwise;//randomize -1 : 1 for the next time we'll have to decide between clockwise or counter-clockwise movement
 			TurnTo(m_target->m_position, deltaTime, inputs_direction);
 		}
-			
 	}
 
 	//apply inputs
@@ -214,7 +212,9 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 
-	if (m_speed.x*m_speed.x + m_speed.y*m_speed.y < dx*dx + dy*dy && abs(delta_angle) < m_angle_coverage_max)
+	bool speed_up_authorized = dx*dx + dy*dy < 500 * 500 || m_speed.x*m_speed.x + m_speed.y*m_speed.y < dx*dx + dy*dy;//authorize to speed faster if very short distance or being far with a low speed
+
+	if (speed_up_authorized == true && abs(delta_angle) < m_angle_coverage_max)
 		inputs_direction.y = -1;
 	else if (abs(delta_angle) > 90)
 		inputs_direction.y = 1;
@@ -331,7 +331,7 @@ void AIShip::OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float
 			AIShip* ally_ship = (AIShip*)ally;
 			float size = MaxBetweenValues(m_radius, ally_ship->m_radius);
 			//optim: make the "lighter" ship turn (checking turn speed)
-			if (m_turn_speed >= ally_ship->m_turn_speed && abs(m_move_destination.x - ally_ship->m_move_destination.x) < size && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size)
+			if (m_turn_speed >= ally_ship->m_turn_speed && abs(m_move_destination.x - ally_ship->m_move_destination.x) < size * 2 && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size * 2)
 			{
 				sf::Vector2f perp_vector = m_move_clockwise == true ? sf::Vector2f(dy, -dx) : sf::Vector2f(-dy, dx);
 				ScaleVector(&perp_vector, size * 3);
@@ -349,7 +349,7 @@ void AIShip::OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float
 				AIShip* ally_ship = (AIShip*)ally;
 				float size = MaxBetweenValues(m_radius, ally_ship->m_radius);
 				//optim: make the "lighter" ship turn (checking turn speed)
-				if (m_turn_speed >= ally_ship->m_turn_speed && abs(m_move_destination.x - ally_ship->m_move_destination.x) < size && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size)
+				if (m_turn_speed >= ally_ship->m_turn_speed && abs(m_move_destination.x - ally_ship->m_move_destination.x) < size * 2 && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size * 2)
 				{
 					sf::Vector2f perp_vector = m_move_clockwise == true ? sf::Vector2f(dy, -dx) : sf::Vector2f(-dy, dx);
 					ScaleVector(&perp_vector, size * 3);
