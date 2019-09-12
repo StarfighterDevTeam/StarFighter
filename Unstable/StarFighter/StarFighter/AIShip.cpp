@@ -137,14 +137,23 @@ void AIShip::Update(sf::Time deltaTime)
 			sf::Vector2f vector = sf::Vector2f(dx, dy);
 			ScaleVector(&vector, m_range_max);
 			m_move_destination = m_target->m_position + vector;
-
-			GoTo(m_move_destination, deltaTime, inputs_direction);
 		}
 
+		//check if not overlapping with friends
+		OffsetMoveDestinationToAvoidAlliedShips(dx, dy);
+
+		//apply move
+		if (m_position != m_move_destination)
+			GoTo(m_move_destination, deltaTime, inputs_direction);
+
 		//turn towards target
-		TurnTo(m_target->m_position, deltaTime, inputs_direction);
+		if (m_position != m_move_destination)
+			TurnTo(m_move_destination, deltaTime, inputs_direction);
+		else
+			TurnTo(m_target->m_position, deltaTime, inputs_direction);
 	}
 
+	//apply inputs
 	ApplyFlightModel(deltaTime, inputs_direction);
 	
 	//Gravity circle to be drawn
@@ -267,7 +276,7 @@ void AIShip::SetROE(RuleOfEngagement roe)
 		for (SpatialObject* allied_ship : m_dynamic_allied_ships)
 			allied_ship->SpatialObject::SetROE(roe);
 
-		for (SpatialObject* allied_ship : m_forced_allied_ships)
+		for (SpatialObject* allied_ship : m_scripted_allied_ships)
 			allied_ship->SpatialObject::SetROE(roe);
 	}
 }
@@ -276,12 +285,12 @@ void AIShip::UpdateAlliedShips()
 {
 	//updating forced allied ships (removing the dead)
 	vector<SpatialObject*> tmp_forced_allied_ships;
-	for (SpatialObject* ally : m_forced_allied_ships)
+	for (SpatialObject* ally : m_scripted_allied_ships)
 		if (ally->m_garbageMe == false)
 			tmp_forced_allied_ships.push_back(ally);
-	m_forced_allied_ships.clear();
+	m_scripted_allied_ships.clear();
 	for (SpatialObject* ally : tmp_forced_allied_ships)
-		m_forced_allied_ships.push_back(ally);
+		m_scripted_allied_ships.push_back(ally);
 
 	//grouping with nearby allied ships
 	m_dynamic_allied_ships.clear();
@@ -294,7 +303,7 @@ void AIShip::UpdateAlliedShips()
 			{
 				//already a forced ally?
 				bool found = false;
-				for (SpatialObject* ally : m_forced_allied_ships)
+				for (SpatialObject* ally : m_scripted_allied_ships)
 					if (ally == allied_ship)
 					{
 						found = true;
@@ -305,4 +314,45 @@ void AIShip::UpdateAlliedShips()
 					m_dynamic_allied_ships.push_back((SpatialObject*)allied_ship);
 			}
 		}
+}
+
+void AIShip::OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float dy)
+{
+	bool check_ok = false;
+	while (check_ok == false)
+	{
+		check_ok = true;
+		for (SpatialObject* ally : m_scripted_allied_ships)
+		{
+			AIShip* ally_ship = (AIShip*)ally;
+			float size = MaxBetweenValues(m_radius, ally_ship->m_radius);
+			if (abs(m_move_destination.x - ally_ship->m_move_destination.x) < size && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size)
+			{
+				sf::Vector2f perp_vector = sf::Vector2f(dy, -dx);// RandomizeSign() == 1 ? sf::Vector2f(dy, -dx) : sf::Vector2f(-dy, dx);
+				ScaleVector(&perp_vector, size * 3);
+				m_move_destination += perp_vector;
+				check_ok = false;
+			}
+
+			if (check_ok == false)
+				break;
+		}
+
+		if (check_ok == true)//second part
+			for (SpatialObject* ally : m_dynamic_allied_ships)
+			{
+				AIShip* ally_ship = (AIShip*)ally;
+				float size = MaxBetweenValues(m_radius, ally_ship->m_radius);
+				if (abs(m_move_destination.x - ally_ship->m_move_destination.x) < size && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size)
+				{
+					sf::Vector2f perp_vector = sf::Vector2f(dy, -dx);
+					ScaleVector(&perp_vector, size * 3);
+					m_move_destination += perp_vector;
+					check_ok = false;
+				}
+
+				if (check_ok == false)
+					break;
+			}
+	}
 }

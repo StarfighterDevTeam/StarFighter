@@ -268,11 +268,11 @@ void Ship::InitShip()
 	//ship range and angle of fire max
 	m_range_max = 0;
 	for (Weapon* weapon : m_weapons)
-		m_range_max = MaxBetweenValues(sf::Vector2f(m_range_max, weapon->m_range));
+		m_range_max = MaxBetweenValues(m_range_max, weapon->m_range);
 
 	m_angle_coverage_max = 0;
 	for (Weapon* weapon : m_weapons)
-		m_angle_coverage_max = MaxBetweenValues(sf::Vector2f(m_angle_coverage_max, weapon->m_locking_angle_coverage));
+		m_angle_coverage_max = MaxBetweenValues(m_angle_coverage_max, weapon->m_locking_angle_coverage);
 
 	m_health = m_health_max;
 	m_shield = m_shield_max;

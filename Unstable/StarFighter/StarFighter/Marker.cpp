@@ -25,7 +25,7 @@ Marker::Marker(MarkerType marker_type, SpatialObject* target)
 		m_targeting_rect[i].setOutlineThickness(0);
 	}
 
-	const float size = MaxBetweenValues(sf::Vector2f(target->m_size.x, target->m_size.y));
+	const float size = MaxBetweenValues(target->m_size.x, target->m_size.y);
 	m_mission_rect.setSize(sf::Vector2f(size, size));
 	m_mission_rect.setOrigin(sf::Vector2f(m_mission_rect.getSize().x * 0.5, m_mission_rect.getSize().y * 0.5));
 	m_mission_rect.setOutlineThickness(4);
@@ -144,7 +144,7 @@ void Marker::Update(sf::Time deltaTime)
 	{
 		//targeting marker
 		const float L = m_targeting_rect[0].getSize().x - m_targeting_rect[0].getSize().y;
-		const float size = MaxBetweenValues(sf::Vector2f(m_target->m_size.x, m_target->m_size.y));
+		const float size = MaxBetweenValues(m_target->m_size.x, m_target->m_size.y);
 
 		m_targeting_rect[0].setPosition(sf::Vector2f(m_target->getPosition().x - size * 0.5 + (L * 0.5), m_target->getPosition().y - m_target->m_size.y * 0.5));
 		m_targeting_rect[1].setPosition(sf::Vector2f(m_target->getPosition().x - size * 0.5, m_target->getPosition().y - size * 0.5 + (L * 0.5)));

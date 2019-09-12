@@ -31,6 +31,7 @@ public :
 	void Death() override;
 	void SetROE(RuleOfEngagement roe) override;
 	void UpdateAlliedShips() override;
+	void OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float dy);
 
 	ShipType m_ship_type;
 
@@ -39,7 +40,7 @@ public :
 	RuleOfEngagement m_native_ROE;
 
 	vector<SpatialObject*> m_dynamic_allied_ships;
-	vector<SpatialObject*> m_forced_allied_ships;
+	vector<SpatialObject*> m_scripted_allied_ships;
 };
 
 #endif // AISHIP_H_INCLUDED

@@ -27,7 +27,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
+	//m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
 
 	//Flight model
 	m_speed_max = 800;
@@ -41,7 +41,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_shield_max = 20;
 	m_shield_range = 100;
 	m_shield_regen = 1.5;
-	m_isReflectingShots = true;
+	m_isReflectingShots = false;
 	m_energy_max = 100;
 	m_energy_regen = 10;
 
@@ -166,11 +166,11 @@ void Player::UpdateMissions()
 					case EnemyShipObject:
 					{
 						AIShip* ship = (AIShip*)object;
-						if (mission->m_mission_type == Mission_EliminateSquad)
+						if (mission->m_mission_type == Mission_EliminateSquad || mission->m_mission_type == Mission_Bounty)
 						{
 							//when reaching the target ship, mark and display the real number of enemy ships
 							if (mission->m_status == MissionStatus_Current && object->m_roe == ROE_FireAtWill && mission->m_marked_objectives.size() == 1)
-								for (SpatialObject* ally : ship->m_forced_allied_ships)
+								for (SpatialObject* ally : ship->m_scripted_allied_ships)
 								{
 									(*CurrentGame).m_playerShip->MarkThis(ally, true);
 									tmp_marked_objectives.push_back(ally);
