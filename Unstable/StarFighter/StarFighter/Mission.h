@@ -17,6 +17,7 @@ enum MissionType
 	Mission_Bounty,
 	Mission_EliminateBoss,
 	Mission_EliminateSquad,
+	Mission_Convoy,
 	NB_MISSION_TYPES,
 };
 

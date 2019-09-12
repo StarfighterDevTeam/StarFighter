@@ -71,6 +71,23 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 			break;
 		}
+		case Ship_Convoy:
+		{
+			m_speed_max = 100;
+			m_acceleration_max = 500;
+			m_turn_speed = 50;
+			m_braking_max = 3000;
+			m_idle_decelleration = 1000;
+
+			m_health_max = 100;
+			m_shield_max = 0;
+
+			textureName = hostility == Hostility_Ally ? "2D/V_Gamma1.png" : "2D/V_Gamma1_red.png";
+			textureSize = sf::Vector2f(75, 126);
+			frameNumber = 1;
+
+			break;
+		}
 	}
 
 	Init(m_position, m_speed, textureName, textureSize, frameNumber, animationNumber);
