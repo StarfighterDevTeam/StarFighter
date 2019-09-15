@@ -1,0 +1,4 @@
+univers
+minimap
+populate sector local (enemy random, planete random, alliés, marchands, ship wrecks)
+combat tactique : tweak ammo speed, lateral dodge

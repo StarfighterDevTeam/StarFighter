@@ -10,6 +10,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
+	m_forced_destination = NULL;
 
 	m_ship_type = ship_type;
 	SetHostility(hostility);
@@ -111,13 +112,14 @@ void AIShip::Update(sf::Time deltaTime)
 	bool input_fire = false;
 
 	//AI - move & shoot strategies
-	m_move_destination = m_position;
+	m_move_destination = (m_forced_destination == NULL || m_roe == ROE_Freeze) ? m_position : m_forced_destination->m_position;
 
 	if (m_target != NULL && m_target->m_garbageMe == true)
 		m_target = NULL;
 
 	switch (m_roe)
 	{
+		case ROE_Freeze:
 		case ROE_HoldFire:
 		case ROE_ReturnFire:
 		{
@@ -142,8 +144,15 @@ void AIShip::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Move strategy
-	if (m_target != NULL)
+	//Move to forced destination
+	if (m_position != m_move_destination)
+	{
+		GoTo(m_move_destination, deltaTime, inputs_direction);
+		TurnTo(m_move_destination, deltaTime, inputs_direction);
+	}
+
+	//Dynamic move strategy
+	if (m_roe != ROE_Freeze && m_target != NULL)
 	{
 		const float dx = m_position.x - m_target->m_position.x;
 		const float dy = m_position.y - m_target->m_position.y;
@@ -186,7 +195,7 @@ void AIShip::Update(sf::Time deltaTime)
 		{
 			weapon->Update(deltaTime);
 			if (m_target != NULL)
-				if (weapon->IsTargetAligned(m_target) == true)
+				if (weapon->IsTargetAligned(m_target, 30) == true)
 				{
 					if (weapon->IsReadyToFire() == true)
 						weapon->Fire();
@@ -212,7 +221,7 @@ void AIShip::SetHostility(Hostility hostility)
 
 bool AIShip::CheckMarkingConditions()
 {
-	return m_hostility == Hostility_Ally || m_roe == ROE_FireAtWill;
+	return m_roe == ROE_FireAtWill;
 }
 
 void AIShip::GetHitByAmmo(GameObject* ammo)
@@ -231,7 +240,7 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 
 	bool speed_up_authorized = dx*dx + dy*dy < 500 * 500 || m_speed.x*m_speed.x + m_speed.y*m_speed.y < dx*dx + dy*dy;//authorize to speed faster if very short distance or being far with a low speed
 
-	if (speed_up_authorized == true && abs(delta_angle) < m_angle_coverage_max)
+	if (speed_up_authorized == true && abs(delta_angle) < 10)
 		inputs_direction.y = -1;
 	else if (abs(delta_angle) > 90)
 		inputs_direction.y = 1;

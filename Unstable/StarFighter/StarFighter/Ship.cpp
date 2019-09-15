@@ -11,7 +11,6 @@ Ship::Ship() : SpatialObject()
 	m_isOrbiting = NULL;
 	m_orbit_angle = 0;
 	m_range_max = 0;
-	m_angle_coverage_max = 0;
 	m_isReflectingShots = false;
 	m_shield_regen_buffer = 0;
 	m_energy_regen_buffer = 0;
@@ -269,10 +268,6 @@ void Ship::InitShip()
 	m_range_max = 0;
 	for (Weapon* weapon : m_weapons)
 		m_range_max = MaxBetweenValues(m_range_max, weapon->m_range);
-
-	m_angle_coverage_max = 0;
-	for (Weapon* weapon : m_weapons)
-		m_angle_coverage_max = MaxBetweenValues(m_angle_coverage_max, weapon->m_locking_angle_coverage);
 
 	m_health = m_health_max;
 	m_shield = m_shield_max;

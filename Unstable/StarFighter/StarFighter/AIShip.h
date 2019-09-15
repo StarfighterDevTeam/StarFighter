@@ -37,6 +37,7 @@ public :
 	ShipType m_ship_type;
 
 	sf::Vector2f m_move_destination;
+	SpatialObject* m_forced_destination;
 	bool m_move_clockwise;
 	SpatialObject* m_target;
 	RuleOfEngagement m_native_ROE;

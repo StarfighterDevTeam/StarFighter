@@ -20,26 +20,21 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 		{
 			Planet* planet = (Planet*)target;
 			m_title_text = "GoTo Mission";
-			m_body_text = "Go to planet " + to_string(planet->m_planet_id);
 			break;
 		}
 		case Mission_Convoy:
 		{
-			Planet* planet = (Planet*)target;
 			m_title_text = "Convoy Mission";
-			m_body_text = "Join the convoy at planet " + to_string(planet->m_planet_id);
 			break;
 		}
 		case Mission_Bounty:
 		{
 			m_title_text = "Bounty Mission";
-			m_body_text = "Go to beacon";
 			break;
 		}
 		case Mission_EliminateBoss:
 		{
 			m_title_text = "Eliminate Mission";
-			m_body_text = "Eliminate target ship";
 			break;
 		}
 	}

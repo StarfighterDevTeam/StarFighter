@@ -181,7 +181,7 @@ pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i s
 
 Mission* Gameloop::CreateMission(Planet* owner)
 {
-	MissionType mission_type = Mission_Convoy;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 
 	//find sector where to create the mission
@@ -197,32 +197,31 @@ Mission* Gameloop::CreateMission(Planet* owner)
 	switch (mission_type)
 	{
 		case Mission_GoTo:
-		case Mission_Convoy:
 		{
 			//re-use an existing planet and add a mission to it
 			if (planet != NULL)
 				planet->m_nb_missions_to_create++;
 			//sector unknown => create a planet
 			else
-				planet = CreatePlanet(found_index, Hostility_Ally, 1, 3);
-
-			if (mission_type == Mission_Convoy)
-			{
-				//create convoy
-				AIShip* ship = CreateAIShip(Ship_Convoy, found_index, 0, Hostility_Ally, ROE_HoldFire);
-				ship->m_isOrbiting = planet;
-
-				//convoy destination
-				pair<Planet*, sf::Vector2i> destination_sector = SnailSearchSectorForMission(found_index, mission_type);
-
-				if (destination_sector.first == NULL)
-					destination_sector.first = CreatePlanet(destination_sector.second, Hostility_Ally, 0, 0);
-
-				ship->m_move_destination.x = 1.f * destination_sector.first->m_sector_index.x * STAR_SECTOR_SIZE;
-				ship->m_move_destination.y = 1.f * destination_sector.first->m_sector_index.y * STAR_SECTOR_SIZE;
-			}
+				planet = CreatePlanet(found_index, Hostility_Ally, 2, 3);
 
 			return new Mission(mission_type, planet, planet);
+		}
+		case Mission_Convoy:
+		{
+			AIShip* ship = CreateAIShip(Ship_Convoy, found_index, 0, Hostility_Ally, ROE_Freeze);
+
+			//convoy destination
+			sf::Vector2i destination_index = sf::Vector2i(found_index.x + RandomizeSign() * RandomizeIntBetweenValues(15, 20), found_index.y + RandomizeSign() * RandomizeIntBetweenValues(15, 20));
+			pair<Planet*, sf::Vector2i> destination_sector = SnailSearchSectorForMission(destination_index, mission_type);
+
+			if (destination_sector.first == NULL)
+				destination_sector.first = CreatePlanet(destination_sector.second, Hostility_Ally, 2, 3);
+
+			ship->m_forced_destination = destination_sector.first;
+			ship->m_heading = GetAngleRadFromVector(sf::Vector2f(ship->m_forced_destination->m_position.x - ship->m_position.x, ship->m_forced_destination->m_position.y - ship->m_position.y)) * 180 / M_PI;
+
+			return new Mission(mission_type, ship, destination_sector.first);
 		}
 		case Mission_Bounty:
 		{
@@ -282,15 +281,11 @@ bool Gameloop::IsSectorNearAnExistingMission(sf::Vector2i sector_index)
 	Player* player = (Player*)(*CurrentGame).m_playerShip;
 	for (Mission* mission : player->m_missions)
 		if (mission->m_marked_objectives.empty() == false)
-			for (SpatialObject* objective : mission->m_marked_objectives)
-			{
-				sf::Vector2i objective_index = mission->m_marked_objectives.front()->m_sector_index;
-				//minimum distance between a new mission and existing objectives can be adjusted here, and can be any value really
-				if (abs(sector_index.x - objective_index.x) < 3.f * REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE && abs(sector_index.y - objective_index.y) < 3.f * REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE)
-				{
-					return true;
-				}
-			}
+		{
+			sf::Vector2i objective_index = mission->m_marked_objectives.front()->m_sector_index;
+			if (abs(sector_index.x - objective_index.x) < 3.f * REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE && abs(sector_index.y - objective_index.y) < 3.f * REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE)
+				return true;
+		}
 
 	return false;
 }

@@ -20,8 +20,7 @@ public:
 	void Fire();
 	void Update(sf::Time deltaTime);
 	bool IsReadyToFire();
-	bool CanStayLocked(SpatialObject* object);
-	bool IsTargetAligned(SpatialObject* target);
+	bool IsTargetAligned(SpatialObject* target, float angle_tolerance);
 
 	SpatialObject* m_owner;
 	sf::Vector2f m_position;
@@ -37,7 +36,6 @@ public:
 	float m_range;
 	SpatialObject* m_locked_target;
 	float m_locking_target_clock;
-	float m_locking_angle_coverage;
 	int m_damage;
 	int m_energy_cost;
 

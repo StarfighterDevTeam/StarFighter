@@ -17,7 +17,6 @@ Weapon::Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type,
 
 	m_locked_target = NULL;
 	m_locking_target_clock = 0;
-	m_locking_angle_coverage = 30;
 
 	m_lock_rectangle.setOutlineColor(sf::Color::Green);
 	m_lock_rectangle.setOutlineThickness(-2);
@@ -75,43 +74,6 @@ void Weapon::Update(sf::Time deltaTime)
 		m_rate_of_fire_timer -= deltaTime.asSeconds();
 	else	
 		m_rate_of_fire_timer = 0;
-	
-	//locking target
-	/*
-	if (m_locked_target == NULL)
-	{
-		ColliderType collider = m_collider == PlayerFire ? EnemyShip : AllyShipObject;
-		GameObject* locked_target = (*CurrentGame).GetClosestObjectTyped(m_position, collider, m_range, m_locking_angle_coverage / 2);
-
-		if (locked_target != NULL)
-		{
-			m_locking_target_clock += deltaTime.asSeconds();
-			if (m_locking_target_clock >= 1)
-			{
-				//lock target
-				m_locked_target = locked_target;
-
-				m_lock_rectangle.setSize(sf::Vector2f((m_locked_target->m_radius * 2) + 2, (m_locked_target->m_radius * 2) + 2));
-				m_lock_rectangle.setOrigin(sf::Vector2f(m_locked_target->m_radius + 1, m_locked_target->m_radius + 1));
-				m_lock_rectangle.setPosition(m_locked_target->getPosition());
-			}
-		}
-		else
-		{
-			m_locking_target_clock = 0;
-		}
-	}
-	else
-	{
-		m_lock_rectangle.setPosition(m_locked_target->getPosition());
-
-		if (CanStayLocked(m_locked_target) == false)
-		{
-			m_locked_target = NULL;
-			m_locking_target_clock = 0;
-		}
-	}
-	*/
 }
 
 bool Weapon::IsReadyToFire()
@@ -121,33 +83,11 @@ bool Weapon::IsReadyToFire()
 	return rate_of_fire;
 }
 
-bool Weapon::CanStayLocked(SpatialObject* object)
-{
-	if (object->m_visible == false || object->m_garbageMe == true)
-	{
-		return false;
-	}
-
-	float angle_delta = GetAngleDegToTargetPosition(m_position, m_heading, object->getPosition());
-	if (abs(angle_delta) > m_locking_angle_coverage)
-	{
-		return false;
-	}
-
-	float dist_squared = GetDistanceSquaredBetweenPositions(m_position, object->getPosition());
-	if (dist_squared > m_range * m_range)
-	{
-		return false;
-	}
-	
-	return true;
-}
-
-bool Weapon::IsTargetAligned(SpatialObject* target)
+bool Weapon::IsTargetAligned(SpatialObject* target, float angle_tolerance)
 {
 	const float dx = target->m_position.x - m_position.x;
 	const float dy = target->m_position.y - m_position.y;
-	if (dx*dx + dy*dy <= m_range * m_range && abs(GetAngleDegToTargetPosition(m_position, m_heading, target->m_position)) <= m_locking_angle_coverage)
+	if (dx*dx + dy*dy <= m_range * m_range && abs(GetAngleDegToTargetPosition(m_position, m_heading, target->m_position)) <= angle_tolerance)
 		return true;
 	else
 		return false;

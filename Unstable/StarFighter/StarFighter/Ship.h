@@ -41,7 +41,6 @@ public :
 	float m_idle_decelleration;
 	vector<Weapon*> m_weapons;
 	float m_range_max;
-	float m_angle_coverage_max;
 	int m_health;
 	int m_health_max;
 	float m_shield_range;

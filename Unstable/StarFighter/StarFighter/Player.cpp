@@ -151,16 +151,23 @@ void Player::UpdateMissions()
 						}
 						else
 							tmp_marked_objectives.push_back(object);
+
+						mission->m_body_text = "Go to beacon";
 						break;
 					}
 					case PlanetObject:
 					{
 						Planet* planet = (Planet*)object;
-
 						if (mission->m_status == MissionStatus_Current && m_isOrbiting == object)
 							UnmarkThis(object, true);
 						else
 							tmp_marked_objectives.push_back(object);
+
+						//update text
+						if (mission->m_mission_type == Mission_GoTo)
+							mission->m_body_text = "Go to planet " + to_string(planet->m_planet_id);
+						else
+							mission->m_body_text = "Go back to planet " + to_string(planet->m_planet_id);
 						break;
 					}
 					case EnemyShipObject:
@@ -181,7 +188,7 @@ void Player::UpdateMissions()
 						else if (mission->m_mission_type == Mission_EliminateBoss)
 							mission->m_body_text = "Destroy target enemy.";
 
-						if (ship->m_health == 0)
+						if (ship->m_garbageMe == true)
 						{
 							UnmarkThis(object, true);
 
@@ -195,6 +202,51 @@ void Player::UpdateMissions()
 						}
 						else
 							tmp_marked_objectives.push_back(object);
+						break;
+					}
+					case AllyShipObject:
+					{
+						AIShip* ship = (AIShip*)object;
+
+						if (mission->m_status == MissionStatus_Current)
+						{	
+							//player near convoy and convoy freezed => start convoy movement
+							if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 200 * 200)
+								ship->SetROE(ROE_HoldFire);
+							
+							//convoy on the move?
+							if (ship->m_roe != ROE_Freeze)
+							{
+								//arrived at destination?
+								if (GetDistanceSquaredBetweenPositions(ship->m_position, ship->m_forced_destination->m_position) < 200 * 200)
+								{
+									UnmarkThis(object, true);
+									object->m_garbageMe = true;
+								}
+								//too far from convoy = freeze convoy movement
+								else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * REF_WINDOW_RESOLUTION_X)
+								{
+									ship->SetROE(ROE_Freeze);
+									tmp_marked_objectives.push_back(ship);
+								}
+								else
+									tmp_marked_objectives.push_back(ship);
+							}
+							else
+								tmp_marked_objectives.push_back(ship);
+						}
+						else
+						{
+							if (ship->m_roe != ROE_Freeze)
+								ship->SetROE(ROE_Freeze);
+							tmp_marked_objectives.push_back(object);
+						}
+
+						//update text
+						if (ship->m_roe == ROE_Freeze)
+							mission->m_body_text = "Rejoin the convoy";
+						else
+							mission->m_body_text = "Escort the convoy";
 						break;
 					}
 				}
