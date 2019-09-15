@@ -10,7 +10,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
-	m_forced_destination = NULL;
+	m_scripted_destination = NULL;
 
 	m_ship_type = ship_type;
 	SetHostility(hostility);
@@ -103,7 +103,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 AIShip::~AIShip()
 {
-
+	delete m_scripted_destination;
 }
 
 void AIShip::Update(sf::Time deltaTime)
@@ -112,7 +112,7 @@ void AIShip::Update(sf::Time deltaTime)
 	bool input_fire = false;
 
 	//AI - move & shoot strategies
-	m_move_destination = (m_forced_destination == NULL || m_roe == ROE_Freeze) ? m_position : m_forced_destination->m_position;
+	m_move_destination = (m_scripted_destination == NULL || m_roe == ROE_Freeze) ? m_position : *m_scripted_destination;
 
 	if (m_target != NULL && m_target->m_garbageMe == true)
 		m_target = NULL;
@@ -163,6 +163,10 @@ void AIShip::Update(sf::Time deltaTime)
 			sf::Vector2f vector = sf::Vector2f(dx, dy);
 			ScaleVector(&vector, m_range_max);
 			m_move_destination = m_target->m_position + vector;
+		}
+		else
+		{
+			m_move_destination = m_position;
 		}
 
 		//check if not overlapping with friends

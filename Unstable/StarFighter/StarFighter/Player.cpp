@@ -218,13 +218,13 @@ void Player::UpdateMissions()
 							if (ship->m_roe != ROE_Freeze)
 							{
 								//arrived at destination?
-								if (GetDistanceSquaredBetweenPositions(ship->m_position, ship->m_forced_destination->m_position) < 200 * 200)
+								if (ship->m_scripted_destination != NULL && GetDistanceSquaredBetweenPositions(ship->m_position, *ship->m_scripted_destination) < 200 * 200)
 								{
 									UnmarkThis(object, true);
 									object->m_garbageMe = true;
 								}
 								//too far from convoy = freeze convoy movement
-								else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * REF_WINDOW_RESOLUTION_X)
+								else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
 								{
 									ship->SetROE(ROE_Freeze);
 									tmp_marked_objectives.push_back(ship);
@@ -260,7 +260,7 @@ void Player::UpdateMissions()
 			if (mission->m_marked_objectives.empty() == true)
 			{
 				EndMission(mission, MissionStatus_Complete);
-				mission->m_owner->m_nb_missions_to_create++;
+				//mission->m_owner->m_nb_missions_to_create++;
 				missions_to_delete.push_back(mission);
 			}
 		}

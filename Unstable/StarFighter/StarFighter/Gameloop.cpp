@@ -104,6 +104,14 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 	return ship;
 }
 
+EscortShip* Gameloop::CreateEscortShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, AIShip* escorted_ship, sf::Vector2f escort_offset)
+{
+	EscortShip* ship = new EscortShip(ship_type, sector_index, heading, hostility, roe, escorted_ship, escort_offset);
+	if (ship->m_removeMe == false)
+		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
+	return ship;
+}
+
 Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create_min, int nb_missions_to_create_max)
 {
 	int nb_missions_to_create = RandomizeIntBetweenValues(nb_missions_to_create_min, nb_missions_to_create_max);
@@ -181,7 +189,7 @@ pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i s
 
 Mission* Gameloop::CreateMission(Planet* owner)
 {
-	MissionType mission_type = (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	MissionType mission_type = Mission_Convoy;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 
 	//find sector where to create the mission
@@ -203,7 +211,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				planet->m_nb_missions_to_create++;
 			//sector unknown => create a planet
 			else
-				planet = CreatePlanet(found_index, Hostility_Ally, 2, 3);
+				planet = CreatePlanet(found_index, Hostility_Ally);
 
 			return new Mission(mission_type, planet, planet);
 		}
@@ -216,11 +224,17 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			pair<Planet*, sf::Vector2i> destination_sector = SnailSearchSectorForMission(destination_index, mission_type);
 
 			if (destination_sector.first == NULL)
-				destination_sector.first = CreatePlanet(destination_sector.second, Hostility_Ally, 2, 3);
+				destination_sector.first = CreatePlanet(destination_sector.second, Hostility_Ally);
 
-			ship->m_forced_destination = destination_sector.first;
-			ship->m_heading = GetAngleRadFromVector(sf::Vector2f(ship->m_forced_destination->m_position.x - ship->m_position.x, ship->m_forced_destination->m_position.y - ship->m_position.y)) * 180 / M_PI;
+			ship->m_scripted_destination = new sf::Vector2f(destination_sector.first->m_position);
+			sf::Vector2f destination_vector = sf::Vector2f(destination_sector.first->m_position.x - ship->m_position.x, destination_sector.first->m_position.y - ship->m_position.y);
+			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180 / M_PI;
 
+			//convoy escorts
+			EscortShip* ally = CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, 0));
+
+			AIShip* enemy = CreateAIShip(Ship_Alpha, destination_sector.second, ship->m_heading + 180, Hostility_Enemy, ROE_Ambush);
+			
 			return new Mission(mission_type, ship, destination_sector.first);
 		}
 		case Mission_Bounty:

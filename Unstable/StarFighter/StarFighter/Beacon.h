@@ -1,7 +1,7 @@
 #ifndef BEACON_H_INCLUDED
 #define BEACON_H_INCLUDED
 
-#include "AIShip.h"
+#include "EscortShip.h"
 
 class Beacon : public SpatialObject
 {

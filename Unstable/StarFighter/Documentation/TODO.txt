@@ -2,3 +2,9 @@ univers
 minimap
 populate sector local (enemy random, planete random, alliés, marchands, ship wrecks)
 combat tactique : tweak ammo speed, lateral dodge
+
+ESCORT :
+- l'escort fait des allers retours de merde
+- l'escort ne disparait pas en fin de mission
+- le convoi ne s'arrête pas quand il est attaqué (admettons)
+- l'ennemi est trop statique et se fait dépasser => il pourrait essayer de rester à distance max ?
