@@ -210,27 +210,30 @@ void Player::UpdateMissions()
 
 						if (mission->m_status == MissionStatus_Current)
 						{	
-							//player near convoy and convoy freezed => start convoy movement
-							if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
+							//escort is figthing?
+							bool escort_is_fighting = false;
+							for (GameObject* escort_object : (*CurrentGame).m_sceneGameObjectsTyped[AllyShipObject])
 							{
-								//escorting ships are fighting?
-								bool escort_is_fighting = false;
-								for (GameObject* escort_object : (*CurrentGame).m_sceneGameObjectsTyped[AllyShipObject])
+								SpatialObject* escort_ally = (SpatialObject*)escort_object;
+								if (escort_ally->GetEscortedShip() != NULL && escort_ally->GetEscortedShip() == ship && escort_ally->m_roe == ROE_FireAtWill)
 								{
-									SpatialObject* escort_ally = (SpatialObject*)escort_object;
-									if (escort_ally->GetEscortedShip() != NULL && escort_ally->GetEscortedShip() == ship && escort_ally->m_roe == ROE_FireAtWill)
-									{
-										escort_is_fighting = true;
-										break;
-									}
+									escort_is_fighting = true;
+									break;
 								}
+							}
 
-								//escort not fighting => ready to start convoy
-								if (escort_is_fighting == false)
+							//escort is fighting => stop the convoy
+							if (escort_is_fighting == true)
+								ship->SetROE(ROE_Freeze);
+							//player near convoy, convoy freezed, escort is not fighting and no enemy nearby? => set convoy on the move
+							else if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
+							{
+								//no enemy on nearby?
+								if (GetTargetableEnemyShip(ship, REF_WINDOW_RESOLUTION_X * 0.5, 360) == NULL)
 									ship->SetROE(ROE_HoldFire);
 							}
 								
-							
+								
 							//convoy on the move?
 							if (ship->m_roe != ROE_Freeze)
 							{

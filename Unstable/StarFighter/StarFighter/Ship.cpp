@@ -218,16 +218,20 @@ void Ship::GetHitByAmmo(GameObject* ammo)
 		}
 
 	//no shield
-	if (damage > 0)
+	if (m_shield <= 0)
 	{
 		//FX hit
-		m_health -= damage;
-		if (m_health < 0)
-			m_health = 0;
-		m_hit_feedback_timer = 0.05;
 		ammo->m_garbageMe = true;
 		FX* new_FX = new FX(FX_Hit, ammo->m_position);
 		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+
+		if (damage > 0)
+		{
+			m_health -= damage;
+			if (m_health < 0)
+				m_health = 0;
+			m_hit_feedback_timer = 0.05;
+		}
 	}
 
 	//Death?

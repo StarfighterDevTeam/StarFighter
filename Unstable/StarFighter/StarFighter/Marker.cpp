@@ -4,9 +4,9 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Marker::Marker(MarkerType marker_type, SpatialObject* target)
+Marker::Marker(MarkerType marker_type, SpatialObject* marker_target)
 {
-	m_target = target;
+	m_marker_target = marker_target;
 
 	m_distance_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_distance_text.setCharacterSize(18);
@@ -25,7 +25,7 @@ Marker::Marker(MarkerType marker_type, SpatialObject* target)
 		m_targeting_rect[i].setOutlineThickness(0);
 	}
 
-	const float size = MaxBetweenValues(target->m_size.x, target->m_size.y);
+	const float size = MaxBetweenValues(marker_target->m_size.x, marker_target->m_size.y);
 	m_mission_rect.setSize(sf::Vector2f(size, size));
 	m_mission_rect.setOrigin(sf::Vector2f(m_mission_rect.getSize().x * 0.5, m_mission_rect.getSize().y * 0.5));
 	m_mission_rect.setOutlineThickness(4);
@@ -82,16 +82,16 @@ void Marker::Update(sf::Time deltaTime)
 	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 
 	//update target's position respect to the player, as it may not be set because of the far distance (m_removeMe == true)
-	m_target->setPosition(sf::Vector2f(m_target->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_target->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	m_marker_target->setPosition(sf::Vector2f(m_marker_target->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_marker_target->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 
 	//is target on screen? if yes, marker doesn't need to be visible
-	m_onScreen = IsInsideArea(m_target->m_size, m_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y)) == true;
+	m_onScreen = IsInsideArea(m_marker_target->m_size, m_marker_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y)) == true;
 
 	if (m_onScreen == false)
 	{
 		//orientation of the marker
-		const float dx = m_target->getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5;
-		const float dy = m_target->getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5;
+		const float dx = m_marker_target->getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5;
+		const float dy = m_marker_target->getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5;
 		const float angle = GetAngleRadFromVector(sf::Vector2f(dx, -dy));
 		setRotation(angle * 180 / M_PI);
 
@@ -102,7 +102,7 @@ void Marker::Update(sf::Time deltaTime)
 		//compute the line equation to the target and stich it to the adequate screen border
 		const float a = REF_WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_X;//as in y=ax+b
 		const float a2 = dx != 0 ? dy / dx : 0;
-		const float b2 = m_target->getPosition().y - (a2 * m_target->getPosition().x);
+		const float b2 = m_marker_target->getPosition().y - (a2 * m_marker_target->getPosition().x);
 
 		//text
 		m_distance_text.setString(to_string((int)GetVectorLength(sf::Vector2f(dx, dy))) + "m");
@@ -144,22 +144,22 @@ void Marker::Update(sf::Time deltaTime)
 	{
 		//targeting marker
 		const float L = m_targeting_rect[0].getSize().x - m_targeting_rect[0].getSize().y;
-		const float size = MaxBetweenValues(m_target->m_size.x, m_target->m_size.y);
+		const float size = MaxBetweenValues(m_marker_target->m_size.x, m_marker_target->m_size.y);
 
-		m_targeting_rect[0].setPosition(sf::Vector2f(m_target->getPosition().x - size * 0.5 + (L * 0.5), m_target->getPosition().y - m_target->m_size.y * 0.5));
-		m_targeting_rect[1].setPosition(sf::Vector2f(m_target->getPosition().x - size * 0.5, m_target->getPosition().y - size * 0.5 + (L * 0.5)));
+		m_targeting_rect[0].setPosition(sf::Vector2f(m_marker_target->getPosition().x - size * 0.5 + (L * 0.5), m_marker_target->getPosition().y - m_marker_target->m_size.y * 0.5));
+		m_targeting_rect[1].setPosition(sf::Vector2f(m_marker_target->getPosition().x - size * 0.5, m_marker_target->getPosition().y - size * 0.5 + (L * 0.5)));
 
-		m_targeting_rect[2].setPosition(sf::Vector2f(m_target->getPosition().x + size * 0.5 - (L * 0.5), m_target->getPosition().y - m_target->m_size.y * 0.5));
-		m_targeting_rect[3].setPosition(sf::Vector2f(m_target->getPosition().x + size * 0.5, m_target->getPosition().y - size * 0.5 + (L * 0.5)));
+		m_targeting_rect[2].setPosition(sf::Vector2f(m_marker_target->getPosition().x + size * 0.5 - (L * 0.5), m_marker_target->getPosition().y - m_marker_target->m_size.y * 0.5));
+		m_targeting_rect[3].setPosition(sf::Vector2f(m_marker_target->getPosition().x + size * 0.5, m_marker_target->getPosition().y - size * 0.5 + (L * 0.5)));
 
-		m_targeting_rect[4].setPosition(sf::Vector2f(m_target->getPosition().x - size * 0.5 + (L * 0.5), m_target->getPosition().y + m_target->m_size.y * 0.5));
-		m_targeting_rect[5].setPosition(sf::Vector2f(m_target->getPosition().x - size * 0.5, m_target->getPosition().y + size * 0.5 - (L * 0.5)));
+		m_targeting_rect[4].setPosition(sf::Vector2f(m_marker_target->getPosition().x - size * 0.5 + (L * 0.5), m_marker_target->getPosition().y + m_marker_target->m_size.y * 0.5));
+		m_targeting_rect[5].setPosition(sf::Vector2f(m_marker_target->getPosition().x - size * 0.5, m_marker_target->getPosition().y + size * 0.5 - (L * 0.5)));
 
-		m_targeting_rect[6].setPosition(sf::Vector2f(m_target->getPosition().x + size * 0.5 - (L * 0.5), m_target->getPosition().y + m_target->m_size.y * 0.5));
-		m_targeting_rect[7].setPosition(sf::Vector2f(m_target->getPosition().x + size * 0.5, m_target->getPosition().y + size * 0.5 - (L * 0.5)));
+		m_targeting_rect[6].setPosition(sf::Vector2f(m_marker_target->getPosition().x + size * 0.5 - (L * 0.5), m_marker_target->getPosition().y + m_marker_target->m_size.y * 0.5));
+		m_targeting_rect[7].setPosition(sf::Vector2f(m_marker_target->getPosition().x + size * 0.5, m_marker_target->getPosition().y + size * 0.5 - (L * 0.5)));
 
 		//mission marker
-		m_mission_rect.setPosition(m_target->getPosition());
+		m_mission_rect.setPosition(m_marker_target->getPosition());
 	}
 
 	if (m_frameNumber > 1)

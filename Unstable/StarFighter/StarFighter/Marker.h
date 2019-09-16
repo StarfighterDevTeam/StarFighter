@@ -14,7 +14,7 @@ enum MarkerType
 class Marker : public GameObject
 {
 public:
-	Marker(MarkerType marker_type, SpatialObject* target);
+	Marker(MarkerType marker_type, SpatialObject* marker_target);
 	~Marker();
 	
 	void Update(sf::Time deltaTime);
@@ -22,7 +22,7 @@ public:
 	void SetMarkerType(MarkerType marker_type);
 
 	MarkerType m_marker_type;
-	SpatialObject* m_target;
+	SpatialObject* m_marker_target;
 	sf::Text m_distance_text;
 	sf::RectangleShape m_targeting_rect[8];
 	sf::RectangleShape m_mission_rect;

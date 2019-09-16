@@ -131,7 +131,7 @@ void AIShip::Update(sf::Time deltaTime)
 			input_fire = true;
 
 			if (m_target != NULL)
-				m_target = KeepTarget();
+				m_target = KeepTarget(MaxBetweenValues(m_range_max, AMBUSH_ENGAGEMENT_DISTANCE));//distance max to keep track of the current target
 
 			if (m_target == NULL)
 				m_target = GetTargetableEnemyShip(m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE, 360);
@@ -234,12 +234,28 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 {
 	if (m_roe == ROE_ReturnFire || m_roe == ROE_Ambush)
 		SetROE(ROE_FireAtWill);
+	else
+	{
+		//allies can replicate if this ship cannot
+		for (SpatialObject* allied_ship : m_dynamic_allied_ships)
+		{
+			Ship* ship = (Ship*)allied_ship;
+			if (ship->m_roe == ROE_ReturnFire || ship->m_roe == ROE_Ambush)
+				ship->Ship::SetROE(ROE_FireAtWill);
+		}
+
+		for (SpatialObject* allied_ship : m_scripted_allied_ships)
+		{
+			Ship* ship = (Ship*)allied_ship;
+			if (ship->m_roe == ROE_ReturnFire || ship->m_roe == ROE_Ambush)
+				ship->Ship::SetROE(ROE_FireAtWill);
+		}
+	}
 
 	//switch target in case we're taking fire while we're aiming at an unarmed target
 	Ammo* ammo_ = (Ammo*)ammo;
 	if ((m_roe == ROE_Ambush || m_roe == ROE_FireAtWill) && m_target != NULL && m_target->HasWeapons() == false && ammo_->m_owner != NULL)
-		if (GetDistanceSquaredBetweenPositions(m_position, ammo_->m_owner->m_position) <= m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE * AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE * FIREATWILL_ENGAGEMENT_DISTANCE)
-			m_target = ammo_->m_owner;
+		m_target = ammo_->m_owner;
 
 	Ship::GetHitByAmmo(ammo);
 }
@@ -282,13 +298,13 @@ void AIShip::Draw(RenderTarget& screen)
 	}
 }
 
-SpatialObject* AIShip::KeepTarget()
+SpatialObject* AIShip::KeepTarget(const float dist_max)
 {
 	const float a = m_position.x - m_target->m_position.x;
 	const float b = m_position.y - m_target->m_position.y;
 
-	float distance_to_ref = (a * a) + (b * b);
-	if (distance_to_ref > m_range_max * m_range_max)
+	const float distance_squared = a*a + b*b;
+	if (distance_squared > dist_max * dist_max)
 		m_target = NULL;
 
 	if (m_target != NULL && abs(GetAngleDegToTargetPosition(m_position, m_heading, m_target->m_position) > 90))

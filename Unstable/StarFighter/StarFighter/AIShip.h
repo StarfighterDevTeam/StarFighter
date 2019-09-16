@@ -31,7 +31,7 @@ public :
 	void GetHitByAmmo(GameObject* ammo) override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	void TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
-	SpatialObject* KeepTarget();
+	SpatialObject* KeepTarget(const float dist_max);
 	void Death() override;
 	void SetROE(RuleOfEngagement roe) override;
 	void UpdateAlliedShips() override;
