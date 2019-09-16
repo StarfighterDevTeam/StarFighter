@@ -61,5 +61,14 @@ void EscortShip::Update(sf::Time deltaTime)
 
 void EscortShip::SetROE(RuleOfEngagement roe)
 {
-	SpatialObject::SetROE(roe);
+	AIShip::SetROE(roe);
+
+	if (m_escorted_ship != NULL)
+		if (roe == ROE_FireAtWill)
+			m_escorted_ship->SetROE(ROE_Freeze);
+}
+
+AIShip* EscortShip::GetEscortedShip()
+{
+	return m_escorted_ship;
 }

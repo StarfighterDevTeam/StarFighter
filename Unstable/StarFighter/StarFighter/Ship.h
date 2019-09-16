@@ -32,6 +32,7 @@ public :
 	void UpdateOrbit(sf::Time deltaTime);
 	float GetRadius() const override;
 	float GetGravitationRange() override;
+	void SetROE(RuleOfEngagement roe) override;
 
 	sf::Vector2f m_inputs_direction;
 	float m_acceleration;

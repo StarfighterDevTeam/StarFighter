@@ -363,3 +363,9 @@ float Ship::GetGravitationRange()
 {
 	return m_gravitation_range;
 }
+
+void Ship::SetROE(RuleOfEngagement roe)
+{
+	if (roe != ROE_FireAtWill || m_weapons.empty() == false)//can't use ROE_FireAtWill without weapons
+		SpatialObject::SetROE(roe);
+}

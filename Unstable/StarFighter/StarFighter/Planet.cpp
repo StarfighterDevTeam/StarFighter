@@ -19,7 +19,7 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_t
 	} while ((*CurrentGame).m_planet_ids[m_planet_id] != NULL);
 	(*CurrentGame).m_planet_ids[m_planet_id] = this;
 
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(138, 138), 1, NB_PLANET_TYPES);
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(PLANET_RADIUS * 2, PLANET_RADIUS * 2), 1, NB_PLANET_TYPES);
 	SetAnimationLine(RandomizeIntBetweenValues(0, NB_PLANET_TYPES - 1));
 	m_heading = 0;
 
@@ -30,7 +30,7 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_t
 	setRotation(m_heading);
 
 	//gravity
-	m_gravity_range = 200;
+	m_gravity_range = PLANET_ORBIT_RANGE;
 	m_gravity_period = 8;
 
 	m_orbit_circle.setRadius(m_gravity_range);

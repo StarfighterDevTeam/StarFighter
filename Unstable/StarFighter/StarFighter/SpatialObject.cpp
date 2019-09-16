@@ -82,3 +82,8 @@ SpatialObject* SpatialObject::GetTargetableEnemyShip(const float dist_max, const
 
 	return target;
 }
+
+AIShip* SpatialObject::GetEscortedShip()
+{
+	return NULL;
+}

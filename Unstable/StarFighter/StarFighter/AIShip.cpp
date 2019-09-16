@@ -311,10 +311,17 @@ void AIShip::SetROE(RuleOfEngagement roe)
 	if (roe == ROE_FireAtWill)
 	{
 		for (SpatialObject* allied_ship : m_dynamic_allied_ships)
-			allied_ship->SpatialObject::SetROE(roe);
+		{
+			Ship* ship = (Ship*)allied_ship;
+			ship->Ship::SetROE(roe);
+		}
+			
 
 		for (SpatialObject* allied_ship : m_scripted_allied_ships)
-			allied_ship->SpatialObject::SetROE(roe);
+		{
+			Ship* ship = (Ship*)allied_ship;
+			ship->Ship::SetROE(roe);
+		}
 	}
 }
 

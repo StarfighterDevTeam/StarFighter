@@ -5,7 +5,9 @@
 
 class Mission;
 
-#define NB_PLANET_TYPES		18
+#define NB_PLANET_TYPES			18
+#define PLANET_ORBIT_RANGE		200
+#define PLANET_RADIUS			69
 
 class Planet : public SpatialObject
 {
