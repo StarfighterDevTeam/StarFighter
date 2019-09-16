@@ -45,12 +45,6 @@ void EscortShip::Update(sf::Time deltaTime)
 			TurnTo(*m_escorted_ship->m_scripted_destination + offset_vector, deltaTime, m_inputs_direction);//look to a projection of the scripted position, rather than the position around the escorted ship
 		}
 
-		//update marking
-		if (m_hostility == Hostility_Ally && m_escorted_ship->m_marker_mission != NULL && m_marker_target == NULL)
-			(*CurrentGame).m_playerShip->MarkThis(this, false);
-		else if (m_hostility == Hostility_Ally && m_escorted_ship->m_marker_mission == NULL && m_marker_target != NULL)
-			(*CurrentGame).m_playerShip->UnmarkThis(this, false);
-
 		//escorted ship is dying?
 		if (m_escorted_ship->m_garbageMe == true)
 			m_escorted_ship = NULL;
@@ -71,4 +65,9 @@ void EscortShip::SetROE(RuleOfEngagement roe)
 AIShip* EscortShip::GetEscortedShip()
 {
 	return m_escorted_ship;
+}
+
+bool EscortShip::CheckMarkingConditions()
+{
+	return m_escorted_ship != NULL && m_escorted_ship->m_marker_mission != NULL;
 }
