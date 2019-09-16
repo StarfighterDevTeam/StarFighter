@@ -63,11 +63,11 @@ Game::Game(RenderWindow* window)
 	//Star Hunter
 
 	//we need an odd number of sectors on X and Y axis
-	m_nb_sectors_managed_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 2;
+	m_nb_sectors_managed_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 4;
 	if (m_nb_sectors_managed_x % 2 == 0)
 		m_nb_sectors_managed_x++;
 
-	m_nb_sectors_managed_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 2;
+	m_nb_sectors_managed_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 4;
 	if (m_nb_sectors_managed_y % 2 == 0)
 		m_nb_sectors_managed_y++;
 
@@ -524,6 +524,8 @@ void Game::UpdateSectorList(bool force_update)
 			for (GameObject* object : m_sceneGameObjectsStored[id])
 			{
 				addToScene(object, object->m_layer, object->m_collider, false);
+				if (object->m_collider == AllyShipObject)
+					printf("\n\nSPAWN\n");
 				//printf("game object restored.\n");
 			}
 

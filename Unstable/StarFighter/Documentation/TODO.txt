@@ -13,7 +13,7 @@ x le convoi ne doit pas redémarrer s'il y a un ennemi proche
 x le convoi n'avance pas s'il se fait tirer dessus
 - en escort, on se met entre le tireur et le convoi
 - ne pas spawner la destination entre le joueur et le convoy
-
+- l'escort pop quand on arrive vite
 
 AI Enemy
 x cible armée vs cible pas armée : essayer de changer de cible quand on reçoit un tir alors qu'on vise une cible pas armée
@@ -21,7 +21,8 @@ x cible armée vs cible pas armée : essayer de changer de cible quand on reçoi
 - essayer de rester à portée max
 - line of sight sur cible
 - se décaler pour dodge quand touché
+- on peut leurrer l'ennemi loin de la planète cible pour ensuite y amener le convoi (=> la mission ou du moins la position ennemie)
 
 Dette technique
-- le GetTargetableEnemyShip override dans Player est plus que suspicieux
-- essayer de faire l'update marking de l'escort dans CheckMarkingConditions() plutôt que dans l'update de EscortShip
+x le GetTargetableEnemyShip override dans Player est plus que suspicieux
+x essayer de faire l'update marking de l'escort dans CheckMarkingConditions() plutôt que dans l'update de EscortShip

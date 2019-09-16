@@ -11,6 +11,7 @@ public :
 	void Update(sf::Time deltaTime) override;
 	void SetROE(RuleOfEngagement roe) override;
 	AIShip* GetEscortedShip() override;
+	bool CheckMarkingConditions() override;
 
 	AIShip* m_escorted_ship;
 	sf::Vector2f m_escorted_offset;

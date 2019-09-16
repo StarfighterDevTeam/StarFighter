@@ -18,27 +18,23 @@ SpatialObject::~SpatialObject()
 
 void SpatialObject::Update(sf::Time deltaTime)
 {
+	//update target markers
+	if (m_marker_target == NULL && CheckMarkingConditions() == true)
+		(*CurrentGame).m_playerShip->MarkThis(this, false);
+	else if (m_marker_target != NULL && CheckMarkingConditions() == false)
+		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
+
 	GameObject::Update(deltaTime);
 }
 
 void SpatialObject::SetHostility(Hostility hostility)
 {
 	m_hostility = hostility;
-
-	if (m_marker_target == NULL && CheckMarkingConditions() == true)
-		(*CurrentGame).m_playerShip->MarkThis(this, false);
-	else if (m_marker_target != NULL && CheckMarkingConditions() == false)
-		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
 }
 
 void SpatialObject::SetROE(RuleOfEngagement roe)
 {
 	m_roe = roe;
-
-	if (m_marker_target == NULL && CheckMarkingConditions() == true)
-		(*CurrentGame).m_playerShip->MarkThis(this, false);
-	else if (m_marker_target != NULL && CheckMarkingConditions() == false)
-		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
 }
 
 bool SpatialObject::IsMarked()
