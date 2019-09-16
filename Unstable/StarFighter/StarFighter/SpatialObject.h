@@ -16,6 +16,7 @@ enum Hostility
 enum RuleOfEngagement
 {
 	ROE_Freeze,
+	ROE_MoveCautiously,
 	ROE_HoldFire,
 	ROE_ReturnFire,
 	ROE_Ambush,

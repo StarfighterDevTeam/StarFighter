@@ -236,12 +236,17 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 		SetROE(ROE_FireAtWill);
 	else
 	{
+		if (m_roe != ROE_FireAtWill && m_roe != ROE_Freeze)
+			SetROE(ROE_Freeze);
+
 		//allies can replicate if this ship cannot
 		for (SpatialObject* allied_ship : m_dynamic_allied_ships)
 		{
 			Ship* ship = (Ship*)allied_ship;
 			if (ship->m_roe == ROE_ReturnFire || ship->m_roe == ROE_Ambush)
 				ship->Ship::SetROE(ROE_FireAtWill);
+			else if (m_roe != ROE_FireAtWill && m_roe != ROE_Freeze)
+				SetROE(ROE_Freeze);
 		}
 
 		for (SpatialObject* allied_ship : m_scripted_allied_ships)
@@ -249,6 +254,8 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 			Ship* ship = (Ship*)allied_ship;
 			if (ship->m_roe == ROE_ReturnFire || ship->m_roe == ROE_Ambush)
 				ship->Ship::SetROE(ROE_FireAtWill);
+			else if (m_roe != ROE_FireAtWill && m_roe != ROE_Freeze)
+				SetROE(ROE_Freeze);
 		}
 	}
 

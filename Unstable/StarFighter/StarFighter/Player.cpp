@@ -230,9 +230,8 @@ void Player::UpdateMissions()
 							{
 								//no enemy on nearby?
 								if (GetTargetableEnemyShip(ship, REF_WINDOW_RESOLUTION_X * 0.5, 360) == NULL)
-									ship->SetROE(ROE_HoldFire);
+									ship->SetROE(ship->m_native_ROE);
 							}
-								
 								
 							//convoy on the move?
 							if (ship->m_roe != ROE_Freeze)

@@ -217,7 +217,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		}
 		case Mission_Convoy:
 		{
-			AIShip* ship = CreateAIShip(Ship_Convoy, found_index, 0, Hostility_Ally, ROE_Freeze);
+			AIShip* ship = CreateAIShip(Ship_Convoy, found_index, 0, Hostility_Ally, ROE_MoveCautiously);
 
 			//convoy destination
 			sf::Vector2i destination_index = sf::Vector2i(found_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 6), found_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 6));
