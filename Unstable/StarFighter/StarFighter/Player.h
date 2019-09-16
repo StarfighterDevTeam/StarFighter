@@ -49,7 +49,6 @@ public :
 	void UnmarkThis(SpatialObject* target, bool isMission) override;
 	void UpdateMarkers(sf::Time deltaTime) override;
 	int GetMarkedObjectsCount() override;
-	SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max) override;
 	bool AcceptMission(Mission* mission);
 	void SetCurrentMission(Mission* mission);
 	void RemoveMission(Mission* mission);

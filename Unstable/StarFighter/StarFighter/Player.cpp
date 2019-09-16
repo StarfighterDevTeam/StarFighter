@@ -229,7 +229,7 @@ void Player::UpdateMissions()
 							else if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
 							{
 								//no enemy on nearby?
-								if (GetTargetableEnemyShip(ship, REF_WINDOW_RESOLUTION_X * 0.5, 360) == NULL)
+								if (ship->GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X * 0.5, 360) == NULL)
 									ship->SetROE(ship->m_native_ROE);
 							}
 								
@@ -608,38 +608,6 @@ void Player::RemoveMission(Mission* mission)
 	}
 
 	delete mission;
-}
-
-SpatialObject* Player::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
-{
-	float shortest_distance = -1;
-	SpatialObject* target = NULL;
-
-	for (SpatialObject* marked_object : m_marked_objects)
-	{
-		if (marked_object->m_garbageMe == true || marked_object->m_collider != EnemyShipObject)
-			continue;
-
-		const float a = ref_object->m_position.x - marked_object->m_position.x;
-		const float b = ref_object->m_position.y - marked_object->m_position.y;
-
-		float distance_to_ref = (a * a) + (b * b);
-		if (distance_to_ref < shortest_distance || shortest_distance < 0)
-		{
-			if (distance_to_ref < dist_max * dist_max)
-			{
-				float angle_delta = GetAngleDegToTargetPosition(ref_object->m_position, ref_object->m_heading, marked_object->m_position);
-
-				if (abs(angle_delta) < angle_delta_max)
-				{
-					shortest_distance = distance_to_ref;
-					target = marked_object;
-				}
-			}
-		}
-	}
-	
-	return target;
 }
 
 void Player::DebugDrawMissions()
