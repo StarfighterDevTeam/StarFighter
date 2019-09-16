@@ -33,6 +33,7 @@ public :
 	float GetRadius() const override;
 	float GetGravitationRange() override;
 
+	sf::Vector2f m_inputs_direction;
 	float m_acceleration;
 	float m_acceleration_max;
 	float m_speed_max;

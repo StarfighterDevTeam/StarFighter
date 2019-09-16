@@ -108,7 +108,6 @@ AIShip::~AIShip()
 
 void AIShip::Update(sf::Time deltaTime)
 {
-	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	bool input_fire = false;
 
 	//AI - move & shoot strategies
@@ -137,7 +136,7 @@ void AIShip::Update(sf::Time deltaTime)
 			if (m_target == NULL)
 				m_target = GetTargetableEnemyShip(m_roe == ROE_Ambush ? REF_WINDOW_RESOLUTION_X * 0.5 : REF_WINDOW_RESOLUTION_X * 2, 360);
 
-			if (m_target == NULL)//no target is sight => go back to native Rule of engagement
+			if (m_target == NULL && m_roe != m_native_ROE)//no target is sight => go back to native Rule of engagement
 				SetROE(m_native_ROE);
 
 			break;
@@ -145,13 +144,13 @@ void AIShip::Update(sf::Time deltaTime)
 	}
 
 	//Move to forced destination
-	if (m_position != m_move_destination)
+	if (m_position != m_move_destination && m_inputs_direction == sf::Vector2f(0, 0))
 	{
-		GoTo(m_move_destination, deltaTime, inputs_direction);
-		TurnTo(m_move_destination, deltaTime, inputs_direction);
+		GoTo(m_move_destination, deltaTime, m_inputs_direction);
+		TurnTo(m_move_destination, deltaTime, m_inputs_direction);
 	}
 
-	//Dynamic move strategy
+	//Enemy target at proximity? => Overwrite current plans
 	if (m_roe != ROE_Freeze && m_target != NULL)
 	{
 		const float dx = m_position.x - m_target->m_position.x;
@@ -175,18 +174,21 @@ void AIShip::Update(sf::Time deltaTime)
 		//move and turn towards destination
 		if (m_position != m_move_destination)
 		{
-			GoTo(m_move_destination, deltaTime, inputs_direction);
-			TurnTo(m_move_destination, deltaTime, inputs_direction);
+			GoTo(m_move_destination, deltaTime, m_inputs_direction);
+			TurnTo(m_move_destination, deltaTime, m_inputs_direction);
 		}
 		else
 		{
 			m_move_clockwise = !m_move_clockwise;//randomize -1 : 1 for the next time we'll have to decide between clockwise or counter-clockwise movement
-			TurnTo(m_target->m_position, deltaTime, inputs_direction);
+			TurnTo(m_target->m_position, deltaTime, m_inputs_direction);
 		}
 	}
 
 	//apply inputs
-	ApplyFlightModel(deltaTime, inputs_direction);
+	ApplyFlightModel(deltaTime, m_inputs_direction);
+
+	//reset inputs for next frame
+	m_inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	
 	//Gravity circle to be drawn
 	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
@@ -242,9 +244,10 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 
-	bool speed_up_authorized = dx*dx + dy*dy < 500 * 500 || m_speed.x*m_speed.x + m_speed.y*m_speed.y < dx*dx + dy*dy;//authorize to speed faster if very short distance or being far with a low speed
+	bool speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed destination is very far relative to the current speed
+	//printf("GO sqrt dx+dy: %f, sqrt speed: %f\n", sqrt(dx*dx + dy*dy), sqrt(m_speed.x*m_speed.x + m_speed.y*m_speed.y));
 
-	if (speed_up_authorized == true && abs(delta_angle) < 10)
+	if (speed_up_authorized == true && abs(delta_angle) < 15)
 		inputs_direction.y = -1;
 	else if (abs(delta_angle) > 90)
 		inputs_direction.y = 1;
@@ -256,9 +259,9 @@ void AIShip::TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inp
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 
-	if (delta_angle < -1)//let's not bother moving, this would only create micro movements
+	if (delta_angle < -2)//let's not bother moving, this would only create micro movements
 		inputs_direction.x = 1;
-	else if (delta_angle > 1)
+	else if (delta_angle > 2)
 		inputs_direction.x = -1;
 }
 
@@ -329,7 +332,7 @@ void AIShip::UpdateAlliedShips()
 	//grouping with nearby allied ships
 	m_dynamic_allied_ships.clear();
 	for (GameObject* allied_ship : (*CurrentGame).m_sceneGameObjectsTyped[m_collider])
-		if (allied_ship != this && allied_ship->m_garbageMe == false)
+		if (allied_ship != this && allied_ship->m_garbageMe == false && allied_ship != (*CurrentGame).m_playerShip)
 		{
 			const float dx = allied_ship->m_position.x - m_position.x;
 			const float dy = allied_ship->m_position.y - m_position.y;

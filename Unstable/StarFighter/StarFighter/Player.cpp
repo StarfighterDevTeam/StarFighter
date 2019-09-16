@@ -59,20 +59,20 @@ void Player::Update(sf::Time deltaTime)
 	//controls
 	UpdateInputStates();
 
-	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+	m_inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
 	{
-		inputs_direction = InputGuy::getDirections();
+		m_inputs_direction = InputGuy::getDirections();
 
 		if (InputGuy::isSpeeding() == true)
-			inputs_direction.y = -1;
+			m_inputs_direction.y = -1;
 		if (InputGuy::isBraking() == true)
-			inputs_direction.y = 1;
+			m_inputs_direction.y = 1;
 		else if (sf::Joystick::isConnected(0) == true && InputGuy::isSpeeding() == false)
-			inputs_direction.y = 0;
+			m_inputs_direction.y = 0;
 	}
 
-	ApplyFlightModel(deltaTime, inputs_direction);
+	ApplyFlightModel(deltaTime, m_inputs_direction);
 
 	//weapons
 	for (Weapon* weapon : m_weapons)
@@ -220,8 +220,16 @@ void Player::UpdateMissions()
 								//arrived at destination?
 								if (ship->m_scripted_destination != NULL && GetDistanceSquaredBetweenPositions(ship->m_position, *ship->m_scripted_destination) < 200 * 200)
 								{
-									UnmarkThis(object, true);
-									object->m_garbageMe = true;
+									UnmarkThis(ship, true);
+									ship->m_garbageMe = true;
+
+									//delete escorting ships
+									for (GameObject* escort_ship : ship->m_scripted_allied_ships)
+									{
+										UnmarkThis((SpatialObject*)escort_ship, false);
+										escort_ship->m_garbageMe = true;
+									}
+										
 								}
 								//too far from convoy = freeze convoy movement
 								else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)

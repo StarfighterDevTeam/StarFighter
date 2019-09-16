@@ -231,9 +231,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180 / M_PI;
 
 			//convoy escorts
-			EscortShip* ally = CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, 0));
+			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, 0)));
 
-			AIShip* enemy = CreateAIShip(Ship_Alpha, destination_sector.second, ship->m_heading + 180, Hostility_Enemy, ROE_Ambush);
+			AIShip* enemy = CreateAIShip(Ship_Alpha, destination_sector.second + sf::Vector2i(2, 0), ship->m_heading + 180, Hostility_Enemy, ROE_Ambush);
 			
 			return new Mission(mission_type, ship, destination_sector.first);
 		}

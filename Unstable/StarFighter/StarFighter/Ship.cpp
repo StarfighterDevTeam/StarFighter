@@ -7,6 +7,7 @@ using namespace sf;
 // ----------------SHIP ---------------
 Ship::Ship() : SpatialObject()
 {
+	m_inputs_direction = sf::Vector2f(0, 0);
 	m_hit_feedback_timer = 0;
 	m_isOrbiting = NULL;
 	m_orbit_angle = 0;

@@ -8,3 +8,7 @@ ESCORT :
 - l'escort ne disparait pas en fin de mission
 - le convoi ne s'arrête pas quand il est attaqué (admettons)
 - l'ennemi est trop statique et se fait dépasser => il pourrait essayer de rester à distance max ?
+- ne pas spawner la destination entre le joueur et le convoy
+- le marking target ally de l'escort update ne semble pas marcher
+- en escort, on se met entre le tireur et le convoi
+- essayer de faire l'update marking de l'escort dans CheckMarkingConditions() plutôt que dans l'update de EscortShip
