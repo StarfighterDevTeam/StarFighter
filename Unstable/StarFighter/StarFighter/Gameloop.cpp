@@ -33,9 +33,8 @@ Gameloop::Gameloop()
 Gameloop::~Gameloop()
 {
 	for (StarGenerator* star_generator : m_star_generator)
-	{
 		delete star_generator;
-	}
+
 	m_star_generator.clear();
 }
 
@@ -109,6 +108,7 @@ EscortShip* Gameloop::CreateEscortShip(ShipType ship_type, sf::Vector2i sector_i
 	EscortShip* ship = new EscortShip(ship_type, sector_index, heading, hostility, roe, escorted_ship, escort_offset);
 	if (ship->m_removeMe == false)
 		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
+
 	return ship;
 }
 
@@ -231,7 +231,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180 / M_PI;
 
 			//convoy escorts
-			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, 0)));
+			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, -100)));
 			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(0, -300)));
 
 			AIShip* enemy = CreateAIShip(Ship_Alpha, destination_sector.second + sf::Vector2i(2, 0), ship->m_heading + 180, Hostility_Enemy, ROE_Ambush);

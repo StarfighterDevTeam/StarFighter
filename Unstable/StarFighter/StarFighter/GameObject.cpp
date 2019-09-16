@@ -143,10 +143,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 
 GameObject::~GameObject()
 {
-	//TODO
-
-	//delete equipment_loot;
-	//delete weapon_loot;
+	
 }
 
 void GameObject::Update(sf::Time deltaTime)

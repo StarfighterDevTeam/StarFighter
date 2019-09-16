@@ -86,4 +86,16 @@ SpatialObject* SpatialObject::GetTargetableEnemyShip(const float dist_max, const
 AIShip* SpatialObject::GetEscortedShip()
 {
 	return NULL;
+	//see override function in class EscortShip
+}
+
+bool SpatialObject::HasWeapons()
+{
+	return false;
+	//see override function in class Ship
+}
+
+void SpatialObject::AddAmmoToShotsFired(Ammo* ammo)
+{
+	//see override function in class Ship
 }

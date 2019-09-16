@@ -15,11 +15,12 @@ enum AmmoType
 class Ammo : public GameObject
 {
 public:
-	Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider);
+	Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider);
 	~Ammo();
 
 	AmmoType m_ammo_type;
 
+	SpatialObject* m_owner;
 	float m_acceleration;
 	float m_speed_min;
 	float m_speed_max;

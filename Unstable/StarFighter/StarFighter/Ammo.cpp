@@ -4,8 +4,9 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ammo::Ammo(AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider)
+Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider)
 {
+	m_owner = owner;
 	m_ammo_type = ammo_type;
 	m_damage = damage;
 	m_locked_target = NULL;
@@ -72,6 +73,9 @@ Ammo::~Ammo()
 
 void Ammo::Update(sf::Time deltaTime)
 {
+	if (m_owner != NULL && m_owner->m_garbageMe == true)
+		m_owner = NULL;
+
 	m_lifespan -= deltaTime.asSeconds();
 
 	if (m_lifespan <= 0)

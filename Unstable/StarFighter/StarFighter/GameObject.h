@@ -54,7 +54,8 @@ public:
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, int stroke_size = 0);
 	GameObject();
-	
+	virtual ~GameObject();
+
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber = 1, int animationNumber = 1);
@@ -62,8 +63,6 @@ public:
 
 	static sf::Uint8* CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size = 0);
 	static void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
-
-	~GameObject();
 
 	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(RenderTarget& screen);

@@ -262,6 +262,9 @@ void Game::UpdateScene(Time deltaTime)
 	//Update quad-tree classification of objects
 	UpdateSectorList(false);
 
+	//Empty garbage objects
+	ClearGarbage();
+
 	//Update GameObjects, interface and feedbacks
 	UpdateObjects(deltaTime);
 
@@ -284,7 +287,7 @@ void Game::UpdateObjects(Time deltaTime)
 	for (GameObject* object : m_sceneGameObjects)
 	{
 		if (object->m_garbageMe == true)
-			delete object;
+			m_garbageObjects.push_back(object);
 		else if (object->m_removeMe == false)//if true, we trust it has already been stored in m_sceneGameObjectsStored, therefore there is no memory leak if we don't push it back
 		{
 			if (object != m_playerShip)//was updated before-hand
@@ -676,4 +679,12 @@ bool Game::StoreObjectIfNecessary(GameObject* object)
 	//printf("manuel storage\n");
 
 	return true;
+}
+
+void Game::ClearGarbage()
+{
+	for (GameObject* object : m_garbageObjects)
+		delete object;
+
+	m_garbageObjects.clear();
 }

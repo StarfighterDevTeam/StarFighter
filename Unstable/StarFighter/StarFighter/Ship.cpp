@@ -58,7 +58,8 @@ Ship::Ship() : SpatialObject()
 
 Ship::~Ship()
 {
-	
+	for (Ammo* ammo : m_shots_fired)
+		ammo->m_owner = NULL;
 }
 
 void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
@@ -368,4 +369,14 @@ void Ship::SetROE(RuleOfEngagement roe)
 {
 	if (roe != ROE_FireAtWill || m_weapons.empty() == false)//can't use ROE_FireAtWill without weapons
 		SpatialObject::SetROE(roe);
+}
+
+bool Ship::HasWeapons()
+{
+	return m_weapons.empty() == false;
+}
+
+void Ship::AddAmmoToShotsFired(Ammo* ammo)
+{
+	m_shots_fired.push_back(ammo);
 }

@@ -9,6 +9,9 @@
 
 #include "Ship.h";
 
+#define AMBUSH_ENGAGEMENT_DISTANCE			(REF_WINDOW_RESOLUTION_X * 0.5)
+#define FIREATWILL_ENGAGEMENT_DISTANCE		(REF_WINDOW_RESOLUTION_X * 2)
+
 enum ShipType
 {
 	Ship_Alpha,
@@ -20,7 +23,7 @@ class AIShip : public Ship
 {
 public :
 	AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe);
-	~AIShip();
+	virtual ~AIShip();
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void SetHostility(Hostility hostility) override;

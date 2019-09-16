@@ -70,6 +70,7 @@ public:
 	void removeFromFeedbacks(SFPanel* panel);
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
 
+	void ClearGarbage();
 	void UpdateObjects(Time deltaTime);
 	void UpdateScene(Time deltaTime);
 	void drawScene();
@@ -131,6 +132,7 @@ public:
 	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_ColliderType];
 	vector<GameObject*> m_temp_sceneGameObjects;
 	map<int, vector<GameObject*> > m_sceneGameObjectsStored;
+	vector<GameObject*> m_garbageObjects;
 
 	int m_nb_sectors_managed_x;
 	int m_nb_sectors_managed_y;

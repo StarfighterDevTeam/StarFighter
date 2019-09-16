@@ -134,7 +134,7 @@ void AIShip::Update(sf::Time deltaTime)
 				m_target = KeepTarget();
 
 			if (m_target == NULL)
-				m_target = GetTargetableEnemyShip(m_roe == ROE_Ambush ? REF_WINDOW_RESOLUTION_X * 0.5 : REF_WINDOW_RESOLUTION_X * 2, 360);
+				m_target = GetTargetableEnemyShip(m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE, 360);
 
 			if (m_target == NULL && m_roe != m_native_ROE)//no target is sight => go back to native Rule of engagement
 				SetROE(m_native_ROE);
@@ -235,6 +235,12 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 	if (m_roe == ROE_ReturnFire || m_roe == ROE_Ambush)
 		SetROE(ROE_FireAtWill);
 
+	//switch target in case we're taking fire while we're aiming at an unarmed target
+	Ammo* ammo_ = (Ammo*)ammo;
+	if ((m_roe == ROE_Ambush || m_roe == ROE_FireAtWill) && m_target != NULL && m_target->HasWeapons() == false && ammo_->m_owner != NULL)
+		if (GetDistanceSquaredBetweenPositions(m_position, ammo_->m_owner->m_position) <= m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE * AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE * FIREATWILL_ENGAGEMENT_DISTANCE)
+			m_target = ammo_->m_owner;
+
 	Ship::GetHitByAmmo(ammo);
 }
 
@@ -316,7 +322,6 @@ void AIShip::SetROE(RuleOfEngagement roe)
 			ship->Ship::SetROE(roe);
 		}
 			
-
 		for (SpatialObject* allied_ship : m_scripted_allied_ships)
 		{
 			Ship* ship = (Ship*)allied_ship;

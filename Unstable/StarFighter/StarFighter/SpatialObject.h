@@ -4,6 +4,7 @@
 #include "FX.h"
 
 class Marker;
+class Ammo;
 
 enum Hostility
 {
@@ -35,6 +36,8 @@ public :
 	SpatialObject* GetTargetableEnemyShip(const float dist_max, const float angle_delta_max);
 	virtual void SetROE(RuleOfEngagement roe);
 	virtual AIShip* GetEscortedShip();
+	virtual bool HasWeapons();
+	virtual void AddAmmoToShotsFired(Ammo* ammo);
 
 	Marker* m_marker_target;
 	Marker* m_marker_mission;

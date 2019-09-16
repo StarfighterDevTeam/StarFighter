@@ -28,7 +28,8 @@ class Player : public Ship
 {
 public :
 	Player(sf::Vector2i sector_index);
-	virtual ~Player();
+	~Player();
+
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void UpdateInputStates();

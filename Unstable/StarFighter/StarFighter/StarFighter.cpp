@@ -144,7 +144,6 @@ int main()
 		}
 	}
 	
-
 	delete gameloop;
 
 	return 0;

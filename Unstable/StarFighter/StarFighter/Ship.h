@@ -33,6 +33,8 @@ public :
 	float GetRadius() const override;
 	float GetGravitationRange() override;
 	void SetROE(RuleOfEngagement roe) override;
+	bool HasWeapons() override;
+	void AddAmmoToShotsFired(Ammo* ammo) override;
 
 	sf::Vector2f m_inputs_direction;
 	float m_acceleration;
@@ -42,6 +44,7 @@ public :
 	float m_braking_max;
 	float m_idle_decelleration;
 	vector<Weapon*> m_weapons;
+	vector<Ammo*> m_shots_fired;
 	float m_range_max;
 	int m_health;
 	int m_health_max;
