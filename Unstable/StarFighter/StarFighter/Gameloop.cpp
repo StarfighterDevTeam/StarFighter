@@ -220,7 +220,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			AIShip* ship = CreateAIShip(Ship_Convoy, found_index, 0, Hostility_Ally, ROE_Freeze);
 
 			//convoy destination
-			sf::Vector2i destination_index = sf::Vector2i(found_index.x + RandomizeSign() * RandomizeIntBetweenValues(15, 20), found_index.y + RandomizeSign() * RandomizeIntBetweenValues(15, 20));
+			sf::Vector2i destination_index = sf::Vector2i(found_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 6), found_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 6));
 			pair<Planet*, sf::Vector2i> destination_sector = SnailSearchSectorForMission(destination_index, mission_type);
 
 			if (destination_sector.first == NULL)

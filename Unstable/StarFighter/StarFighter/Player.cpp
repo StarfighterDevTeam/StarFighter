@@ -435,11 +435,13 @@ void Player::SetControllerType(ControlerType contoller)
 
 void Player::MarkThis(SpatialObject* target, bool isMission)
 {
+	//change flag and add marker if necessary
 	if (isMission == true && target->m_marker_mission == NULL)
 			target->m_marker_mission = new Marker(Marker_Mission, target);
 	else if (isMission == false && target->m_marker_target == NULL)
 		target->m_marker_target = new Marker(target->m_hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy, target);
-
+		
+	//already marked?
 	for (SpatialObject* object : m_marked_objects)
 		if (object == target)
 			return;
