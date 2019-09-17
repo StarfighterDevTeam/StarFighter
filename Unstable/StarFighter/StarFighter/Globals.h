@@ -95,6 +95,7 @@ float GetAngleRadFromVector(sf::Vector2f vector);
 float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
 bool NormalizeVector(sf::Vector2f* vector, float max_value);
 void ScaleVector(sf::Vector2f* vector, float target_value);
+void ScaleVectorInt(sf::Vector2i* vector, int target_value);
 float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 float GetVectorLength(sf::Vector2f vector);

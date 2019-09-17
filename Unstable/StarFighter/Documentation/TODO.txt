@@ -12,8 +12,8 @@ x l'escort doit répliquer si le convoi est attaqué
 x le convoi ne doit pas redémarrer s'il y a un ennemi proche
 x le convoi n'avance pas s'il se fait tirer dessus
 x l'escort pop quand on arrive vite
+x ne pas spawner la destination entre le joueur et le convoy
 - en escort, on se met entre le tireur et le convoi
-- ne pas spawner la destination entre le joueur et le convoy
 
 
 AI Enemy

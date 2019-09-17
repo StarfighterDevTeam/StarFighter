@@ -270,6 +270,16 @@ void ScaleVector(sf::Vector2f* vector, float target_value)
 	vector->y *= p;
 }
 
+void ScaleVectorInt(sf::Vector2i* vector, int target_value)
+{
+	if (vector->x == 0 && vector->y == 0)
+		return;
+
+	float p = 1.f * target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+	vector->x *= p;
+	vector->y *= p;
+}
+
 float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
