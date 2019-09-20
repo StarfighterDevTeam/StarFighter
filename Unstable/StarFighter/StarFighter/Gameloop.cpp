@@ -217,6 +217,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		}
 		case Mission_Convoy:
 		{
+			//convoy
 			AIShip* ship = CreateAIShip(Ship_Convoy, found_index, 0, Hostility_Ally, ROE_MoveCautiously);
 
 			//convoy destination
@@ -236,7 +237,24 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, -400)));
 			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(0, -500)));
 
-			AIShip* enemy = CreateAIShip(Ship_Alpha, destination_sector.second + sf::Vector2i(2, 0), ship->m_heading + 180, Hostility_Enemy, ROE_Ambush);
+			//enemy "trap"
+			float path_ratio = RandomizeFloatBetweenValues(0.4, 0.8);
+			float perpAngle = angle + M_PI_2 * RandomizeSign();
+			
+			Beacon* beacon = new Beacon(sf::Vector2i(0, 0));
+			beacon->m_position = sf::Vector2f(ship->m_position.x - path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y - path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
+			beacon->UpdateStarSectorIndex();
+
+			for (int e = 0; e < 3; e++)
+			{
+				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, perpAngle);
+				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
+				angle += 0.08;
+
+				AIShip* ship = new AIShip(Ship_Alpha, beacon->m_sector_index + offset, (perpAngle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
+				ship->m_visible = false;
+				beacon->m_ships_to_create.push_back(ship);
+			}
 			
 			return new Mission(mission_type, ship, destination_sector.first);
 		}
@@ -249,7 +267,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 				angle += 0.08;
 
-				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_HoldFire);
+				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
 				ship->m_visible = false;
 				beacon->m_ships_to_create.push_back(ship);
 			}
