@@ -139,8 +139,7 @@ void Player::UpdateMissions()
 							Beacon* beacon = (Beacon*)object;
 							for (AIShip* ship : beacon->m_ships_to_create)
 							{
-								//(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, true);
-								ship->m_visible = true;
+								(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, true);
 								ship->SetROE(ROE_FireAtWill);
 								(*CurrentGame).m_playerShip->MarkThis(ship, true);
 
@@ -476,9 +475,8 @@ void Player::MarkThis(SpatialObject* target, bool isMission)
 	m_marked_objects.push_back(target);
 
 	//add to game objects updated if not present
-	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[target->m_collider])
-		if (object == target)
-			return;
+	if (target->m_removeMe == false)
+		return;
 
 	(*CurrentGame).addToScene(target, target->m_layer, target->m_collider, true);
 

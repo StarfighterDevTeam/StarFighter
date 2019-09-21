@@ -48,7 +48,6 @@ void Beacon::Activate()
 	for (AIShip* ship : m_ships_to_create)
 	{
 		(*CurrentGame).addToScene(ship, AIShipLayer, ship->m_hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, true);
-		ship->m_visible = true;
 		ship->SetROE(ROE_FireAtWill);
 	}
 

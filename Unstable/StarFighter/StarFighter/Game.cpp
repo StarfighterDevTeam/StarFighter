@@ -198,7 +198,7 @@ void Game::addToScene(GameObject *object, LayerType layer, ColliderType type, bo
 	object->m_layer = layer;
 	object->m_collider = type;
 	object->m_removeMe = false;
-		
+
 	if (created_by_updated_object == true)
 	{
 		m_temp_sceneGameObjects.push_back(object);
@@ -595,9 +595,6 @@ void Game::SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index)
 
 	object->m_position.x = 1.f * sector_index.x * STAR_SECTOR_SIZE;
 	object->m_position.y = 1.f * sector_index.y * STAR_SECTOR_SIZE;
-
-	if (object != m_playerShip)
-		StoreObjectIfNecessary(object);
 }
 
 void Game::DebugDrawSectors()

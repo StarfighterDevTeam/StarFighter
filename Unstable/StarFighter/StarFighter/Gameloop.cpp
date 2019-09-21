@@ -14,7 +14,6 @@ Gameloop::Gameloop()
 	(*CurrentGame).UpdateSectorList(true);
 
 	//Init first mission
-	//sf::Vector2i index = sf::Vector2i(player->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), player->m_sector_index.y + RandomizeIntBetweenValues(10, 15));
 	sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(2, 2));
 	Planet* planet = CreatePlanet(index, Hostility_Ally, 1, 1);
 	Mission* mission = new Mission(Mission_GoTo, planet, planet);
@@ -98,15 +97,18 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe)
 {
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe);
-	if (ship->m_removeMe == false)
+
+	if ((*CurrentGame).StoreObjectIfNecessary(ship) == false)
 		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
+
 	return ship;
 }
 
 EscortShip* Gameloop::CreateEscortShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, AIShip* escorted_ship, sf::Vector2f escort_offset)
 {
 	EscortShip* ship = new EscortShip(ship_type, sector_index, heading, hostility, roe, escorted_ship, escort_offset);
-	if (ship->m_removeMe == false)
+
+	if ((*CurrentGame).StoreObjectIfNecessary(ship) == false)
 		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
 
 	return ship;
@@ -117,7 +119,8 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	int nb_missions_to_create = RandomizeIntBetweenValues(nb_missions_to_create_min, nb_missions_to_create_max);
 
 	Planet* planet = new Planet(sector_index, hostility, nb_missions_to_create);
-	if (planet->m_removeMe == false)
+	
+	if ((*CurrentGame).StoreObjectIfNecessary(planet) == false)
 		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject, false);
 
 	return planet;
@@ -126,7 +129,8 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 Beacon* Gameloop::CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective)
 {
 	Beacon* beacon = new Beacon(sector_index, trigger, isMissionObjective);
-	if (beacon->m_removeMe == false)
+
+	if ((*CurrentGame).StoreObjectIfNecessary(beacon) == false)
 		(*CurrentGame).addToScene(beacon, BeaconLayer, BeaconObject, false);
 
 	return beacon;
@@ -261,7 +265,6 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				angle += 0.08;
 
 				AIShip* ship = new AIShip(Ship_Alpha, beacon->m_sector_index + offset, (perpAngle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
-				ship->m_visible = false;
 				beacon->m_ships_to_create.push_back(ship);
 			}
 			
@@ -269,7 +272,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		}
 		case Mission_Bounty:
 		{
-			Beacon* beacon = new Beacon(found_index, (SpatialObject*)(*CurrentGame).m_playerShip, true);
+			Beacon* beacon = CreateBeacon(found_index, (SpatialObject*)(*CurrentGame).m_playerShip, true);
 			for (int e = 0; e < 3; e++)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
@@ -277,7 +280,6 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				angle += 0.08;
 
 				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
-				ship->m_visible = false;
 				beacon->m_ships_to_create.push_back(ship);
 			}
 				
