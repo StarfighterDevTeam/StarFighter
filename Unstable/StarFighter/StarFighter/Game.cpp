@@ -378,6 +378,10 @@ void Game::CollisionChecks()
 				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
 					enemy->GetHitByGravitation(ally_ship);
 
+		for (GameObject* beacon : m_sceneGameObjectsTyped[BeaconObject])
+			if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, beacon->m_position) <= 200 * 200)
+				beacon->TryTrigger(ally_ship);
+
 		if (ally_ship != m_playerShip)
 			ally_ship->UpdateAlliedShips();
 	}
@@ -524,8 +528,6 @@ void Game::UpdateSectorList(bool force_update)
 			for (GameObject* object : m_sceneGameObjectsStored[id])
 			{
 				addToScene(object, object->m_layer, object->m_collider, false);
-				if (object->m_collider == AllyShipObject)
-					printf("\n\nSPAWN\n");
 				//printf("game object restored.\n");
 			}
 

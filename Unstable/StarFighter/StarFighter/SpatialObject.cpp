@@ -8,6 +8,8 @@ SpatialObject::SpatialObject()
 {
 	m_marker_target = NULL;
 	m_marker_mission = NULL;
+	m_removeMe = false;
+	m_garbageMe = false;
 }
 
 SpatialObject::~SpatialObject()

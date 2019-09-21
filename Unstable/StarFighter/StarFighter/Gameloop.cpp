@@ -123,6 +123,15 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	return planet;
 }
 
+Beacon* Gameloop::CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective)
+{
+	Beacon* beacon = new Beacon(sector_index, trigger, isMissionObjective);
+	if (beacon->m_removeMe == false)
+		(*CurrentGame).addToScene(beacon, BeaconLayer, BeaconObject, false);
+
+	return beacon;
+}
+
 pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i starting_index, MissionType mission_type)
 {
 	sf::Vector2i found_index = starting_index;
@@ -237,13 +246,13 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, -400)));
 			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(0, -500)));
 
-			//enemy "trap"
-			float path_ratio = RandomizeFloatBetweenValues(0.4, 0.8);
+			//enemy "trap" beacon
+			float path_ratio = RandomizeFloatBetweenValues(0.3, 0.7);
 			float perpAngle = angle + M_PI_2 * RandomizeSign();
 			
-			Beacon* beacon = new Beacon(sf::Vector2i(0, 0));
-			beacon->m_position = sf::Vector2f(ship->m_position.x - path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y - path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
-			beacon->UpdateStarSectorIndex();
+			sf::Vector2f beacon_position = sf::Vector2f(ship->m_position.x + path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y + path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
+			sf::Vector2i beacon_sector_index = GameObject::GetStarSectorIndex(beacon_position);
+			Beacon* beacon = CreateBeacon(beacon_sector_index, ship, false);
 
 			for (int e = 0; e < 3; e++)
 			{
@@ -260,7 +269,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		}
 		case Mission_Bounty:
 		{
-			Beacon* beacon = new Beacon(found_index);
+			Beacon* beacon = new Beacon(found_index, (SpatialObject*)(*CurrentGame).m_playerShip, true);
 			for (int e = 0; e < 3; e++)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);

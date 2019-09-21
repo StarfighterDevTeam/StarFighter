@@ -153,13 +153,21 @@ void GameObject::Update(sf::Time deltaTime)
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 
-	UpdateStarSectorIndex();
+	m_sector_index = GetStarSectorIndex(m_position);
 
 	BoundAngle(m_heading, 360);
 	setRotation(m_heading);
 
 	if (m_frameNumber > 1)
 		AnimatedSprite::Update(deltaTime);
+}
+
+sf::Vector2i GameObject::GetStarSectorIndex(sf::Vector2f position)
+{
+	sf::Vector2i sector_index;
+	sector_index.x = (int)(position.x / STAR_SECTOR_SIZE + (position.x >= 0 ? 0.5 : -0.5));
+	sector_index.y = (int)(position.y / STAR_SECTOR_SIZE + (position.y >= 0 ? 0.5 : -0.5));
+	return sector_index;
 }
 
 void GameObject::Draw(RenderTarget& screen)
@@ -271,11 +279,6 @@ float GameObject::GetRadius() const
 	//see override function in class Ship
 }
 //Star Hunter
-void GameObject::UpdateStarSectorIndex()
-{
-	m_sector_index.x = (int)(m_position.x / STAR_SECTOR_SIZE + (m_position.x >= 0 ? 0.5 : -0.5));
-	m_sector_index.y = (int)(m_position.y / STAR_SECTOR_SIZE + (m_position.y >= 0 ? 0.5 : -0.5));
-}
 
 void GameObject::GetHitByAmmo(GameObject* ammo)
 {
@@ -334,4 +337,10 @@ float GameObject::GetGravitationRange()
 void GameObject::UpdateAlliedShips()
 {
 	//see override function in class AIShip
+}
+
+bool GameObject::TryTrigger(GameObject* trigger)
+{
+	return false;
+	//see override function in class Beacon
 }

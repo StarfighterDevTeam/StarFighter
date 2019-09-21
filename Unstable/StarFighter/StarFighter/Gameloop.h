@@ -24,6 +24,7 @@ public:
 	EscortShip* CreateEscortShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe, AIShip* escorted_ship, sf::Vector2f escort_offset);
 	Planet* CreatePlanet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create_min = 1, int nb_missions_to_create_max = 1);
 	Mission* CreateMission(Planet* owner);
+	Beacon* CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective);
 	Planet* GetPlanetAtSectorId(int id);
 	bool IsSectorNearAnExistingMission(sf::Vector2i sector_index);
 	pair<Planet*, sf::Vector2i> SnailSearchSectorForMission(sf::Vector2i starting_index, MissionType mission_type);

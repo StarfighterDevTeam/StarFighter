@@ -23,6 +23,7 @@ enum LayerType
 	GravitationLayer,
 	Planet_Layer,
 	FX_Layer,
+	BeaconLayer,
 	PlayerFireLayer,
 	AIShipFireLayer,
 	PlayerStroboscopicLayer,
@@ -71,6 +72,7 @@ public:
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static int GaussianBlurDistribution(int x);
 	virtual float GetRadius() const;
+	virtual bool TryTrigger(GameObject* trigger);
 
 	string GetTextureName();
 	GameObject* Clone();
@@ -96,7 +98,7 @@ public:
 	sf::Vector2f m_previous_speed;
 
 	//Star Hunter
-	void UpdateStarSectorIndex();
+	static sf::Vector2i GetStarSectorIndex(sf::Vector2f position);
 	virtual void MarkThis(SpatialObject* target, bool isMission);
 	virtual void UnmarkThis(SpatialObject* target, bool isMission);
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
