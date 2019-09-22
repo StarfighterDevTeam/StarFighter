@@ -18,6 +18,7 @@ Ship::Ship() : SpatialObject()
 	m_shield_max = 0;
 	m_energy_max = 0;
 	m_gravitation_range = 0;
+	m_collision_damage = 0;
 
 	//UI
 	m_shield_circle.setFillColor(sf::Color::Transparent);
@@ -223,6 +224,49 @@ void Ship::GetHitByAmmo(GameObject* ammo)
 		//FX hit
 		ammo->m_garbageMe = true;
 		FX* new_FX = new FX(FX_Hit, ammo->m_position);
+		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+
+		if (damage > 0)
+		{
+			m_health -= damage;
+			if (m_health < 0)
+				m_health = 0;
+			m_hit_feedback_timer = 0.05;
+		}
+	}
+
+	//Death?
+	if (m_health <= 0)
+		Death();
+}
+
+void Ship::GetHitByShip(GameObject* ship)
+{
+	//Apply damage
+	int damage = ((Ship*)ship)->m_collision_damage;
+
+	if (m_shield > 0)
+		//shield absorbing damage
+		if (m_shield > damage)
+		{
+			m_shield -= damage;
+			damage = 0;
+
+			FX* new_FX = new FX(FX_HitShield, ship->m_position);
+			(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+		}
+	//shield destroyed
+		else
+		{
+			damage -= m_shield;
+			m_shield = 0;
+		}
+
+	//no shield
+	if (m_shield <= 0)
+	{
+		//FX hit
+		FX* new_FX = new FX(FX_Hit, ship->m_position);
 		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 
 		if (damage > 0)

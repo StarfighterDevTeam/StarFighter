@@ -45,6 +45,26 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
+		case Ship_Sigma:
+		{
+			m_speed_max = 1200;
+			m_acceleration_max = 1200;
+			m_turn_speed = 200;
+			m_braking_max = 3000;
+			m_idle_decelleration = 1000;
+
+			m_health_max = 50;
+			m_shield_max = 0;
+			m_shield_range = 0;
+			m_shield_regen = 0;
+
+			m_collision_damage = 10;
+
+			textureName = hostility == Hostility_Ally ? "2D/V_Alpha2.png" : "2D/V_Alpha2_red.png";
+			textureSize = sf::Vector2f(68, 84);
+			frameNumber = 3;
+			break;
+		}
 		case Ship_Cruiser:
 		{
 			m_speed_max = 200;
@@ -265,6 +285,42 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 		m_target = ammo_->m_owner;
 
 	Ship::GetHitByAmmo(ammo);
+}
+
+void AIShip::GetHitByShip(GameObject* ship)
+{
+	if (m_roe == ROE_ReturnFire || m_roe == ROE_Ambush)
+		SetROE(ROE_FireAtWill);
+	else
+	{
+		if (m_roe != ROE_FireAtWill && m_roe != ROE_Freeze)
+			SetROE(ROE_Freeze);
+
+		//allies can replicate if this ship cannot
+		for (SpatialObject* allied_ship : m_dynamic_allied_ships)
+		{
+			Ship* ship = (Ship*)allied_ship;
+			if (ship->m_roe == ROE_ReturnFire || ship->m_roe == ROE_Ambush)
+				ship->Ship::SetROE(ROE_FireAtWill);
+			else if (m_roe != ROE_FireAtWill && m_roe != ROE_Freeze)
+				SetROE(ROE_Freeze);
+		}
+
+		for (SpatialObject* allied_ship : m_scripted_allied_ships)
+		{
+			Ship* ship = (Ship*)allied_ship;
+			if (ship->m_roe == ROE_ReturnFire || ship->m_roe == ROE_Ambush)
+				ship->Ship::SetROE(ROE_FireAtWill);
+			else if (m_roe != ROE_FireAtWill && m_roe != ROE_Freeze)
+				SetROE(ROE_Freeze);
+		}
+	}
+
+	//switch target in case we're taking fire while we're aiming at an unarmed target
+	if ((m_roe == ROE_Ambush || m_roe == ROE_FireAtWill) && m_target != NULL && m_target->HasWeapons() == false)
+		m_target = (SpatialObject*)ship;
+
+	Ship::GetHitByShip(ship);
 }
 
 void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)

@@ -32,8 +32,8 @@ Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, floa
 		}
 		case Ammo_LaserRed:
 		{
-			m_speed_min = 2000;
-			m_speed_max = 2000;
+			m_speed_min = 1000;
+			m_speed_max = 1000;
 			m_acceleration = 0;
 			textureSize = sf::Vector2f(6, 32);
 			textureName = "2D/laser_red.png";

@@ -373,15 +373,24 @@ void Game::CollisionChecks()
 			if (AreColliding(ally_ship, enemy_ammo) == true)
 				ally_ship->GetHitByAmmo(enemy_ammo);
 
-		if (ally_ship->GetGravitationRange() > 0)
-			for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyShipObject])
-				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
-					enemy->GetHitByGravitation(ally_ship);
-
 		for (GameObject* beacon : m_sceneGameObjectsTyped[BeaconObject])
 			if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, beacon->m_position) <= 200 * 200)
 				beacon->TryTrigger(ally_ship);
 
+		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
+		{
+			if (AreColliding
+				(ally_ship, enemy_ship) == true)
+			{
+				ally_ship->GetHitByShip(enemy_ship);
+				enemy_ship->GetHitByShip(ally_ship);
+			}
+
+			if (ally_ship->GetGravitationRange() > 0)
+				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy_ship->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
+					enemy_ship->GetHitByGravitation(ally_ship);
+		}
+			
 		if (ally_ship != m_playerShip)
 			ally_ship->UpdateAlliedShips();
 	}

@@ -103,6 +103,7 @@ public:
 	virtual void UnmarkThis(SpatialObject* target, bool isMission);
 	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual void GetHitByAmmo(GameObject* ammo);
+	virtual void GetHitByShip(GameObject* ship);
 	virtual void GetHitByGravitation(GameObject* ship);
 	virtual void SetPosition(sf::Vector2f position);
 	virtual void UpdateMarkers(sf::Time deltaTime);

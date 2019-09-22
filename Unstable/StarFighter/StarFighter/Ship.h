@@ -28,6 +28,7 @@ public :
 	void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
 	void GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByShip(GameObject* ship) override;
 	void GetHitByGravitation(GameObject* ship) override;
 	void UpdateOrbit(sf::Time deltaTime);
 	float GetRadius() const override;
@@ -61,6 +62,7 @@ public :
 	float m_gravitation_range;
 	float m_gravitation_strength;
 	sf::CircleShape m_gravitation_circle;
+	int m_collision_damage;
 
 	sf::RectangleShape m_health_rect;
 	sf::RectangleShape m_health_container_rect;

@@ -15,6 +15,7 @@
 enum ShipType
 {
 	Ship_Alpha,
+	Ship_Sigma,
 	Ship_Cruiser,
 	Ship_Convoy,
 };
@@ -29,6 +30,7 @@ public :
 	void SetHostility(Hostility hostility) override;
 	bool CheckMarkingConditions() override;
 	void GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByShip(GameObject* ship) override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	void TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	SpatialObject* KeepTarget(const float dist_max);
