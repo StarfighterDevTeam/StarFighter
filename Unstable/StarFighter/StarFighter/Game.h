@@ -86,6 +86,8 @@ public:
 	bool m_pause;
 	bool m_window_has_focus;
 
+	sf::Vector2f m_mouse_pos;
+
 	sf::View m_view;
 	sf::Vector2f m_map_size;
 

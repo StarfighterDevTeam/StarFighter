@@ -6,7 +6,7 @@ bool InputGuy::isSpeeding(ControlerType device)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			return true;
+			//return true;
 		}
 	}
 
@@ -32,7 +32,7 @@ bool InputGuy::isFiring(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			return true;
 		}

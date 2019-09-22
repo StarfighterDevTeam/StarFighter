@@ -259,6 +259,9 @@ void Game::UpdateScene(Time deltaTime)
 	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
+	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
+
 	//Update quad-tree classification of objects
 	UpdateSectorList(false);
 

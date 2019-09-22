@@ -31,8 +31,8 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 
 	//Flight model
 	m_speed_max = 800;
-	m_acceleration_max = 2000;
-	m_turn_speed = 160;
+	m_acceleration_max = 3000;
+	m_turn_speed = 240;
 	m_braking_max = 3000;
 	m_idle_decelleration = 1000;
 
@@ -83,6 +83,11 @@ void Player::Update(sf::Time deltaTime)
 			if (weapon->IsReadyToFire() == true)
 				if (m_energy >= weapon->m_energy_cost)
 				{
+					//weapon orientation
+					if (sf::Mouse::isButtonPressed(Mouse::Left) == true)
+						weapon->m_heading = (GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, -(getPosition().y - (*CurrentGame).m_mouse_pos.y))) * 180 / M_PI) + 180;
+
+					//weapon fire
 					weapon->Fire();
 					m_energy -= weapon->m_energy_cost;
 				}
