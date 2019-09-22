@@ -20,7 +20,7 @@ Gameloop::Gameloop()
 	player->AcceptMission(mission);
 
 	//AIShip* cruiser = CreateAIShip(Ship_Cruiser, sf::Vector2i(10, 0), 0, Hostility_Enemy, ROE_Ambush);
-	AIShip* enemy = CreateAIShip(Ship_Sigma, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
+	//AIShip* enemy = CreateAIShip(Ship_Sigma, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
 	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally, ROE_FireAtWill);
 	//Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
 

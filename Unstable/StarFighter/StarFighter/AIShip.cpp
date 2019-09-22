@@ -47,8 +47,8 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		}
 		case Ship_Sigma:
 		{
-			m_speed_max = 1200;
-			m_acceleration_max = 1200;
+			m_speed_max = 1000;
+			m_acceleration_max = 1500;
 			m_turn_speed = 200;
 			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
@@ -60,8 +60,8 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 			m_collision_damage = 10;
 
-			textureName = hostility == Hostility_Ally ? "2D/V_Alpha2.png" : "2D/V_Alpha2_red.png";
-			textureSize = sf::Vector2f(68, 84);
+			textureName = hostility == Hostility_Ally ? "2D/V_Sigma1.png" : "2D/V_Sigma1_red.png";
+			textureSize = sf::Vector2f(39, 52);
 			frameNumber = 3;
 			break;
 		}
@@ -329,8 +329,11 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 
-	bool speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed destination is very far relative to the current speed
-	//printf("GO sqrt dx+dy: %f, sqrt speed: %f\n", sqrt(dx*dx + dy*dy), sqrt(m_speed.x*m_speed.x + m_speed.y*m_speed.y));
+	bool speed_up_authorized;
+	if (m_collision_damage == 0 || m_weapons.empty() == false)//shooter profile
+		speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed if destination is very far relative to the current speed
+	else//melee profile
+		speed_up_authorized = true;
 
 	if (speed_up_authorized == true && abs(delta_angle) < 15)
 		inputs_direction.y = -1;
