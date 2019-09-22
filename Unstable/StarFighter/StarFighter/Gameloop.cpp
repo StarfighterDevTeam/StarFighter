@@ -247,8 +247,8 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180 / M_PI;
 
 			//convoy escorts
-			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, -400)));
-			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(0, -500)));
+			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, -200)));
+			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(-200, -200)));
 
 			//enemy "trap" beacon
 			float path_ratio = RandomizeFloatBetweenValues(0.3, 0.7);

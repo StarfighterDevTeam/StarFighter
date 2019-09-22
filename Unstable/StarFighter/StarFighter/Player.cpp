@@ -228,7 +228,7 @@ void Player::UpdateMissions()
 							else if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
 							{
 								//no enemy on nearby?
-								if (ship->GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X * 0.5, 360) == NULL)
+								if (ship->GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X, 360) == NULL)
 									ship->SetROE(ship->m_native_ROE);
 							}
 								
