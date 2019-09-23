@@ -165,7 +165,7 @@ void Ammo::Bounce(GameObject* target)
 	m_heading = radius_angle + cross_product * (radius_angle - incoming_angle);
 
 	//instant repositioning at collision point
-	m_position = target->m_position + GetVectorFromLengthAndAngle(target->GetRadius() + m_size.y * 0.5, (radius_angle - 180) * M_PI / 180);
+	m_position = target->m_position + GetVectorFromLengthAndAngle(target->GetRadius(true) + m_size.y * 0.5, (radius_angle - 180) * M_PI / 180);
 	SetPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 	setRotation(m_heading);
 }

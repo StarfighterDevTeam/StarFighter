@@ -109,4 +109,21 @@ void DestructibleObject::Death()
 	//FX death
 	FX* new_FX = new FX(FX_Death, m_position);
 	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
+
+	//create loot
+	if (m_hostility == Hostility_Enemy)
+		CreateLoot(10);
+}
+
+Loot* DestructibleObject::CreateLoot(int money)
+{
+	Loot* loot = new Loot(money);
+	loot->m_position = m_position;
+	loot->m_sector_index = GameObject::GetStarSectorIndex(m_position);
+	loot->m_speed = sf::Vector2f(m_speed.x * 0.1, m_speed.y * 0.1);
+
+	if ((*CurrentGame).StoreObjectIfNecessary(loot) == false)
+		(*CurrentGame).addToScene(loot, AIShipLayer, LootObject, true);
+
+	return loot;
 }

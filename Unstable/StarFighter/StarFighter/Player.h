@@ -57,6 +57,7 @@ public :
 	void UpdateMissions();
 	void Death() override;
 	void GetHitByGravitation(GameObject* ship) override;
+	void GetHitByLoot(GameObject* loot) override;
 
 	void DebugDrawMissions();
 	void DebugDrawMoney();

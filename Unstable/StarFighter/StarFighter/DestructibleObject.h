@@ -13,6 +13,8 @@ public :
 	void GetHitByObject(GameObject* object) override;
 	virtual void Death();
 
+	Loot* CreateLoot(int money);
+
 	int m_collision_damage;
 	int m_health;
 	int m_health_max;

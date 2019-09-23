@@ -1,7 +1,7 @@
 #ifndef AMMO_H_INCLUDED
 #define AMMO_H_INCLUDED
 
-#include "Marker.h"
+#include "Loot.h"
 
 class Weapon;
 

@@ -125,7 +125,7 @@ public:
 	void SetStarSectorIndex(GameObject* object, sf::Vector2i sector_index);
 	void DebugDrawGameObjectsStats();
 	void DebugDrawSectors();
-	bool AreColliding(GameObject* objectA, GameObject* objectB);
+	bool AreColliding(GameObject* objectA, GameObject* objectB, bool include_shield);
 	static sf::IntRect FToIRect(const sf::FloatRect& f);
 	bool StoreObjectIfNecessary(GameObject* object);
 

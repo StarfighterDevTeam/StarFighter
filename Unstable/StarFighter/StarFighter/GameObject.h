@@ -39,6 +39,7 @@ enum ColliderType
 {
 	BackgroundObject,
 	DestructibleObject,
+	LootObject,
 	PlanetObject,
 	AllyShipObject,
 	AllyFire,
@@ -72,7 +73,7 @@ public:
 	void SetAnimationLine(int animation, bool keep_frame_index = false);
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static int GaussianBlurDistribution(int x);
-	virtual float GetRadius() const;
+	virtual float GetRadius(bool include_shield) const;
 	virtual bool TryTrigger(GameObject* trigger);
 
 	string GetTextureName();
@@ -106,6 +107,7 @@ public:
 	virtual void GetHitByAmmo(GameObject* ammo);
 	virtual void GetHitByObject(GameObject* object);
 	virtual void GetHitByGravitation(GameObject* ship);
+	virtual void GetHitByLoot(GameObject* loot);
 	virtual void SetPosition(sf::Vector2f position);
 	virtual void UpdateMarkers(sf::Time deltaTime);
 	virtual bool IsMarked();

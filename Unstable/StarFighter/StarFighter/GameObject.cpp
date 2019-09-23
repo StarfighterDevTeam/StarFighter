@@ -273,7 +273,7 @@ void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int h
 	}
 }
 
-float GameObject::GetRadius() const
+float GameObject::GetRadius(bool include_shield) const
 {
 	return m_radius;
 	//see override function in class Ship
@@ -293,6 +293,11 @@ void GameObject::GetHitByObject(GameObject* object)
 void GameObject::GetHitByGravitation(GameObject* ship)
 {
 	//see override function in class Ship and Player
+}
+
+void GameObject::GetHitByLoot(GameObject* loot)
+{
+	//see override function in class Player
 }
 
 void GameObject::MarkThis(SpatialObject* target, bool isMission)

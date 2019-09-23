@@ -9,6 +9,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index) : DestructibleObject()
 	m_collision_damage = 10;
 	m_health_max = 10;
 	m_health = m_health_max;
+	m_hostility = Hostility_Enemy;
 
 	Init(m_position, m_speed, "2D/asteroid.png", sf::Vector2f(200, 224), 1, 1);
 

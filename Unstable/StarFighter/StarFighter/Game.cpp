@@ -372,72 +372,88 @@ void Game::CollisionChecks()
 
 	for (GameObject* ally_ship : m_sceneGameObjectsTyped[AllyShipObject])
 	{
+		//Enemy shots
 		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
-			if (AreColliding(ally_ship, enemy_ammo) == true)
+			if (AreColliding(ally_ship, enemy_ammo, true) == true)
 				ally_ship->GetHitByAmmo(enemy_ammo);
 
+		//Beacons
 		for (GameObject* beacon : m_sceneGameObjectsTyped[BeaconObject])
 			if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, beacon->m_position) <= 200 * 200)
 				beacon->TryTrigger(ally_ship);
 
+		//Collision with objects
 		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
-			if (AreColliding(ally_ship, object) == true)
+			if (AreColliding(ally_ship, object, true) == true)
 			{
 				object->GetHitByObject(ally_ship);
 				ally_ship->GetHitByObject(object);
 			}
 
+		//Collision with enemies
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 		{
-			if (AreColliding(ally_ship, enemy_ship) == true)
+			if (AreColliding(ally_ship, enemy_ship, true) == true)
 			{
 				ally_ship->GetHitByObject(enemy_ship);
 				enemy_ship->GetHitByObject(ally_ship);
 			}
 
+			//Enemies hit by our gravitational range
 			if (ally_ship->GetGravitationRange() > 0)
 				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy_ship->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
 					enemy_ship->GetHitByGravitation(ally_ship);
 		}
-			
+		
+		//AI grouping
 		if (ally_ship != m_playerShip)
 			ally_ship->UpdateAlliedShips();
+		else
+		//Player loot
+			for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
+				if (AreColliding(ally_ship, loot, false) == true)
+					ally_ship->GetHitByLoot(loot);
 	}
 
 	for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 	{
+		//Our shots
 		for (GameObject* player_ammo : m_sceneGameObjectsTyped[AllyFire])
-			if (AreColliding(player_ammo, enemy_ship) == true)
+			if (AreColliding(player_ammo, enemy_ship, true) == true)
 				enemy_ship->GetHitByAmmo(player_ammo);
 
+		//Hit by enemy gravitational range
 		if (enemy_ship->GetGravitationRange() > 0)
 			for (GameObject* ally_ship : m_sceneGameObjectsTyped[AllyShipObject])
 				if (GetDistanceSquaredBetweenPositions(enemy_ship->m_position, ally_ship->m_position) <= enemy_ship->GetGravitationRange() * enemy_ship->GetGravitationRange())
 					ally_ship->GetHitByGravitation(enemy_ship);
 
+		//Enemies hit by objects
 		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
-			if (AreColliding(enemy_ship, object) == true)
+			if (AreColliding(enemy_ship, object, true) == true)
 			{
 				object->GetHitByObject(enemy_ship);
 				enemy_ship->GetHitByObject(object);
 			}
 
+		//AI grouping
 		enemy_ship->UpdateAlliedShips();
 	}
 
+	//Shots versus objects
 	for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
 	{
 		for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
-			if (AreColliding(object, ally_ammo) == true)
+			if (AreColliding(object, ally_ammo, true) == true)
 				object->GetHitByAmmo(ally_ammo);
 
 		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
-			if (AreColliding(object, enemy_ammo) == true)
+			if (AreColliding(object, enemy_ammo, true) == true)
 				object->GetHitByAmmo(enemy_ammo);
 	}
 }
 
-bool Game::AreColliding(GameObject* objectA, GameObject* objectB)
+bool Game::AreColliding(GameObject* objectA, GameObject* objectB, bool include_shield)
 {
 	if (objectA->m_visible == false || objectB->m_visible == false)
 		return false;
@@ -445,7 +461,7 @@ bool Game::AreColliding(GameObject* objectA, GameObject* objectB)
 	//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
 	const float a = objectA->getPosition().x - objectB->getPosition().x;
 	const float b = objectA->getPosition().y - objectB->getPosition().y;
-	const float c = objectA->GetRadius() + objectB->GetRadius();
+	const float c = objectA->GetRadius(include_shield) + objectB->GetRadius(include_shield);
 
 	if (a*a + b*b > c*c)
 		return false;

@@ -674,3 +674,12 @@ void Player::GetHitByGravitation(GameObject* ship)
 
 	Ship::GetHitByGravitation(ship);
 }
+
+void Player::GetHitByLoot(GameObject* loot)
+{
+	loot->m_garbageMe = true;
+
+	Loot* this_loot = (Loot*)loot;
+	m_money += this_loot->m_money;
+	this_loot->m_money = 0;
+}

@@ -142,9 +142,9 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 	}
 }
 
-float Ship::GetRadius() const
+float Ship::GetRadius(bool include_shield) const
 {
-	return m_shield == 0 ? m_radius : m_shield_range;
+	return include_shield == false || m_shield == 0 ? m_radius : m_shield_range;
 }
 
 void Ship::Update(sf::Time deltaTime)

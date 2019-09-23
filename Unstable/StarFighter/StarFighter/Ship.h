@@ -31,7 +31,7 @@ public :
 	void GetHitByObject(GameObject* object) override;
 	void GetHitByGravitation(GameObject* ship) override;
 	void UpdateOrbit(sf::Time deltaTime);
-	float GetRadius() const override;
+	float GetRadius(bool include_shield) const override;
 	float GetGravitationRange() override;
 	void SetROE(RuleOfEngagement roe) override;
 	bool HasWeapons() override;
