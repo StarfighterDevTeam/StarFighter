@@ -307,6 +307,26 @@ void Ship::GetHitByGravitation(GameObject* ship)
 
 void Ship::Death()
 {
+	//garbage object
+	m_garbageMe = true;
+
+	//destroyed outside of screen view? => delete from storage
+	if (m_removeMe == true)
+	{
+		(*CurrentGame).m_garbageObjects.push_back(this);
+
+		int id = (*CurrentGame).GetSectorId(m_sector_index);
+		vector<GameObject*> tmp_stored_objects;
+		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])
+			if (object != this)
+				tmp_stored_objects.push_back(object);
+
+		(*CurrentGame).m_sceneGameObjectsStored[id].clear();
+		if (tmp_stored_objects.empty() == false)
+			for (GameObject* object : tmp_stored_objects)
+				(*CurrentGame).m_sceneGameObjectsStored[id].push_back(object);
+	}
+
 	//FX death
 	FX* new_FX = new FX(FX_Death, m_position);
 	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);

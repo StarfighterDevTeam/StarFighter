@@ -381,8 +381,6 @@ SpatialObject* AIShip::KeepTarget(const float dist_max)
 
 void AIShip::Death()
 {
-	m_garbageMe = true;
-
 	if (m_marker_target != NULL)
 		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
 
