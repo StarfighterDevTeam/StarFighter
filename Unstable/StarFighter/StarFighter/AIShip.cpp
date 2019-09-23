@@ -381,13 +381,11 @@ SpatialObject* AIShip::KeepTarget(const float dist_max)
 
 void AIShip::Death()
 {
-	if (m_marker_target != NULL)
-		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
+	//create loot
+	if (m_hostility == Hostility_Enemy && RandomizeFloatBetweenValues(0, 1) < 0.25)
+		CreateLoot(RandomizeIntBetweenValues(8, 20));
 
-	if (m_marker_mission != NULL)
-		(*CurrentGame).m_playerShip->UnmarkThis(this, true);
-
-	Ship::Death();
+	Destructible::Death();
 }
 
 void AIShip::SetROE(RuleOfEngagement roe)

@@ -86,6 +86,13 @@ void Destructible::GetHitByObject(GameObject* object)
 
 void Destructible::Death()
 {
+	//unmark
+	if (m_marker_target != NULL)
+		(*CurrentGame).m_playerShip->UnmarkThis(this, false);
+
+	if (m_marker_mission != NULL)
+		(*CurrentGame).m_playerShip->UnmarkThis(this, true);
+
 	//garbage object
 	m_garbageMe = true;
 
@@ -109,10 +116,6 @@ void Destructible::Death()
 	//FX death
 	FX* new_FX = new FX(FX_Death, m_position);
 	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
-
-	//create loot
-	if (m_hostility == Hostility_Enemy)
-		CreateLoot(10);
 }
 
 Loot* Destructible::CreateLoot(int money)

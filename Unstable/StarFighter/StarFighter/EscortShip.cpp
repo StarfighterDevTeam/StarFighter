@@ -49,6 +49,8 @@ void EscortShip::Update(sf::Time deltaTime)
 		if (m_escorted_ship->m_garbageMe == true)
 			m_escorted_ship = NULL;
 	}
+	else
+		*m_scripted_destination = m_position;
 
 	AIShip::Update(deltaTime);
 }
