@@ -26,6 +26,7 @@ public:
 	Mission* CreateMission(Planet* owner);
 	Beacon* CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective);
 	Planet* GetPlanetAtSectorId(int id);
+	Asteroid* CreateAsteroid(sf::Vector2i sector_index);
 	bool IsSectorNearAnExistingMission(sf::Vector2i sector_index);
 	pair<Planet*, sf::Vector2i> SnailSearchSectorForMission(sf::Vector2i starting_index, MissionType mission_type);
 

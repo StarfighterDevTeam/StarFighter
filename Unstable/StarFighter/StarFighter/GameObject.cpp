@@ -285,7 +285,7 @@ void GameObject::GetHitByAmmo(GameObject* ammo)
 	//see override function in class Ship and AIShip
 }
 
-void GameObject::GetHitByShip(GameObject* ship)
+void GameObject::GetHitByObject(GameObject* object)
 {
 	//see override function in class Ship and AIShip
 }

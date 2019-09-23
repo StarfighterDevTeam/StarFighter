@@ -7,7 +7,7 @@ using namespace sf;
 // ----------------SHIP ---------------
 AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe) : Ship()
 {
-	ColliderType weapon_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
+	ColliderType weapon_collider = hostility == Hostility_Ally ? AllyFire : EnemyFire;
 	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
 	m_scripted_destination = NULL;
@@ -242,7 +242,7 @@ void AIShip::SetHostility(Hostility hostility)
 		m_marker_target->SetMarkerType(hostility == Hostility_Ally ? Marker_Ally : Marker_Enemy);
 
 	for (Weapon* weapon : m_weapons)
-		weapon->m_collider = hostility == Hostility_Ally ? PlayerFire : EnemyFire;
+		weapon->m_collider = hostility == Hostility_Ally ? AllyFire : EnemyFire;
 }
 
 bool AIShip::CheckMarkingConditions()
@@ -287,7 +287,7 @@ void AIShip::GetHitByAmmo(GameObject* ammo)
 	Ship::GetHitByAmmo(ammo);
 }
 
-void AIShip::GetHitByShip(GameObject* ship)
+void AIShip::GetHitByObject(GameObject* object)
 {
 	if (m_roe == ROE_ReturnFire || m_roe == ROE_Ambush)
 		SetROE(ROE_FireAtWill);
@@ -318,9 +318,9 @@ void AIShip::GetHitByShip(GameObject* ship)
 
 	//switch target in case we're taking fire while we're aiming at an unarmed target
 	if ((m_roe == ROE_Ambush || m_roe == ROE_FireAtWill) && m_target != NULL && m_target->HasWeapons() == false)
-		m_target = (SpatialObject*)ship;
+		m_target = (SpatialObject*)object;
 
-	Ship::GetHitByShip(ship);
+	Ship::GetHitByObject(object);
 }
 
 void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)

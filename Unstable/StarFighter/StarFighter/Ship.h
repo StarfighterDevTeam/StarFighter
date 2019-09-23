@@ -7,9 +7,9 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
-#include "Planet.h"
+#include "Asteroid.h"
 
-class Ship : public SpatialObject
+class Ship : public DestructibleObject
 {
 public :
 	Ship();
@@ -28,7 +28,7 @@ public :
 	void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
 	void GetHitByAmmo(GameObject* ammo) override;
-	void GetHitByShip(GameObject* ship) override;
+	void GetHitByObject(GameObject* object) override;
 	void GetHitByGravitation(GameObject* ship) override;
 	void UpdateOrbit(sf::Time deltaTime);
 	float GetRadius() const override;
@@ -47,8 +47,6 @@ public :
 	vector<Weapon*> m_weapons;
 	vector<Ammo*> m_shots_fired;
 	float m_range_max;
-	int m_health;
-	int m_health_max;
 	float m_shield_range;
 	int m_shield;
 	int m_shield_max;
@@ -62,7 +60,6 @@ public :
 	float m_gravitation_range;
 	float m_gravitation_strength;
 	sf::CircleShape m_gravitation_circle;
-	int m_collision_damage;
 
 	sf::RectangleShape m_health_rect;
 	sf::RectangleShape m_health_container_rect;
@@ -71,14 +68,12 @@ public :
 	sf::RectangleShape m_energy_rect;
 	sf::RectangleShape m_energy_container_rect;
 
-	virtual void Death();
 	void UpdateShieldRegen(sf::Time deltaTime);
 	void UpdateEnergyRegen(sf::Time deltaTime);
 	void InitShip();
 
 	bool m_isReflectingShots;
 
-	float m_hit_feedback_timer;
 	Planet* m_isOrbiting;
 	float m_orbit_angle;
 	int m_orbit_cw;

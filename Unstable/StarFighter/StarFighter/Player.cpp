@@ -24,10 +24,10 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, PlayerFire, PlayerFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, PlayerFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, AllyFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, AllyFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
 
 	//Flight model
 	m_speed_max = 800;
@@ -60,7 +60,7 @@ void Player::Update(sf::Time deltaTime)
 	UpdateInputStates();
 
 	m_inputs_direction = sf::Vector2f(0, 0);
-	if ((*CurrentGame).m_window_has_focus)
+	if ((*CurrentGame).m_window_has_focus == true)
 	{
 		m_inputs_direction = InputGuy::getDirections();
 
@@ -76,14 +76,14 @@ void Player::Update(sf::Time deltaTime)
 
 	//weapons
 	float aim_heading = m_heading;
-	if (sf::Mouse::isButtonPressed(Mouse::Left) == true)
+	if ((*CurrentGame).m_window_has_focus == true && sf::Mouse::isButtonPressed(Mouse::Left) == true)
 		aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
 		
 	for (Weapon* weapon : m_weapons)
 	{
 		weapon->Update(deltaTime, aim_heading);
 
-		if (InputGuy::isFiring() == true)
+		if ((*CurrentGame).m_window_has_focus == true && InputGuy::isFiring() == true)
 			if (weapon->IsReadyToFire() == true)
 				if (m_energy >= weapon->m_energy_cost)
 				{
@@ -657,12 +657,13 @@ void Player::DebugDrawMoney()
 
 void Player::Death()
 {
+	Ship::Death();
+
 	//Debug respawn
+	m_garbageMe = false;
 	m_health = m_health_max;
 	m_shield = m_shield_max;
 	m_energy = m_energy_max;
-
-	Ship::Death();
 }
 
 void Player::GetHitByGravitation(GameObject* ship)

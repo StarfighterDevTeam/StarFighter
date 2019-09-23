@@ -380,13 +380,19 @@ void Game::CollisionChecks()
 			if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, beacon->m_position) <= 200 * 200)
 				beacon->TryTrigger(ally_ship);
 
+		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
+			if (AreColliding(ally_ship, object) == true)
+			{
+				object->GetHitByObject(ally_ship);
+				ally_ship->GetHitByObject(object);
+			}
+
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 		{
-			if (AreColliding
-				(ally_ship, enemy_ship) == true)
+			if (AreColliding(ally_ship, enemy_ship) == true)
 			{
-				ally_ship->GetHitByShip(enemy_ship);
-				enemy_ship->GetHitByShip(ally_ship);
+				ally_ship->GetHitByObject(enemy_ship);
+				enemy_ship->GetHitByObject(ally_ship);
 			}
 
 			if (ally_ship->GetGravitationRange() > 0)
@@ -400,7 +406,7 @@ void Game::CollisionChecks()
 
 	for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 	{
-		for (GameObject* player_ammo : m_sceneGameObjectsTyped[PlayerFire])
+		for (GameObject* player_ammo : m_sceneGameObjectsTyped[AllyFire])
 			if (AreColliding(player_ammo, enemy_ship) == true)
 				enemy_ship->GetHitByAmmo(player_ammo);
 
@@ -409,7 +415,25 @@ void Game::CollisionChecks()
 				if (GetDistanceSquaredBetweenPositions(enemy_ship->m_position, ally_ship->m_position) <= enemy_ship->GetGravitationRange() * enemy_ship->GetGravitationRange())
 					ally_ship->GetHitByGravitation(enemy_ship);
 
+		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
+			if (AreColliding(enemy_ship, object) == true)
+			{
+				object->GetHitByObject(enemy_ship);
+				enemy_ship->GetHitByObject(object);
+			}
+
 		enemy_ship->UpdateAlliedShips();
+	}
+
+	for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
+	{
+		for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
+			if (AreColliding(object, ally_ammo) == true)
+				object->GetHitByAmmo(ally_ammo);
+
+		for (GameObject* enemy_ammo : m_sceneGameObjectsTyped[EnemyFire])
+			if (AreColliding(object, enemy_ammo) == true)
+				object->GetHitByAmmo(enemy_ammo);
 	}
 }
 
@@ -564,7 +588,7 @@ void Game::UpdateSectorList(bool force_update)
 					if (object->m_sector_index == index && object->m_garbageMe == false)
 					{
 						//temporary objects such as flying ammunition don't need to be stored, they can be garbaged in the process
-						if (object->m_layer != StarLayer && object->m_collider != EnemyFire && object->m_collider != PlayerFire)
+						if (object->m_layer != StarLayer && object->m_collider != EnemyFire && object->m_collider != AllyFire)
 						{
 							//marked objects are never stored, they keep getting updated at any distance
 							if (object->IsMarked() == false)
@@ -631,7 +655,7 @@ void Game::DebugDrawGameObjectsStats()
 {
 	int a = 0;
 	for (GameObject* object : m_sceneGameObjects)
-		if (object->m_layer != StarLayer && object != m_playerShip && object->m_collider != BackgroundObject && object->m_collider != PlayerFire && object->m_collider != EnemyFire)
+		if (object->m_layer != StarLayer && object != m_playerShip && object->m_collider != BackgroundObject && object->m_collider != AllyFire && object->m_collider != EnemyFire)
 			a++;
 
 	int b = m_playerShip->GetMarkedObjectsCount();

@@ -30,7 +30,7 @@ public :
 	void SetHostility(Hostility hostility) override;
 	bool CheckMarkingConditions() override;
 	void GetHitByAmmo(GameObject* ammo) override;
-	void GetHitByShip(GameObject* ship) override;
+	void GetHitByObject(GameObject* object) override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	void TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);
 	SpatialObject* KeepTarget(const float dist_max);

@@ -10,6 +10,7 @@ SpatialObject::SpatialObject()
 	m_marker_mission = NULL;
 	m_removeMe = false;
 	m_garbageMe = false;
+	m_visible = true;
 }
 
 SpatialObject::~SpatialObject()

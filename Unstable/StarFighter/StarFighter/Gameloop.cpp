@@ -19,6 +19,10 @@ Gameloop::Gameloop()
 	Mission* mission = new Mission(Mission_GoTo, planet, planet);
 	player->AcceptMission(mission);
 
+	Asteroid* asteroid = CreateAsteroid(sf::Vector2i(2, 0));
+	Asteroid* asteroid2 = CreateAsteroid(sf::Vector2i(3, 0));
+	Asteroid* asteroid3 = CreateAsteroid(sf::Vector2i(4, 0));
+
 	//AIShip* cruiser = CreateAIShip(Ship_Cruiser, sf::Vector2i(10, 0), 0, Hostility_Enemy, ROE_Ambush);
 	//AIShip* enemy = CreateAIShip(Ship_Sigma, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
 	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally, ROE_FireAtWill);
@@ -123,6 +127,16 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject, false);
 
 	return planet;
+}
+
+Asteroid* Gameloop::CreateAsteroid(sf::Vector2i sector_index)
+{
+	Asteroid* asteroid = new Asteroid(sector_index);
+
+	if ((*CurrentGame).StoreObjectIfNecessary(asteroid) == false)
+		(*CurrentGame).addToScene(asteroid, AIShipLayer, DestructibleObject, false);
+
+	return asteroid;
 }
 
 Beacon* Gameloop::CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective)

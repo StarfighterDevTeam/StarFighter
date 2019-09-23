@@ -89,9 +89,11 @@
     <ClCompile Include="Ammo.cpp" />
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Asteroid.cpp" />
     <ClCompile Include="Beacon.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="AIShip.cpp" />
+    <ClCompile Include="DestructibleObject.cpp" />
     <ClCompile Include="EscortShip.cpp" />
     <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -121,9 +123,11 @@
     <ClInclude Include="Ammo.h" />
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="Asteroid.h" />
     <ClInclude Include="Beacon.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="AIShip.h" />
+    <ClInclude Include="DestructibleObject.h" />
     <ClInclude Include="EscortShip.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="FX.h" />

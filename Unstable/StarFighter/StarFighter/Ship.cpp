@@ -5,10 +5,9 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-Ship::Ship() : SpatialObject()
+Ship::Ship() : DestructibleObject()
 {
 	m_inputs_direction = sf::Vector2f(0, 0);
-	m_hit_feedback_timer = 0;
 	m_isOrbiting = NULL;
 	m_orbit_angle = 0;
 	m_range_max = 0;
@@ -18,7 +17,6 @@ Ship::Ship() : SpatialObject()
 	m_shield_max = 0;
 	m_energy_max = 0;
 	m_gravitation_range = 0;
-	m_collision_damage = 0;
 
 	//UI
 	m_shield_circle.setFillColor(sf::Color::Transparent);
@@ -151,15 +149,6 @@ float Ship::GetRadius() const
 
 void Ship::Update(sf::Time deltaTime)
 {
-	//hit feedback
-	if (m_hit_feedback_timer > 0)
-		m_hit_feedback_timer -= deltaTime.asSeconds();
-
-	if (m_hit_feedback_timer > 0)
-		setColor(sf::Color::Yellow);
-	else
-		setColor(sf::Color::White);
-
 	//Entering/Leaving planet orbit
 	UpdateOrbit(deltaTime);
 
@@ -171,7 +160,7 @@ void Ship::Update(sf::Time deltaTime)
 	if (m_shield_max > 0)
 		m_shield_rect.setSize(sf::Vector2f(m_shield_container_rect.getSize().x * m_shield / m_shield_max, m_shield_container_rect.getSize().y));
 
-	SpatialObject::Update(deltaTime);
+	DestructibleObject::Update(deltaTime);
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
@@ -200,7 +189,7 @@ void Ship::GetHitByAmmo(GameObject* ammo)
 			{
 				Ammo* this_ammo = (Ammo*)ammo;
 				this_ammo->Bounce(this);
-				ammo->m_collider = ammo->m_collider == PlayerFire ? EnemyFire : PlayerFire;
+				ammo->m_collider = ammo->m_collider == AllyFire ? EnemyFire : AllyFire;
 			}
 			else
 			{
@@ -220,30 +209,13 @@ void Ship::GetHitByAmmo(GameObject* ammo)
 
 	//no shield
 	if (m_shield <= 0)
-	{
-		//FX hit
-		ammo->m_garbageMe = true;
-		FX* new_FX = new FX(FX_Hit, ammo->m_position);
-		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
-
-		if (damage > 0)
-		{
-			m_health -= damage;
-			if (m_health < 0)
-				m_health = 0;
-			m_hit_feedback_timer = 0.05;
-		}
-	}
-
-	//Death?
-	if (m_health <= 0)
-		Death();
+		DestructibleObject::GetHitByAmmo(ammo);
 }
 
-void Ship::GetHitByShip(GameObject* ship)
+void Ship::GetHitByObject(GameObject* object)
 {
 	//Apply damage
-	int damage = ((Ship*)ship)->m_collision_damage;
+	int damage = ((DestructibleObject*)object)->m_collision_damage;
 
 	if (m_shield > 0)
 		//shield absorbing damage
@@ -252,7 +224,7 @@ void Ship::GetHitByShip(GameObject* ship)
 			m_shield -= damage;
 			damage = 0;
 
-			FX* new_FX = new FX(FX_HitShield, ship->m_position);
+			FX* new_FX = new FX(FX_HitShield, m_position);
 			(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 		}
 	//shield destroyed
@@ -264,23 +236,7 @@ void Ship::GetHitByShip(GameObject* ship)
 
 	//no shield
 	if (m_shield <= 0)
-	{
-		//FX hit
-		FX* new_FX = new FX(FX_Hit, ship->m_position);
-		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
-
-		if (damage > 0)
-		{
-			m_health -= damage;
-			if (m_health < 0)
-				m_health = 0;
-			m_hit_feedback_timer = 0.05;
-		}
-	}
-
-	//Death?
-	if (m_health <= 0)
-		Death();
+		DestructibleObject::GetHitByObject(object);
 }
 
 void Ship::GetHitByGravitation(GameObject* ship)
@@ -303,33 +259,6 @@ void Ship::GetHitByGravitation(GameObject* ship)
 		m_speed += gravity;
 		NormalizeVector(&m_speed, m_speed_max);
 	}
-}
-
-void Ship::Death()
-{
-	//garbage object
-	m_garbageMe = true;
-
-	//destroyed outside of screen view? => delete from storage
-	if (m_removeMe == true)
-	{
-		(*CurrentGame).m_garbageObjects.push_back(this);
-
-		int id = (*CurrentGame).GetSectorId(m_sector_index);
-		vector<GameObject*> tmp_stored_objects;
-		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsStored[id])
-			if (object != this)
-				tmp_stored_objects.push_back(object);
-
-		(*CurrentGame).m_sceneGameObjectsStored[id].clear();
-		if (tmp_stored_objects.empty() == false)
-			for (GameObject* object : tmp_stored_objects)
-				(*CurrentGame).m_sceneGameObjectsStored[id].push_back(object);
-	}
-
-	//FX death
-	FX* new_FX = new FX(FX_Death, m_position);
-	(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 }
 
 void Ship::InitShip()
