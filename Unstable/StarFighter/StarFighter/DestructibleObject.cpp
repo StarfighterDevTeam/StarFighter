@@ -62,9 +62,17 @@ void DestructibleObject::GetHitByObject(GameObject* object)
 
 	if (damage > 0 && m_hit_immunity_timer <= 0)
 	{
-		FX* new_FX = new FX(FX_Hit, m_position);
+		//calculate the "exact" point of collision for FX placement
+		const float dx = object->m_position.x - m_position.x;
+		const float dy = object->m_position.y - m_position.y;
+		const float overlap = object->m_radius + m_radius - sqrt(dx*dx + dy*dy);
+		sf::Vector2f collision_vector = sf::Vector2f(dx, dy);
+		ScaleVector(&collision_vector, m_radius - overlap * 0.5);
+
+		FX* new_FX = new FX(FX_Hit, m_position + collision_vector);
 		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 
+		//apply damage
 		m_health -= damage;
 		if (m_health < 0)
 			m_health = 0;
