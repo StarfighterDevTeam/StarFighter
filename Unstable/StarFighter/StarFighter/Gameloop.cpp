@@ -14,10 +14,10 @@ Gameloop::Gameloop()
 	(*CurrentGame).UpdateSectorList(true);
 
 	//Init first mission
-	sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(2, 2));
-	Planet* planet = CreatePlanet(index, Hostility_Ally, 1, 1);
-	Mission* mission = new Mission(Mission_GoTo, planet, planet);
-	player->AcceptMission(mission);
+	//sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(2, 2));
+	//Planet* planet = CreatePlanet(index, Hostility_Ally, 1, 1);
+	//Mission* mission = new Mission(Mission_GoTo, planet, planet);
+	//player->AcceptMission(mission);
 
 	//AIShip* cruiser = CreateAIShip(Ship_Cruiser, sf::Vector2i(10, 0), 0, Hostility_Enemy, ROE_Ambush);
 	//AIShip* enemy = CreateAIShip(Ship_Sigma, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
@@ -41,14 +41,14 @@ void Gameloop::Update(sf::Time deltaTime)
 	Player* player = (Player*)(*CurrentGame).m_playerShip;
 
 	//create procedural content for new sectors
-	for (sf::Vector2i sector_index : (*CurrentGame).m_star_sectors_to_create)
+	for (sf::Vector2i sector_index : (*CurrentGame).m_sectorsToCreate)
 		PopulateSector(sector_index);
-	(*CurrentGame).m_star_sectors_to_create.clear();
+	(*CurrentGame).m_sectorsToCreate.clear();
 
 	//create procedural stars for sectors
-	for (sf::Vector2i sector_index : (*CurrentGame).m_sectors_to_add_star)
+	for (sf::Vector2i sector_index : (*CurrentGame).m_sectorsToAddStar)
 		StarGenerator::CreateStar(sector_index);
-	(*CurrentGame).m_sectors_to_add_star.clear();
+	(*CurrentGame).m_sectorsToAddStar.clear();
 
 	//Get new missions from planet where're orbiting around
 	while (player->m_missions.size() < NB_MISSIONS_MAX && player->m_isOrbiting != NULL && player->m_isOrbiting->m_nb_missions_to_create > 0)
@@ -91,11 +91,40 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	Star* new_star = StarGenerator::CreateStar(sector_index);
 
 	if (sector_index == (*CurrentGame).m_playerShip->m_sector_index)
+	{
+		(*CurrentGame).m_sectorsKnownTyped[Sector_Default].push_back(sector_index);
 		return;
+	}
+
+	//chance of planet
+	if (RandomizeIntBetweenValues(1, 20) == 1)
+	{
+		bool condition_ok = true;
+		for (StarSector sector : (*CurrentGame).m_sectorsKnownTyped[Sector_Planet])
+			if (abs(sector.m_index.x - sector_index.x) < (*CurrentGame).m_nb_sectors_managed_x && abs(sector.m_index.y - sector_index.y) < (*CurrentGame).m_nb_sectors_managed_y)
+			{
+				condition_ok = false;
+				break;
+			}
+
+		if (condition_ok == true)
+		{
+			(*CurrentGame).m_sectorsKnownTyped[Sector_Planet].push_back(sector_index);
+			CreatePlanet(sector_index, Hostility_Ally, 2, 3);
+			return;
+		}
+	}
 
 	//chance of asteroid field
 	if (RandomizeIntBetweenValues(1, 20) == 1)
+	{
+		(*CurrentGame).m_sectorsKnownTyped[Sector_Asteroid].push_back(sector_index);
 		CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
+		return;
+	}
+
+	//default
+	(*CurrentGame).m_sectorsKnownTyped[Sector_Default].push_back(sector_index);
 }
 
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe)
@@ -126,6 +155,8 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	
 	if ((*CurrentGame).StoreObjectIfNecessary(planet) == false)
 		(*CurrentGame).addToScene(planet, planet->m_layer, planet->m_collider, false);
+
+	(*CurrentGame).m_sectorsKnownTyped[Sector_Planet].push_back(sector_index);
 
 	return planet;
 }

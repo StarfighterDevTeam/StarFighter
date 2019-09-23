@@ -40,7 +40,6 @@ public :
 	sf::Vector2f m_inputs_direction;
 	float m_acceleration;
 	float m_acceleration_max;
-	float m_speed_max;
 	float m_turn_speed;
 	float m_braking_max;
 	float m_idle_decelleration;

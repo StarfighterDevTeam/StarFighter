@@ -18,6 +18,7 @@ public :
 	int m_collision_damage;
 	int m_health;
 	int m_health_max;
+	float m_speed_max;
 
 	float m_hit_feedback_timer;
 	float m_hit_immunity_timer;

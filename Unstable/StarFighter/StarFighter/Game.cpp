@@ -523,7 +523,7 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 
 bool Game::AddToStarSectorsKnown(sf::Vector2i star_sector_index)
 {
-	for (StarSector sector : m_star_sectors_known)
+	for (StarSector sector : m_sectorsKnown)
 	{
 		if (sector.m_index == star_sector_index)
 		{
@@ -531,7 +531,7 @@ bool Game::AddToStarSectorsKnown(sf::Vector2i star_sector_index)
 		}
 	}
 
-	m_star_sectors_known.push_back(StarSector(star_sector_index, m_star_sectors_known.size()));
+	m_sectorsKnown.push_back(StarSector(star_sector_index, m_sectorsKnown.size()));
 
 	return true;
 }
@@ -543,7 +543,7 @@ void Game::UpdateSectorList(bool force_update)
 	//update needed?
 	if (force_update == true || m_previous_star_sector_index != player->m_sector_index)
 	{
-		vector<sf::Vector2i> tmp_star_sectors_managed;
+		vector<sf::Vector2i> tmp_starSectorsManaged;
 		sf::Vector2i index;
 
 		//search for nearby sectors that were far from previous player sector => add them to the list of managed sectors
@@ -555,7 +555,7 @@ void Game::UpdateSectorList(bool force_update)
 				for (int i = 0; i < m_nb_sectors_managed_x; i++)
 				{
 					index.x = i + m_playerShip->m_sector_index.x - (m_nb_sectors_managed_x / 2);
-					tmp_star_sectors_managed.push_back(index);
+					tmp_starSectorsManaged.push_back(index);
 				}
 			else
 				for (int i = 0; i < m_nb_sectors_managed_x; i += force_update == true ? 1 : m_nb_sectors_managed_x - 1)
@@ -563,7 +563,7 @@ void Game::UpdateSectorList(bool force_update)
 					index.x = i + m_playerShip->m_sector_index.x - (m_nb_sectors_managed_x / 2);
 					//add the left or right row (or the whole line if we are forcing a complete update)
 					if (force_update == true || abs(index.x - m_previous_star_sector_index.x) > m_nb_sectors_managed_x / 2)
-						tmp_star_sectors_managed.push_back(index);
+						tmp_starSectorsManaged.push_back(index);
 				}
 		}
 
@@ -571,17 +571,17 @@ void Game::UpdateSectorList(bool force_update)
 		m_previous_star_sector_index = m_playerShip->m_sector_index;
 		
 		//manage freshly added sectors
-		for (sf::Vector2i index : tmp_star_sectors_managed)
+		for (sf::Vector2i index : tmp_starSectorsManaged)
 		{
 			//add a star in the background during next Gameloop update
-			m_sectors_to_add_star.push_back(index);
+			m_sectorsToAddStar.push_back(index);
 
 			//sector is unknown? => add it to the list of known sectors and populate it
 			int id = GetSectorId(index);
 			if (id == -1)
 			{
-				m_star_sectors_to_create.push_back(index);
-				m_star_sectors_known.push_back(StarSector(index, m_star_sectors_known.size()));
+				m_sectorsToCreate.push_back(index);
+				m_sectorsKnown.push_back(StarSector(index, m_sectorsKnown.size()));
 			}
 
 			//bring back objects stored in this sector back into game scene
@@ -595,11 +595,11 @@ void Game::UpdateSectorList(bool force_update)
 		}
 
 		//search for sectors that were managed until now but have become now too far from current player sector => remove them from the list of managed sectors
-		for (sf::Vector2i index : m_star_sectors_managed)
+		for (sf::Vector2i index : m_sectorsManaged)
 		{
 			//close enough to keep being managed
 			if (abs(index.x - player->m_sector_index.x) <= m_nb_sectors_managed_x / 2 && abs(index.y - player->m_sector_index.y) <= m_nb_sectors_managed_y / 2)
-				tmp_star_sectors_managed.push_back(index);
+				tmp_starSectorsManaged.push_back(index);
 			//too far => sector objects have to be stored
 			else
 			{
@@ -630,19 +630,19 @@ void Game::UpdateSectorList(bool force_update)
 		}
 
 		//refresh the list of managed sectors
-		m_star_sectors_managed.clear();
-		for (sf::Vector2i index : tmp_star_sectors_managed)
-			m_star_sectors_managed.push_back(index);
+		m_sectorsManaged.clear();
+		for (sf::Vector2i index : tmp_starSectorsManaged)
+			m_sectorsManaged.push_back(index);
 
 		//debug assert
-		if (m_star_sectors_managed.size() != m_nb_sectors_managed_x * m_nb_sectors_managed_y)
-			printf("\n<!> BUG : managed sectors' count is wrong (UpdateSectorList). Expected: %d. Actual: %d)\n\n", m_nb_sectors_managed_x * m_nb_sectors_managed_y, m_star_sectors_managed.size());
+		if (m_sectorsManaged.size() != m_nb_sectors_managed_x * m_nb_sectors_managed_y)
+			printf("\n<!> BUG : managed sectors' count is wrong (UpdateSectorList). Expected: %d. Actual: %d)\n\n", m_nb_sectors_managed_x * m_nb_sectors_managed_y, m_sectorsManaged.size());
 	}
 }
 
 int Game::GetSectorId(sf::Vector2i index)
 {
-	for (StarSector sector : m_star_sectors_known)
+	for (StarSector sector : m_sectorsKnown)
 		if (sector.m_index == index)
 			return sector.m_id;
 
@@ -661,7 +661,7 @@ void Game::DebugDrawSectors()
 {
 	GameObject* player = (GameObject*)m_playerShip;
 
-	for (StarSector sector : m_star_sectors_managed)
+	for (StarSector sector : m_sectorsManaged)
 	{
 		GameObject* sector_debug;
 		if (sector.m_index == m_playerShip->m_sector_index)
@@ -722,7 +722,7 @@ void Game::DebugDrawGameObjectsStats()
 bool Game::StoreObjectIfNecessary(GameObject* object)
 {
 	//need a manual storage? (if the sector is beyond "managed sectors" i.e. ~ off-screen)
-	for (sf::Vector2i index : m_star_sectors_managed)
+	for (sf::Vector2i index : m_sectorsManaged)
 		if (object->m_sector_index == index)
 			return false;
 
@@ -730,8 +730,8 @@ bool Game::StoreObjectIfNecessary(GameObject* object)
 	int id = GetSectorId(object->m_sector_index);
 	if (id == -1)
 	{
-		id = m_star_sectors_known.size();
-		m_star_sectors_known.push_back(StarSector(object->m_sector_index, id));
+		id = m_sectorsKnown.size();
+		m_sectorsKnown.push_back(StarSector(object->m_sector_index, id));
 	}
 
 	//store it
