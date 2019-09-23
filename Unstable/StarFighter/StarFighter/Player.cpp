@@ -75,18 +75,18 @@ void Player::Update(sf::Time deltaTime)
 	ApplyFlightModel(deltaTime, m_inputs_direction);
 
 	//weapons
+	float aim_heading = m_heading;
+	if (sf::Mouse::isButtonPressed(Mouse::Left) == true)
+		aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
+		
 	for (Weapon* weapon : m_weapons)
 	{
-		weapon->Update(deltaTime);
+		weapon->Update(deltaTime, aim_heading);
 
 		if (InputGuy::isFiring() == true)
 			if (weapon->IsReadyToFire() == true)
 				if (m_energy >= weapon->m_energy_cost)
 				{
-					//weapon orientation
-					if (sf::Mouse::isButtonPressed(Mouse::Left) == true)
-						weapon->m_heading = (GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, -(getPosition().y - (*CurrentGame).m_mouse_pos.y))) * 180 / M_PI) + 180;
-
 					//weapon fire
 					weapon->Fire();
 					m_energy -= weapon->m_energy_cost;

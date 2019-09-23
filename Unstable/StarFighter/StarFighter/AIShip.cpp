@@ -219,7 +219,7 @@ void AIShip::Update(sf::Time deltaTime)
 	if (input_fire == true)
 		for (Weapon* weapon : m_weapons)
 		{
-			weapon->Update(deltaTime);
+			weapon->Update(deltaTime, m_heading);
 			if (m_target != NULL)
 				if (weapon->IsTargetAligned(m_target, 30) == true)
 				{

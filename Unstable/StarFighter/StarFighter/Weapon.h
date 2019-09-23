@@ -18,7 +18,7 @@ public:
 	~Weapon();
 
 	void Fire();
-	void Update(sf::Time deltaTime);
+	void Update(sf::Time deltaTime, float aim_heading);
 	bool IsReadyToFire();
 	bool IsTargetAligned(SpatialObject* target, float angle_tolerance);
 

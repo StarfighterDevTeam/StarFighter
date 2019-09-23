@@ -50,24 +50,24 @@ Weapon::~Weapon()
 
 void Weapon::Fire()
 {
-	Ammo* ammo = new Ammo(m_owner, m_ammo_type, m_position, m_heading, m_range, m_damage, m_collider);
+	Ammo* ammo = new Ammo(m_owner, m_ammo_type, m_position, m_heading + m_heading_offset, m_range, m_damage, m_collider);
 	(*CurrentGame).addToScene(ammo, m_layer, m_collider, true);
 
 	m_rate_of_fire_timer = m_rate_of_fire;
 
 	//position offset
-	ammo->m_position.x += ammo->m_size.y * 0.5 * cos((m_owner->m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
-	ammo->m_position.y -= ammo->m_size.y * 0.5 * sin((m_owner->m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
+	ammo->m_position.x += ammo->m_size.y * 0.5 * cos((m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
+	ammo->m_position.y -= ammo->m_size.y * 0.5 * sin((m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
 }
 
-void Weapon::Update(sf::Time deltaTime)
+void Weapon::Update(sf::Time deltaTime, float aim_heading)
 {
 	//position offset
-	m_position.x = m_owner->m_position.x + cos(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y + sin(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
-	m_position.y = m_owner->m_position.y + sin(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y - cos(-m_owner->m_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;;
+	m_position.x = m_owner->m_position.x + cos(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y + sin(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
+	m_position.y = m_owner->m_position.y + sin(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y - cos(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
 
 	//heading
-	m_heading = m_owner->m_heading + m_heading_offset;
+	m_heading = aim_heading + m_heading_offset;
 
 	//rate of fire
 	if (m_rate_of_fire_timer > 0)
