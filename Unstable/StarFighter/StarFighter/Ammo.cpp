@@ -169,3 +169,8 @@ void Ammo::Bounce(GameObject* target)
 	SetPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
 	setRotation(m_heading);
 }
+
+bool Ammo::IsAmmoOwnedByPlayer()
+{
+	return m_owner == (*CurrentGame).m_playerShip;
+}

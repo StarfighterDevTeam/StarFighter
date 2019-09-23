@@ -405,9 +405,19 @@ void Game::CollisionChecks()
 					enemy_ship->GetHitByGravitation(ally_ship);
 		}
 		
-		//AI grouping
 		if (ally_ship != m_playerShip)
+		{
+			//Ally AI grouping
 			ally_ship->UpdateAlliedShips();
+
+			//Collateral damage by player shots on allies
+			/*
+			for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
+				if (ally_ammo->IsAmmoOwnedByPlayer() == true)
+					if (AreColliding(ally_ship, ally_ammo, true) == true)
+						ally_ship->GetHitByAmmo(ally_ammo);
+			*/
+		}
 		else
 		//Player loot
 			for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
@@ -417,10 +427,10 @@ void Game::CollisionChecks()
 
 	for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 	{
-		//Our shots
-		for (GameObject* player_ammo : m_sceneGameObjectsTyped[AllyFire])
-			if (AreColliding(player_ammo, enemy_ship, true) == true)
-				enemy_ship->GetHitByAmmo(player_ammo);
+		//Player & allies shots
+		for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
+			if (AreColliding(ally_ammo, enemy_ship, true) == true)
+				enemy_ship->GetHitByAmmo(ally_ammo);
 
 		//Hit by enemy gravitational range
 		if (enemy_ship->GetGravitationRange() > 0)
@@ -436,7 +446,7 @@ void Game::CollisionChecks()
 				enemy_ship->GetHitByObject(object);
 			}
 
-		//AI grouping
+		//Enemy AI grouping
 		enemy_ship->UpdateAlliedShips();
 	}
 

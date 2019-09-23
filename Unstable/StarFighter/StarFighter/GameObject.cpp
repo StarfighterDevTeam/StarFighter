@@ -354,3 +354,9 @@ bool GameObject::TryTrigger(GameObject* trigger)
 	return false;
 	//see override function in class Beacon
 }
+
+bool GameObject::IsAmmoOwnedByPlayer()
+{
+	return false;
+	//see override function in class Ammo
+}

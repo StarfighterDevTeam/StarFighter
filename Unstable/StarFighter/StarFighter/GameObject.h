@@ -74,6 +74,7 @@ public:
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static int GaussianBlurDistribution(int x);
 	virtual float GetRadius(bool include_shield) const;
+	virtual bool IsAmmoOwnedByPlayer();
 	virtual bool TryTrigger(GameObject* trigger);
 
 	string GetTextureName();
