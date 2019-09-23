@@ -9,7 +9,7 @@
 
 #include "Asteroid.h"
 
-class Ship : public DestructibleObject
+class Ship : public Destructible
 {
 public :
 	Ship();

@@ -1,22 +1,22 @@
-#include "DestructibleObject.h"
+#include "Destructible.h"
 
 extern Game* CurrentGame;
 
 using namespace sf;
 
-DestructibleObject::DestructibleObject() : SpatialObject()
+Destructible::Destructible() : SpatialObject()
 {
 	m_collision_damage = 0;
 	m_hit_feedback_timer = 0;
 	m_hit_immunity_timer = 0;
 }
 
-DestructibleObject::~DestructibleObject()
+Destructible::~Destructible()
 {
 	
 }
 
-void DestructibleObject::Update(sf::Time deltaTime)
+void Destructible::Update(sf::Time deltaTime)
 {
 	//hit feedback update
 	if (m_hit_feedback_timer > 0)
@@ -34,7 +34,7 @@ void DestructibleObject::Update(sf::Time deltaTime)
 	SpatialObject::Update(deltaTime);
 }
 
-void DestructibleObject::GetHitByAmmo(GameObject* ammo)
+void Destructible::GetHitByAmmo(GameObject* ammo)
 {
 	int damage = ((Ammo*)ammo)->m_damage;
 
@@ -56,9 +56,9 @@ void DestructibleObject::GetHitByAmmo(GameObject* ammo)
 	}
 }
 
-void DestructibleObject::GetHitByObject(GameObject* object)
+void Destructible::GetHitByObject(GameObject* object)
 {
-	int damage = ((DestructibleObject*)object)->m_collision_damage;
+	int damage = ((Destructible*)object)->m_collision_damage;
 
 	if (damage > 0 && m_hit_immunity_timer <= 0)
 	{
@@ -84,7 +84,7 @@ void DestructibleObject::GetHitByObject(GameObject* object)
 	}
 }
 
-void DestructibleObject::Death()
+void Destructible::Death()
 {
 	//garbage object
 	m_garbageMe = true;
@@ -115,7 +115,7 @@ void DestructibleObject::Death()
 		CreateLoot(10);
 }
 
-Loot* DestructibleObject::CreateLoot(int money)
+Loot* Destructible::CreateLoot(int money)
 {
 	Loot* loot = new Loot(money);
 	loot->m_position = m_position;
@@ -123,7 +123,7 @@ Loot* DestructibleObject::CreateLoot(int money)
 	loot->m_speed = sf::Vector2f(m_speed.x * 0.1, m_speed.y * 0.1);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(loot) == false)
-		(*CurrentGame).addToScene(loot, AIShipLayer, LootObject, true);
+		(*CurrentGame).addToScene(loot, loot->m_layer, loot->m_collider, true);
 
 	return loot;
 }

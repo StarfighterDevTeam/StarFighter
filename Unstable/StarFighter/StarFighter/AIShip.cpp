@@ -8,8 +8,8 @@ using namespace sf;
 AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe) : Ship()
 {
 	ColliderType weapon_collider = hostility == Hostility_Ally ? AllyFire : EnemyFire;
-	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_layer = AIShipLayer;
+	m_collider = hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject;
 	m_scripted_destination = NULL;
 
 	m_ship_type = ship_type;

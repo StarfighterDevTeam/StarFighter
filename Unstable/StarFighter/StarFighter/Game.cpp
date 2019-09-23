@@ -411,12 +411,10 @@ void Game::CollisionChecks()
 			ally_ship->UpdateAlliedShips();
 
 			//Collateral damage by player shots on allies
-			/*
 			for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
 				if (ally_ammo->IsAmmoOwnedByPlayer() == true)
 					if (AreColliding(ally_ship, ally_ammo, true) == true)
 						ally_ship->GetHitByAmmo(ally_ammo);
-			*/
 		}
 		else
 		//Player loot

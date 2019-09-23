@@ -10,8 +10,8 @@ Beacon::Beacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMission
 	m_visible = false;
 	m_trigger = trigger;
 	m_isMissionObjective = isMissionObjective;
-	m_collider = BeaconObject;
 	m_layer = BackgroundLayer;
+	m_collider = BeaconObject;
 	m_size = sf::Vector2f(138, 138);
 }
 

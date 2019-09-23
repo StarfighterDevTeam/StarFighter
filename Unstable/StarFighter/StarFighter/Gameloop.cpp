@@ -102,7 +102,7 @@ AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, fl
 	AIShip* ship = new AIShip(ship_type, sector_index, heading, hostility, roe);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(ship) == false)
-		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
+		(*CurrentGame).addToScene(ship, ship->m_layer, ship->m_collider, false);
 
 	return ship;
 }
@@ -112,7 +112,7 @@ EscortShip* Gameloop::CreateEscortShip(ShipType ship_type, sf::Vector2i sector_i
 	EscortShip* ship = new EscortShip(ship_type, sector_index, heading, hostility, roe, escorted_ship, escort_offset);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(ship) == false)
-		(*CurrentGame).addToScene(ship, AIShipLayer, hostility == Hostility_Ally ? AllyShipObject : EnemyShipObject, false);
+		(*CurrentGame).addToScene(ship, ship->m_layer, ship->m_collider, false);
 
 	return ship;
 }
@@ -124,7 +124,7 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	Planet* planet = new Planet(sector_index, hostility, nb_missions_to_create);
 	
 	if ((*CurrentGame).StoreObjectIfNecessary(planet) == false)
-		(*CurrentGame).addToScene(planet, Planet_Layer, PlanetObject, false);
+		(*CurrentGame).addToScene(planet, planet->m_layer, planet->m_collider, false);
 
 	return planet;
 }
@@ -134,7 +134,7 @@ Asteroid* Gameloop::CreateAsteroid(sf::Vector2i sector_index)
 	Asteroid* asteroid = new Asteroid(sector_index);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(asteroid) == false)
-		(*CurrentGame).addToScene(asteroid, AIShipLayer, DestructibleObject, false);
+		(*CurrentGame).addToScene(asteroid, asteroid->m_layer, asteroid->m_collider, false);
 
 	return asteroid;
 }
@@ -144,7 +144,7 @@ Beacon* Gameloop::CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger
 	Beacon* beacon = new Beacon(sector_index, trigger, isMissionObjective);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(beacon) == false)
-		(*CurrentGame).addToScene(beacon, BeaconLayer, BeaconObject, false);
+		(*CurrentGame).addToScene(beacon, beacon->m_layer, beacon->m_collider, false);
 
 	return beacon;
 }

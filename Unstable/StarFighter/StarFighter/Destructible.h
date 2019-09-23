@@ -1,13 +1,13 @@
-#ifndef DESTRUCTIBLEOBJECT_H_INCLUDED
-#define DESTRUCTIBLEOBJECT_H_INCLUDED
+#ifndef DESTRUCTIBLE_H_INCLUDED
+#define DESTRUCTIBLE_H_INCLUDED
 
 #include "Planet.h"
 
-class DestructibleObject : public SpatialObject
+class Destructible : public SpatialObject
 {
 public :
-	DestructibleObject();
-	virtual ~DestructibleObject();
+	Destructible();
+	virtual ~Destructible();
 	void Update(sf::Time deltaTime) override;
 	void GetHitByAmmo(GameObject* ammo) override;
 	void GetHitByObject(GameObject* object) override;
@@ -23,4 +23,4 @@ public :
 	float m_hit_immunity_timer;
 };
 
-#endif // DESTRUCTIBLEOBJECT_H_INCLUDED
+#endif // DESTRUCTIBLE_H_INCLUDED

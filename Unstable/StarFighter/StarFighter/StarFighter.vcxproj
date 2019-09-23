@@ -93,7 +93,7 @@
     <ClCompile Include="Beacon.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="AIShip.cpp" />
-    <ClCompile Include="DestructibleObject.cpp" />
+    <ClCompile Include="Destructible.cpp" />
     <ClCompile Include="EscortShip.cpp" />
     <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -128,7 +128,7 @@
     <ClInclude Include="Beacon.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="AIShip.h" />
-    <ClInclude Include="DestructibleObject.h" />
+    <ClInclude Include="Destructible.h" />
     <ClInclude Include="EscortShip.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="FX.h" />

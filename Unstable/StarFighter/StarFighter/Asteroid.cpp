@@ -4,12 +4,14 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Asteroid::Asteroid(sf::Vector2i sector_index) : DestructibleObject()
+Asteroid::Asteroid(sf::Vector2i sector_index) : Destructible()
 {
 	m_collision_damage = 10;
 	m_health_max = 10;
 	m_health = m_health_max;
 	m_hostility = Hostility_Enemy;
+	m_layer = AIShipLayer;
+	m_collider = DestructibleObject;
 
 	Init(m_position, m_speed, "2D/asteroid.png", sf::Vector2f(200, 224), 1, 1);
 
@@ -28,5 +30,5 @@ void Asteroid::Update(sf::Time deltaTime)
 {
 	m_heading += m_rotation_speed * deltaTime.asSeconds();
 
-	DestructibleObject::Update(deltaTime);
+	Destructible::Update(deltaTime);
 }

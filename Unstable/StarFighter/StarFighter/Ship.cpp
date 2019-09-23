@@ -4,8 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-// ----------------SHIP ---------------
-Ship::Ship() : DestructibleObject()
+Ship::Ship() : Destructible()
 {
 	m_inputs_direction = sf::Vector2f(0, 0);
 	m_isOrbiting = NULL;
@@ -160,7 +159,7 @@ void Ship::Update(sf::Time deltaTime)
 	if (m_shield_max > 0)
 		m_shield_rect.setSize(sf::Vector2f(m_shield_container_rect.getSize().x * m_shield / m_shield_max, m_shield_container_rect.getSize().y));
 
-	DestructibleObject::Update(deltaTime);
+	Destructible::Update(deltaTime);
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
@@ -209,13 +208,13 @@ void Ship::GetHitByAmmo(GameObject* ammo)
 
 	//no shield
 	if (m_shield <= 0)
-		DestructibleObject::GetHitByAmmo(ammo);
+		Destructible::GetHitByAmmo(ammo);
 }
 
 void Ship::GetHitByObject(GameObject* object)
 {
 	//Apply damage
-	int damage = ((DestructibleObject*)object)->m_collision_damage;
+	int damage = ((Destructible*)object)->m_collision_damage;
 
 	if (m_shield > 0)
 		//shield absorbing damage
@@ -243,7 +242,7 @@ void Ship::GetHitByObject(GameObject* object)
 
 	//no shield
 	if (m_shield <= 0)
-		DestructibleObject::GetHitByObject(object);
+		Destructible::GetHitByObject(object);
 }
 
 void Ship::GetHitByGravitation(GameObject* ship)

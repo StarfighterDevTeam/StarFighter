@@ -1,9 +1,9 @@
 #ifndef ASTEROID_H_INCLUDED
 #define ASTEROID_H_INCLUDED
 
-#include "DestructibleObject.h"
+#include "Destructible.h"
 
-class Asteroid : public DestructibleObject
+class Asteroid : public Destructible
 {
 public :
 	Asteroid(sf::Vector2i sector_index);
