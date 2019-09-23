@@ -120,7 +120,7 @@ Loot* Destructible::CreateLoot(int money)
 	Loot* loot = new Loot(money);
 	loot->m_position = m_position;
 	loot->m_sector_index = GameObject::GetStarSectorIndex(m_position);
-	loot->m_speed = sf::Vector2f(m_speed.x * 0.1, m_speed.y * 0.1);
+	loot->m_speed = sf::Vector2f(m_speed.x * 0.2, m_speed.y * 0.2);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(loot) == false)
 		(*CurrentGame).addToScene(loot, loot->m_layer, loot->m_collider, true);

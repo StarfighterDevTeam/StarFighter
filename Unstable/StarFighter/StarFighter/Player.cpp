@@ -210,6 +210,13 @@ void Player::UpdateMissions()
 					}
 					case AllyShipObject:
 					{
+						//convoy is dead?
+						if (object->m_garbageMe == true)
+						{
+							EndMission(mission, MissionStatus_Failed);
+							continue;
+						}
+						
 						AIShip* ship = (AIShip*)object;
 
 						if (mission->m_status == MissionStatus_Current)
@@ -291,13 +298,20 @@ void Player::UpdateMissions()
 			if (mission->m_marked_objectives.empty() == true)
 			{
 				EndMission(mission, MissionStatus_Complete);
-				//mission->m_owner->m_nb_missions_to_create++;
-				missions_to_delete.push_back(mission);
+				mission->m_owner->m_nb_missions_to_create++;
 			}
 		}
 
-	for (Mission* mission : missions_to_delete)
-		RemoveMission(mission);
+	//Refresh mission list
+	vector<Mission*> old_missions;
+	for (Mission* mission : m_missions)
+		old_missions.push_back(mission);
+	m_missions.clear();
+	for (Mission* mission : old_missions)
+		if (mission->m_status == MissionStatus_Complete || mission->m_status == MissionStatus_Failed)
+			RemoveMission(mission);
+		else
+			m_missions.push_back(mission);
 }
 
 bool Player::CycleMission()
@@ -591,14 +605,6 @@ void Player::EndMission(Mission* mission, MissionStatus status)
 void Player::RemoveMission(Mission* mission)
 {
 	//Delete mission
-	vector<Mission*> old_missions;
-	for (Mission* it_mission : m_missions)
-		old_missions.push_back(it_mission);
-	m_missions.clear();
-	for (Mission* it_mission : old_missions)
-		if (it_mission != mission)
-			m_missions.push_back(it_mission);
-
 	if (mission->m_owner != NULL)
 	{
 		vector<Mission*> old_planet_missions;
