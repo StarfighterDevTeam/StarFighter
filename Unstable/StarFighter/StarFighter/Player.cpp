@@ -221,57 +221,74 @@ void Player::UpdateMissions()
 
 						if (mission->m_status == MissionStatus_Current)
 						{	
-							//escort is figthing?
-							bool escort_is_fighting = false;
-							for (GameObject* escort_object : (*CurrentGame).m_sceneGameObjectsTyped[AllyShipObject])
+							//MISSION ASTEROID
+							if (mission->m_mission_type == Mission_AsteroidSearch)
 							{
-								SpatialObject* escort_ally = (SpatialObject*)escort_object;
-								if (escort_ally->GetEscortedShip() != NULL && escort_ally->GetEscortedShip() == ship && escort_ally->m_roe == ROE_FireAtWill)
+								if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
 								{
-									escort_is_fighting = true;
-									break;
-								}
-							}
+									UnmarkThis(object, true);
 
-							//escort is fighting => stop the convoy
-							if (escort_is_fighting == true)
-								ship->SetROE(ROE_Freeze);
-							//player near convoy, convoy freezed, escort is not fighting and no enemy nearby? => set convoy on the move
-							else if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
-							{
-								//no enemy on nearby?
-								if (ship->GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X, 360) == NULL)
-									ship->SetROE(ship->m_native_ROE);
-							}
-								
-							//convoy on the move?
-							if (ship->m_roe != ROE_Freeze)
-							{
-								//arrived at destination?
-								if (ship->m_scripted_destination != NULL && GetDistanceSquaredBetweenPositions(ship->m_position, *ship->m_scripted_destination) < (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5) * (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5))
-								{
-									UnmarkThis(ship, true);
-									ship->m_garbageMe = true;
-
-									//delete escorting ships
-									for (GameObject* escort_ship : ship->m_scripted_allied_ships)
-									{
-										UnmarkThis((SpatialObject*)escort_ship, false);
-										escort_ship->m_garbageMe = true;
-									}
-										
-								}
-								//too far from convoy = freeze convoy movement
-								else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
-								{
-									ship->SetROE(ROE_Freeze);
-									tmp_marked_objectives.push_back(ship);
+									MarkThis(mission->m_owner, true);
+									tmp_marked_objectives.push_back(mission->m_owner);
 								}
 								else
 									tmp_marked_objectives.push_back(ship);
 							}
-							else
-								tmp_marked_objectives.push_back(ship);
+							//MISSION CONVOY
+							else if (mission->m_mission_type == Mission_Convoy)
+							{
+								//escort is figthing?
+								bool escort_is_fighting = false;
+								for (GameObject* escort_object : (*CurrentGame).m_sceneGameObjectsTyped[AllyShipObject])
+								{
+									SpatialObject* escort_ally = (SpatialObject*)escort_object;
+									if (escort_ally->GetEscortedShip() != NULL && escort_ally->GetEscortedShip() == ship && escort_ally->m_roe == ROE_FireAtWill)
+									{
+										escort_is_fighting = true;
+										break;
+									}
+								}
+
+								//escort is fighting => stop the convoy
+								if (escort_is_fighting == true)
+									ship->SetROE(ROE_Freeze);
+								//player near convoy, convoy freezed, escort is not fighting and no enemy nearby? => set convoy on the move
+								else if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
+								{
+									//no enemy on nearby?
+									if (ship->GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X, 360) == NULL)
+										ship->SetROE(ship->m_native_ROE);
+								}
+
+								//convoy on the move?
+								if (ship->m_roe != ROE_Freeze)
+								{
+									//arrived at destination?
+									if (ship->m_scripted_destination != NULL && GetDistanceSquaredBetweenPositions(ship->m_position, *ship->m_scripted_destination) < (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5) * (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5))
+									{
+										UnmarkThis(ship, true);
+										ship->m_garbageMe = true;
+
+										//delete escorting ships
+										for (GameObject* escort_ship : ship->m_scripted_allied_ships)
+										{
+											UnmarkThis((SpatialObject*)escort_ship, false);
+											escort_ship->m_garbageMe = true;
+										}
+
+									}
+									//too far from convoy = freeze convoy movement
+									else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
+									{
+										ship->SetROE(ROE_Freeze);
+										tmp_marked_objectives.push_back(ship);
+									}
+									else
+										tmp_marked_objectives.push_back(ship);
+								}
+								else
+									tmp_marked_objectives.push_back(ship);
+							}
 						}
 						else
 						{
@@ -281,7 +298,9 @@ void Player::UpdateMissions()
 						}
 
 						//update text
-						if (ship->m_roe == ROE_Freeze)
+						if (mission->m_mission_type == Mission_AsteroidSearch)
+							mission->m_body_text = "Rescue the ship";
+						else if (ship->m_roe == ROE_Freeze)
 							mission->m_body_text = "Rejoin the convoy";
 						else
 							mission->m_body_text = "Escort the convoy";

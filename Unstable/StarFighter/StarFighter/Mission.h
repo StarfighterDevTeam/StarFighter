@@ -18,6 +18,7 @@ enum MissionType
 	Mission_EliminateBoss,
 	Mission_EliminateSquad,
 	Mission_Convoy,
+	Mission_AsteroidSearch,
 	NB_MISSION_TYPES,
 };
 

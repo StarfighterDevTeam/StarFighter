@@ -37,5 +37,10 @@ Mission::Mission(MissionType mission_type, SpatialObject* target, Planet* owner)
 			m_title_text = "Eliminate Mission";
 			break;
 		}
+		case Mission_AsteroidSearch:
+		{
+			m_title_text = "Asteroid mission";
+			break;
+		}
 	}
 }

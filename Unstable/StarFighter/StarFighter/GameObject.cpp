@@ -153,7 +153,7 @@ void GameObject::Update(sf::Time deltaTime)
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 
-	m_sector_index = GetStarSectorIndex(m_position);
+	m_sector_index = GetStarSectorIndexAtPosition(m_position);
 
 	BoundAngle(m_heading, 360);
 	setRotation(m_heading);
@@ -162,7 +162,7 @@ void GameObject::Update(sf::Time deltaTime)
 		AnimatedSprite::Update(deltaTime);
 }
 
-sf::Vector2i GameObject::GetStarSectorIndex(sf::Vector2f position)
+sf::Vector2i GameObject::GetStarSectorIndexAtPosition(sf::Vector2f position)
 {
 	sf::Vector2i sector_index;
 	sector_index.x = (int)(position.x / STAR_SECTOR_SIZE + (position.x >= 0 ? 0.5 : -0.5));

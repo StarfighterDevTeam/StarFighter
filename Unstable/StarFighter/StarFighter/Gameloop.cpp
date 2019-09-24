@@ -97,7 +97,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	}
 
 	//chance of planet
-	if (RandomizeIntBetweenValues(1, 20) == 1)
+	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
 	{
 		bool condition_ok = true;
 		for (StarSector sector : (*CurrentGame).m_sectorsKnownTyped[Sector_Planet])
@@ -110,13 +110,13 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 		if (condition_ok == true)
 		{
 			(*CurrentGame).m_sectorsKnownTyped[Sector_Planet].push_back(sector_index);
-			CreatePlanet(sector_index, Hostility_Ally, 2, 3);
+			CreatePlanet(sector_index, Hostility_Ally, 1, 1);
 			return;
 		}
 	}
 
 	//chance of asteroid field
-	if (RandomizeIntBetweenValues(1, 20) == 1)
+	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
 	{
 		(*CurrentGame).m_sectorsKnownTyped[Sector_Asteroid].push_back(sector_index);
 		CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
@@ -169,6 +169,25 @@ Asteroid* Gameloop::CreateAsteroid(sf::Vector2i sector_index, AsteroidType aster
 		(*CurrentGame).addToScene(asteroid, asteroid->m_layer, asteroid->m_collider, false);
 
 	return asteroid;
+}
+
+sf::Vector2i Gameloop::CreateAsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y)
+{
+	//we'll keep at least one empty space at the middle of the asteroid field, to spawn mission objectives later
+	sf::Vector2i center = sf::Vector2i(sector_index_left + sector_index_size_x / 2, sector_index_bottom + sector_index_size_y / 2);
+
+	for (int i = 0; i < sector_index_size_x * sector_index_size_y; i++)
+	{
+		sf::Vector2i index = sf::Vector2i(sector_index_left + (i % sector_index_size_y), sector_index_bottom + (i / sector_index_size_y));
+		if (index != center && RandomizeFloatBetweenValues(0, 1) < 0.5)
+		{
+			Asteroid* asteroid = CreateAsteroid(index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
+			asteroid->m_position.x += RandomizeFloatBetweenValues(-STAR_SECTOR_SIZE * 0.25, STAR_SECTOR_SIZE * 0.25);
+			asteroid->m_position.y += RandomizeFloatBetweenValues(-STAR_SECTOR_SIZE * 0.25, STAR_SECTOR_SIZE * 0.25);
+		}
+	}
+
+	return center;
 }
 
 Beacon* Gameloop::CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective)
@@ -247,7 +266,7 @@ pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i s
 
 Mission* Gameloop::CreateMission(Planet* owner)
 {
-	MissionType mission_type = Mission_Convoy;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	MissionType mission_type = Mission_AsteroidSearch;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 
 	//find sector where to create the mission
@@ -300,7 +319,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			float perpAngle = angle + M_PI_2 * RandomizeSign();
 			
 			sf::Vector2f beacon_position = sf::Vector2f(ship->m_position.x + path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y + path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
-			sf::Vector2i beacon_sector_index = GameObject::GetStarSectorIndex(beacon_position);
+			sf::Vector2i beacon_sector_index = GameObject::GetStarSectorIndexAtPosition(beacon_position);
 			Beacon* beacon = CreateBeacon(beacon_sector_index, ship, false);
 
 			for (int e = 0; e < 3; e++)
@@ -361,6 +380,14 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				else
 					ship->m_scripted_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush));
 			}
+
+			return new Mission(mission_type, ship, owner);
+		}
+		case Mission_AsteroidSearch:
+		{
+			sf::Vector2i empty_space = CreateAsteroidField(1, 1, RandomizeIntBetweenValues(18, 22), RandomizeIntBetweenValues(18, 22));
+
+			AIShip* ship = CreateAIShip(Ship_Convoy, empty_space, RandomizeFloatBetweenValues(0, 359.9), Hostility_Ally, ROE_Freeze);
 
 			return new Mission(mission_type, ship, owner);
 		}
