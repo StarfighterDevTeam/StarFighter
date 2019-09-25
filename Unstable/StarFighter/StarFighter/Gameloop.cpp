@@ -91,17 +91,24 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	Star* new_star = StarGenerator::CreateStar(sector_index);
 
 	if (sector_index == (*CurrentGame).m_playerShip->m_sector_index)
-	{
-		(*CurrentGame).m_sectorsKnownTyped[Sector_Default].push_back(sector_index);
 		return;
-	}
 
 	//chance of planet
 	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
 	{
 		bool condition_ok = true;
-		for (StarSector sector : (*CurrentGame).m_sectorsKnownTyped[Sector_Planet])
-			if (abs(sector.m_index.x - sector_index.x) < (*CurrentGame).m_nb_sectors_managed_x && abs(sector.m_index.y - sector_index.y) < (*CurrentGame).m_nb_sectors_managed_y)
+		//position too close to an existing planet?
+		for (Planet* planet : (*CurrentGame).m_planets)
+			if (abs(planet->m_sector_index.x - sector_index.x) < (*CurrentGame).m_nb_sectors_managed_x && abs(planet->m_sector_index.y - sector_index.y) < (*CurrentGame).m_nb_sectors_managed_y)
+			{
+				condition_ok = false;
+				break;
+			}
+
+		//position included inside an asteroid field?
+		for (AsteroidField* asteroid_field : (*CurrentGame).m_asteroidFields)
+			if (sector_index.x >= asteroid_field->m_sector_index_left && sector_index.x <= asteroid_field->m_sector_index_left + asteroid_field->m_sector_index_size_x
+				&& sector_index.y >= asteroid_field->m_sector_index_bottom && sector_index.y <= asteroid_field->m_sector_index_bottom + asteroid_field->m_sector_index_size_y)
 			{
 				condition_ok = false;
 				break;
@@ -109,22 +116,19 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 
 		if (condition_ok == true)
 		{
-			(*CurrentGame).m_sectorsKnownTyped[Sector_Planet].push_back(sector_index);
 			CreatePlanet(sector_index, Hostility_Ally, 1, 1);
 			return;
 		}
 	}
 
-	//chance of asteroid field
+	//chance of asteroid
 	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
 	{
-		(*CurrentGame).m_sectorsKnownTyped[Sector_Asteroid].push_back(sector_index);
-		AsteroidField::CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
+		Asteroid* asteroid = AsteroidField::CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
+		asteroid->m_speed = sf::Vector2f(RandomizeFloatBetweenValues(0, 1), RandomizeFloatBetweenValues(0, 1));
+		ScaleVector(&asteroid->m_speed, asteroid->m_speed_max);
 		return;
 	}
-
-	//default
-	(*CurrentGame).m_sectorsKnownTyped[Sector_Default].push_back(sector_index);
 }
 
 AIShip* Gameloop::CreateAIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hostility hostility, RuleOfEngagement roe)
@@ -156,7 +160,7 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	if ((*CurrentGame).StoreObjectIfNecessary(planet) == false)
 		(*CurrentGame).addToScene(planet, planet->m_layer, planet->m_collider, false);
 
-	(*CurrentGame).m_sectorsKnownTyped[Sector_Planet].push_back(sector_index);
+	(*CurrentGame).m_planets.push_back(planet);
 
 	return planet;
 }

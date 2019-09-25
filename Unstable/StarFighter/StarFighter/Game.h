@@ -41,14 +41,6 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
-enum SectorType
-{
-	Sector_Default,
-	Sector_Planet,
-	Sector_Asteroid,
-	NB_SECTOR_TYPES,
-};
-
 struct StarSector
 {
 public:
@@ -59,7 +51,6 @@ public:
 	sf::Vector2i m_index;
 	int m_hazard_level;
 	int m_id;
-	SectorType m_sector_type;
 };
 
 using namespace sf;
@@ -153,12 +144,12 @@ public:
 	vector<CircleShape> m_gravity_circles;
 
 	vector<StarSector> m_sectorsKnown;//all sectors encountered by the player
-	vector<StarSector> m_sectorsKnownTyped[NB_SECTOR_TYPES];//all sectors encountered by the player, ordered by sector type
 	vector<sf::Vector2i> m_sectorsManaged;//all sectors that are close enough to need an updated
 	vector<sf::Vector2i> m_sectorsToCreate;//all sectors that have just been created and need content creation
 	vector<sf::Vector2i> m_sectorsToAddStar;//all planets that are requesting a mission creation from Gameloop
 	vector<Planet*> m_planetsToCreateMission;//all planets that are requesting a mission creation from Gameloop
 	vector<AsteroidField*> m_asteroidFields;//all asteroid fields created
+	vector<Planet*> m_planets;//all planets created
 
 	sf::Vector2i m_previous_star_sector_index;
 	map<int, Planet*> m_planet_ids;
