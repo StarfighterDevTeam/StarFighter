@@ -29,7 +29,7 @@ public :
 	void SetPosition(sf::Vector2f position) override;
 	void GetHitByAmmo(GameObject* ammo) override;
 	void GetHitByObject(GameObject* object) override;
-	void GetHitByGravitation(GameObject* ship) override;
+	void HitWithGravitation(GameObject* object) override;
 	void UpdateOrbit(sf::Time deltaTime);
 	float GetRadius(bool include_shield) const override;
 	float GetGravitationRange() override;

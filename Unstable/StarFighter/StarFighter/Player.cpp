@@ -45,6 +45,9 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_energy_max = 100;
 	m_energy_regen = 10;
 
+	m_gravitation_range = 300;
+	m_gravitation_strength = 70;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
+
 	InitShip();
 }
 
@@ -99,8 +102,13 @@ void Player::Update(sf::Time deltaTime)
 
 	Ship::Update(deltaTime);
 
+	//update energy
 	UpdateEnergyRegen(deltaTime);
 	m_energy_rect.setSize(sf::Vector2f(m_energy_container_rect.getSize().x * m_energy / m_energy_max, m_energy_container_rect.getSize().y));
+
+	//refill health when docking do a planet
+	if (m_isOrbiting != NULL)
+		Replenish();
 
 	//cycling mission
 	if (m_inputs_states[Action_CyclingMission] == Input_Tap)
@@ -686,18 +694,14 @@ void Player::Death()
 
 	//Debug respawn
 	m_garbageMe = false;
+	Replenish();
+}
+
+void Player::Replenish()
+{
 	m_health = m_health_max;
 	m_shield = m_shield_max;
 	m_energy = m_energy_max;
-}
-
-void Player::GetHitByGravitation(GameObject* ship)
-{
-	AIShip* attractor = (AIShip*)ship;
-	if (attractor->m_roe == ROE_Ambush)
-		attractor->SetROE(ROE_FireAtWill);
-
-	Ship::GetHitByGravitation(ship);
 }
 
 void Player::GetHitByLoot(GameObject* loot)

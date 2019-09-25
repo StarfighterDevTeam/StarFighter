@@ -243,28 +243,6 @@ void Ship::GetHitByObject(GameObject* object)
 		Destructible::GetHitByObject(object);
 }
 
-void Ship::GetHitByGravitation(GameObject* ship)
-{
-	const float dx = m_position.x - ship->m_position.x;
-	const float dy = m_position.y - ship->m_position.y;
-	const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
-	const float speed_deg = (angle * 180 / M_PI);
-
-	//Apply gravitation only if ship is trying to get away from the attractor
-	Ship* attractor = (Ship*)ship;
-	if ((ship == (*CurrentGame).m_playerShip || attractor->m_roe == ROE_FireAtWill) && abs(GetAngleDegToTargetPosition(m_position, speed_deg, ship->m_position)) > 90)
-	{
-		const float dist_sqr = dx*dx + dy*dy;
-		const float range = attractor->m_gravitation_range;
-
-		const float strenght = Lerp(dist_sqr, (range * 0.5) * (range * 0.5), (range) * (range), 0, attractor->m_gravitation_strength);
-		sf::Vector2f gravity = GetVectorFromLengthAndAngle(strenght, angle);
-
-		m_speed += gravity;
-		NormalizeVector(&m_speed, m_speed_max);
-	}
-}
-
 void Ship::InitShip()
 {
 	//ship range and angle of fire max
@@ -380,4 +358,30 @@ bool Ship::HasWeapons()
 void Ship::AddAmmoToShotsFired(Ammo* ammo)
 {
 	m_shots_fired.push_back(ammo);
+}
+
+void Ship::HitWithGravitation(GameObject* object)
+{
+	SpatialObject* target = (SpatialObject*)object;
+
+	const float dx = target->m_position.x - m_position.x;
+	const float dy = target->m_position.y - m_position.y;
+	const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
+	const float speed_deg = (angle * 180 / M_PI);
+
+	//Apply gravitation only if object is trying to get away from the attractor
+	if ((this == (*CurrentGame).m_playerShip || m_roe == ROE_FireAtWill) && m_radius > object->m_radius && abs(GetAngleDegToTargetPosition(object->m_position, speed_deg, m_position)) > 90)
+	{
+		const float dist_sqr = dx*dx + dy*dy;
+		const float range = m_gravitation_range;
+
+		const float strenght = Lerp(dist_sqr, (range * 0.5) * (range * 0.5), (range)* (range), 0, m_gravitation_strength);
+		sf::Vector2f gravity = GetVectorFromLengthAndAngle(strenght, angle);
+
+		target->m_speed += gravity;
+		NormalizeVector(&target->m_speed, target->m_speed_max);
+
+		//update Rule of engagement if object is an AIShip
+		target->GetHitByGravitation();
+	}
 }

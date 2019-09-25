@@ -98,3 +98,8 @@ void SpatialObject::AddAmmoToShotsFired(Ammo* ammo)
 {
 	//see override function in class Ship
 }
+
+void SpatialObject::GetHitByGravitation()
+{
+	//see override function in class AIShip
+}

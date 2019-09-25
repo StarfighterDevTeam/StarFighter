@@ -290,14 +290,14 @@ void GameObject::GetHitByObject(GameObject* object)
 	//see override function in class Ship and AIShip
 }
 
-void GameObject::GetHitByGravitation(GameObject* ship)
-{
-	//see override function in class Ship and Player
-}
-
 void GameObject::GetHitByLoot(GameObject* loot)
 {
 	//see override function in class Player
+}
+
+void GameObject::HitWithGravitation(GameObject* attractor)
+{
+	//see override function in class Ship
 }
 
 void GameObject::MarkThis(SpatialObject* target, bool isMission)

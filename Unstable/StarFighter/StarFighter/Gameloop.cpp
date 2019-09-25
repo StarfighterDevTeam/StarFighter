@@ -9,23 +9,10 @@ Gameloop::Gameloop()
 
 	//ship
 	Player* player = new Player(sf::Vector2i(0, 0));
-	//(*CurrentGame).m_playerShip = player;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, AllyShipObject, false);
 	(*CurrentGame).UpdateSectorList(true);
 
-	//Init first mission
-	//sf::Vector2i index = sf::Vector2i(RandomizeSign() * RandomizeIntBetweenValues(0, 0), RandomizeIntBetweenValues(2, 2));
-	//Planet* planet = CreatePlanet(index, Hostility_Ally, 1, 1);
-	//Mission* mission = new Mission(Mission_GoTo, planet, planet);
-	//player->AcceptMission(mission);
-
-	//AIShip* cruiser = CreateAIShip(Ship_Cruiser, sf::Vector2i(10, 0), 0, Hostility_Enemy, ROE_Ambush);
 	//AIShip* enemy = CreateAIShip(Ship_Sigma, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
-	//AIShip* ally = CreateAIShip(Ship_Alpha, sf::Vector2i(1, 1), 0, Hostility_Ally, ROE_FireAtWill);
-	//Planet* planet = CreatePlanet(sf::Vector2i(-2, 1), Hostility_Ally);
-
-	//star
-	//StarGenerator* generator = new StarGenerator();
 }
 
 Gameloop::~Gameloop()
@@ -105,7 +92,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 		return;
 
 	//chance of planet
-	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
+	if (RandomizeFloatBetweenValues(0, 1) < 0.01)
 	{
 		bool condition_ok = true;
 		//position too close to an existing planet?
@@ -127,7 +114,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 
 		if (condition_ok == true)
 		{
-			CreatePlanet(sector_index, Hostility_Ally, 1, 1);
+			CreatePlanet(sector_index, Hostility_Ally, 2, 3);
 			return;
 		}
 	}
@@ -249,7 +236,7 @@ pair<Planet*, sf::Vector2i> Gameloop::SnailSearchSectorForMission(sf::Vector2i s
 
 Mission* Gameloop::CreateMission(Planet* owner)
 {
-	MissionType mission_type = Mission_AsteroidSearch;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
+	MissionType mission_type = Mission_EliminateBoss;// (MissionType)RandomizeIntBetweenValues(0, NB_MISSION_TYPES - 1);
 	sf::Vector2i starting_index = sf::Vector2i(owner->m_sector_index.x + RandomizeSign() * RandomizeIntBetweenValues(5, 10), owner->m_sector_index.y + RandomizeSign() * RandomizeIntBetweenValues(5, 10));
 
 	//find sector where to create the mission

@@ -39,11 +39,13 @@ public :
 	virtual AIShip* GetEscortedShip();
 	virtual bool HasWeapons();
 	virtual void AddAmmoToShotsFired(Ammo* ammo);
+	virtual void GetHitByGravitation();
 
 	Marker* m_marker_target;
 	Marker* m_marker_mission;
 	Hostility m_hostility;
 	RuleOfEngagement m_roe;
+	float m_speed_max;
 
 	sf::Text m_id_text;
 };

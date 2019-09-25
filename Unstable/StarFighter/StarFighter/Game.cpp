@@ -387,12 +387,19 @@ void Game::CollisionChecks()
 
 		//Collision with objects
 		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
+		{
 			if (AreColliding(ally_ship, object, true) == true)
 			{
 				object->GetHitByObject(ally_ship);
 				ally_ship->GetHitByObject(object);
 			}
 
+			//Objects hit by our gravitational range
+			if (ally_ship->GetGravitationRange() > 0)
+				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, object->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
+					ally_ship->HitWithGravitation(object);
+		}
+					
 		//Collision with enemies
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
 		{
@@ -405,7 +412,7 @@ void Game::CollisionChecks()
 			//Enemies hit by our gravitational range
 			if (ally_ship->GetGravitationRange() > 0)
 				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy_ship->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
-					enemy_ship->GetHitByGravitation(ally_ship);
+					ally_ship->HitWithGravitation(enemy_ship);
 		}
 		
 		if (ally_ship != m_playerShip)
@@ -421,9 +428,15 @@ void Game::CollisionChecks()
 		}
 		else
 		//Player loot
-			for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
-				if (AreColliding(ally_ship, loot, false) == true)
-					ally_ship->GetHitByLoot(loot);
+		for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
+		{
+			if (AreColliding(ally_ship, loot, false) == true)
+				ally_ship->GetHitByLoot(loot);
+			//Loots hit by our gravitational range
+			else if (ally_ship->GetGravitationRange() > 0)
+				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, loot->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
+					ally_ship->HitWithGravitation(loot);
+		}
 	}
 
 	for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
@@ -437,7 +450,7 @@ void Game::CollisionChecks()
 		if (enemy_ship->GetGravitationRange() > 0)
 			for (GameObject* ally_ship : m_sceneGameObjectsTyped[AllyShipObject])
 				if (GetDistanceSquaredBetweenPositions(enemy_ship->m_position, ally_ship->m_position) <= enemy_ship->GetGravitationRange() * enemy_ship->GetGravitationRange())
-					ally_ship->GetHitByGravitation(enemy_ship);
+					enemy_ship->HitWithGravitation(ally_ship);
 
 		//Enemies hit by objects
 		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])

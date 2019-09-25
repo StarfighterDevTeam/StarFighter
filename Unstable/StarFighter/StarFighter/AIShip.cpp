@@ -88,7 +88,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-textureSize.x * 0.5 + 8, textureSize.y * 0.25)));
 
 			m_gravitation_range = REF_WINDOW_RESOLUTION_X;
-			m_gravitation_strength = 60;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
+			m_gravitation_strength = 70;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
 
 			break;
 		}
@@ -323,6 +323,12 @@ void AIShip::GetHitByObject(GameObject* object)
 	Ship::GetHitByObject(object);
 }
 
+void AIShip::GetHitByGravitation()
+{
+	if (m_roe == ROE_Ambush)
+		SetROE(ROE_FireAtWill);
+}
+
 void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)
 {
 	const float dx = m_position.x - position.x;
@@ -382,7 +388,7 @@ SpatialObject* AIShip::KeepTarget(const float dist_max)
 void AIShip::Death()
 {
 	//create loot
-	if (m_hostility == Hostility_Enemy && RandomizeFloatBetweenValues(0, 1) < 0.25)
+	if (m_hostility == Hostility_Enemy && RandomizeFloatBetweenValues(0, 1) < 0.70)
 		CreateLoot(RandomizeIntBetweenValues(8, 20));
 
 	Destructible::Death();
