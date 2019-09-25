@@ -45,9 +45,20 @@ void Gameloop::Update(sf::Time deltaTime)
 		PopulateSector(sector_index);
 	(*CurrentGame).m_sectorsToCreate.clear();
 
-	//create procedural stars for sectors
+	//create procedural stars for sectors + random moving asteroids
 	for (sf::Vector2i sector_index : (*CurrentGame).m_sectorsToAddStar)
+	{
 		StarGenerator::CreateStar(sector_index);
+
+		//chance of moving asteroid
+		if (sector_index != (*CurrentGame).m_playerShip->m_sector_index && (*CurrentGame).m_sceneGameObjectsTyped[DestructibleObject].size() < 3 && RandomizeFloatBetweenValues(0, 1) < 0.05)
+		{
+			Asteroid* asteroid = AsteroidField::CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
+			asteroid->m_speed = sf::Vector2f(RandomizeFloatBetweenValues(-1, 1), RandomizeFloatBetweenValues(-1, 1));
+			ScaleVector(&asteroid->m_speed, asteroid->m_speed_max);
+		}
+	}
+		
 	(*CurrentGame).m_sectorsToAddStar.clear();
 
 	//Get new missions from planet where're orbiting around
@@ -119,15 +130,6 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 			CreatePlanet(sector_index, Hostility_Ally, 1, 1);
 			return;
 		}
-	}
-
-	//chance of asteroid
-	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
-	{
-		Asteroid* asteroid = AsteroidField::CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
-		asteroid->m_speed = sf::Vector2f(RandomizeFloatBetweenValues(0, 1), RandomizeFloatBetweenValues(0, 1));
-		ScaleVector(&asteroid->m_speed, asteroid->m_speed_max);
-		return;
 	}
 }
 

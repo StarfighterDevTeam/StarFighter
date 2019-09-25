@@ -10,7 +10,6 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 	m_layer = AIShipLayer;
 	m_collider = DestructibleObject;
 	m_asteroid_type = asteroid_type;
-	m_speed_max = RandomizeFloatBetweenValues(10, 100);
 
 	string textureName;
 	sf::Vector2f textureSize;
@@ -24,6 +23,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 1;
 			m_health_max = 1;
 			m_chance_of_loot = 0;
+			m_speed_max = RandomizeIntBetweenValues(30, 100);
 			break;
 		}
 		case Asteroid_XS:
@@ -31,8 +31,9 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			textureName = "2D/asteroid_XS.png";
 			textureSize = sf::Vector2f(39, 40);
 			m_collision_damage = 2;
-			m_health_max = 4;
+			m_health_max = 1;
 			m_chance_of_loot = 0;
+			m_speed_max = RandomizeIntBetweenValues(30, 100);
 			break;
 		}
 		case Asteroid_S:
@@ -40,8 +41,9 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			textureName = "2D/asteroid_XS.png";
 			textureSize = sf::Vector2f(80, 73);
 			m_collision_damage = 4;
-			m_health_max = 8;
+			m_health_max = 4;
 			m_chance_of_loot = 0;
+			m_speed_max = RandomizeIntBetweenValues(30, 100);
 			break;
 		}
 		case Asteroid_M:
@@ -51,6 +53,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 8;
 			m_health_max = 16;
 			m_chance_of_loot = 0.01;
+			m_speed_max = RandomizeIntBetweenValues(20, 80);
 			break;
 		}
 		case Asteroid_L:
@@ -60,6 +63,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 8;
 			m_health_max = 32;
 			m_chance_of_loot = 0.05;
+			m_speed_max = RandomizeIntBetweenValues(20, 80);
 			break;
 		}
 		case Asteroid_XL:
@@ -69,6 +73,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 16;
 			m_health_max = 64;
 			m_chance_of_loot = 0.1;
+			m_speed_max = RandomizeIntBetweenValues(10, 40);
 			break;
 		}
 		case Asteroid_XXL:
@@ -78,6 +83,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 16;
 			m_health_max = 64;
 			m_chance_of_loot = 0.1;
+			m_speed_max = RandomizeIntBetweenValues(10, 40);
 			break;
 		}
 	}
