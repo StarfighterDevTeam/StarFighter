@@ -477,7 +477,7 @@ bool Game::AreColliding(GameObject* objectA, GameObject* objectB, bool include_s
 	if (a*a + b*b > c*c)
 		return false;
 
-	if (c*c > objectA->m_radius * objectB->m_radius)
+	if (include_shield == true)
 		return true;
 
 	if (PIXEL_PERFECT_COLLISION)

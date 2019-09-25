@@ -51,7 +51,7 @@ struct Vector2int
 
 #define TEXTURE_SIZE_LIMITATION						8187
 
-#define PIXEL_PERFECT_COLLISION							false
+#define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 #define RECTANGLE_INSIDE_ALPHA							100
 

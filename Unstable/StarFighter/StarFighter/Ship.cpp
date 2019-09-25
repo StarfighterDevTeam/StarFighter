@@ -224,13 +224,11 @@ void Ship::GetHitByObject(GameObject* object)
 			damage = 0;
 
 			//calculate the "exact" point of collision for FX placement
-			const float dx = object->m_position.x - m_position.x;
-			const float dy = object->m_position.y - m_position.y;
-			const float overlap = object->m_radius + m_radius - sqrt(dx*dx + dy*dy);
-			sf::Vector2f collision_vector = sf::Vector2f(dx, dy);
-			ScaleVector(&collision_vector, m_radius - overlap * 0.5);
+			const float dx = m_position.x- object->m_position.x;
+			const float dy = m_position.y -object->m_position.y;
+			const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
 
-			FX* new_FX = new FX(FX_HitShield, m_position + collision_vector);
+			FX* new_FX = new FX(FX_HitShield, m_position + GetVectorFromLengthAndAngle(m_shield_range, angle));
 			(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 		}
 	//shield destroyed
