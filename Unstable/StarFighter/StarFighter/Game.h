@@ -20,6 +20,7 @@
 
 class Ship;
 class Planet;
+class AsteroidField;
 
 enum SFX_Bank
 {
@@ -157,7 +158,8 @@ public:
 	vector<sf::Vector2i> m_sectorsToCreate;//all sectors that have just been created and need content creation
 	vector<sf::Vector2i> m_sectorsToAddStar;//all planets that are requesting a mission creation from Gameloop
 	vector<Planet*> m_planetsToCreateMission;//all planets that are requesting a mission creation from Gameloop
-	
+	vector<AsteroidField*> m_asteroidFields;//all asteroid fields created
+
 	sf::Vector2i m_previous_star_sector_index;
 	map<int, Planet*> m_planet_ids;
 

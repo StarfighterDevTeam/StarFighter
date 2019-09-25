@@ -82,6 +82,9 @@ Game::~Game()
 
 	delete m_sector_debug_current;
 	delete m_sector_debug_onscreen;
+
+	for (AsteroidField* field : m_asteroidFields)
+		delete field;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)

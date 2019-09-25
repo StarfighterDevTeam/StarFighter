@@ -7,7 +7,7 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
-#include "Asteroid.h"
+#include "AsteroidField.h"
 
 class Ship : public Destructible
 {

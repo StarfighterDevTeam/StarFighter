@@ -119,7 +119,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 	if (RandomizeFloatBetweenValues(0, 1) < 0.05)
 	{
 		(*CurrentGame).m_sectorsKnownTyped[Sector_Asteroid].push_back(sector_index);
-		CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
+		AsteroidField::CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
 		return;
 	}
 
@@ -161,33 +161,10 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 	return planet;
 }
 
-Asteroid* Gameloop::CreateAsteroid(sf::Vector2i sector_index, AsteroidType asteroid_type)
+AsteroidField* Gameloop::CreateAsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y)
 {
-	Asteroid* asteroid = new Asteroid(sector_index, asteroid_type);
-
-	if ((*CurrentGame).StoreObjectIfNecessary(asteroid) == false)
-		(*CurrentGame).addToScene(asteroid, asteroid->m_layer, asteroid->m_collider, false);
-
-	return asteroid;
-}
-
-sf::Vector2i Gameloop::CreateAsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y)
-{
-	//we'll keep at least one empty space at the middle of the asteroid field, to spawn mission objectives later
-	sf::Vector2i center = sf::Vector2i(sector_index_left + sector_index_size_x / 2, sector_index_bottom + sector_index_size_y / 2);
-
-	for (int i = 0; i < sector_index_size_x * sector_index_size_y; i++)
-	{
-		sf::Vector2i index = sf::Vector2i(sector_index_left + (i % sector_index_size_y), sector_index_bottom + (i / sector_index_size_y));
-		if (index != center && RandomizeFloatBetweenValues(0, 1) < 0.5)
-		{
-			Asteroid* asteroid = CreateAsteroid(index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
-			asteroid->m_position.x += RandomizeFloatBetweenValues(-STAR_SECTOR_SIZE * 0.25, STAR_SECTOR_SIZE * 0.25);
-			asteroid->m_position.y += RandomizeFloatBetweenValues(-STAR_SECTOR_SIZE * 0.25, STAR_SECTOR_SIZE * 0.25);
-		}
-	}
-
-	return center;
+	AsteroidField* field = new AsteroidField(sector_index_bottom, sector_index_left, sector_index_size_x, sector_index_size_y);
+	return field;
 }
 
 Beacon* Gameloop::CreateBeacon(sf::Vector2i sector_index, SpatialObject* trigger, bool isMissionObjective)
@@ -385,9 +362,32 @@ Mission* Gameloop::CreateMission(Planet* owner)
 		}
 		case Mission_AsteroidSearch:
 		{
-			sf::Vector2i empty_space = CreateAsteroidField(1, 1, RandomizeIntBetweenValues(18, 22), RandomizeIntBetweenValues(18, 22));
+			sf::Vector2i destination_index = sf::Vector2i(found_index - owner->m_sector_index);
 
-			AIShip* ship = CreateAIShip(Ship_Convoy, empty_space, RandomizeFloatBetweenValues(0, 359.9), Hostility_Ally, ROE_Freeze);
+			int sector_index_size_x = RandomizeIntBetweenValues(15, 20);
+			int sector_index_size_y = RandomizeIntBetweenValues(15, 20);
+			int sector_index_left = destination_index.x > 0 ? found_index.x : found_index.x + sector_index_size_x;
+			int sector_index_bottom = destination_index.y > 0 ? found_index.y : found_index.y + sector_index_size_y;
+
+			//check if we can re-use an existing field at those coordinates
+			AsteroidField* field = NULL;
+			for (AsteroidField* existing_field : (*CurrentGame).m_asteroidFields)
+			{
+				if (existing_field->IsOverlappingWithArea(sector_index_bottom, sector_index_left, sector_index_size_x, sector_index_size_y) == true)
+				{
+					field = existing_field;
+					break;
+				}
+			}
+			
+			//create a new field
+			if (field == NULL)
+			{
+				field = CreateAsteroidField(sector_index_left, sector_index_bottom, sector_index_size_x, sector_index_size_y);
+				(*CurrentGame).m_asteroidFields.push_back(field);
+			}
+
+			AIShip* ship = CreateAIShip(Ship_Convoy, field->m_free_space, RandomizeFloatBetweenValues(0, 359.9), Hostility_Ally, ROE_Freeze);
 
 			return new Mission(mission_type, ship, owner);
 		}

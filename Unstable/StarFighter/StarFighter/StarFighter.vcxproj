@@ -90,6 +90,7 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Asteroid.cpp" />
+    <ClCompile Include="AsteroidField.cpp" />
     <ClCompile Include="Beacon.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="AIShip.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Asteroid.h" />
+    <ClInclude Include="AsteroidField.h" />
     <ClInclude Include="Beacon.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="AIShip.h" />
