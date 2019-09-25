@@ -129,6 +129,7 @@ public:
 	bool AreColliding(GameObject* objectA, GameObject* objectB, bool include_shield);
 	static sf::IntRect FToIRect(const sf::FloatRect& f);
 	bool StoreObjectIfNecessary(GameObject* object);
+	SpatialObject* GetTargetableEnemyShip(GameObject* const shooter, float dist_max, float angle_delta_max);
 
 	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];

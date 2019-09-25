@@ -18,7 +18,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	//Star Hunter
 	(*CurrentGame).m_playerShip = this;
 
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/V_Alpha2.png", sf::Vector2f(68, 84), 3, 1);
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/ship_alpha_blue.png", sf::Vector2f(68, 84), 3, 1);
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
@@ -264,7 +264,7 @@ void Player::UpdateMissions()
 								else if (ship->m_roe == ROE_Freeze && GetDistanceSquaredBetweenPositions(m_position, object->m_position) < 300 * 300)
 								{
 									//no enemy on nearby?
-									if (ship->GetTargetableEnemyShip(REF_WINDOW_RESOLUTION_X, 360) == NULL)
+									if ((*CurrentGame).GetTargetableEnemyShip(ship, REF_WINDOW_RESOLUTION_X, 360) == NULL)
 										ship->SetROE(ship->m_native_ROE);
 								}
 
@@ -399,6 +399,8 @@ void Player::Draw(RenderTarget& screen)
 	DebugDrawMissions();
 
 	DebugDrawMoney();
+
+	//DebugDrawSegment(getPosition(), sf::Vector2f(getPosition().x + m_speed.x, getPosition().y - m_speed.y), sf::Color::Green, (*CurrentGame).m_mainScreen);
 }
 
 void Player::UpdateInputStates()

@@ -15,6 +15,7 @@
 enum ShipType
 {
 	Ship_Alpha,
+	Ship_AlphaBlack,
 	Ship_Sigma,
 	Ship_Cruiser,
 	Ship_Convoy,

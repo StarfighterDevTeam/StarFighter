@@ -104,7 +104,6 @@ public:
 	static sf::Vector2i GetStarSectorIndexAtPosition(sf::Vector2f position);
 	virtual void MarkThis(SpatialObject* target, bool isMission);
 	virtual void UnmarkThis(SpatialObject* target, bool isMission);
-	virtual SpatialObject* GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max);
 	virtual void GetHitByAmmo(GameObject* ammo);
 	virtual void GetHitByObject(GameObject* object);
 	virtual void GetHitByLoot(GameObject* loot);

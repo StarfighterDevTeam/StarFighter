@@ -765,3 +765,34 @@ void Game::ClearGarbage()
 
 	m_garbageObjects.clear();
 }
+
+SpatialObject* Game::GetTargetableEnemyShip(GameObject* const shooter, float dist_max, float angle_delta_max)
+{
+	float shortest_distance = -1;
+	SpatialObject* target = NULL;
+
+	ColliderType target_collider = (shooter->m_collider == AllyShipObject || shooter->m_collider == AllyFire) ? EnemyShipObject : AllyShipObject;
+
+	for (GameObject* object : m_sceneGameObjectsTyped[target_collider])
+	{
+		const float a = shooter->m_position.x - object->m_position.x;
+		const float b = shooter->m_position.y - object->m_position.y;
+
+		float distance_to_ref = (a * a) + (b * b);
+		if (distance_to_ref < shortest_distance || shortest_distance < 0)
+		{
+			if (distance_to_ref <= dist_max * dist_max)
+			{
+				float angle_delta = GetAngleDegToTargetPosition(shooter->m_position, shooter->m_heading, object->m_position);
+
+				if (abs(angle_delta) <= angle_delta_max)
+				{
+					shortest_distance = distance_to_ref;
+					target = (SpatialObject*)object;
+				}
+			}
+		}
+	}
+
+	return target;
+}

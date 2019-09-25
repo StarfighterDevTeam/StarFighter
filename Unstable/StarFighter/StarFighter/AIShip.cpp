@@ -38,11 +38,31 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_range = 50;
 			m_shield_regen = 1.5;
 
-			textureName = hostility == Hostility_Ally ? "2D/V_Alpha2.png" : "2D/V_Alpha2_red.png";
+			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_blue.png" : "2D/ship_alpha_red.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
 			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			break;
+		}
+		case Ship_AlphaBlack:
+		{
+			m_speed_max = 500;
+			m_acceleration_max = 1000;
+			m_turn_speed = 160;
+			m_braking_max = 3000;
+			m_idle_decelleration = 1000;
+
+			m_health_max = 10;
+			m_shield_max = 10;
+			m_shield_range = 50;
+			m_shield_regen = 1.5;
+
+			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_blue.png" : "2D/ship_alpha_black.png";
+			textureSize = sf::Vector2f(68, 84);
+			frameNumber = 3;
+
+			m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 		case Ship_Sigma:
@@ -60,7 +80,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 
 			m_collision_damage = 10;
 
-			textureName = hostility == Hostility_Ally ? "2D/V_Sigma1.png" : "2D/V_Sigma1_red.png";
+			textureName = hostility == Hostility_Ally ? "2D/ship_sigma_blue.png" : "2D/ship_sigma_red.png";
 			textureSize = sf::Vector2f(39, 52);
 			frameNumber = 3;
 			break;
@@ -78,7 +98,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_range = 250;
 			m_shield_regen = 1.5;
 
-			textureName = hostility == Hostility_Ally ? "2D/V_Delta1.png" : "2D/V_Delta1_red.png";
+			textureName = hostility == Hostility_Ally ? "2D/ship_cruiser_blue.png" : "2D/ship_cruiser_red.png";
 			textureSize = sf::Vector2f(288, 390);
 			frameNumber = 1;
 
@@ -103,7 +123,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_health_max = 100;
 			m_shield_max = 0;
 
-			textureName = hostility == Hostility_Ally ? "2D/V_Gamma1.png" : "2D/V_Gamma1_red.png";
+			textureName = hostility == Hostility_Ally ? "2D/ship_convoy_blue.png" : "2D/ship_convoy_red.png";
 			textureSize = sf::Vector2f(75, 126);
 			frameNumber = 1;
 
@@ -154,7 +174,7 @@ void AIShip::Update(sf::Time deltaTime)
 				m_target = KeepTarget(MaxBetweenValues(m_range_max, AMBUSH_ENGAGEMENT_DISTANCE));//distance max to keep track of the current target
 
 			if (m_target == NULL)
-				m_target = GetTargetableEnemyShip(m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE, 360);
+				m_target = (*CurrentGame).GetTargetableEnemyShip(this, m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE, 360);
 
 			if (m_target == NULL && m_roe != m_native_ROE)//no target is sight => go back to native Rule of engagement
 				SetROE(m_native_ROE);

@@ -310,12 +310,6 @@ void GameObject::UnmarkThis(SpatialObject* target, bool isMission)
 	//see override function in class Player
 }
 
-SpatialObject* GameObject::GetTargetableEnemyShip(const GameObject* ref_object, const float dist_max, const float angle_delta_max)
-{
-	return NULL;
-	//see override function in class Player
-}
-
 bool GameObject::IsMarked()
 {
 	return false;

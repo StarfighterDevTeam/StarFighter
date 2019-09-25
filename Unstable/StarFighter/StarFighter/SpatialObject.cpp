@@ -51,37 +51,6 @@ bool SpatialObject::CheckMarkingConditions()
 	//see override function in class Planet and AIShip
 }
 
-SpatialObject* SpatialObject::GetTargetableEnemyShip(const float dist_max, const float angle_delta_max)
-{
-	float shortest_distance = -1;
-	SpatialObject* target = NULL;
-
-	ColliderType target_collider = m_collider == AllyShipObject ? EnemyShipObject : AllyShipObject;
-	
-	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[target_collider])
-	{
-		const float a = m_position.x - object->m_position.x;
-		const float b = m_position.y - object->m_position.y;
-
-		float distance_to_ref = (a * a) + (b * b);
-		if (distance_to_ref < shortest_distance || shortest_distance < 0)
-		{
-			if (distance_to_ref <= dist_max * dist_max)
-			{
-				float angle_delta = GetAngleDegToTargetPosition(m_position, m_heading, object->m_position);
-
-				if (abs(angle_delta) <= angle_delta_max)
-				{
-					shortest_distance = distance_to_ref;
-					target = (SpatialObject*)object;
-				}
-			}
-		}
-	}
-
-	return target;
-}
-
 AIShip* SpatialObject::GetEscortedShip()
 {
 	return NULL;
