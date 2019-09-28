@@ -12,7 +12,7 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, AllyShipObject, false);
 	(*CurrentGame).UpdateSectorList(true);
 
-	//AIShip* enemy = CreateAIShip(Ship_AlphaBlack, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
+	AIShip* enemy = CreateAIShip(Ship_AlphaBlack, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
 }
 
 Gameloop::~Gameloop()
@@ -277,7 +277,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				destination_sector.first = CreatePlanet(destination_sector.second, Hostility_Ally);
 
 			ship->m_scripted_destination = new sf::Vector2f(destination_sector.first->m_position);
-			sf::Vector2f destination_vector = sf::Vector2f(destination_sector.first->m_position.x - ship->m_position.x, destination_sector.first->m_position.y - ship->m_position.y);
+			const sf::Vector2f destination_vector = sf::Vector2f(destination_sector.first->m_position.x - ship->m_position.x, destination_sector.first->m_position.y - ship->m_position.y);
 			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180 / M_PI;
 
 			//convoy escorts
@@ -285,21 +285,22 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(-200, -200)));
 
 			//enemy "trap" beacon
-			float path_ratio = RandomizeFloatBetweenValues(0.3, 0.7);
-			float perpAngle = angle + M_PI_2 * RandomizeSign();
+			const float path_ratio = RandomizeFloatBetweenValues(0.3, 0.7);
 			
-			sf::Vector2f beacon_position = sf::Vector2f(ship->m_position.x + path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y + path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
-			sf::Vector2i beacon_sector_index = GameObject::GetStarSectorIndexAtPosition(beacon_position);
+			const sf::Vector2f beacon_position = sf::Vector2f(ship->m_position.x + path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y + path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
+			const sf::Vector2i beacon_sector_index = GameObject::GetStarSectorIndexAtPosition(beacon_position);
 			Beacon* beacon = CreateBeacon(beacon_sector_index, ship, false);
 
 			for (int e = 0; e < 3; e++)
 			{
-				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, perpAngle);
-				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += 0.08;
+				const float perpAngle = angle + M_PI_2 * RandomizeSign();
+				const sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, perpAngle);
+				const sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 
 				AIShip* ship = new AIShip(Ship_Alpha, beacon->m_sector_index + offset, (perpAngle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
 				beacon->m_ships_to_create.push_back(ship);
+
+				angle += 0.08;
 			}
 			
 			return new Mission(mission_type, ship, destination_sector.first);

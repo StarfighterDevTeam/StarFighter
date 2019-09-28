@@ -40,6 +40,7 @@ public :
 	void SetROE(RuleOfEngagement roe) override;
 	void UpdateAlliedShips() override;
 	void OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float dy);
+	void GetTacticalMoveAroundTarget(sf::Vector2f &move_destination, SpatialObject* target);
 
 	ShipType m_ship_type;
 

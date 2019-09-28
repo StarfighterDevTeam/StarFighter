@@ -38,6 +38,7 @@ public :
 	void AddAmmoToShotsFired(Ammo* ammo) override;
 
 	sf::Vector2f m_inputs_direction;
+	float m_speed_min;
 	float m_acceleration;
 	float m_acceleration_max;
 	float m_turn_speed;

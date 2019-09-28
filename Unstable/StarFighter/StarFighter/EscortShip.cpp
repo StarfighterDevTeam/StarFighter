@@ -32,7 +32,7 @@ void EscortShip::Update(sf::Time deltaTime)
 		offset_vector.y = sin(-m_escorted_ship->m_heading * M_PI / 180 + M_PI_2) * m_escorted_offset.y - cos(-m_escorted_ship->m_heading * M_PI / 180 + M_PI_2) * m_escorted_offset.x;;
 
 		*m_scripted_destination = m_escorted_ship->m_position + offset_vector;
-		m_move_destination = *m_scripted_destination;
+		/*m_move_destination = *m_scripted_destination;
 
 		float speed_max = MaxBetweenValues(20, GetVectorLength(m_speed));
 		if (abs(m_position.x - m_move_destination.x) > 32 || abs(m_position.y - m_move_destination.y) > 32)
@@ -44,14 +44,18 @@ void EscortShip::Update(sf::Time deltaTime)
 		{
 			TurnTo(*m_escorted_ship->m_scripted_destination + offset_vector, deltaTime, m_inputs_direction);//look to a projection of the scripted position, rather than the position around the escorted ship
 		}
+		*/
 
 		//escorted ship is dying?
 		if (m_escorted_ship->m_garbageMe == true)
 			m_escorted_ship = NULL;
 	}
 	else
-		*m_scripted_destination = m_position;
-
+	{
+		delete m_scripted_destination;
+		m_scripted_destination = NULL;
+	}
+		
 	AIShip::Update(deltaTime);
 }
 

@@ -30,6 +30,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
 
 	//Flight model
+	m_speed_min = 0;
 	m_speed_max = 800;
 	m_acceleration_max = 3000;
 	m_turn_speed = 240;

@@ -27,6 +27,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 	{
 		case Ship_Alpha:
 		{
+			m_speed_min = 0;
 			m_speed_max = 500;
 			m_acceleration_max = 1000;
 			m_turn_speed = 160;
@@ -47,26 +48,28 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		}
 		case Ship_AlphaBlack:
 		{
-			m_speed_max = 500;
+			m_speed_min = 300;
+			m_speed_max = 700;
 			m_acceleration_max = 1000;
-			m_turn_speed = 160;
+			m_turn_speed = 240;
 			m_braking_max = 3000;
 			m_idle_decelleration = 1000;
 
-			m_health_max = 10;
-			m_shield_max = 10;
+			m_health_max = 50;
+			m_shield_max = 20;
 			m_shield_range = 50;
-			m_shield_regen = 1.5;
+			m_shield_regen = 3;
 
 			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_blue.png" : "2D/ship_alpha_black.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
 			break;
 		}
 		case Ship_Sigma:
 		{
+			m_speed_min = 500;
 			m_speed_max = 1000;
 			m_acceleration_max = 1500;
 			m_turn_speed = 200;
@@ -87,6 +90,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		}
 		case Ship_Cruiser:
 		{
+			m_speed_min = 0;
 			m_speed_max = 200;
 			m_acceleration_max = 2000;
 			m_turn_speed = 30;
@@ -114,6 +118,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 		}
 		case Ship_Convoy:
 		{
+			m_speed_min = 0;
 			m_speed_max = 100;
 			m_acceleration_max = 500;
 			m_turn_speed = 50;
@@ -151,7 +156,7 @@ void AIShip::Update(sf::Time deltaTime)
 	bool input_fire = false;
 
 	//AI - move & shoot strategies
-	m_move_destination = (m_scripted_destination == NULL || m_roe == ROE_Freeze) ? m_position : *m_scripted_destination;
+	//m_move_destination = (m_scripted_destination == NULL || m_roe == ROE_Freeze) ? m_position : *m_scripted_destination;
 
 	if (m_target != NULL && m_target->m_garbageMe == true)
 		m_target = NULL;
@@ -184,44 +189,31 @@ void AIShip::Update(sf::Time deltaTime)
 	}
 
 	//Move to forced destination
-	if (m_position != m_move_destination && m_inputs_direction == sf::Vector2f(0, 0))
+	/*if (m_position != m_move_destination && m_inputs_direction == sf::Vector2f(0, 0))
 	{
 		GoTo(m_move_destination, deltaTime, m_inputs_direction);
 		TurnTo(m_move_destination, deltaTime, m_inputs_direction);
 	}
+	*/
 
-	//Enemy target at proximity? => Overwrite current plans
-	if (m_roe != ROE_Freeze && m_target != NULL)
+	//Enemy nearby? Get tactical movements
+	if (m_target != NULL)
+		GetTacticalMoveAroundTarget(m_move_destination, m_target);
+	else if (m_scripted_destination != NULL)
+		m_move_destination = *m_scripted_destination;
+	else
+		m_move_destination = m_position;
+
+	//move and turn towards destination
+	if (m_position != m_move_destination)
 	{
-		const float dx = m_position.x - m_target->m_position.x;
-		const float dy = m_position.y - m_target->m_position.y;
-		if (dx*dx + dy*dy > m_range_max * m_range_max)
-		{
-			//move to range position with same approch angle as current angle to target
-			const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
-			sf::Vector2f vector = sf::Vector2f(dx, dy);
-			ScaleVector(&vector, m_range_max);
-			m_move_destination = m_target->m_position + vector;
-		}
-		else
-		{
-			m_move_destination = m_position;
-		}
-
-		//check if not overlapping with friends
-		OffsetMoveDestinationToAvoidAlliedShips(dx, dy);
-
-		//move and turn towards destination
-		if (m_position != m_move_destination)
-		{
-			GoTo(m_move_destination, deltaTime, m_inputs_direction);
-			TurnTo(m_move_destination, deltaTime, m_inputs_direction);
-		}
-		else
-		{
-			m_move_clockwise = !m_move_clockwise;//randomize -1 : 1 for the next time we'll have to decide between clockwise or counter-clockwise movement
-			TurnTo(m_target->m_position, deltaTime, m_inputs_direction);
-		}
+		GoTo(m_move_destination, deltaTime, m_inputs_direction);
+		TurnTo(m_move_destination, deltaTime, m_inputs_direction);
+	}
+	else if (m_target != NULL)
+	{
+		m_move_clockwise = !m_move_clockwise;//randomize -1 : 1 for the next time we'll have to decide between clockwise or counter-clockwise movement
+		TurnTo(m_target->m_position, deltaTime, m_inputs_direction);
 	}
 
 	//apply inputs
@@ -356,9 +348,9 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 
 	bool speed_up_authorized;
-	if (m_collision_damage == 0 || m_weapons.empty() == false)//shooter profile
-		speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed if destination is very far relative to the current speed
-	else//melee profile
+	//if (m_collision_damage == 0 || m_weapons.empty() == false)//shooter profile
+		//speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed if destination is very far relative to the current speed
+	//else//melee profile
 		speed_up_authorized = true;
 
 	if (speed_up_authorized == true && abs(delta_angle) < 15)
@@ -432,6 +424,37 @@ void AIShip::SetROE(RuleOfEngagement roe)
 			ship->Ship::SetROE(roe);
 		}
 	}
+}
+
+void AIShip::GetTacticalMoveAroundTarget(sf::Vector2f &move_destination, SpatialObject* target)
+{
+	switch (m_ship_type)
+	{
+		default:
+		{
+			move_destination = target->m_position;
+		}
+	}
+
+	/*
+	const float dx = m_position.x - m_target->m_position.x;
+	const float dy = m_position.y - m_target->m_position.y;
+	if (dx*dx + dy*dy > m_range_max * m_range_max)
+	{
+	//move to range position with same approch angle as current angle to target
+	const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
+	sf::Vector2f vector = sf::Vector2f(dx, dy);
+	ScaleVector(&vector, m_range_max);
+	m_move_destination = m_target->m_position + vector;
+	}
+	else
+	{
+	m_move_destination = m_position;
+	}
+
+	//check if not overlapping with friends
+	OffsetMoveDestinationToAvoidAlliedShips(dx, dy);
+	*/
 }
 
 void AIShip::UpdateAlliedShips()

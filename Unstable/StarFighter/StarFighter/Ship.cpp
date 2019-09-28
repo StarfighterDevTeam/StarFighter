@@ -62,17 +62,21 @@ Ship::~Ship()
 
 void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 {
+	//acceleration
 	m_acceleration = 0;
 	if (inputs_direction.y < 0)//up
 		m_acceleration = m_acceleration_max * inputs_direction.y;
 
+	//turn
 	m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();
 
 	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration, m_heading * M_PI / 180);
 
+	//inertia
 	sf::Vector2f braking_vector = sf::Vector2f(0, 0);
 	float current_inertia_angle = GetAngleRadFromVector(m_speed);
 
+	//brakes
 	if (inputs_direction.y > 0)
 		braking_vector = GetVectorFromLengthAndAngle(m_braking_max, current_inertia_angle);
 	else if (inputs_direction.y == 0)
@@ -81,8 +85,15 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 	braking_vector.x = abs(m_speed.x) > abs(braking_vector.x) ? braking_vector.x : -m_speed.x;//braking cannot exceed speed (that would make us go backward)
 	braking_vector.y = abs(m_speed.y) > abs(braking_vector.y) ? braking_vector.y : -m_speed.y;
 
+	//apply speed
 	m_speed += (acceleration_vector + braking_vector) * deltaTime.asSeconds();
-	NormalizeVector(&m_speed, m_speed_max);
+
+	//speed limitations
+	float speed = GetVectorLength(m_speed);
+	if (speed > m_speed_max)
+		m_speed = GetVectorFromLengthAndAngle(m_speed_max, (m_heading + 180) * M_PI / 180);
+	else if (speed < m_speed_min)
+		m_speed = GetVectorFromLengthAndAngle(m_speed_min, (m_heading + 180) * M_PI / 180);
 
 	//thruster animation
 	m_currentFrame = inputs_direction.y < 0 ? 1 : 0;
@@ -216,7 +227,7 @@ void Ship::GetHitByObject(GameObject* object)
 	//Apply damage
 	int damage = ((Destructible*)object)->m_collision_damage;
 
-	if (m_shield > 0)
+	if (damage > 0 && m_shield > 0)
 		//shield absorbing damage
 		if (m_shield > damage)
 		{
