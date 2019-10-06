@@ -153,7 +153,9 @@ AIShip::~AIShip()
 
 void AIShip::Update(sf::Time deltaTime)
 {
+	//Reset inputs commands
 	bool input_fire = false;
+	m_inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 
 	//AI - move & shoot strategies
 	//m_move_destination = (m_scripted_destination == NULL || m_roe == ROE_Freeze) ? m_position : *m_scripted_destination;
@@ -205,23 +207,20 @@ void AIShip::Update(sf::Time deltaTime)
 		m_move_destination = m_position;
 
 	//move and turn towards destination
-	if (m_position != m_move_destination)
+	if (m_speed_min == 0)//MODEL WITH SPEED MIN 0
 	{
 		GoTo(m_move_destination, deltaTime, m_inputs_direction);
-		TurnTo(m_move_destination, deltaTime, m_inputs_direction);
-	}
-	else if (m_target != NULL)
-	{
-		m_move_clockwise = !m_move_clockwise;//randomize -1 : 1 for the next time we'll have to decide between clockwise or counter-clockwise movement
-		TurnTo(m_target->m_position, deltaTime, m_inputs_direction);
-	}
+
+		if (m_inputs_direction.y >= 0 && m_target != NULL)
+			TurnTo(m_target->m_position, deltaTime, m_inputs_direction);
+	}	
 
 	//apply inputs
 	ApplyFlightModel(deltaTime, m_inputs_direction);
-
-	//reset inputs for next frame
-	m_inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
 	
+	//"randomize" clockwise/counterclockwise turns
+	//m_move_clockwise = !m_move_clockwise;
+
 	//Gravity circle to be drawn
 	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
 		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
@@ -346,17 +345,19 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 	const float dx = m_position.x - position.x;
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
+	const float speed = GetVectorLengthSquared(m_speed);
 
-	bool speed_up_authorized;
-	//if (m_collision_damage == 0 || m_weapons.empty() == false)//shooter profile
-		//speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed if destination is very far relative to the current speed
-	//else//melee profile
-		speed_up_authorized = true;
+	if ((dx*dx + dy*dy > 10 * 10))
+		//turn?
+		if (abs(delta_angle) > 2)
+			inputs_direction.x = delta_angle < 0 ? 1 : -1;
+		//speed up
+		else if (dx*dx + dy*dy > speed)
+			inputs_direction.y = -1;
 
-	if (speed_up_authorized == true && abs(delta_angle) < 15)
-		inputs_direction.y = -1;
-	else if (abs(delta_angle) > 90)
-		inputs_direction.y = 1;
+	//brake?
+	if (inputs_direction.y == 0 || (delta_angle) > 90)
+		inputs_direction.y = 1;		
 }
 
 void AIShip::TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction)
@@ -365,20 +366,25 @@ void AIShip::TurnTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inp
 	const float dy = m_position.y - position.y;
 	const float delta_angle = GetAngleDegToTargetPosition(m_position, m_heading, position);
 
-	if (delta_angle < -2)//let's not bother moving, this would only create micro movements
-		inputs_direction.x = 1;
-	else if (delta_angle > 2)
-		inputs_direction.x = -1;
+	//turn?
+	if (abs(delta_angle) > 2)
+		inputs_direction.x = delta_angle < 0 ? 1 : -1;
 }
 
 void AIShip::Draw(RenderTarget& screen)
 {
 	Ship::Draw(screen);
 
-	if (m_position != m_move_destination)
+	if (m_speed != sf::Vector2f(0, 0))
 	{
 		sf::Vector2f destination = sf::Vector2f(m_move_destination.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_move_destination.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5);
-		DebugDrawSegment(getPosition(), destination, sf::Color::Magenta, (*CurrentGame).m_mainScreen);
+
+		if (m_inputs_direction.y < 0)
+			DebugDrawSegment(getPosition(), destination, sf::Color::Green, (*CurrentGame).m_mainScreen);
+		else if (m_inputs_direction.y > 0)
+			DebugDrawSegment(getPosition(), destination, sf::Color::Red, (*CurrentGame).m_mainScreen);
+		else
+			DebugDrawSegment(getPosition(), destination, sf::Color::Magenta, (*CurrentGame).m_mainScreen);
 	}
 }
 
@@ -428,6 +434,28 @@ void AIShip::SetROE(RuleOfEngagement roe)
 
 void AIShip::GetTacticalMoveAroundTarget(sf::Vector2f &move_destination, SpatialObject* target)
 {
+	const float dx = m_position.x - target->m_position.x;
+	const float dy = m_position.y - target->m_position.y;
+
+	//melee, trying to collide with enemy
+	if (m_range_max == 0)
+		m_move_destination = target->m_position;
+	else
+	{
+		//already in range for shooting? don't move
+		if (GetDistanceSquaredBetweenPositions(m_position, target->m_position) < m_range_max*m_range_max)
+			m_move_destination = m_position;
+		//not in range? get close enough to be in range for shooting
+		else
+		{
+			sf::Vector2f vector = (sf::Vector2f(dx, dy));
+			ScaleVector(&vector, m_range_max);
+			m_move_destination = m_position - vector;
+		}
+
+		OffsetMoveDestinationToAvoidAlliedShips(dx, dy);
+	}
+	/*
 	switch (m_ship_type)
 	{
 		default:
@@ -435,7 +463,7 @@ void AIShip::GetTacticalMoveAroundTarget(sf::Vector2f &move_destination, Spatial
 			move_destination = target->m_position;
 		}
 	}
-
+	*/
 	/*
 	const float dx = m_position.x - m_target->m_position.x;
 	const float dy = m_position.y - m_target->m_position.y;
@@ -506,7 +534,7 @@ void AIShip::OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float
 			if (m_turn_speed >= ally_ship->m_turn_speed && abs(m_move_destination.x - ally_ship->m_move_destination.x) < size * 2 && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size * 2)
 			{
 				sf::Vector2f perp_vector = m_move_clockwise == true ? sf::Vector2f(dy, -dx) : sf::Vector2f(-dy, dx);
-				ScaleVector(&perp_vector, size * 3);
+				ScaleVector(&perp_vector, size * 2);
 				m_move_destination += perp_vector;
 				check_ok = false;
 			}
@@ -524,7 +552,7 @@ void AIShip::OffsetMoveDestinationToAvoidAlliedShips(const float dx, const float
 				if (m_turn_speed >= ally_ship->m_turn_speed && abs(m_move_destination.x - ally_ship->m_move_destination.x) < size * 2 && abs(m_move_destination.y - ally_ship->m_move_destination.y) < size * 2)
 				{
 					sf::Vector2f perp_vector = m_move_clockwise == true ? sf::Vector2f(dy, -dx) : sf::Vector2f(-dy, dx);
-					ScaleVector(&perp_vector, size * 3);
+					ScaleVector(&perp_vector, size * 2);
 					m_move_destination += perp_vector;
 					check_ok = false;
 				}

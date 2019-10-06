@@ -27,7 +27,7 @@ Weapon::Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type,
 		case Weapon_Laser:
 		{
 			m_rate_of_fire = 0.2;
-			m_range = REF_WINDOW_RESOLUTION_X * 0.6;
+			m_range = REF_WINDOW_RESOLUTION_X * 0.4;
 			m_damage = 1;
 			m_energy_cost = 1;
 			break;

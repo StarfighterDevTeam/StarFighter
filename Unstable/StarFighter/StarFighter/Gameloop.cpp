@@ -12,7 +12,9 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, AllyShipObject, false);
 	(*CurrentGame).UpdateSectorList(true);
 
-	AIShip* enemy = CreateAIShip(Ship_AlphaBlack, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
+	AIShip* enemy = CreateAIShip(Ship_Alpha, sf::Vector2i(2, 0), 0, Hostility_Enemy, ROE_FireAtWill);
+
+	AIShip* enemy2 = CreateAIShip(Ship_Alpha, sf::Vector2i(3, 0), 0, Hostility_Enemy, ROE_FireAtWill);
 }
 
 Gameloop::~Gameloop()
