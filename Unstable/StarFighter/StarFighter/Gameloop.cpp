@@ -5,13 +5,13 @@ extern Game* CurrentGame;
 Gameloop::Gameloop()
 {
 	//background
-	m_background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1920, 1080));
+	m_background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(1920, 1080));
 	(*CurrentGame).addToScene(m_background, BackgroundLayer, BackgroundObject);
 	(*CurrentGame).m_map_size = m_background->m_size;
 
 	//ship
-	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3, 1);
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Blue, 16);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerLayer, PlayerShip);
 }
 
 Gameloop::~Gameloop()

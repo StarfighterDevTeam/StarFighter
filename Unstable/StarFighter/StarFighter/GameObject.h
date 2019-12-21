@@ -14,19 +14,11 @@ using namespace sf;
 
 enum LayerType {
 	BackgroundLayer,
-	PortalLayer,
+	TileLayer,
+	DoorLayer,
 	PlayerStroboscopicLayer,
-	ExplosionLayer,
-	EnemyObjectLayer,
-	AuraLayer,
+	PlayerLayer,
 	FeedbacksLayer,
-	FriendlyFireLayer,
-	PlayerShipLayer,
-	EnemyFireLayer,
-
-	PanelLayer,
-	HudObject,
-	HudCursor,
 	NBVAL_Layer
 };
 
@@ -103,6 +95,9 @@ public:
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
 	sf::Vector2f m_previous_speed;
+
+	//Music Doors
+	pair<int, int> m_tile_coord;
 };
 
 #endif // GameObject_H_INCLUDED

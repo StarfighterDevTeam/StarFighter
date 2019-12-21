@@ -21,6 +21,10 @@ enum PlayerActions
 	Action_Firing,
 	Action_Muting,
 	Action_Pausing,
+	Action_Left,
+	Action_Right,
+	Action_Up,
+	Action_Down,
 	NBVAL_PlayerActions,
 };
 
@@ -37,6 +41,7 @@ public :
 	Ship();
 	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	Ship(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size = 0);
 	void Init();
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
@@ -56,7 +61,6 @@ public :
 	void SetControllerType(ControlerType contoller);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	void UpdateInputStates();
-	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 
 	static int Ship::SaveShip(Ship* ship);
@@ -66,6 +70,9 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	//Music Doors
+	bool Move(PlayerActions action);
 
 private:
 	bool m_moving;

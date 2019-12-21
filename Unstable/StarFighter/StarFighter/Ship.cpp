@@ -12,7 +12,7 @@ Ship::Ship()
 
 void Ship::Init()
 {
-	m_layer = PlayerShipLayer;
+	m_layer = PlayerLayer;
 	m_collider_type = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
@@ -25,16 +25,25 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	//Music Doors
+	m_tile_coord = { 0, 0 };
+	setPosition(START_X, START_Y);
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	this->Init();
+	Init();
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size)
 {
-	this->Init();
+	Init();
+}
+
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size) : GameObject(position, speed, color, radius, stroke_size)
+{
+	Init();
 }
 
 Ship::~Ship()
@@ -49,32 +58,43 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
-	if ((*CurrentGame).m_window_has_focus)
-	{
-		inputs_direction = InputGuy::getDirections();
-	}
+	//sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+	//if ((*CurrentGame).m_window_has_focus)
+	//{
+	//	inputs_direction = InputGuy::getDirections();
+	//}
+	//
+	//if (!m_disable_inputs)
+	//{
+	//	m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
+	//	m_movingX = inputs_direction.x != 0;
+	//	m_movingY = inputs_direction.y != 0;
+	//}
 
-	if (!m_disable_inputs)
-	{
-		m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
-		m_movingX = inputs_direction.x != 0;
-		m_movingY = inputs_direction.y != 0;
-	}
-
-	ManageAcceleration(inputs_direction);
+	//ManageAcceleration(inputs_direction);
 	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
-	{
-		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
-	}
+	//if (m_inputs_states[Action_Firing] == Input_Tap)
+	//{
+	//	//do some action
+	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+	//}
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
-	UpdateRotation();
+	if (m_inputs_states[Action_Left] == Input_Tap)
+		Move(Action_Left);
+	else if (m_inputs_states[Action_Right] == Input_Tap)
+		Move(Action_Right);
+	else if (m_inputs_states[Action_Up] == Input_Tap)
+		Move(Action_Up);
+	else if (m_inputs_states[Action_Down] == Input_Tap)
+		Move(Action_Down);
+
+	setPosition(START_X + m_tile_coord.first * TILE_SIZE, START_Y - m_tile_coord.second * TILE_SIZE);
+
+	//MaxSpeedConstraints();
+	//IdleDecelleration(deltaTime);
+	//UpdateRotation();
 
 	GameObject::update(deltaTime);
 
@@ -86,6 +106,47 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	ScreenBorderContraints();	
+}
+
+bool Ship::Move(PlayerActions action)
+{
+	switch (action)
+	{
+		case Action_Left:
+		{
+			if (m_tile_coord.first == 0)
+				return false;
+
+			m_tile_coord.first--;
+			break;
+		}
+		case Action_Right:
+		{
+			if (m_tile_coord.first == NB_TILES_X - 1)
+				return false;
+
+			m_tile_coord.first++;
+			break;
+		}
+		case Action_Up:
+		{
+			if (m_tile_coord.second == NB_TILES_Y - 1)
+				return false;
+
+			m_tile_coord.second++;
+			break;
+		}
+		case Action_Down:
+		{
+			if (m_tile_coord.second == 0)
+				return false;
+
+			m_tile_coord.second--;
+			break;
+		}
+	}
+
+	return true;
 }
 
 bool Ship::ScreenBorderContraints()
@@ -212,30 +273,21 @@ void Ship::UpdateInputStates()
 	if ((*CurrentGame).m_window_has_focus)
 	{
 		GetInputState(InputGuy::isFiring(), Action_Firing);
+
+		GetInputState(InputGuy::getDirections().x < 0 && InputGuy::getDirections().y == 0, Action_Left);
+		GetInputState(InputGuy::getDirections().x > 0 && InputGuy::getDirections().y == 0, Action_Right);
+		GetInputState(InputGuy::getDirections().x == 0 && InputGuy::getDirections().y < 0, Action_Up);
+		GetInputState(InputGuy::getDirections().x == 0 && InputGuy::getDirections().y > 0, Action_Down);
 	}
 	else
 	{
 		GetInputState(false, Action_Firing);
-	}
-}
 
-bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
-{
-	if (state_required == Input_Tap && condition && m_inputs_states[action] == Input_Tap)
-	{
-		m_actions_states[action] = !m_actions_states[action];
-		return true;
+		GetInputState(false, Action_Left);
+		GetInputState(false, Action_Right);
+		GetInputState(false, Action_Up);
+		GetInputState(false, Action_Down);
 	}
-	else if (state_required == Input_Hold && condition)
-	{
-		m_actions_states[action] = m_inputs_states[action];
-		return true;
-	}
-	else if (!condition)
-	{
-		m_actions_states[action] = false;
-	}
-	return false;
 }
 
 void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)

@@ -55,6 +55,21 @@ Game::Game(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
+	
+	//Music Doors
+	InitMap();
+}
+
+void Game::InitMap()
+{
+	for (int i = 0; i < NB_TILES_X; i++)
+		for (int j = 0; j < NB_TILES_Y; j++)
+		{
+			GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(128, 128, 128, 255), sf::Vector2f(TILE_SIZE, TILE_SIZE), 2);
+			tile->m_tile_coord = { i, j };
+			tile->setPosition(START_X + (i * TILE_SIZE), START_Y - (j * TILE_SIZE));
+			addToScene(tile, TileLayer, BackgroundObject);
+		}
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -307,13 +322,6 @@ void Game::drawScene()
 				{
 					m_mainScreen.draw(*(*it));
 				}
-			}
-		}
-		else if (i == PanelLayer)
-		{
-			for (std::list<SFPanel*>::iterator it = this->m_sceneFeedbackSFPanels.begin(); it != this->m_sceneFeedbackSFPanels.end(); it++)
-			{
-				(*(*it)).Draw(m_mainScreen);
 			}
 		}
 		else
