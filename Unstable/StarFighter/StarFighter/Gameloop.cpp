@@ -6,20 +6,20 @@ Gameloop::Gameloop()
 {
 	//background
 	m_background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(1920, 1080));
-	(*CurrentGame).addToScene(m_background, BackgroundLayer, BackgroundObject);
+	(*CurrentGame).addToScene(m_background, BackgroundLayer, BackgroundObject, false);
 	(*CurrentGame).m_map_size = m_background->m_size;
 
 	//ship
 	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Green, 16);
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerLayer, PlayerShip);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerLayer, PlayerShip, false);
 
 	if (LoadMap(PLAYER_SAVE_FILE) == false)
 	{
 		//create scenario
-		AddDoor(pair<int, int>(0, 0), pair<int, int>(0, 1), 4, 1);
+		Door::AddDoor(pair<int, int>(0, 0), pair<int, int>(0, 1), 4, 1, false);
 
-		AddDoor(pair<int, int>(0, 0), pair<int, int>(1, 0), 0, 1);
-		AddDoor(pair<int, int>(2, 2), pair<int, int>(3, 2), 4, 1);
+		Door::AddDoor(pair<int, int>(0, 0), pair<int, int>(1, 0), 0, 1, false);
+		Door::AddDoor(pair<int, int>(2, 2), pair<int, int>(3, 2), 4, 1, false);
 
 		Ship::SaveShip((*CurrentGame).m_playerShip);
 	}
@@ -42,7 +42,7 @@ bool Gameloop::LoadMap(string map_filename)
 			int value;
 			ss >> tileA.first >> tileA.second >> tileB.first >> tileB.second >> frequency >> value;
 
-			AddDoor(tileA, tileB, frequency, value);
+			Door::AddDoor(tileA, tileB, frequency, value, false);
 		}
 
 		data.close();  // on ferme le fichier
@@ -55,13 +55,7 @@ bool Gameloop::LoadMap(string map_filename)
 	}
 }
 
-bool Gameloop::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value)
-{
-	Door* door = new Door(tileA, tileB, frequency, value);
-	(*CurrentGame).addToScene(door, DoorLayer, DoorObject);
 
-	return true;
-}
 
 Gameloop::~Gameloop()
 {
@@ -74,7 +68,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	UpdateCamera(deltaTime);
+	//UpdateCamera(deltaTime);
 }
 
 void Gameloop::Draw()

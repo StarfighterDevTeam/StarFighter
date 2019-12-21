@@ -22,6 +22,17 @@ enum PlayerActions
 	Action_Firing,
 	Action_Muting,
 	Action_Pausing,
+	Action_Editor,
+	Action_TurnEditor,
+	Action_Remove,
+	Action_Add1,
+	Action_Add2,
+	Action_Add3,
+	Action_Add4,
+	Action_Add5,
+	Action_Add6,
+	Action_Add7,
+	Action_Add8,
 	Action_Left,
 	Action_Right,
 	Action_Up,
@@ -74,6 +85,10 @@ public :
 
 	//Music Doors
 	bool Move(PlayerActions action);
+	bool MoveEditor(PlayerActions action);
+
+	bool m_editor_mode;
+	Door* m_editor_door;
 
 private:
 	bool m_moving;

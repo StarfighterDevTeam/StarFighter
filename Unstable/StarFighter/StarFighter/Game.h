@@ -55,7 +55,7 @@ struct Game
 public:
 	Game(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
+	void addToScene(GameObject *object, LayerType layer, GameObjectType type, bool created_by_updated_object);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
 	void addToFeedbacks(SFText* text);
@@ -121,6 +121,7 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+	vector<GameObject*> m_tmp_sceneGameObjects;
 
 	//Music Doors
 	void InitMap();

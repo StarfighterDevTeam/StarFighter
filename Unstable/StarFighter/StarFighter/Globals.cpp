@@ -127,13 +127,22 @@ float MinBetweenValues(sf::Vector2f values)
 	return min;
 }
 
-float MinBetweenIntValues(int valueA, int valueB)
+int MinBetweenIntValues(int valueA, int valueB)
 {
 	int min = valueA;
 	if (valueB < min)
 		min = valueB;
 
 	return min;
+}
+
+int MaxBetweenIntValues(int valueA, int valueB)
+{
+	int max = valueA;
+	if (valueB > max)
+		max = valueB;
+
+	return max;
 }
 
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)

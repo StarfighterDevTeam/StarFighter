@@ -21,8 +21,6 @@ public:
 	GameObject* m_background;
 
 	//Music Doors
-	bool AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value);
-
 	bool LoadMap(string map_filename);
 
 private:

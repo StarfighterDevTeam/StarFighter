@@ -1,15 +1,22 @@
 #include "Door.h"
 
-Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value)
+extern Game* CurrentGame;
+
+Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset)
 {
 	m_tileA = tileA;
 	m_tileB = tileB;
 	m_frequency = frequency;
-	m_value = value;
+	m_offset = offset;
 
 	sf::Color color;
 	switch (frequency)
 	{
+		case -1:
+		{
+			color = sf::Color::Green;
+			break;
+		}
 		case 0:
 		{
 			color = sf::Color::Black;
@@ -51,6 +58,32 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value)
 	}
 	else
 	{
-		setPosition(START_X + (tileA.first * TILE_SIZE), START_Y - (0.5 + (MinBetweenIntValues(tileA.first, tileB.first))) * TILE_SIZE);
+		setPosition(START_X + (tileA.first * TILE_SIZE), START_Y - (0.5 + (MinBetweenIntValues(tileA.second, tileB.second))) * TILE_SIZE);
 	}
+}
+
+bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value, bool erase_current_door)
+{
+	if (erase_current_door == true)
+		EraseDoor(tileA, tileB);
+
+	Door* door = new Door(tileA, tileB, frequency, value);
+	(*CurrentGame).addToScene(door, DoorLayer, DoorObject, true);
+
+	return true;
+}
+
+bool Door::EraseDoor(pair<int, int> tileA, pair<int, int> tileB)
+{
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+	{
+		Door* door = (Door*)object;
+		if (door->m_tileA == tileA && door->m_tileB == tileB && door->m_visible == true)
+		{
+			door->m_visible = false;
+			return true;
+		}
+	}
+
+	return false;
 }

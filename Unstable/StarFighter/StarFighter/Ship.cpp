@@ -12,6 +12,10 @@ Ship::Ship()
 
 void Ship::Init()
 {
+	m_editor_mode = false;
+	m_editor_door = new Door(pair<int, int>(0, 0), pair<int, int>(0, 1), -1, 1);
+	(*CurrentGame).addToScene(m_editor_door, EditorDoorLayer, BackgroundObject, false);
+	
 	m_layer = PlayerLayer;
 	m_collider_type = PlayerShip;
 	m_moving = false;
@@ -81,14 +85,76 @@ void Ship::update(sf::Time deltaTime)
 	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	//}
 
-	if (m_inputs_states[Action_Left] == Input_Tap)
-		Move(Action_Left);
-	else if (m_inputs_states[Action_Right] == Input_Tap)
-		Move(Action_Right);
-	else if (m_inputs_states[Action_Up] == Input_Tap)
-		Move(Action_Up);
-	else if (m_inputs_states[Action_Down] == Input_Tap)
-		Move(Action_Down);
+	if (m_inputs_states[Action_Editor] == Input_Tap)
+		m_editor_mode = !m_editor_mode;
+		
+	m_editor_door->m_visible = m_editor_mode;
+
+	if (m_editor_mode == false)
+	{
+		if (m_inputs_states[Action_Left] == Input_Tap)
+			Move(Action_Left);
+		else if (m_inputs_states[Action_Right] == Input_Tap)
+			Move(Action_Right);
+		else if (m_inputs_states[Action_Up] == Input_Tap)
+			Move(Action_Up);
+		else if (m_inputs_states[Action_Down] == Input_Tap)
+			Move(Action_Down);
+	}
+	else//EDITOR MODE
+	{
+		if (m_inputs_states[Action_Left] == Input_Tap)
+			MoveEditor(Action_Left);
+		else if (m_inputs_states[Action_Right] == Input_Tap)
+			MoveEditor(Action_Right);
+		else if (m_inputs_states[Action_Up] == Input_Tap)
+			MoveEditor(Action_Up);
+		else if (m_inputs_states[Action_Down] == Input_Tap)
+			MoveEditor(Action_Down);
+		else if (m_inputs_states[Action_TurnEditor] == Input_Tap)
+			MoveEditor(Action_TurnEditor);
+		else
+		{
+			//remove door
+			if (m_inputs_states[Action_Remove] == Input_Tap)
+			{
+				Door::EraseDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
+				SaveShip(this);
+			}
+			//add new door
+			else if (m_inputs_states[Action_Add1] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 0, 1, true);
+				SaveShip(this);
+			}
+			else if (m_inputs_states[Action_Add2] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 4, 1, true);
+				SaveShip(this);
+			}
+			else if (m_inputs_states[Action_Add3] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 8, 1, true);
+				SaveShip(this);
+			}
+			else if (m_inputs_states[Action_Add4] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 12, 1, true);
+				SaveShip(this);
+			}
+			else if (m_inputs_states[Action_Add5] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 16, 1, true);
+				SaveShip(this);
+			}
+			else if (m_inputs_states[Action_Add6] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 24, 1, true);
+				SaveShip(this);
+			}
+		}
+			
+	}
 
 	setPosition(START_X + m_tile_coord.first * TILE_SIZE, START_Y - m_tile_coord.second * TILE_SIZE);
 
@@ -146,6 +212,79 @@ bool Ship::Move(PlayerActions action)
 		}
 	}
 
+	return true;
+}
+
+bool Ship::MoveEditor(PlayerActions action)
+{
+	switch (action)
+	{
+		case Action_Left:
+		{
+			if (MinBetweenIntValues(m_editor_door->m_tileA.first, m_editor_door->m_tileB.first) == 0)
+				return false;
+
+			m_editor_door->m_tileA.first--;
+			m_editor_door->m_tileB.first--;
+			break;
+		}
+		case Action_Right:
+		{
+			if (MaxBetweenIntValues(m_editor_door->m_tileA.first, m_editor_door->m_tileB.first) == NB_TILES_X - 1)
+				return false;
+
+			m_editor_door->m_tileA.first++;
+			m_editor_door->m_tileB.first++;
+			break;
+		}
+		case Action_Up:
+		{
+			if (MaxBetweenIntValues(m_editor_door->m_tileA.second, m_editor_door->m_tileB.second) == NB_TILES_Y - 1)
+				return false;
+
+			m_editor_door->m_tileA.second++;
+			m_editor_door->m_tileB.second++;
+			break;
+		}
+		case Action_Down:
+		{
+			if (MinBetweenIntValues(m_editor_door->m_tileA.second, m_editor_door->m_tileB.second) == 0)
+				return false;
+
+			m_editor_door->m_tileA.second--;
+			m_editor_door->m_tileB.second--;
+			break;
+		}
+		case Action_TurnEditor:
+		{
+			//horizontal connexion = vertical door
+			if (m_editor_door->m_tileA.second == m_editor_door->m_tileB.second)
+			{
+				m_editor_door->m_tileB.first = m_editor_door->m_tileA.first;
+				m_editor_door->m_tileB.second = m_editor_door->m_tileA.second == NB_TILES_Y - 1 ? m_editor_door->m_tileA.second - 1 : m_editor_door->m_tileA.second + 1;
+			}
+			else
+			{
+				m_editor_door->m_tileB.second = m_editor_door->m_tileA.second;
+				m_editor_door->m_tileB.first = m_editor_door->m_tileA.first == NB_TILES_X - 1 ? m_editor_door->m_tileA.first - 1 : m_editor_door->m_tileA.first + 1;
+			}
+
+			break;
+		}
+	}
+
+	//horizontal connexion = vertical door
+	if (m_editor_door->m_tileA.second == m_editor_door->m_tileB.second)
+	{
+		m_editor_door->setPosition(START_X + (0.5 + (MinBetweenIntValues(m_editor_door->m_tileA.first, m_editor_door->m_tileB.first))) * TILE_SIZE, START_Y - (m_editor_door->m_tileB.second * TILE_SIZE));
+		m_editor_door->setRotation(90);
+	}
+	else
+	{
+		m_editor_door->setPosition(START_X + (m_editor_door->m_tileA.first * TILE_SIZE), START_Y - (0.5 + (MinBetweenIntValues(m_editor_door->m_tileA.second, m_editor_door->m_tileB.second))) * TILE_SIZE);
+		m_editor_door->setRotation(0);
+	}
+		
 	return true;
 }
 
@@ -262,7 +401,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
 	{
 		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
-		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject, true);
 
 		m_stroboscopic_effect_clock.restart();
 	}
@@ -278,6 +417,18 @@ void Ship::UpdateInputStates()
 		GetInputState(InputGuy::getDirections().x > 0 && InputGuy::getDirections().y == 0, Action_Right);
 		GetInputState(InputGuy::getDirections().x == 0 && InputGuy::getDirections().y < 0, Action_Up);
 		GetInputState(InputGuy::getDirections().x == 0 && InputGuy::getDirections().y > 0, Action_Down);
+
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::F4), Action_Editor);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Add), Action_TurnEditor);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num1), Action_Add1);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num2), Action_Add2);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num3), Action_Add3);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num4), Action_Add4);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num5), Action_Add5);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num6), Action_Add6);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num7), Action_Add7);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num8), Action_Add8);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Subtract), Action_Remove);
 	}
 	else
 	{
@@ -287,6 +438,18 @@ void Ship::UpdateInputStates()
 		GetInputState(false, Action_Right);
 		GetInputState(false, Action_Up);
 		GetInputState(false, Action_Down);
+
+		GetInputState(false, Action_Editor);
+		GetInputState(false, Action_TurnEditor);
+		GetInputState(false, Action_Add1);
+		GetInputState(false, Action_Add2);
+		GetInputState(false, Action_Add3);
+		GetInputState(false, Action_Add4);
+		GetInputState(false, Action_Add5);
+		GetInputState(false, Action_Add6);
+		GetInputState(false, Action_Add7);
+		GetInputState(false, Action_Add8);
+		GetInputState(false, Action_Remove);
 	}
 }
 
@@ -305,17 +468,35 @@ void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
 //SAVE AND LOAD LOCAL FILE
 int Ship::SaveShip(Ship* ship)
 {
+	printf("Save\n");
+
 	printf("Saving game in local file.\n");
 	assert(ship != NULL);
 
 	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
+		vector<Door*> save_list;
 		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
 		{
 			Door* door = (Door*)object;
-			data << door->m_tileA.first << " " << door->m_tileA.second << " " << door->m_tileB.first << " " << door->m_tileB.second << " " << door->m_frequency << " "  << door->m_value << endl;// << ship->m_speed.x << endl;
+
+			if (door->m_frequency >= 0 && door->m_visible == true)
+				save_list.push_back(door);
 		}
+		for (GameObject* object : (*CurrentGame).m_tmp_sceneGameObjects)
+		{
+			if (object->m_collider_type == DoorObject && object->m_visible == true)
+			{
+				Door* door = (Door*)object;
+
+				if (door->m_frequency >= 0)
+					save_list.push_back(door);
+			}
+		}
+
+		for (Door* door : save_list)
+			data << door->m_tileA.first << " " << door->m_tileA.second << " " << door->m_tileB.first << " " << door->m_tileB.second << " " << door->m_frequency << " " << door->m_offset << endl;
 
 		data.close();  // on ferme le fichier
 	}

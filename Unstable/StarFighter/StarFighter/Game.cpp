@@ -68,7 +68,7 @@ void Game::InitMap()
 			GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(128, 128, 128, 255), sf::Vector2f(TILE_SIZE, TILE_SIZE), 2);
 			tile->m_tile_coord = { i, j };
 			tile->setPosition(START_X + (i * TILE_SIZE), START_Y - (j * TILE_SIZE));
-			addToScene(tile, TileLayer, BackgroundObject);
+			addToScene(tile, TileLayer, BackgroundObject, false);
 		}
 }
 
@@ -181,7 +181,7 @@ sf::RenderWindow* Game::getMainWindow()
 	return m_window;
 }
 
-void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
+void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type, bool created_by_updated_object)
 {
 	object->m_layer = layer;
 	object->m_collider_type = type;
@@ -189,7 +189,9 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
+	if (created_by_updated_object == true)
+		m_tmp_sceneGameObjects.push_back(object);
+	else if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
 		AddGameObjectToVector(object, &this->m_sceneGameObjectsTyped[(int)type]);
 		AddGameObjectToVector(object, &this->m_sceneGameObjectsLayered[(int)layer]);
@@ -262,14 +264,15 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
-	for (size_t i = 0; i < sceneGameObjectsSize; i++)
-	{
-		if (this->m_sceneGameObjects[i] == NULL)
-			continue;
+	for (GameObject* object : m_sceneGameObjectsTyped[PlayerShip])
+		object->update(deltaTime);
 
-		this->m_sceneGameObjects[i]->update(deltaTime);
-	}
+	for (GameObject* object : m_sceneGameObjectsTyped[DoorObject])
+		object->update(deltaTime);
+
+	for (GameObject* object : m_tmp_sceneGameObjects)
+		addToScene(object, object->m_layer, object->m_collider_type, false);
+	m_tmp_sceneGameObjects.clear();
 
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();

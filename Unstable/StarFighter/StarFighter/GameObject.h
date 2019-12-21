@@ -16,6 +16,7 @@ enum LayerType {
 	BackgroundLayer,
 	TileLayer,
 	DoorLayer,
+	EditorDoorLayer,
 	PlayerStroboscopicLayer,
 	PlayerLayer,
 	FeedbacksLayer,

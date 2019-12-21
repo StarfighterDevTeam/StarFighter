@@ -72,14 +72,15 @@ int main()
 				printf("Window focus lost\n");
 			}
 		}
-
-		if ((*CurrentGame).m_window_has_focus == true)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-			{
-				renderWindow.close();
-			}
-			else
+			renderWindow.close();
+		}
+		else
+		{
+
+
+			if ((*CurrentGame).m_window_has_focus == true)
 			{
 				//Resolution switch
 				if (InputGuy::isChangingResolution())
@@ -125,24 +126,24 @@ int main()
 					renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 					renderWindow.setTitle("StarFighter Engine");
 				}
+			}
 
-				dt = deltaClock.restart();
+			dt = deltaClock.restart();
 
-				if (dt.asSeconds() < 0.3f)
-				{
-					//Update
-					gameloop->Update(dt);
+			if (true)
+			{
+				//Update
+				gameloop->Update(dt);
 
-					//Draw
-					gameloop->Draw();
+				//Draw
+				gameloop->Draw();
 
-					//Diplay
-					renderWindow.display();
-				}
-				else
-				{
-					printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT\n");
-				}
+				//Diplay
+				renderWindow.display();
+			}
+			else
+			{
+				printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT\n");
 			}
 		}
 	}
