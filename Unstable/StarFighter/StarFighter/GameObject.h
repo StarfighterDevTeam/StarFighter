@@ -21,6 +21,7 @@ enum LayerType
 	SectorLayer,
 	StarLayer,
 	GravitationLayer,
+	ShieldLayer,
 	Planet_Layer,
 	FX_Layer,
 	BeaconLayer,

@@ -102,6 +102,7 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Glow.cpp" />
+    <ClCompile Include="CircleDisplay.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Loot.cpp" />
     <ClCompile Include="Marker.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="Gameloop.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Glow.h" />
+    <ClInclude Include="CircleDisplay.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />

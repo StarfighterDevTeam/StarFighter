@@ -17,7 +17,7 @@ public:
 	Marker(MarkerType marker_type, SpatialObject* marker_target);
 	~Marker();
 	
-	void Update(sf::Time deltaTime);
+	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void SetMarkerType(MarkerType marker_type);
 

@@ -27,6 +27,8 @@ Game::Game(RenderWindow* window)
 	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	m_view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
+	m_zoom = 1;
+
 	//default value
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
@@ -60,20 +62,24 @@ Game::Game(RenderWindow* window)
 	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 	addToScene(m_background, BackgroundLayer, BackgroundObject, false);
 
-	//Star Hunter
-
-	//we need an odd number of sectors on X and Y axis
-	m_nb_sectors_managed_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 4;
-	if (m_nb_sectors_managed_x % 2 == 0)
-		m_nb_sectors_managed_x++;
-
-	m_nb_sectors_managed_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 4;
-	if (m_nb_sectors_managed_y % 2 == 0)
-		m_nb_sectors_managed_y++;
+	SetSectorsNbSectorsManaged();
 
 	//DEBUG
 	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
 	m_sector_debug_onscreen = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Green, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
+}
+
+void Game::SetSectorsNbSectorsManaged()
+{
+	m_nb_sectors_managed_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 4;
+	m_nb_sectors_managed_x *= m_zoom;
+	if (m_nb_sectors_managed_x % 2 == 0)
+		m_nb_sectors_managed_x++;
+
+	m_nb_sectors_managed_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 4;
+	m_nb_sectors_managed_y *= m_zoom;
+	if (m_nb_sectors_managed_y % 2 == 0)
+		m_nb_sectors_managed_y++;
 }
 
 Game::~Game()
@@ -262,6 +268,23 @@ void Game::UpdateScene(Time deltaTime)
 	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
+	//zoom / zoom back
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
+	{
+		m_zoom += 0.1;
+		printf("zoom: %f\n", m_zoom);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
+	{
+		m_zoom -= 0.1;
+		printf("zoom: %f\n", m_zoom);
+	}
+
+	//we need an odd number of sectors on X and Y axis
+	SetSectorsNbSectorsManaged();
+
+	Bound(m_zoom, 1, 10);
+	
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
 	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
 
@@ -343,20 +366,65 @@ void Game::drawScene()
 		}
 		else if (i == GravitationLayer)
 		{
-			for (CircleShape circle : m_gravity_circles)
-				m_mainScreen.draw(circle);
+			for (CircleDisplay* circle : m_gravity_circles)
+			{
+				GameObject* object = circle->m_target_object;
+
+				object->setScale(1.f / m_zoom, 1.f / m_zoom);
+				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+
+				circle->setScale(1.f / m_zoom, 1.f / m_zoom);
+				circle->setPosition(object->getPosition());
+
+				m_mainScreen.draw(*circle);
+
+				object->setScale(1, 1);
+				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+
+				circle->setScale(1, 1);
+			}
+		}
+		else if (i == ShieldLayer)
+		{
+			for (CircleDisplay* circle : m_shield_circles)
+			{
+				GameObject* object = circle->m_target_object;
+
+				object->setScale(1.f / m_zoom, 1.f / m_zoom);
+				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+
+				circle->setScale(1.f / m_zoom, 1.f / m_zoom);
+				circle->setPosition(object->getPosition());
+
+				m_mainScreen.draw(*circle);
+
+				object->setScale(1, 1);
+				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+
+				circle->setScale(1, 1);
+			}
 		}
 		else
 		{
 			for (GameObject* object : m_sceneGameObjectsLayered[i])
 			{
+				object->setScale(1.f / m_zoom, 1.f / m_zoom);
+				if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
+					object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+
 				object->Draw(m_mainScreen);
+
+				object->setScale(1, 1);
+				if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
+					object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+
 			}
 		}
 	}
 
 	//Reset circles to be drawn
 	m_gravity_circles.clear();
+	m_shield_circles.clear();
 
 	//DEBUG
 	DebugDrawGameObjectsStats();
@@ -365,6 +433,7 @@ void Game::drawScene()
 	sf::Sprite temp(m_mainScreen.getTexture());
 	temp.scale(m_scale_factor.x, m_scale_factor.y);
 	temp.setPosition(sf::Vector2f(0, 0));
+	m_window->clear();
 	m_window->draw(temp);
 }
 
@@ -706,30 +775,26 @@ void Game::DebugDrawGameObjectsStats()
 			if (object->m_layer != StarLayer && object != m_playerShip && object != m_background)
 				c++;
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		sf::Text text;
 		text.setFont(*m_font[Font_Arial]);
 		text.setCharacterSize(20);
 		text.setColor(sf::Color::White);
 
+		text.setPosition(sf::Vector2f(50, 50 * (1 + i)));
+
 		if (i == 0)
-		{
 			text.setString("Spatial objects updated: " + to_string(a));
-			text.setPosition(sf::Vector2f(50, 50));
-		}
 
 		if (i == 1)
-		{
-			text.setPosition(sf::Vector2f(50, 100));
 			text.setString("Marked objects: " + to_string(b));
-		}
 
 		if (i == 2)
-		{
-			text.setPosition(sf::Vector2f(50, 150));
 			text.setString("Stored objects: " + to_string(c));
-		}
+
+		if (i == 3)
+			text.setString("Zoom level: " + to_string(m_zoom));
 
 		m_mainScreen.draw(text);
 	}

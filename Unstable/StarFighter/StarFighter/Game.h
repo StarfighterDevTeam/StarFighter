@@ -2,7 +2,6 @@
 #define GAME_H_INCLUDED
 
 #include "Globals.h"
-#include "GameObject.h"
 #include <list>
 #include <vector>
 #include "TextUtils.h"
@@ -17,6 +16,7 @@
 #include "Stroboscopic.h"
 #include "SFPanel.h"
 #include "SFTextPop.h"
+#include "CircleDisplay.h"
 
 class Ship;
 class Planet;
@@ -82,6 +82,7 @@ public:
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
 	sf::Vector2f m_scale_factor;
+	float m_zoom;
 
 	GameObject* m_playerShip;
 	bool m_pause;
@@ -130,6 +131,7 @@ public:
 	static sf::IntRect FToIRect(const sf::FloatRect& f);
 	bool StoreObjectIfNecessary(GameObject* object);
 	SpatialObject* GetTargetableEnemyShip(GameObject* const shooter, float dist_max, float angle_delta_max);
+	void SetSectorsNbSectorsManaged();
 
 	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
@@ -142,7 +144,8 @@ public:
 	int m_nb_sectors_managed_y;
 
 	GameObject* m_background;
-	vector<CircleShape> m_gravity_circles;
+	vector<CircleDisplay*> m_gravity_circles;
+	vector<CircleDisplay*> m_shield_circles;
 
 	vector<StarSector> m_sectorsKnown;//all sectors encountered by the player
 	vector<sf::Vector2i> m_sectorsManaged;//all sectors that are close enough to need an updated

@@ -52,13 +52,13 @@ public :
 	float m_shield_regen;
 	double m_shield_regen_buffer;
 	double m_energy_regen_buffer;
-	sf::CircleShape m_shield_circle;
 	int m_energy;
 	int m_energy_max;
 	float m_energy_regen;
 	float m_gravitation_range;
 	float m_gravitation_strength;
-	sf::CircleShape m_gravitation_circle;
+	CircleDisplay* m_shield_circle;
+	CircleDisplay* m_gravitation_circle;
 
 	sf::RectangleShape m_health_rect;
 	sf::RectangleShape m_health_container_rect;

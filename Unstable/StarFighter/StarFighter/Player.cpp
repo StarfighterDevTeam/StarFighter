@@ -100,6 +100,9 @@ void Player::Update(sf::Time deltaTime)
 	if (m_gravitation_range > 0)
 		(*CurrentGame).m_gravity_circles.push_back(m_gravitation_circle);
 
+	if (m_shield > 0)
+		(*CurrentGame).m_shield_circles.push_back(m_shield_circle);
+
 	Ship::Update(deltaTime);
 
 	//update energy
