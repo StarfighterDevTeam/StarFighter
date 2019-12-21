@@ -358,17 +358,17 @@ void Game::colisionChecksV2()
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
-		{
-			if (*it2 == NULL)
-				continue;
-			
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
-			{
-				//Do something 
-				
-			}
-		}
+		//for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		//{
+		//	if (*it2 == NULL)
+		//		continue;
+		//	
+		//	if (SimpleCollision::AreColliding((*it1), (*it2)))
+		//	{
+		//		//Do something 
+		//		
+		//	}
+		//}
 	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }

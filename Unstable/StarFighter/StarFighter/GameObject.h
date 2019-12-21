@@ -24,15 +24,8 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
-	PortalObject,
-	ShopObject,
-	LootObject,
+	DoorObject,
 	PlayerShip,
-	FakePlayerShip,
-	FriendlyFire,
-	Neutral,
-	EnemyFire,
-	EnemyObject,
 	NBVAL_GameObject
 };
 

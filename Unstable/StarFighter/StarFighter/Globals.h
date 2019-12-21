@@ -55,9 +55,11 @@ std::string StringCut(std::string str, const size_t length);
 
 //MUSIC DOORS
 #define BPM				138
+#define SONG_OFFSET		0.0
 #define NB_TILES_X		10
 #define NB_TILES_Y		10
 #define TILE_SIZE		84
+#define DOOR_WIDTH		4
 #define START_X			300
 #define START_Y			900
 
@@ -88,6 +90,7 @@ float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
 int RandomizeSign();
 float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
+float MinBetweenIntValues(int valueA, int valueB);
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max);
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);

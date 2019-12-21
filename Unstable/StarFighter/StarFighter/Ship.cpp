@@ -311,7 +311,11 @@ int Ship::SaveShip(Ship* ship)
 	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
-		data << "Save ";// << ship->m_speed.x << endl;
+		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+		{
+			Door* door = (Door*)object;
+			data << door->m_tileA.first << " " << door->m_tileA.second << " " << door->m_tileB.first << " " << door->m_tileB.second << " " << door->m_frequency << " "  << door->m_value << endl;// << ship->m_speed.x << endl;
+		}
 
 		data.close();  // on ferme le fichier
 	}

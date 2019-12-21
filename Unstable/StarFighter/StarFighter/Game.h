@@ -120,6 +120,7 @@ public:
 
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
+	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
 
 	//Music Doors
 	void InitMap();
@@ -139,7 +140,7 @@ private:
 	std::vector<SFText*> m_sceneFeedbackSFTexts;
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
-	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+	
 	std::vector<GameObject*> m_sceneGameObjectsLayeredTemp[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;

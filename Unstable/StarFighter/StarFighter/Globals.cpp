@@ -122,9 +122,17 @@ float MinBetweenValues(sf::Vector2f values)
 {
 	float min = values.x;
 	if (values.y < min)
-	{
 		min = values.y;
-	}
+	
+	return min;
+}
+
+float MinBetweenIntValues(int valueA, int valueB)
+{
+	int min = valueA;
+	if (valueB < min)
+		min = valueB;
+
 	return min;
 }
 
