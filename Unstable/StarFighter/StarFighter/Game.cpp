@@ -62,6 +62,8 @@ Game::Game(RenderWindow* window)
 
 void Game::InitMap()
 {
+	m_time = SONG_OFFSET;
+
 	for (int i = 0; i < NB_TILES_X; i++)
 		for (int j = 0; j < NB_TILES_Y; j++)
 		{
@@ -252,6 +254,8 @@ void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, Gam
 
 void Game::updateScene(Time deltaTime)
 {
+
+	m_time += deltaTime.asSeconds();
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
 	//TODO: Updating screen resolution

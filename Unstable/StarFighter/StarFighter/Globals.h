@@ -54,14 +54,15 @@ std::string StringCut(std::string str, const size_t length);
 #define MUSIC_FADE_OUT_TIME						2.f
 
 //MUSIC DOORS
-#define BPM				138
-#define SONG_OFFSET		0.0
-#define NB_TILES_X		10
-#define NB_TILES_Y		10
-#define TILE_SIZE		84
-#define DOOR_WIDTH		4
-#define START_X			300
-#define START_Y			900
+#define BPM					138
+#define SONG_OFFSET			0.0
+#define NB_TILES_X			10
+#define NB_TILES_Y			10
+#define TILE_SIZE			84
+#define DOOR_WIDTH			4
+#define START_X				300
+#define START_Y				900
+#define OPENING_DURATION	0.5
 
 //TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10

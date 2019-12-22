@@ -126,6 +126,8 @@ public:
 	//Music Doors
 	void InitMap();
 
+	float m_time;
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);

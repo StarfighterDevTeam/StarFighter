@@ -9,6 +9,10 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	m_frequency = frequency;
 	m_offset = offset;
 
+	m_cooldown = 4.f * 4.f / frequency / BPM * 60;
+	m_cooldown_current = m_cooldown + SONG_OFFSET;
+	m_door_state = Door_Close;
+
 	sf::Color color;
 	switch (frequency)
 	{
@@ -86,4 +90,35 @@ bool Door::EraseDoor(pair<int, int> tileA, pair<int, int> tileB)
 	}
 
 	return false;
+}
+
+void Door::update(Time deltaTime)
+{
+	if (m_frequency <= 0)
+		return;
+
+	m_cooldown_current -= deltaTime.asSeconds();
+
+	if (m_door_state == Door_Close && m_cooldown_current <= 0)//OPENING_DURATION)
+	{
+		m_door_state = Door_Opening;
+	}
+
+	if (m_door_state == Door_Opening && m_cooldown_current <= -OPENING_DURATION * 0.5)//0)
+	{
+		m_door_state = Door_Closing;
+	}
+
+	if (m_door_state == Door_Closing && m_cooldown_current <= -OPENING_DURATION)
+	{
+		m_cooldown_current += m_cooldown;
+		m_door_state = Door_Close;
+	}
+
+	if (m_door_state == Door_Opening || m_door_state == Door_Closing)
+		setColor(sf::Color(255, 255, 255, 0));
+	else
+		setColor(sf::Color(255, 255, 255, 255));
+
+	printf("cooldown: %f\n", m_cooldown_current);
 }
