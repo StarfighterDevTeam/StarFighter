@@ -15,7 +15,7 @@ class Door : public GameObject
 {
 public:
 	Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset);
-	~Door(){};
+	~Door();
 	void update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 
@@ -31,6 +31,12 @@ public:
 	float m_cooldown;
 	float m_cooldown_current;
 	DoorState m_door_state;
+	float m_open_ratio;
+
+	void UpdateDoorsPosition();
+
+	RectangleShape m_door_UL;//up and left
+	RectangleShape m_door_DR;//don and right
 
 	Text m_text;
 };
