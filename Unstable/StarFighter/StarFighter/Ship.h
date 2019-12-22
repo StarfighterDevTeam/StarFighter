@@ -8,12 +8,6 @@
 #include "SFTextPop.h"
 #include "Door.h"
 
-#define SHIP_START_X                990
-#define SHIP_START_Y                540
-#define SHIP_ACCELERATION	        2000.0f
-#define SHIP_DECCELERATION_COEF		5000.0f
-#define SHIP_MAX_SPEED				400.0f
-#define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
 enum PlayerActions
@@ -48,6 +42,12 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
+enum MoveState
+{
+	Move_Idle,
+	Move_Moving,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -60,10 +60,7 @@ public :
 	void update(sf::Time deltaTime) override;
 	
 	void ManageHudControls(sf::Vector2f inputs_directions);
-	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
-	void MaxSpeedConstraints();
 	void UpdateRotation();
 
 	bool m_disable_inputs;
@@ -90,6 +87,8 @@ public :
 
 	bool m_editor_mode;
 	Door* m_editor_door;
+	float m_speed_max;
+	MoveState m_move_state;
 
 private:
 	bool m_moving;

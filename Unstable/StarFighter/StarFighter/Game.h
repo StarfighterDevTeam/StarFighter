@@ -125,7 +125,7 @@ public:
 
 	//Music Doors
 	void InitMap();
-
+	sf::Vector2f getTilePosition(pair<int, int> tile_coord);
 	float m_time;
 
 private:

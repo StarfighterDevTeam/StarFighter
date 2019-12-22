@@ -75,6 +75,11 @@ void Game::InitMap()
 		}
 }
 
+sf::Vector2f Game::getTilePosition(pair<int, int> tile_coord)
+{
+	return sf::Vector2f(START_X + (tile_coord.first * TILE_SIZE), START_Y - (tile_coord.second * TILE_SIZE));
+}
+
 void Game::SetSFXVolume(bool activate_sfx)
 {
 	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);

@@ -10,7 +10,7 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	m_offset = offset;
 	m_open_ratio = 0;
 
-	m_cooldown = 4.f * 4.f / frequency / BPM * 60;
+	m_cooldown = 4.f * 4.f / frequency / SONG_BPM * 60;
 	m_cooldown_current = 0.5f * (m_offset - 1) * m_cooldown + m_cooldown + SONG_OFFSET;
 	m_door_state = Door_Close;
 
@@ -235,9 +235,12 @@ void Door::update(Time deltaTime)
 
 void Door::Draw(RenderTarget& screen)
 {
-	//GameObject::Draw(screen);
-
-	screen.draw(m_door_UL);
-	screen.draw(m_door_DR);
-	screen.draw(m_text);
+	if (m_frequency <= 0)
+		GameObject::Draw(screen);
+	else
+	{
+		screen.draw(m_door_UL);
+		screen.draw(m_door_DR);
+		screen.draw(m_text);
+	}
 }

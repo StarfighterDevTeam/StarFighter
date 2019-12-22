@@ -15,6 +15,9 @@ void Ship::Init()
 	m_editor_mode = false;
 	m_editor_door = new Door(pair<int, int>(0, 0), pair<int, int>(0, 1), -1, 1);
 	(*CurrentGame).addToScene(m_editor_door, EditorDoorLayer, BackgroundObject, false);
+
+	m_speed_max = TILE_SIZE * 4 * SONG_BPM / 60;
+	m_move_state = Move_Idle;
 	
 	m_layer = PlayerLayer;
 	m_collider_type = PlayerShip;
@@ -160,10 +163,28 @@ void Ship::update(sf::Time deltaTime)
 				SaveShip(this);
 			}
 		}
-			
 	}
 
-	setPosition(START_X + m_tile_coord.first * TILE_SIZE, START_Y - m_tile_coord.second * TILE_SIZE);
+	//apply move
+	if (m_move_state == Move_Moving)
+	{
+		sf::Vector2f destination_coord = (*CurrentGame).getTilePosition(m_tile_coord);
+		sf::Vector2f move_vector = destination_coord - getPosition();
+
+		if (GetVectorLengthSquared(move_vector) <= m_speed_max * m_speed_max * deltaTime.asSeconds() * deltaTime.asSeconds())
+		{
+			setPosition(destination_coord);
+			m_move_state = Move_Idle;
+		}
+		else
+		{
+			int x = move_vector.x == 0 ? 0 : (move_vector.x > 0 ? 1 : -1);
+			int y = move_vector.y == 0 ? 0 : (move_vector.y > 0 ? 1 : -1);
+			setPosition(getPosition().x + m_speed_max * deltaTime.asSeconds() * x, getPosition().y + m_speed_max * deltaTime.asSeconds() * y);
+		}	
+	}
+
+	//setPosition(START_X + m_tile_coord.first * TILE_SIZE, START_Y - m_tile_coord.second * TILE_SIZE);
 
 	//MaxSpeedConstraints();
 	//IdleDecelleration(deltaTime);
@@ -183,6 +204,9 @@ void Ship::update(sf::Time deltaTime)
 
 bool Ship::Move(PlayerActions action)
 {
+	if (m_move_state == Move_Moving)
+		return false;
+
 	switch (action)
 	{
 		case Action_Left:
@@ -218,6 +242,8 @@ bool Ship::Move(PlayerActions action)
 			break;
 		}
 	}
+
+	m_move_state = Move_Moving;
 
 	return true;
 }
@@ -328,50 +354,6 @@ bool Ship::ScreenBorderContraints()
 	}
 
 	return touched_screen_border;
-}
-
-void Ship::IdleDecelleration(sf::Time deltaTime)
-{
-	//idle decceleration
-	if (!m_movingX)
-	{
-		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.x) < SHIP_MIN_SPEED)
-			m_speed.x = 0;
-	}
-
-	if (!m_movingY)
-	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.y) < SHIP_MIN_SPEED)
-			m_speed.y = 0;
-	}
-}
-
-void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
-{
-	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
-
-	//max speed constraints
-	if (abs(m_speed.x) > SHIP_MAX_SPEED)
-	{
-		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-	if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-}
-
-void Ship::MaxSpeedConstraints()
-{
-	float ship_max_speed = SHIP_MAX_SPEED;
-
-	//max speed constraints
-	NormalizeVector(&m_speed, ship_max_speed);
 }
 
 void Ship::UpdateRotation()
