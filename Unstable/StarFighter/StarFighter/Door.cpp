@@ -10,8 +10,8 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	m_offset = offset;
 	m_open_ratio = 0;
 
-	m_cooldown = 4.f * 4.f / frequency / SONG_BPM * 60;
-	m_cooldown_current = 0.5f * (m_offset - 1) * m_cooldown + m_cooldown + SONG_OFFSET;
+	m_cooldown = 4.f / SONG_BPM * 60;
+	m_cooldown_current = m_cooldown + (m_cooldown / (frequency / 4.f) * (m_offset - 1)) + SONG_OFFSET;   // 0.5f * (m_offset - 1) * m_cooldown + m_cooldown + SONG_OFFSET;
 	m_door_state = Door_Close;
 
 	switch (frequency)
@@ -50,6 +50,11 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 			m_color = sf::Color::Magenta;
 			break;
 		}	
+		case 64:
+		{
+			m_color = sf::Color(255, 128, 255, 255);//orange
+			break;
+		}
 	}
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), m_color, sf::Vector2f(TILE_SIZE, DOOR_WIDTH));

@@ -15,6 +15,7 @@ using namespace sf;
 enum LayerType {
 	BackgroundLayer,
 	TileLayer,
+	ExitLayer,
 	DoorLayer,
 	EditorDoorLayer,
 	PlayerStroboscopicLayer,
@@ -25,6 +26,7 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
+	ExitObject,
 	DoorObject,
 	PlayerShip,
 	NBVAL_GameObject

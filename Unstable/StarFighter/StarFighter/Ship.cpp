@@ -96,14 +96,17 @@ void Ship::update(sf::Time deltaTime)
 
 	if (m_editor_mode == false)
 	{
-		if (m_inputs_states[Action_Left] == Input_Tap)
-			Move(Action_Left);
-		else if (m_inputs_states[Action_Right] == Input_Tap)
-			Move(Action_Right);
-		else if (m_inputs_states[Action_Up] == Input_Tap)
-			Move(Action_Up);
-		else if (m_inputs_states[Action_Down] == Input_Tap)
-			Move(Action_Down);
+		if (m_move_state != Move_Moving)
+		{
+			if (m_inputs_states[Action_Left] == Input_Tap)
+				Move(Action_Left);
+			else if (m_inputs_states[Action_Right] == Input_Tap)
+				Move(Action_Right);
+			else if (m_inputs_states[Action_Up] == Input_Tap)
+				Move(Action_Up);
+			else if (m_inputs_states[Action_Down] == Input_Tap)
+				Move(Action_Down);
+		}
 	}
 	else//EDITOR MODE
 	{
@@ -123,44 +126,40 @@ void Ship::update(sf::Time deltaTime)
 			if (m_inputs_states[Action_Erase] == Input_Tap)
 			{
 				Door::EraseDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
-				SaveShip(this);
 			}
 			//offset door
 			else if (m_inputs_states[Action_Offset] == Input_Tap)
 			{
 				Door::OffsetDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
-				SaveShip(this);
 			}
 			//add new door
 			else if (m_inputs_states[Action_Add1] == Input_Tap)
 			{
 				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 0, 1, true);
-				SaveShip(this);
 			}
 			else if (m_inputs_states[Action_Add2] == Input_Tap)
 			{
 				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 4, 1, true);
-				SaveShip(this);
 			}
 			else if (m_inputs_states[Action_Add3] == Input_Tap)
 			{
 				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 8, 1, true);
-				SaveShip(this);
 			}
 			else if (m_inputs_states[Action_Add4] == Input_Tap)
 			{
 				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 12, 1, true);
-				SaveShip(this);
 			}
 			else if (m_inputs_states[Action_Add5] == Input_Tap)
 			{
 				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 16, 1, true);
-				SaveShip(this);
 			}
 			else if (m_inputs_states[Action_Add6] == Input_Tap)
 			{
 				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 24, 1, true);
-				SaveShip(this);
+			}
+			else if (m_inputs_states[Action_Add7] == Input_Tap)
+			{
+				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 64, 1, true);
 			}
 		}
 	}
@@ -171,15 +170,30 @@ void Ship::update(sf::Time deltaTime)
 		sf::Vector2f destination_coord = (*CurrentGame).getTilePosition(m_tile_coord);
 		sf::Vector2f move_vector = destination_coord - getPosition();
 
+		int x = move_vector.x == 0 ? 0 : (move_vector.x > 0 ? 1 : -1);
+		int y = move_vector.y == 0 ? 0 : (move_vector.y > 0 ? 1 : -1);
+
 		if (GetVectorLengthSquared(move_vector) <= m_speed_max * m_speed_max * deltaTime.asSeconds() * deltaTime.asSeconds())
 		{
-			setPosition(destination_coord);
-			m_move_state = Move_Idle;
+			//stream (hold)
+			bool stream_success = false;
+			if (x == -1 && m_inputs_states[Action_Left] == Input_Hold)
+				stream_success = Move(Action_Left);
+			else if (x == 1 && m_inputs_states[Action_Right] == Input_Hold)
+				stream_success = Move(Action_Right);
+			else if (y == -1 && m_inputs_states[Action_Up] == Input_Hold)
+				stream_success = Move(Action_Up);
+			else if (y == 1 && m_inputs_states[Action_Down] == Input_Hold)
+				stream_success = Move(Action_Down);
+			
+			if (stream_success == false)
+			{
+				setPosition(destination_coord);
+				m_move_state = Move_Idle;
+			}
 		}
 		else
 		{
-			int x = move_vector.x == 0 ? 0 : (move_vector.x > 0 ? 1 : -1);
-			int y = move_vector.y == 0 ? 0 : (move_vector.y > 0 ? 1 : -1);
 			setPosition(getPosition().x + m_speed_max * deltaTime.asSeconds() * x, getPosition().y + m_speed_max * deltaTime.asSeconds() * y);
 		}	
 	}
@@ -208,7 +222,7 @@ bool Ship::IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB)
 	{
 		Door* door = (Door*)object;
 
-		if (door->m_visible == true && door->m_frequency == 0 && (door->m_tileA == tileA && door->m_tileB == tileB) || (door->m_tileA == tileB && door->m_tileB == tileA))
+		if (door->m_visible == true && door->m_frequency == 0 && ((door->m_tileA == tileA && door->m_tileB == tileB) || (door->m_tileA == tileB && door->m_tileB == tileA)))
 			return false;
 	}
 
@@ -217,9 +231,6 @@ bool Ship::IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB)
 
 bool Ship::Move(PlayerActions action)
 {
-	if (m_move_state == Move_Moving)
-		return false;
-
 	switch (action)
 	{
 		case Action_Left:
@@ -478,77 +489,5 @@ void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
 	else
 	{
 		m_inputs_states[action] = Input_Release;
-	}
-}
-
-//SAVE AND LOAD LOCAL FILE
-int Ship::SaveShip(Ship* ship)
-{
-	printf("Save\n");
-
-	printf("Saving game in local file.\n");
-	assert(ship != NULL);
-
-	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
-	{
-		vector<Door*> save_list;
-		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
-		{
-			Door* door = (Door*)object;
-
-			if (door->m_frequency >= 0 && door->m_visible == true)
-				save_list.push_back(door);
-		}
-		for (GameObject* object : (*CurrentGame).m_tmp_sceneGameObjects)
-		{
-			if (object->m_collider_type == DoorObject && object->m_visible == true)
-			{
-				Door* door = (Door*)object;
-
-				if (door->m_frequency >= 0)
-					save_list.push_back(door);
-			}
-		}
-
-		for (Door* door : save_list)
-			data << door->m_tileA.first << " " << door->m_tileA.second << " " << door->m_tileB.first << " " << door->m_tileB.second << " " << door->m_frequency << " " << door->m_offset << endl;
-
-		data.close();  // on ferme le fichier
-	}
-	else  // si l'ouverture a échoué
-	{
-		cerr << "DEBUG: No existing save file founded. A new file is going to be created.\n" << endl;
-	}
-
-	return 0;
-}
-
-bool Ship::LoadShip(Ship* ship)
-{
-	printf("Loading ship from local file.\n");
-	assert(ship != NULL);
-
-	std::ifstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
-
-	if (data) // si ouverture du fichier réussie
-	{
-		std::string line;
-		while (std::getline(data, line))
-		{
-			std::istringstream ss(line);
-
-			string saved_content;
-			ss >> saved_content;
-			//ship->content = saved_content;
-		}
-
-		data.close();  // on ferme le fichier
-		return true;
-	}
-	else  // si l'ouverture a échoué
-	{
-		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
-		return false;
 	}
 }

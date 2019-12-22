@@ -23,7 +23,7 @@ std::string StringCut(std::string str, const size_t length);
 #ifdef __APPLE__
 	#define PLAYER_SAVE_FILE						"SaveFile.txt"
 #else
-	#define PLAYER_SAVE_FILE						"Saves/SaveFile.txt"
+	#define PLAYER_SAVE_FILE						"Saves/Level1.txt"
 #endif
 
 #define	REF_WINDOW_RESOLUTION_X					1920

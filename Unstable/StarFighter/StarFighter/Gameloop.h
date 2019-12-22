@@ -22,6 +22,11 @@ public:
 
 	//Music Doors
 	bool LoadMap(string map_filename);
+	bool SaveMap(string map_filename);
+
+	pair<int, int> m_start;
+	pair<int, int> m_finish;
+	string m_current_map_filename;
 
 private:
 	sf::RenderWindow* mainWindow;
