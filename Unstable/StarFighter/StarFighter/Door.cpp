@@ -81,6 +81,9 @@ bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, in
 	if (erase_current_door == true)
 		EraseDoor(tileA, tileB);
 
+	if (tileA.first > NB_TILES_X || tileB.first > NB_TILES_X || tileA.second > NB_TILES_Y || tileB.second > NB_TILES_Y)
+		return false;
+
 	Door* door = new Door(tileA, tileB, frequency, value);
 	(*CurrentGame).addToScene(door, DoorLayer, DoorObject, true);
 

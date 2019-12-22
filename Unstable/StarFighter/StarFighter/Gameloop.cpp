@@ -46,6 +46,8 @@ bool Gameloop::LoadMap(string map_filename)
 		}
 
 		data.close();  // on ferme le fichier
+
+		Ship::SaveShip((*CurrentGame).m_playerShip);
 		return true;
 	}
 	else  // si l'ouverture a échoué

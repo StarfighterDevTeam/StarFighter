@@ -67,7 +67,8 @@ void Game::InitMap()
 	for (int i = 0; i < NB_TILES_X; i++)
 		for (int j = 0; j < NB_TILES_Y; j++)
 		{
-			GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(128, 128, 128, 255), sf::Vector2f(TILE_SIZE, TILE_SIZE), 2);
+			//GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(128, 128, 128, 255), sf::Vector2f(TILE_SIZE, TILE_SIZE), 2);
+			GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(TILE_SIZE, TILE_SIZE));
 			tile->m_tile_coord = { i, j };
 			tile->setPosition(START_X + (i * TILE_SIZE), START_Y - (j * TILE_SIZE));
 			addToScene(tile, TileLayer, BackgroundObject, false);
