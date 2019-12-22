@@ -191,6 +191,11 @@ void GameObject::update(sf::Time deltaTime)
 	}
 }
 
+void GameObject::Draw(RenderTarget& screen)
+{
+	screen.draw(*this);
+}
+
 void GameObject::updateAnimation(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);

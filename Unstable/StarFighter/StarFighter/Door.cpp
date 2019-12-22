@@ -10,7 +10,7 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	m_offset = offset;
 
 	m_cooldown = 4.f * 4.f / frequency / BPM * 60;
-	m_cooldown_current = m_cooldown + SONG_OFFSET;
+	m_cooldown_current = 0.5f * (m_offset - 1) * m_cooldown + m_cooldown + SONG_OFFSET;
 	m_door_state = Door_Close;
 
 	sf::Color color;
@@ -64,6 +64,16 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	{
 		setPosition(START_X + (tileA.first * TILE_SIZE), START_Y - (0.5 + (MinBetweenIntValues(tileA.second, tileB.second))) * TILE_SIZE);
 	}
+
+	//debug offset
+	if (m_frequency > 0)
+	{
+		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_text.setCharacterSize(18);
+		m_text.setColor(sf::Color::Black);
+		m_text.setString(to_string(offset));
+		m_text.setPosition(getPosition().x, getPosition().y - 20);
+	}
 }
 
 bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value, bool erase_current_door)
@@ -85,6 +95,25 @@ bool Door::EraseDoor(pair<int, int> tileA, pair<int, int> tileB)
 		if (door->m_tileA == tileA && door->m_tileB == tileB && door->m_visible == true)
 		{
 			door->m_visible = false;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Door::OffsetDoor(pair<int, int> tileA, pair<int, int> tileB)
+{
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+	{
+		Door* door = (Door*)object;
+		if (door->m_tileA == tileA && door->m_tileB == tileB && door->m_visible == true)
+		{
+			door->m_offset++;
+			door->m_offset %= 1 + (door->m_frequency / 4);
+			if (door->m_offset == 0)
+				door->m_offset = 1;
+			door->m_text.setString(to_string(door->m_offset));
 			return true;
 		}
 	}
@@ -119,6 +148,10 @@ void Door::update(Time deltaTime)
 		setColor(sf::Color(255, 255, 255, 0));
 	else
 		setColor(sf::Color(255, 255, 255, 255));
+}
 
-	printf("cooldown: %f\n", m_cooldown_current);
+void Door::Draw(RenderTarget& screen)
+{
+	GameObject::Draw(screen);
+	screen.draw(m_text);
 }

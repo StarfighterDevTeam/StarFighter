@@ -117,9 +117,15 @@ void Ship::update(sf::Time deltaTime)
 		else
 		{
 			//remove door
-			if (m_inputs_states[Action_Remove] == Input_Tap)
+			if (m_inputs_states[Action_Erase] == Input_Tap)
 			{
 				Door::EraseDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
+				SaveShip(this);
+			}
+			//offset door
+			else if (m_inputs_states[Action_Offset] == Input_Tap)
+			{
+				Door::OffsetDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
 				SaveShip(this);
 			}
 			//add new door
@@ -429,7 +435,8 @@ void Ship::UpdateInputStates()
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num6), Action_Add6);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num7), Action_Add7);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num8), Action_Add8);
-		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Subtract), Action_Remove);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Subtract), Action_Erase);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Multiply), Action_Offset);
 	}
 	else
 	{
@@ -450,7 +457,8 @@ void Ship::UpdateInputStates()
 		GetInputState(false, Action_Add6);
 		GetInputState(false, Action_Add7);
 		GetInputState(false, Action_Add8);
-		GetInputState(false, Action_Remove);
+		GetInputState(false, Action_Erase);
+		GetInputState(false, Action_Offset);
 	}
 }
 

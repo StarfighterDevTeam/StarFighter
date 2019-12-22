@@ -17,10 +17,11 @@ public:
 	Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset);
 	~Door(){};
 	void update(sf::Time deltaTime) override;
-
+	void Draw(RenderTarget& screen) override;
 
 	static bool AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, bool erase_current_door);
 	static bool EraseDoor(pair<int, int> tileA, pair<int, int> tileB);
+	static bool OffsetDoor(pair<int, int> tileA, pair<int, int> tileB);
 
 	pair<int, int> m_tileA;
 	pair<int, int> m_tileB;
@@ -30,6 +31,8 @@ public:
 	float m_cooldown;
 	float m_cooldown_current;
 	DoorState m_door_state;
+
+	Text m_text;
 };
 
 #endif // DOOR_H_INCLUDED
