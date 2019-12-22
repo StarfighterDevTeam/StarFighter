@@ -21,7 +21,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 std::string StringCut(std::string str, const size_t length);
 
 #ifdef __APPLE__
-	#define PLAYER_SAVE_FILE						"SaveFile.txt"
+	#define PLAYER_SAVE_FILE						"Level1.txt"
 #else
 	#define PLAYER_SAVE_FILE						"Saves/Level1.txt"
 #endif

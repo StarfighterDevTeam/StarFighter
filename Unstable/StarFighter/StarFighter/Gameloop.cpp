@@ -64,7 +64,6 @@ bool Gameloop::LoadMap(string map_filename)
 					(*CurrentGame).addToScene(exit, ExitLayer, ExitObject, false);
 					exit->m_tile_coord = m_finish;
 					exit->setPosition((*CurrentGame).getTilePosition(m_finish));
-
 				}
 					
 			}
@@ -150,6 +149,14 @@ void Gameloop::Update(sf::Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//UpdateCamera(deltaTime);
+
+	//Load next level
+	sf::Vector2f finish_vector = (*CurrentGame).m_playerShip->getPosition() - (*CurrentGame).getTilePosition(m_finish);
+	if (GetVectorLengthSquared(finish_vector) <= (*CurrentGame).m_playerShip->m_size.x * (*CurrentGame).m_playerShip->m_size.x)
+	{
+		printf("Finish\n");
+		//LoadMap(PLAYER_SAVE_FILE);
+	}
 
 	//auto save editior mode
 	if ((*CurrentGame).m_playerShip->m_editor_mode == true)

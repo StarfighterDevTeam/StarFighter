@@ -65,7 +65,6 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-
 	//sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	//if ((*CurrentGame).m_window_has_focus)
 	//{
