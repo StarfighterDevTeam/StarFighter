@@ -202,6 +202,19 @@ void Ship::update(sf::Time deltaTime)
 	ScreenBorderContraints();	
 }
 
+bool Ship::IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB)
+{
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+	{
+		Door* door = (Door*)object;
+
+		if (door->m_visible == true && door->m_frequency == 0 && (door->m_tileA == tileA && door->m_tileB == tileB) || (door->m_tileA == tileB && door->m_tileB == tileA))
+			return false;
+	}
+
+	return true;
+}
+
 bool Ship::Move(PlayerActions action)
 {
 	if (m_move_state == Move_Moving)
@@ -214,12 +227,18 @@ bool Ship::Move(PlayerActions action)
 			if (m_tile_coord.first == 0)
 				return false;
 
+			if (IsMovementPossible(m_tile_coord, pair<int, int>(m_tile_coord.first - 1, m_tile_coord.second)) == false)
+				return false;
+			
 			m_tile_coord.first--;
 			break;
 		}
 		case Action_Right:
 		{
 			if (m_tile_coord.first == NB_TILES_X - 1)
+				return false;
+
+			if (IsMovementPossible(m_tile_coord, pair<int, int>(m_tile_coord.first + 1, m_tile_coord.second)) == false)
 				return false;
 
 			m_tile_coord.first++;
@@ -230,12 +249,18 @@ bool Ship::Move(PlayerActions action)
 			if (m_tile_coord.second == NB_TILES_Y - 1)
 				return false;
 
+			if (IsMovementPossible(m_tile_coord, pair<int, int>(m_tile_coord.first, m_tile_coord.second + 1)) == false)
+				return false;
+
 			m_tile_coord.second++;
 			break;
 		}
 		case Action_Down:
 		{
 			if (m_tile_coord.second == 0)
+				return false;
+
+			if (IsMovementPossible(m_tile_coord, pair<int, int>(m_tile_coord.first, m_tile_coord.second - 1)) == false)
 				return false;
 
 			m_tile_coord.second--;

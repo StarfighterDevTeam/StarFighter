@@ -85,10 +85,13 @@ public :
 	bool Move(PlayerActions action);
 	bool MoveEditor(PlayerActions action);
 
+	static bool IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB);
+	
 	bool m_editor_mode;
 	Door* m_editor_door;
 	float m_speed_max;
 	MoveState m_move_state;
+	
 
 private:
 	bool m_moving;
