@@ -13,8 +13,6 @@ Ship::Ship()
 void Ship::Init()
 {
 	m_editor_mode = false;
-	m_editor_door = new Door(pair<int, int>(0, 0), pair<int, int>(0, 1), -1, 1);
-	(*CurrentGame).addToScene(m_editor_door, EditorDoorLayer, BackgroundObject, false);
 
 	m_speed_max = TILE_SIZE * 4 * SONG_BPM / 60;
 	m_move_state = Move_Idle;
@@ -55,7 +53,7 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float rad
 
 Ship::~Ship()
 {
-	
+
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -91,7 +89,7 @@ void Ship::update(sf::Time deltaTime)
 	if (m_inputs_states[Action_Editor] == Input_Tap)
 		m_editor_mode = !m_editor_mode;
 		
-	m_editor_door->m_visible = m_editor_mode;
+	(*CurrentGame).m_editor_door->m_visible = m_editor_mode;
 
 	if (m_editor_mode == false)
 	{
@@ -124,41 +122,41 @@ void Ship::update(sf::Time deltaTime)
 			//remove door
 			if (m_inputs_states[Action_Erase] == Input_Tap)
 			{
-				Door::EraseDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
+				Door::EraseDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB);
 			}
 			//offset door
 			else if (m_inputs_states[Action_Offset] == Input_Tap)
 			{
-				Door::OffsetDoor(m_editor_door->m_tileA, m_editor_door->m_tileB);
+				Door::OffsetDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB);
 			}
 			//add new door
 			else if (m_inputs_states[Action_Add1] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 0, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 0, 1, true);
 			}
 			else if (m_inputs_states[Action_Add2] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 4, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 4, 1, true);
 			}
 			else if (m_inputs_states[Action_Add3] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 8, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 8, 1, true);
 			}
 			else if (m_inputs_states[Action_Add4] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 12, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 12, 1, true);
 			}
 			else if (m_inputs_states[Action_Add5] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 16, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 16, 1, true);
 			}
 			else if (m_inputs_states[Action_Add6] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 24, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 24, 1, true);
 			}
 			else if (m_inputs_states[Action_Add7] == Input_Tap)
 			{
-				Door::AddDoor(m_editor_door->m_tileA, m_editor_door->m_tileB, 64, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 64, 1, true);
 			}
 		}
 	}
@@ -289,52 +287,52 @@ bool Ship::MoveEditor(PlayerActions action)
 	{
 		case Action_Left:
 		{
-			if (MinBetweenIntValues(m_editor_door->m_tileA.first, m_editor_door->m_tileB.first) == 0)
+			if (MinBetweenIntValues((*CurrentGame).m_editor_door->m_tileA.first, (*CurrentGame).m_editor_door->m_tileB.first) == 0)
 				return false;
 
-			m_editor_door->m_tileA.first--;
-			m_editor_door->m_tileB.first--;
+			(*CurrentGame).m_editor_door->m_tileA.first--;
+			(*CurrentGame).m_editor_door->m_tileB.first--;
 			break;
 		}
 		case Action_Right:
 		{
-			if (MaxBetweenIntValues(m_editor_door->m_tileA.first, m_editor_door->m_tileB.first) == NB_TILES_X - 1)
+			if (MaxBetweenIntValues((*CurrentGame).m_editor_door->m_tileA.first, (*CurrentGame).m_editor_door->m_tileB.first) == NB_TILES_X - 1)
 				return false;
 
-			m_editor_door->m_tileA.first++;
-			m_editor_door->m_tileB.first++;
+			(*CurrentGame).m_editor_door->m_tileA.first++;
+			(*CurrentGame).m_editor_door->m_tileB.first++;
 			break;
 		}
 		case Action_Up:
 		{
-			if (MaxBetweenIntValues(m_editor_door->m_tileA.second, m_editor_door->m_tileB.second) == NB_TILES_Y - 1)
+			if (MaxBetweenIntValues((*CurrentGame).m_editor_door->m_tileA.second, (*CurrentGame).m_editor_door->m_tileB.second) == NB_TILES_Y - 1)
 				return false;
 
-			m_editor_door->m_tileA.second++;
-			m_editor_door->m_tileB.second++;
+			(*CurrentGame).m_editor_door->m_tileA.second++;
+			(*CurrentGame).m_editor_door->m_tileB.second++;
 			break;
 		}
 		case Action_Down:
 		{
-			if (MinBetweenIntValues(m_editor_door->m_tileA.second, m_editor_door->m_tileB.second) == 0)
+			if (MinBetweenIntValues((*CurrentGame).m_editor_door->m_tileA.second, (*CurrentGame).m_editor_door->m_tileB.second) == 0)
 				return false;
 
-			m_editor_door->m_tileA.second--;
-			m_editor_door->m_tileB.second--;
+			(*CurrentGame).m_editor_door->m_tileA.second--;
+			(*CurrentGame).m_editor_door->m_tileB.second--;
 			break;
 		}
 		case Action_TurnEditor:
 		{
 			//horizontal connexion = vertical door
-			if (m_editor_door->m_tileA.second == m_editor_door->m_tileB.second)
+			if ((*CurrentGame).m_editor_door->m_tileA.second == (*CurrentGame).m_editor_door->m_tileB.second)
 			{
-				m_editor_door->m_tileB.first = m_editor_door->m_tileA.first;
-				m_editor_door->m_tileB.second = m_editor_door->m_tileA.second == NB_TILES_Y - 1 ? m_editor_door->m_tileA.second - 1 : m_editor_door->m_tileA.second + 1;
+				(*CurrentGame).m_editor_door->m_tileB.first = (*CurrentGame).m_editor_door->m_tileA.first;
+				(*CurrentGame).m_editor_door->m_tileB.second = (*CurrentGame).m_editor_door->m_tileA.second == NB_TILES_Y - 1 ? (*CurrentGame).m_editor_door->m_tileA.second - 1 : (*CurrentGame).m_editor_door->m_tileA.second + 1;
 			}
 			else
 			{
-				m_editor_door->m_tileB.second = m_editor_door->m_tileA.second;
-				m_editor_door->m_tileB.first = m_editor_door->m_tileA.first == NB_TILES_X - 1 ? m_editor_door->m_tileA.first - 1 : m_editor_door->m_tileA.first + 1;
+				(*CurrentGame).m_editor_door->m_tileB.second = (*CurrentGame).m_editor_door->m_tileA.second;
+				(*CurrentGame).m_editor_door->m_tileB.first = (*CurrentGame).m_editor_door->m_tileA.first == NB_TILES_X - 1 ? (*CurrentGame).m_editor_door->m_tileA.first - 1 : (*CurrentGame).m_editor_door->m_tileA.first + 1;
 			}
 
 			break;
@@ -342,15 +340,15 @@ bool Ship::MoveEditor(PlayerActions action)
 	}
 
 	//horizontal connexion = vertical door
-	if (m_editor_door->m_tileA.second == m_editor_door->m_tileB.second)
+	if ((*CurrentGame).m_editor_door->m_tileA.second == (*CurrentGame).m_editor_door->m_tileB.second)
 	{
-		m_editor_door->setPosition(START_X + (0.5 + (MinBetweenIntValues(m_editor_door->m_tileA.first, m_editor_door->m_tileB.first))) * TILE_SIZE, START_Y - (m_editor_door->m_tileB.second * TILE_SIZE));
-		m_editor_door->setRotation(90);
+		(*CurrentGame).m_editor_door->setPosition(START_X + (0.5 + (MinBetweenIntValues((*CurrentGame).m_editor_door->m_tileA.first, (*CurrentGame).m_editor_door->m_tileB.first))) * TILE_SIZE, START_Y - ((*CurrentGame).m_editor_door->m_tileB.second * TILE_SIZE));
+		(*CurrentGame).m_editor_door->setRotation(90);
 	}
 	else
 	{
-		m_editor_door->setPosition(START_X + (m_editor_door->m_tileA.first * TILE_SIZE), START_Y - (0.5 + (MinBetweenIntValues(m_editor_door->m_tileA.second, m_editor_door->m_tileB.second))) * TILE_SIZE);
-		m_editor_door->setRotation(0);
+		(*CurrentGame).m_editor_door->setPosition(START_X + ((*CurrentGame).m_editor_door->m_tileA.first * TILE_SIZE), START_Y - (0.5 + (MinBetweenIntValues((*CurrentGame).m_editor_door->m_tileA.second, (*CurrentGame).m_editor_door->m_tileB.second))) * TILE_SIZE);
+		(*CurrentGame).m_editor_door->setRotation(0);
 	}
 		
 	return true;

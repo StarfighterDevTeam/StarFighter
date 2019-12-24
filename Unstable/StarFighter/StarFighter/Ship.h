@@ -18,6 +18,7 @@ enum PlayerActions
 	Action_Pausing,
 	Action_Editor,
 	Action_TurnEditor,
+	Action_EDITOR_CHANGE_START,
 	Action_Erase,
 	Action_Offset,
 	Action_Add1,
@@ -28,6 +29,7 @@ enum PlayerActions
 	Action_Add6,
 	Action_Add7,
 	Action_Add8,
+	Action_EDITOR_CHANGE_END,
 	Action_Left,
 	Action_Right,
 	Action_Up,
@@ -85,7 +87,6 @@ public :
 	static bool IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB);
 	
 	bool m_editor_mode;
-	Door* m_editor_door;
 	float m_speed_max;
 	MoveState m_move_state;
 	

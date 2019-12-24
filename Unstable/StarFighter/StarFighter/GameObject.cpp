@@ -193,7 +193,8 @@ void GameObject::update(sf::Time deltaTime)
 
 void GameObject::Draw(RenderTarget& screen)
 {
-	screen.draw(*this);
+	if (m_visible == true)
+		screen.draw(*this);
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)

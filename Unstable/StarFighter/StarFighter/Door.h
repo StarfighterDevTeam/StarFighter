@@ -20,7 +20,7 @@ public:
 	void Draw(RenderTarget& screen) override;
 
 	static bool AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, bool erase_current_door);
-	static bool EraseDoor(pair<int, int> tileA, pair<int, int> tileB);
+	static void EraseDoor(pair<int, int> tileA, pair<int, int> tileB);
 	static bool OffsetDoor(pair<int, int> tileA, pair<int, int> tileB);
 
 	pair<int, int> m_tileA;

@@ -19,6 +19,7 @@
 #include "SFTextPop.h"
 
 class Ship;
+class Door;
 
 enum SFX_Bank
 {
@@ -78,7 +79,6 @@ public:
 	float m_vspeed;
 	sf::Vector2f m_scale_factor;
 
-	Ship* m_playerShip;
 	bool m_pause;
 	bool m_window_has_focus;
 
@@ -124,9 +124,15 @@ public:
 	vector<GameObject*> m_tmp_sceneGameObjects;
 
 	//Music Doors
-	void InitMap();
 	sf::Vector2f getTilePosition(pair<int, int> tile_coord);
+	
 	float m_time;
+
+	Ship* m_playerShip;
+	Door* m_editor_door;
+	vector<Door*> m_doors;
+	vector<GameObject*> m_tiles;
+	GameObject* m_exit;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

@@ -13,6 +13,7 @@ const char* GameObjectTypeValues[] =
 Game::Game(RenderWindow* window)
 {
 	m_playerShip = NULL;
+	m_exit = NULL;
 	m_pause = false;
 	m_window_has_focus = true;
 
@@ -55,24 +56,6 @@ Game::Game(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
-	
-	//Music Doors
-	InitMap();
-}
-
-void Game::InitMap()
-{
-	m_time = SONG_OFFSET;
-
-	for (int i = 0; i < NB_TILES_X; i++)
-		for (int j = 0; j < NB_TILES_Y; j++)
-		{
-			//GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(128, 128, 128, 255), sf::Vector2f(TILE_SIZE, TILE_SIZE), 2);
-			GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(TILE_SIZE, TILE_SIZE));
-			tile->m_tile_coord = { i, j };
-			tile->setPosition(START_X + (i * TILE_SIZE), START_Y - (j * TILE_SIZE));
-			addToScene(tile, TileLayer, BackgroundObject, false);
-		}
 }
 
 sf::Vector2f Game::getTilePosition(pair<int, int> tile_coord)
@@ -260,7 +243,6 @@ void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, Gam
 
 void Game::updateScene(Time deltaTime)
 {
-
 	m_time += deltaTime.asSeconds();
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
@@ -268,34 +250,20 @@ void Game::updateScene(Time deltaTime)
 	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
-	//Clean garbage
-	cleanGarbage();
+	//Update objects
+	GameObject* player = (GameObject*)m_playerShip;
+	player->update(deltaTime);
 
-	//Checking colisions
-	colisionChecksV2();
+	m_exit->update(deltaTime);
 
-	for (GameObject* object : m_sceneGameObjectsTyped[PlayerShip])
-		object->update(deltaTime);
-
-	for (GameObject* object : m_sceneGameObjectsTyped[DoorObject])
-		object->update(deltaTime);
-
-	for (GameObject* object : m_tmp_sceneGameObjects)
-		addToScene(object, object->m_layer, object->m_collider_type, false);
-	m_tmp_sceneGameObjects.clear();
-
-	//SFTextPop (text feedbacks)
-	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
-	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
+	for (Door* door : m_doors)
 	{
-		if (m_sceneFeedbackSFTexts[i] == NULL)
-			continue;
-
-		m_sceneFeedbackSFTexts[i]->update(deltaTime);
+		GameObject* object = (GameObject*)door;
+		object->update(deltaTime);
 	}
 
-	//Collect the dust
-	collectGarbage();
+	GameObject* editor_door = (GameObject*)m_editor_door;
+	editor_door->update(deltaTime);
 
 	//Update music transitions
 	ManageMusicTransitions(deltaTime);
@@ -308,50 +276,25 @@ void Game::drawScene()
 {
 	m_mainScreen.clear();
 
-	for (int i = 0; i < NBVAL_Layer; i++)
+	//Draw objects
+	for (GameObject* tile : m_tiles)
+		tile->Draw(m_mainScreen);
+
+	for (Door* door : m_doors)
 	{
-		if (i == FeedbacksLayer)
-		{
-			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				m_mainScreen.draw(*(*it));
-			}
-			for (std::list<Text*>::iterator it = this->m_sceneFeedbackTexts.begin(); it != this->m_sceneFeedbackTexts.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				m_mainScreen.draw(*(*it));
-			}
-			for (std::vector<SFText*>::iterator it = this->m_sceneFeedbackSFTexts.begin(); it != this->m_sceneFeedbackSFTexts.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				if ((*(*it)).m_visible)
-				{
-					m_mainScreen.draw(*(*it));
-				}
-			}
-		}
-		else
-		{
-			for (std::vector<GameObject*>::iterator it = this->m_sceneGameObjectsLayered[i].begin(); it != this->m_sceneGameObjectsLayered[i].end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				if ((*(*it)).m_visible)
-				{
-					((*it)->Draw(m_mainScreen));
-				}
-			}
-		}
+		GameObject* object = (GameObject*)door;
+		object->Draw(m_mainScreen);
 	}
 
+	GameObject* player = (GameObject*)m_playerShip;
+	player->Draw(m_mainScreen);
+
+	m_exit->Draw(m_mainScreen);
+
+	GameObject* editor_door = (GameObject*)m_editor_door;
+	editor_door->Draw(m_mainScreen);
+
+	//Render texture
 	m_mainScreen.display();
 	sf::Sprite temp(m_mainScreen.getTexture());
 	temp.scale(m_scale_factor.x, m_scale_factor.y);

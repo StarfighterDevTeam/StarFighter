@@ -140,24 +140,26 @@ bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, in
 		return false;
 
 	Door* door = new Door(tileA, tileB, frequency, value);
-	(*CurrentGame).addToScene(door, DoorLayer, DoorObject, true);
+	(*CurrentGame).m_doors.push_back(door);
 
 	return true;
 }
 
-bool Door::EraseDoor(pair<int, int> tileA, pair<int, int> tileB)
+void Door::EraseDoor(pair<int, int> tileA, pair<int, int> tileB)
 {
-	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+	vector<Door*> tmp_doors;
+	for (Door* door : (*CurrentGame).m_doors)
 	{
-		Door* door = (Door*)object;
 		if (door->m_tileA == tileA && door->m_tileB == tileB && door->m_visible == true)
-		{
-			door->m_visible = false;
-			return true;
-		}
+			delete door;
+		else
+			tmp_doors.push_back(door);
 	}
 
-	return false;
+	(*CurrentGame).m_doors.clear();
+
+	for (Door* door : tmp_doors)
+		(*CurrentGame).m_doors.push_back(door);
 }
 
 bool Door::OffsetDoor(pair<int, int> tileA, pair<int, int> tileB)
