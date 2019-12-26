@@ -200,7 +200,7 @@ void Ship::update(sf::Time deltaTime)
 				setPosition(destination_coord);
 				m_move_state = Move_Idle;
 
-				if (m_next_action == Action_Right || m_next_action == Action_Left || m_next_action == Action_Up || m_next_action == Action_Down)
+				if ((x != 1 && m_next_action == Action_Right) || (x != -1 && m_next_action == Action_Left) || (y != -1 && m_next_action == Action_Up) || (y != 1 && m_next_action == Action_Down))
 				{
 					Move(m_next_action);
 				}
@@ -460,7 +460,7 @@ void Ship::UpdateInputStates()
 		GetInputState(InputGuy::getDirections().x == 0 && InputGuy::getDirections().y > 0, Action_Down);
 
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::F4), Action_Editor);
-		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Add), Action_TurnEditor);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Add) || Keyboard::isKeyPressed(sf::Keyboard::I), Action_TurnEditor);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num1), Action_Add1);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num2), Action_Add2);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num3), Action_Add3);
@@ -469,8 +469,8 @@ void Ship::UpdateInputStates()
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num6), Action_Add6);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num7), Action_Add7);
 		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Num8), Action_Add8);
-		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Subtract), Action_Erase);
-		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Multiply), Action_Offset);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Subtract) || Keyboard::isKeyPressed(sf::Keyboard::P), Action_Erase);
+		GetInputState(Keyboard::isKeyPressed(sf::Keyboard::Multiply) || Keyboard::isKeyPressed(sf::Keyboard::O), Action_Offset);
 	}
 	else
 	{

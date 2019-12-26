@@ -164,9 +164,8 @@ void Door::EraseDoor(pair<int, int> tileA, pair<int, int> tileB)
 
 bool Door::OffsetDoor(pair<int, int> tileA, pair<int, int> tileB)
 {
-	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+	for (Door* door : (*CurrentGame).m_doors)
 	{
-		Door* door = (Door*)object;
 		if (door->m_tileA == tileA && door->m_tileB == tileB && door->m_visible == true)
 		{
 			door->m_offset++;
