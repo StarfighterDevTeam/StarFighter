@@ -89,7 +89,7 @@ public :
 	bool m_editor_mode;
 	float m_speed_max;
 	MoveState m_move_state;
-	
+	PlayerActions m_next_action;
 
 private:
 	bool m_moving;

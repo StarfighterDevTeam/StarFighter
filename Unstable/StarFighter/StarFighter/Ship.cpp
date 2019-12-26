@@ -16,6 +16,7 @@ void Ship::Init()
 
 	m_speed_max = TILE_SIZE * 4 * SONG_BPM / 60;
 	m_move_state = Move_Idle;
+	m_next_action = NBVAL_PlayerActions;
 	
 	m_layer = PlayerLayer;
 	m_collider_type = PlayerShip;
@@ -104,6 +105,17 @@ void Ship::update(sf::Time deltaTime)
 			else if (m_inputs_states[Action_Down] == Input_Tap)
 				Move(Action_Down);
 		}
+		else
+		{
+			if (m_inputs_states[Action_Left] == Input_Tap)
+				m_next_action = Action_Left;
+			else if (m_inputs_states[Action_Right] == Input_Tap)
+				m_next_action = Action_Right;
+			else if (m_inputs_states[Action_Up] == Input_Tap)
+				m_next_action = Action_Up;
+			else if (m_inputs_states[Action_Down] == Input_Tap)
+				m_next_action = Action_Down;
+		}
 	}
 	else//EDITOR MODE
 	{
@@ -187,6 +199,11 @@ void Ship::update(sf::Time deltaTime)
 			{
 				setPosition(destination_coord);
 				m_move_state = Move_Idle;
+
+				if (m_next_action == Action_Right || m_next_action == Action_Left || m_next_action == Action_Up || m_next_action == Action_Down)
+				{
+					Move(m_next_action);
+				}
 			}
 		}
 		else
@@ -228,6 +245,8 @@ bool Ship::IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB)
 
 bool Ship::Move(PlayerActions action)
 {
+	m_next_action = NBVAL_PlayerActions;
+
 	switch (action)
 	{
 		case Action_Left:
