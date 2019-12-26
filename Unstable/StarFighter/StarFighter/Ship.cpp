@@ -232,10 +232,8 @@ void Ship::update(sf::Time deltaTime)
 
 bool Ship::IsMovementPossible(pair<int, int> tileA, pair<int, int> tileB)
 {
-	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[DoorObject])
+	for (Door* door : (*CurrentGame).m_doors)
 	{
-		Door* door = (Door*)object;
-
 		if (door->m_visible == true && door->m_frequency == 0 && ((door->m_tileA == tileA && door->m_tileB == tileB) || (door->m_tileA == tileB && door->m_tileB == tileA)))
 			return false;
 	}

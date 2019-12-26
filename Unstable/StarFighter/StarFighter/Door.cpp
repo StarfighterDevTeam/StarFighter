@@ -23,7 +23,7 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 		}
 		case 0:
 		{
-			m_color = sf::Color::Black;
+			m_color = sf::Color(200, 200, 200, 255);
 			break;
 		}
 		case 1:
