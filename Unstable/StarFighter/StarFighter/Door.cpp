@@ -96,9 +96,14 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	}
 }
 
+float Door::GetDoorSize()
+{
+	return Lerp(m_open_ratio, 0, 1, TILE_SIZE * 0.5, DOOR_SIZE_MIN);
+}
+
 void Door::UpdateDoorsPosition()
 {
-	float door_size = Lerp(m_open_ratio, 0, 1, TILE_SIZE * 0.5, DOOR_SIZE_MIN);
+	float door_size = GetDoorSize();
 
 	//horizontal connexion = vertical door
 	if (m_tileA.second == m_tileB.second)

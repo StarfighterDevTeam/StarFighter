@@ -45,6 +45,8 @@ bool Gameloop::LoadMap(string map_filename)
 		//Clear current map
 		ClearMap();
 
+		m_current_map_filename = map_filename;
+
 		//BPM
 		(*CurrentGame).m_time = SONG_OFFSET;
 
@@ -103,6 +105,8 @@ bool Gameloop::LoadMap(string map_filename)
 			}
 		}
 
+		(*CurrentGame).PlayMusic(Music_Main);
+
 		data.close();  // on ferme le fichier
 
 		return true;
@@ -153,6 +157,32 @@ void Gameloop::Update(sf::Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//UpdateCamera(deltaTime);
+
+	//Collision of player with doors
+	for (Door* door : (*CurrentGame).m_doors)
+	{
+		if (GetVectorLengthSquared(sf::Vector2f((*CurrentGame).m_playerShip->getPosition() - door->getPosition())) < (PLAYER_SIZE * 0.5 + DOOR_WIDTH * 0.5) * (PLAYER_SIZE * 0.5 + DOOR_WIDTH * 0.5))
+		{
+			float door_size = door->GetDoorSize();
+			int vertical_door = (int)(door->getRotation() > 0);
+			int horizontal_door = (int)!vertical_door;
+
+			float x1 = door->m_door_UL.getGlobalBounds().left + door->m_door_UL.getOutlineThickness();
+			float x2 = door->m_door_UL.getGlobalBounds().left + door->m_door_UL.getOutlineThickness() + 1.f * horizontal_door * door_size + 1.f * vertical_door * DOOR_WIDTH;
+			float y1 = door->m_door_UL.getGlobalBounds().top + door->m_door_UL.getOutlineThickness();
+			float y2 = door->m_door_UL.getGlobalBounds().top + door->m_door_UL.getOutlineThickness() + 1.f * horizontal_door * DOOR_WIDTH + 1.f * vertical_door * door_size;
+
+			if (GetVectorLengthSquared(sf::Vector2f((*CurrentGame).m_playerShip->getPosition() - sf::Vector2f(x1, y1))) <= PLAYER_SIZE * 0.5 * PLAYER_SIZE * 0.5
+				|| GetVectorLengthSquared(sf::Vector2f((*CurrentGame).m_playerShip->getPosition() - sf::Vector2f(x2, y1))) <= PLAYER_SIZE * 0.5 * PLAYER_SIZE * 0.5
+				|| GetVectorLengthSquared(sf::Vector2f((*CurrentGame).m_playerShip->getPosition() - sf::Vector2f(x2, y1))) <= PLAYER_SIZE * 0.5 * PLAYER_SIZE * 0.5
+				|| GetVectorLengthSquared(sf::Vector2f((*CurrentGame).m_playerShip->getPosition() - sf::Vector2f(x2, y2))) <= PLAYER_SIZE * 0.5 * PLAYER_SIZE * 0.5)
+			{
+				//Death
+				LoadMap(m_current_map_filename);
+				break;
+			}
+		}
+	}
 
 	//Load next level
 	sf::Vector2f finish_vector = (*CurrentGame).m_playerShip->getPosition() - (*CurrentGame).m_exit->getPosition();

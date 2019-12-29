@@ -22,6 +22,7 @@ public:
 	static bool AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, bool erase_current_door);
 	static void EraseDoor(pair<int, int> tileA, pair<int, int> tileB);
 	static bool OffsetDoor(pair<int, int> tileA, pair<int, int> tileB);
+	float GetDoorSize();
 
 	pair<int, int> m_tileA;
 	pair<int, int> m_tileB;
