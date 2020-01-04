@@ -17,7 +17,7 @@ Gameloop::Gameloop()
 		printf("Level loading failed\n");
 
 	//Editor mode init
-	(*CurrentGame).m_editor_door = new Door(pair<int, int>(0, 0), pair<int, int>(0, 1), -1, 1);
+	(*CurrentGame).m_editor_door = new Door(pair<int, int>(0, 0), pair<int, int>(0, 1), -1, 1, 0);
 }
 
 void Gameloop::ClearMap()
@@ -45,10 +45,17 @@ bool Gameloop::LoadMap(string map_filename)
 		//Clear current map
 		ClearMap();
 
-		m_current_map_filename = map_filename;
+		//Time offset to match the music
+		//float song_offset = fmod(((*CurrentGame).m_time + SONG_OFFSET), (60 / SONG_BPM));
+		float song_offset = SONG_OFFSET;
+		song_offset -= (*CurrentGame).m_time;
 
-		//BPM
-		(*CurrentGame).m_time = SONG_OFFSET;
+		while (song_offset > 60.f / SONG_BPM)
+			song_offset -= 60.f / SONG_BPM;
+		while (song_offset < 0)
+			song_offset += 60.f / SONG_BPM;
+
+		(*CurrentGame).m_time = song_offset;
 
 		//Tiles
 		for (int i = 0; i < NB_TILES_X; i++)
@@ -101,12 +108,13 @@ bool Gameloop::LoadMap(string map_filename)
 				int value;
 				ss >> tileA.first >> tileA.second >> tileB.first >> tileB.second >> frequency >> value;
 
-				Door::AddDoor(tileA, tileB, frequency, value, false);
+				Door::AddDoor(tileA, tileB, frequency, value, false, song_offset);
 			}
 		}
-
-		(*CurrentGame).PlayMusic(Music_Main);
-
+		
+		//Reset map infos
+		m_current_map_filename = map_filename;
+		
 		data.close();  // on ferme le fichier
 
 		return true;

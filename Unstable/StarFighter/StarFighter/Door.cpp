@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset)
+Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, float song_offset)
 {
 	m_tileA = tileA;
 	m_tileB = tileB;
@@ -11,7 +11,7 @@ Door::Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset
 	m_open_ratio = 0;
 
 	m_cooldown = 4.f / SONG_BPM * 60;
-	m_cooldown_current = m_cooldown + (m_cooldown / (frequency / 4.f) * (m_offset - 1)) + SONG_OFFSET;   // 0.5f * (m_offset - 1) * m_cooldown + m_cooldown + SONG_OFFSET;
+	m_cooldown_current = m_cooldown + (m_cooldown / (frequency / 4.f) * (m_offset - 1)) + song_offset;   // 0.5f * (m_offset - 1) * m_cooldown + m_cooldown + SONG_OFFSET;
 	m_door_state = Door_Close;
 
 	switch (frequency)
@@ -136,7 +136,7 @@ Door::~Door()
 	//delete m_door_DR;
 }
 
-bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value, bool erase_current_door)
+bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int value, bool erase_current_door, float song_offset)
 {
 	if (erase_current_door == true)
 		EraseDoor(tileA, tileB);
@@ -144,7 +144,7 @@ bool Door::AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, in
 	if (tileA.first > NB_TILES_X || tileB.first > NB_TILES_X || tileA.second > NB_TILES_Y || tileB.second > NB_TILES_Y)
 		return false;
 
-	Door* door = new Door(tileA, tileB, frequency, value);
+	Door* door = new Door(tileA, tileB, frequency, value, song_offset);
 	(*CurrentGame).m_doors.push_back(door);
 
 	return true;

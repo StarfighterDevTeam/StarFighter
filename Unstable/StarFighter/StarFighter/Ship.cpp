@@ -144,31 +144,31 @@ void Ship::update(sf::Time deltaTime)
 			//add new door
 			else if (m_inputs_states[Action_Add1] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 0, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 0, 1, true, 0);
 			}
 			else if (m_inputs_states[Action_Add2] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 4, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 4, 1, true, 0);
 			}
 			else if (m_inputs_states[Action_Add3] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 8, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 8, 1, true, 0);
 			}
 			else if (m_inputs_states[Action_Add4] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 12, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 12, 1, true, 0);
 			}
 			else if (m_inputs_states[Action_Add5] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 16, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 16, 1, true, 0);
 			}
 			else if (m_inputs_states[Action_Add6] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 24, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 24, 1, true, 0);
 			}
 			else if (m_inputs_states[Action_Add7] == Input_Tap)
 			{
-				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 64, 1, true);
+				Door::AddDoor((*CurrentGame).m_editor_door->m_tileA, (*CurrentGame).m_editor_door->m_tileB, 64, 1, true, 0);
 			}
 		}
 	}

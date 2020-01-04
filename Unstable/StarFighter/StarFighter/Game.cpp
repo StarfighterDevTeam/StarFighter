@@ -56,6 +56,8 @@ Game::Game(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
+
+	m_time = 0;
 }
 
 sf::Vector2f Game::getTilePosition(pair<int, int> tile_coord)

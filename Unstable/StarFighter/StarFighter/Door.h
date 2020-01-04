@@ -14,12 +14,12 @@ enum DoorState
 class Door : public GameObject
 {
 public:
-	Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset);
+	Door(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, float song_offset);
 	~Door();
 	void update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 
-	static bool AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, bool erase_current_door);
+	static bool AddDoor(pair<int, int> tileA, pair<int, int> tileB, int frequency, int offset, bool erase_current_door, float song_offset);
 	static void EraseDoor(pair<int, int> tileA, pair<int, int> tileB);
 	static bool OffsetDoor(pair<int, int> tileA, pair<int, int> tileB);
 	float GetDoorSize();
