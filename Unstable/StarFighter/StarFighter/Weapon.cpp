@@ -41,7 +41,6 @@ Weapon::~Weapon()
 void Weapon::Fire()
 {
 	Ballistic* shot = new Ballistic(this, m_ballistic_type, m_position, m_owner->m_alliance, m_heading, m_range, m_collision_domain, m_locked_target);
-	(*CurrentGame).m_L16_entities.push_back(shot);
 	(*CurrentGame).AddCircleObject(shot);
 
 	m_rate_of_fire_timer = m_rate_of_fire;

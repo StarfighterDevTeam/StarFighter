@@ -37,7 +37,6 @@ public :
 	ControlerType m_controllerType;
 
 	void SetControllerType(ControlerType contoller);
-	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 
 	static int Ship::SaveShip(Ship* ship);
 	static bool Ship::LoadShip(Ship* ship);

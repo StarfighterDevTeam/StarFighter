@@ -109,22 +109,10 @@ public:
 	Game(RenderWindow* window);
 	~Game();
 	RenderWindow* getMainWindow();
-	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
-	void addToFeedbacks(RectangleShape* feedback);
-	void addToFeedbacks(Text* text);
-	void addToFeedbacks(SFText* text);
-	void addToFeedbacks(SFPanel* panel);
-	void removeFromFeedbacks(RectangleShape* feedback);
-	void removeFromFeedbacks(Text* text);
-	void removeFromFeedbacks(SFPanel* panel);
-	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
-	void changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
 	void CheckCollisions();
-	void cleanGarbage();
-	void collectGarbage();
 
 	sf::RenderTexture m_mainScreen;
 	sf::Vector2i m_screen_size;
@@ -147,11 +135,6 @@ public:
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;
-
-	//Utiliary methods
-	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
-	GameObject* GetClosestObjectTyped(const sf::Vector2f position, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
-	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	//Fonts
 	sf::Font* m_font[NBVAL_FontsStyle];
@@ -181,6 +164,8 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//Liaison 16
+	GameObject* m_background;
+
 	void AddCircleObject(CircleObject* object);
 	void AddLineObject(LineObject* object);
 
@@ -212,25 +197,7 @@ public:
 	int m_shots_fired;
 
 private:
-	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
-	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);
-	void TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer);
-	void TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collider_type);
-	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
-	bool isVectorEmpty(vector <GameObject*>* vector);
-
 	RenderWindow* m_window;
-	std::list<RectangleShape*> m_sceneFeedbackBars;
-	std::list<Text*> m_sceneFeedbackTexts;
-	std::list<SFPanel*> m_sceneFeedbackSFPanels;
-	std::vector<SFText*> m_sceneFeedbackSFTexts;
-	std::vector<GameObject*> m_sceneGameObjects;
-	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
-	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
-	std::vector<GameObject*> m_sceneGameObjectsLayeredTemp[NBVAL_Layer];
-	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
-	std::vector<GameObject*> m_garbage;
-	std::vector<SFText*> m_garbageTexts;
 };
 
 #endif // GAME_H_INCLUDED

@@ -21,8 +21,6 @@ public:
 	void Draw();
 	void UpdateCamera(sf::Time deltaTime);
 
-	GameObject* m_background;
-
 	//Liaison16
 	Node* CreateNode(sf::Vector2f position, AllianceType alliance);
 	Terminal* CreateTerminal(sf::Vector2f position, AllianceType alliance);

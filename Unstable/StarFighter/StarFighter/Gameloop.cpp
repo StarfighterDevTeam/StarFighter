@@ -4,14 +4,9 @@ extern Game* CurrentGame;
 
 Gameloop::Gameloop()
 {
-	//background
-	m_background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(1920, 1080));
-	(*CurrentGame).addToScene(m_background, BackgroundLayer, BackgroundObject);
-	(*CurrentGame).m_map_size = m_background->m_size;
-
 	//ship
 	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color::White , sf::Vector2f(64, 64));
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	//(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
 
 	//init scenario
@@ -20,7 +15,7 @@ Gameloop::Gameloop()
 
 Gameloop::~Gameloop()
 {
-	delete m_background;
+	
 }
 
 void Gameloop::Update(sf::Time deltaTime)
@@ -93,17 +88,17 @@ void Gameloop::Update(sf::Time deltaTime)
 void Gameloop::ResetGame()
 {
 	//clean previous scenario
-	for (L16Entity* entity : (*CurrentGame).m_L16_entities)
-		delete entity;
+	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
+		for (int j = 0; j < NB_CIRCLE_TYPES; j++)
+		{
+			for (CircleObject* object : (*CurrentGame).m_sceneCircleObjects[i][j])
+				delete object;
+
+			(*CurrentGame).m_sceneCircleObjects[i][j].clear();
+		}
+
 	(*CurrentGame).m_L16_entities.clear();
-
-	for (Wave* wave : (*CurrentGame).m_waves)
-		delete wave;
 	(*CurrentGame).m_waves.clear();
-
-	for (Link* link : (*CurrentGame).m_links)
-		delete link;
-	(*CurrentGame).m_links.clear();
 
 	//entities
 	m_wing = CreateWing(sf::Vector2f(500, 400), PlayerAlliance, 0);
@@ -111,17 +106,17 @@ void Gameloop::ResetGame()
 
 	m_finish = CreateTerminal(sf::Vector2f(1920 - 100, 200), PlayerAlliance);
 
-	//CreateTerminal(sf::Vector2f(1920 - 700, 700), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 700, 400), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 700, 200), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 700, 900), EnemyAlliance);
-	//
-	//CreateTerminal(sf::Vector2f(1920 - 400, 0), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 400, 200), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 400, 400), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 400, 700), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 400, 900), EnemyAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 400, 1100), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 700, 700), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 700, 400), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 700, 200), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 700, 900), EnemyAlliance);
+	
+	CreateTerminal(sf::Vector2f(1920 - 400, 0), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 400, 200), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 400, 400), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 400, 700), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 400, 900), EnemyAlliance);
+	CreateTerminal(sf::Vector2f(1920 - 400, 1100), EnemyAlliance);
 
 	//AI metrics
 	(*CurrentGame).m_clock = 0;
@@ -157,7 +152,6 @@ Node* Gameloop::CreateNode(sf::Vector2f position, AllianceType alliance)
 {
 	Node* node = new Node(position, alliance);
 	(*CurrentGame).AddCircleObject(node);
-	(*CurrentGame).m_L16_entities.push_back(node);
 
 	return node;
 }
@@ -166,7 +160,6 @@ Terminal* Gameloop::CreateTerminal(sf::Vector2f position, AllianceType alliance)
 {
 	Terminal* terminal = new Terminal(position, alliance);
 	(*CurrentGame).AddCircleObject(terminal);
-	(*CurrentGame).m_L16_entities.push_back(terminal);
 
 	return terminal;
 }
@@ -187,7 +180,6 @@ Wing* Gameloop::CreateWing(sf::Vector2f position, AllianceType alliance, float h
 {
 	Wing* wing = new Wing(position, alliance, heading);
 	(*CurrentGame).AddCircleObject(wing);
-	(*CurrentGame).m_L16_entities.push_back(wing);
 	
 	return wing;
 }
