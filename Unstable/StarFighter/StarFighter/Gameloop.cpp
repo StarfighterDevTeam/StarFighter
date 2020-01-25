@@ -80,7 +80,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 	else if (GetDistanceBetweenPositions(m_wing->getPosition(), m_finish->getPosition()) < m_finish->getRadius())
 	{
-		printf("WIN");
+		printf("WIN (SCORE: %d): shots: %d, time: %d\n", (int)(*CurrentGame).m_clock + (*CurrentGame).m_shots_fired, (*CurrentGame).m_shots_fired, (int)(*CurrentGame).m_clock);
 		ResetGame();
 	}
 }
