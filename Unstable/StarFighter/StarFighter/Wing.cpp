@@ -163,6 +163,10 @@ void Wing::Fire()
 		if ((*it)->IsReadyToFire() == true)
 		{
 			(*it)->Fire();
+
+			//AI metrics
+			if (m_alliance == PlayerAlliance)
+				(*CurrentGame).m_shots_fired++;
 		}
 	}
 }

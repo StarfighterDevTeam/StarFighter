@@ -309,7 +309,7 @@ void Game::updateScene(Time deltaTime)
 	cleanGarbage();
 
 	//Checking colisions
-	collision_checks();
+	CheckCollisions();
 
 	//Update inputs
 	UpdateInputStates();
@@ -535,9 +535,9 @@ void Game::drawScene()
 }
 
 
-void Game::collision_checks()
+void Game::CheckCollisions()
 {
-	//Wave collisions
+	//Wave collisions with everything else
 	for (int i = 0; i < NB_ALLIANCE_TYPES; i++)
 	{
 		for (int j = 0; j < NB_ALLIANCE_TYPES; j++)

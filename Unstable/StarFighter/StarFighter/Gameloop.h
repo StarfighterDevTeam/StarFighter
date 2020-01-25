@@ -30,6 +30,11 @@ public:
 	Wing* CreateWing(sf::Vector2f position, AllianceType alliance, float heading);
 	L16Entity* GetRectangularSelection();
 
+	Wing* m_wing;
+	Terminal* m_finish;
+
+	void ResetGame();
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

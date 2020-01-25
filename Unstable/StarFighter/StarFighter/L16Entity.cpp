@@ -46,7 +46,7 @@ void L16Entity::update(sf::Time deltaTime)
 	}
 
 	//hovering & selection
-	if (m_alliance == PlayerAlliance && ((*CurrentGame).m_display_rectangular_selection == true || (*CurrentGame).m_released_rectangular_selection == true))
+	/*if (m_alliance == PlayerAlliance && ((*CurrentGame).m_display_rectangular_selection == true || (*CurrentGame).m_released_rectangular_selection == true))
 	{
 		//is inside rectangular selection?
 		float xL = (*CurrentGame).m_rectangular_selection.getSize().x >= 0 ? (*CurrentGame).m_rectangular_selection.getPosition().x : (*CurrentGame).m_rectangular_selection.getPosition().x + (*CurrentGame).m_rectangular_selection.getSize().x;
@@ -92,6 +92,7 @@ void L16Entity::update(sf::Time deltaTime)
 			}
 		}
 	}
+	*/
 	
 	ResetColor();
 	if (m_selected == true)

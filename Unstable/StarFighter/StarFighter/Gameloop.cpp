@@ -14,26 +14,8 @@ Gameloop::Gameloop()
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 	(*CurrentGame).m_playerShip->setColor(sf::Color(255, 255, 255, 0));
 
-	//node
-	Terminal* t = CreateTerminal(sf::Vector2f(300, 440), PlayerAlliance);
-	Wing* w = CreateWing(sf::Vector2f(500, 400), PlayerAlliance, 0);
-	//Wing* w2 = CreateWing(sf::Vector2f(600, 300), PlayerAlliance, 0);
-
-
-	//Node* node_a = CreateNode(sf::Vector2f(450, 540), PlayerAlliance);
-	//Node* node_b = CreateNode(sf::Vector2f(650, 340), PlayerAlliance);
-	//CreateTerminal(sf::Vector2f(1920 - 600, 540), PlayerAlliance);
-
-	//CreateNode(sf::Vector2f(1920 - 380, 650), EnemyAlliance);
-	//CreateNode(sf::Vector2f(1920 - 300, 635), EnemyAlliance);
-	//CreateNode(sf::Vector2f(1920 - 220, 610), EnemyAlliance);
-	//CreateNode(sf::Vector2f(1920 - 250, 710), EnemyAlliance);
-
-	Terminal* t2 = CreateTerminal(sf::Vector2f(1920 - 700, 800), EnemyAlliance);
-	CreateWing(sf::Vector2f(1000, 300), EnemyAlliance, 180);
-	CreateNode(sf::Vector2f(1920 - 1000, 800), PlayerAlliance);
-
-	//CreateLink(node_a, node_b);
+	//init scenario
+	ResetGame();
 }
 
 Gameloop::~Gameloop()
@@ -43,6 +25,9 @@ Gameloop::~Gameloop()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
+	//AI metrics - clock
+	(*CurrentGame).m_clock += deltaTime.asSeconds();
+
 	//Get mouse & keyboard inputs
 	(*CurrentGame).m_hovered_entities.clear();
 	(*CurrentGame).GetMouseInputs(deltaTime);
@@ -91,6 +76,56 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//Scroll camera
 	UpdateCamera(deltaTime);
+
+	//L16 AI : win/lose conditions
+	if (m_wing->m_visible == true)
+	{
+		printf("GAME OVER\n");
+		ResetGame();
+	}
+	else if (GetDistanceBetweenPositions(m_wing->getPosition(), m_finish->getPosition()) < m_finish->getRadius())
+	{
+		printf("WIN");
+		ResetGame();
+	}
+}
+
+void Gameloop::ResetGame()
+{
+	//clean previous scenario
+	for (L16Entity* entity : (*CurrentGame).m_L16_entities)
+		delete entity;
+	(*CurrentGame).m_L16_entities.clear();
+
+	for (Wave* wave : (*CurrentGame).m_waves)
+		delete wave;
+	(*CurrentGame).m_waves.clear();
+
+	for (Link* link : (*CurrentGame).m_links)
+		delete link;
+	(*CurrentGame).m_links.clear();
+
+	//entities
+	m_wing = CreateWing(sf::Vector2f(500, 400), PlayerAlliance, 0);
+	m_wing->m_selected = true;
+
+	m_finish = CreateTerminal(sf::Vector2f(1920 - 100, 200), PlayerAlliance);
+
+	//CreateTerminal(sf::Vector2f(1920 - 700, 700), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 700, 400), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 700, 200), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 700, 900), EnemyAlliance);
+	//
+	//CreateTerminal(sf::Vector2f(1920 - 400, 0), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 400, 200), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 400, 400), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 400, 700), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 400, 900), EnemyAlliance);
+	//CreateTerminal(sf::Vector2f(1920 - 400, 1100), EnemyAlliance);
+
+	//AI metrics
+	(*CurrentGame).m_clock = 0;
+	(*CurrentGame).m_shots_fired = 0;
 }
 
 void Gameloop::Draw()

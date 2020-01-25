@@ -122,7 +122,7 @@ public:
 
 	void updateScene(Time deltaTime);
 	void drawScene();
-	void collision_checks();
+	void CheckCollisions();
 	void cleanGarbage();
 	void collectGarbage();
 
@@ -206,6 +206,10 @@ public:
 	vector<CircleObject*> m_sceneCircleObjects[NB_ALLIANCE_TYPES][NB_CIRCLE_TYPES];
 	vector<CircleObject*> m_new_sceneCircleObjects;
 	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
+
+	//AI metrics
+	float m_clock;
+	int m_shots_fired;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

@@ -67,7 +67,7 @@ void Weapon::update(sf::Time deltaTime)
 	}
 
 	//locking target
-	if (m_locked_target == NULL)
+	/*if (m_locked_target == NULL)
 	{
 		AllianceType alliance = m_owner->m_alliance == PlayerAlliance ? EnemyAlliance : PlayerAlliance;
 
@@ -101,6 +101,7 @@ void Weapon::update(sf::Time deltaTime)
 			m_locking_target_clock = 0;
 		}
 	}
+	*/
 }
 
 bool Weapon::IsReadyToFire()
