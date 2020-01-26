@@ -71,6 +71,10 @@ Game::Game(RenderWindow* window)
 	m_rectangular_selection.setOutlineColor(sf::Color::White);
 	m_rectangular_selection.setOutlineThickness(-1);
 	m_rectangular_selection.setFillColor(sf::Color(0, 0, 0, 0));
+
+	//AI commands
+	m_AI_direction_x = 0.5;
+	m_AI_fire = 0;
 }
 
 Game::~Game()
@@ -274,6 +278,11 @@ void Game::updateScene(Time deltaTime)
 	{
 		object->update(deltaTime);
 		m_sceneCircleObjects[object->m_alliance][object->m_circle_type].push_back(object);
+
+		if (object->m_circle_type == Circle_Wave || object->m_circle_type == Circle_WaveBounce)
+			m_waves.push_back((Wave*)object);
+		else
+			m_L16_entities.push_back((L16Entity*)object);
 	}
 
 	for (CircleObject* object : m_new_sceneCircleObjects)

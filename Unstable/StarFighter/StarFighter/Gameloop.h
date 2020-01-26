@@ -6,10 +6,7 @@
 #include <sstream>
 #include "Game.h"
 #include "FileLoadUtils.h"
-#include "Ship.h"
-#include "Node.h"
-#include "Terminal.h"
-#include "Link.h"
+#include "Chromosome.h"
 
 class Gameloop
 {
@@ -30,6 +27,7 @@ public:
 
 	Wing* m_wing;
 	Terminal* m_finish;
+	Chromosome m_chromosome;
 
 	void ResetGame();
 

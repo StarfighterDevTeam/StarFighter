@@ -23,6 +23,10 @@ void Gameloop::Update(sf::Time deltaTime)
 	//AI metrics - clock
 	(*CurrentGame).m_clock += deltaTime.asSeconds();
 
+	//AI - update input data
+	m_chromosome.UpdateDNA(m_wing, m_finish);
+	m_chromosome.MagicFunction((*CurrentGame).m_AI_direction_x, (*CurrentGame).m_AI_fire);
+
 	//Get mouse & keyboard inputs
 	(*CurrentGame).m_hovered_entities.clear();
 	(*CurrentGame).GetMouseInputs(deltaTime);
@@ -102,7 +106,7 @@ void Gameloop::ResetGame()
 
 	//entities
 	m_wing = CreateWing(sf::Vector2f(500, 400), PlayerAlliance, 0);
-	m_wing->m_selected = true;
+	//m_wing->m_selected = true;
 
 	m_finish = CreateTerminal(sf::Vector2f(1920 - 100, 200), PlayerAlliance);
 

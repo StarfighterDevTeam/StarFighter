@@ -47,7 +47,7 @@ void CircleObject::Draw(RenderTarget& screen)
 {
 	//see override function in class Wave
 	screen.draw(*this);
-}
+ }
 
 bool CircleObject::IsColliding(Wave* wave, float direction)
 {

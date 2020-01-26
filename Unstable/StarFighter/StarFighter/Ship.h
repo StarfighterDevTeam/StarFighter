@@ -2,10 +2,9 @@
 #define SHIP_H_INCLUDED
 
 #include "Globals.h"
-#include "GameObject.h"
 #include "InputGuy.h"
-#include "Game.h"
 #include "SFTextPop.h"
+#include "Terminal.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540

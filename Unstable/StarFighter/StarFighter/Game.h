@@ -192,6 +192,10 @@ public:
 	vector<CircleObject*> m_new_sceneCircleObjects;
 	vector<LineObject*> m_sceneLineObjects[NB_ALLIANCE_TYPES];
 
+	//AI commands
+	float m_AI_direction_x;
+	float m_AI_fire;
+
 	//AI metrics
 	float m_clock;
 	int m_shots_fired;

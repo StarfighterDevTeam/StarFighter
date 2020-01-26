@@ -2,7 +2,6 @@
 #define LINK_H_INCLUDED
 
 #include "LineObject.h"
-#include "Game.h"
 #include "Node.h"
 
 class Link : public LineObject

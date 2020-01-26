@@ -83,7 +83,12 @@ void Wing::update(sf::Time deltaTime)
 		if (m_mission == L16Mission_Idle)
 		{
 			//circle patrol
-			inputs_direction.x = 1;
+			//inputs_direction.x = 1;
+
+			//AI commands
+			inputs_direction.x = ((*CurrentGame).m_AI_direction_x * 2) - 1;
+			if ((*CurrentGame).m_AI_fire == 1)
+				Fire();
 		}
 	}
 
