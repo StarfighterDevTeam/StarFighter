@@ -1,9 +1,7 @@
 #ifndef BOID_H_INCLUDED
 #define BOID_H_INCLUDED
 
-#include "Globals.h"
-#include "Game.h"
-#include "GameObject.h"
+#include "Plancton.h"
 
 struct Threat
 {
@@ -22,12 +20,11 @@ enum BoidState
 	NB_BOID_STATES,
 };
 
-
-class Boid : public GameObject
+class Boid : public LivingThing
 {
 public :
 	Boid();
-	Boid(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Boid(sf::Vector2f position);
 	void Init();
 
 	virtual ~Boid();
@@ -45,9 +42,10 @@ public :
 	sf::Vector2f GetAverageSpeed();
 	sf::Vector2f Separate();
 
+	vector<Threat*> m_threats;
+
 	sf::Vector2f Flee(sf::Vector2f threat_pos);
 	float FleeByAngle(sf::Vector2f threat_pos);
-	vector<Threat> m_threats;
 	void UpdateThreats();
 
 	void EggLaying();

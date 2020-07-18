@@ -70,6 +70,9 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define BOID_OSCILLATION_FREQUENCY			0.04f
 #define BOID_OSCILLATION_AMPLITUDE			30.f
 
+//PLANCTONS
+#define PLANCTON_SCALE					0.25f
+
 //PREDATORS
 #define PREDATOR_MIN_CHANGE_DIR_TIME		5.f
 #define PREDATOR_MAX_CHANGE_DIR_TIME		15.f

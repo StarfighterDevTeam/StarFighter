@@ -31,6 +31,7 @@ public:
 	static bool isPausing();
 	static bool isSpawningBoid();
 	static bool isSpawningPredator();
+	static bool isSpawningPlancton();
 	static bool isFleeing();
 };
 

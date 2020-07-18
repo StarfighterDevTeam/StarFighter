@@ -9,13 +9,17 @@ Boid::Boid()
 	Boid::Init();
 }
 
-Boid::Boid(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
+Boid::Boid(sf::Vector2f position)
 {
+	GameObject::Init(position, sf::Vector2f(0, 0), "2D/boid.png", sf::Vector2f(32, 32));
 	Boid::Init();
 }
 
 void Boid::Init()
 {
+	m_layer = BoidLayer;
+	m_collider_type = BoidObject;
+
 	m_state = Boid_Swimming_Solo;
 	m_growth = 100;
 
@@ -40,7 +44,8 @@ void Boid::Init()
 
 Boid::~Boid()
 {
-	m_boid_neighbours.clear();
+	for (Threat* threat : m_threats)
+		delete threat;
 }
 
 void Boid::update(sf::Time deltaTime)
@@ -84,10 +89,10 @@ void Boid::update(sf::Time deltaTime)
 			float flee_angle = 0;
 			if (!m_threats.empty() && IsGrown())//babies don't know how to flee threats
 			{
-				for (Threat threat : m_threats)
+				for (Threat* threat : m_threats)
 				{
 					//Flee all possible threats at the same time
-					flee_vector += Flee(threat.m_pos);
+					flee_vector += Flee(threat->m_pos);
 					//flee_angle += FleeByAngle(threat.m_pos);
 				}
 
@@ -269,12 +274,12 @@ void Boid::ClearBoidNeighbours()
 void Boid::AddToBoidThreats(GameObject* predator)
 {
 	bool found = false;
-	for (Threat threat : m_threats)
+	for (Threat* threat : m_threats)
 	{
 		//threat already known? then simply refresh the clock
-		if (threat.m_object == predator)
+		if (threat->m_object == predator)
 		{
-			threat.m_clock.restart();
+			threat->m_clock.restart();
 			found = true;
 			continue;
 		}
@@ -282,10 +287,10 @@ void Boid::AddToBoidThreats(GameObject* predator)
 	//new threat identified
 	if (!found)
 	{
-		Threat new_threat;
-		new_threat.m_object = predator;
-		new_threat.m_pos = predator->getPosition();
-		new_threat.m_angle = predator->getRotation();
+		Threat* new_threat = new Threat();
+		new_threat->m_object = predator;
+		new_threat->m_pos = predator->getPosition();
+		new_threat->m_angle = predator->getRotation();
 
 		m_threats.push_back(new_threat);
 	}
@@ -293,12 +298,12 @@ void Boid::AddToBoidThreats(GameObject* predator)
 
 void Boid::AddToBoidThreats(sf::Vector2f pos)
 {
-	Threat new_threat;
-	new_threat.m_object = NULL;
-	new_threat.m_pos = pos;
+	Threat* new_threat = new Threat();
+	new_threat->m_object = NULL;
+	new_threat->m_pos = pos;
+	new_threat->m_object = NULL;
 
 	m_threats.push_back(new_threat);
-	
 }
 
 sf::Vector2f Boid::GetAveragePosition()
@@ -408,15 +413,19 @@ float Boid::FleeByAngle(sf::Vector2f threat_pos)
 void Boid::UpdateThreats()
 {
 	//remanence of threat
-	vector<Threat> updated_threats;
-	for (Threat threat : m_threats)
+	vector<Threat*> updated_threats;
+	for (Threat* threat : m_threats)
 	{
-		if (threat.m_clock.getElapsedTime().asSeconds() < FLEEING_DURATION)
-		{
+		if (threat->m_clock.getElapsedTime().asSeconds() < FLEEING_DURATION)
 			updated_threats.push_back(threat);
-		}
+		else
+			delete threat;
 	}
-	m_threats = updated_threats;
+
+	m_threats.clear();
+
+	for (Threat* threat : updated_threats)
+		m_threats.push_back(threat);
 }
 
 void Boid::Growing()
@@ -461,11 +470,11 @@ void Boid::EggLaying()
 	if (m_egg_clock.getElapsedTime().asSeconds() > m_egg_cooldown || m_state == Boid_Laying_Egg)//the second condition has purpose when laying egg has already started, then we want to ignore threats
 	{
 		m_state = Boid_Laying_Egg;
-		m_speed = sf::Vector2f(0, 0);
+		ScaleSpeed(&m_speed, m_randomized_speed * 0.5);
 
 		if (m_between_two_eggs_clock.getElapsedTime().asSeconds() > EGG_LAYING_TIME_BETWEEN_TWO_EGGS)
 		{
-			Boid* baby_boid = new Boid(getPosition(), "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			Boid* baby_boid = new Boid(getPosition());
 			baby_boid->ScaleObject(BABY_BOID_SCALE);
 			baby_boid->setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
 			baby_boid->m_growth = 100 * BABY_BOID_SCALE;

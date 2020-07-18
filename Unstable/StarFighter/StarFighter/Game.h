@@ -107,9 +107,7 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//ATLANTIS SPECIFIC
-	int m_boids_alive;
-	int m_predators_alive;
-	int m_boids_eaten;
+	int m_living_count[NB_LIVINGTHINGTYPES];
 	bool AddVirtualThreat(sf::Vector2f pos);
 	void WipePrey(GameObject* prey);
 

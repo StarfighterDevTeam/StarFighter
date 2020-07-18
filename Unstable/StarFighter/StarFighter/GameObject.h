@@ -32,6 +32,7 @@ enum LayerType {
 
 	PredatorLayer,
 	BoidLayer,
+	PlanctonLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -49,9 +50,18 @@ enum GameObjectType {
 	Neutral,
 	BoidObject,
 	PredatorObject,
+	PlanctonObject,
 	EnemyFire,
 	EnemyObject,
 	NBVAL_GameObject
+};
+
+enum LivingThingType
+{
+	Living_Boid,
+	Living_Predator,
+	Living_Plancton,
+	NB_LIVINGTHINGTYPES,
 };
 
 class GameObject : public AnimatedSprite

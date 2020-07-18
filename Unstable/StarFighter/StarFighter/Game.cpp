@@ -57,9 +57,8 @@ void Game::init(RenderWindow* window)
 	PlayMusic(Music_Main);
 
 	//ATLANTIS specific
-	m_boids_alive = 0;
-	m_predators_alive = 0;
-	m_boids_eaten = 0;
+	for (int i = 0; i < NB_LIVINGTHINGTYPES; i++)
+		m_living_count[i] = 0;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -178,14 +177,9 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 	object->m_layer = layer;
 	object->m_collider_type = type;
 
-	if (type == BoidObject)
-	{
-		m_boids_alive++;
-	}
-	if (type == PredatorObject)
-	{
-		m_predators_alive++;
-	}
+	int living_type = type - BoidObject;
+	if (living_type >= 0 && living_type < NB_LIVINGTHINGTYPES)
+		m_living_count[living_type]++;
 
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);

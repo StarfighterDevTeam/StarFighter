@@ -1,9 +1,7 @@
 #ifndef PREADATOR_H_INCLUDED
 #define PREADATOR_H_INCLUDED
 
-#include "Globals.h"
-#include "Game.h"
-#include "GameObject.h"
+#include "Boid.h"
 
 enum PredatorState
 {
@@ -14,11 +12,11 @@ enum PredatorState
 	NB_PREDATOR_STATES,
 };
 
-class Predator : public GameObject
+class Predator : public LivingThing
 {
 public :
 	Predator();
-	Predator(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Predator(sf::Vector2f position);
 	void Init();
 
 	virtual ~Predator();

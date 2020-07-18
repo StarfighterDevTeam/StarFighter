@@ -40,8 +40,9 @@ void SFPanelSpecific::Update(sf::Time deltaTime)
 {
 	//texts strings
 	ostringstream ss;
-	ss << "Boids living: " << (*CurrentGame).m_boids_alive;
-	ss << "\nPredator living: " << (*CurrentGame).m_predators_alive;
+	ss << "Boids living: " << (*CurrentGame).m_living_count[Living_Boid];
+	ss << "\nPredator living: " << (*CurrentGame).m_living_count[Living_Predator];
+	ss << "\nPlancton living: " << (*CurrentGame).m_living_count[Living_Plancton];
 	m_text.setString(ss.str());
 }
 

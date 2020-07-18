@@ -2,11 +2,9 @@
 #define SHIP_H_INCLUDED
 
 #include "Globals.h"
-#include "GameObject.h"
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
-#include "Boid.h"
 #include "Predator.h"
 #include "FX.h"
 
@@ -26,6 +24,7 @@ enum PlayerActions
 	Action_Pausing,
 	Action_SpawnBoid,
 	Action_SpawnPredator,
+	Action_SpawnPlancton,
 	Action_Flee,
 	NBVAL_PlayerActions,
 };
@@ -72,6 +71,8 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	static LivingThing* CreateLivingThing(LivingThingType type, sf::Vector2f position);
 
 private:
 	bool m_moving;

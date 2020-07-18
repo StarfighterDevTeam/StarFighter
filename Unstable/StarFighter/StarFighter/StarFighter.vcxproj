@@ -97,8 +97,10 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="LivingThing.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="InGameState.cpp" />
+    <ClCompile Include="Plancton.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Predator.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
@@ -126,8 +128,10 @@
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
+    <ClInclude Include="LivingThing.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="InGameState.h" />
+    <ClInclude Include="Plancton.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Predator.h" />
     <ClInclude Include="PrefsManager.h" />

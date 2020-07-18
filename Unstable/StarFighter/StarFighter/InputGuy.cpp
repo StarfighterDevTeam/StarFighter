@@ -188,6 +188,16 @@ bool InputGuy::isSpawningPredator()
 	return false;
 }
 
+bool InputGuy::isSpawningPlancton()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::N))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isFleeing()
 {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))

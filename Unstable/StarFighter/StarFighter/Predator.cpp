@@ -9,9 +9,18 @@ Predator::Predator()
 	Predator::Init();
 }
 
-Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
+Predator::Predator(sf::Vector2f position)
 {
+	GameObject::Init(position, sf::Vector2f(0, 0), "2D/boid.png", sf::Vector2f(32, 32));
 	Predator::Init();
+}
+
+void Predator::Init()
+{
+	m_layer = PredatorLayer;
+	m_collider_type = PredatorObject;
+
+	m_state = Predator_Swimming;
 
 	//random speed, direction and color
 	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_BASE_SPEED_MIN, PREDATOR_BASE_SPEED_MAX));
@@ -23,14 +32,9 @@ Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f 
 	int b = RandomizeIntBetweenValues(0, 255);
 	setColor(sf::Color(255, 0, 0, 255));
 	m_prey = NULL;
+	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_MIN_CHANGE_DIR_TIME, PREDATOR_MAX_CHANGE_DIR_TIME));
 
 	ScaleObject(PREDATOR_SCALE);
-}
-
-void Predator::Init()
-{
-	m_state = Predator_Swimming;
-	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_MIN_CHANGE_DIR_TIME, PREDATOR_MAX_CHANGE_DIR_TIME));
 }
 
 Predator::~Predator()
@@ -158,11 +162,10 @@ bool Predator::Eat(GameObject* prey)
 		prey->m_garbageMe = true;
 		prey->m_visible = false;
 		(*CurrentGame).WipePrey(prey);
-		(*CurrentGame).m_boids_eaten++;
-		(*CurrentGame).m_boids_alive--;
+		(*CurrentGame).m_living_count[Living_Boid]--;
 		m_state = Predator_Swimming;
 		ScaleSpeed(&m_speed, m_randomized_speed);
-		printf("Boids alive: %d (EAT)\n", (*CurrentGame).m_boids_alive);
+		//printf("Boids alive: %d (EAT)\n", (*CurrentGame).m_living_count[Living_Boid]);
 
 		return true;
 	}
