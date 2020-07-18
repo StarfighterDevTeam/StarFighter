@@ -29,9 +29,9 @@ void Plancton::Init()
 
 	setRotation(angle_ * 180 / M_PI - 180);
 
-	int r = RandomizeIntBetweenValues(50, 200);
-	int g = RandomizeIntBetweenValues(50, 255);
-	int b = RandomizeIntBetweenValues(50, 255);
+	int r = 30;// RandomizeIntBetweenValues(50, 200);
+	int g = 170;// RandomizeIntBetweenValues(50, 255);
+	int b = 70;// RandomizeIntBetweenValues(50, 255);
 	setColor(sf::Color(r, g, b, 255));
 	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(BOID_MIN_CHANGE_DIR_TIME, BOID_MAX_CHANGE_DIR_TIME));
 }

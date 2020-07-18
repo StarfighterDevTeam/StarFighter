@@ -353,17 +353,20 @@ LivingThing* Ship::CreateLivingThing(LivingThingType type, sf::Vector2f position
 	{
 		case Living_Boid:
 		{
-			living = new Boid(position);
+			if ((*CurrentGame).m_living_count[type] < BOID_MAX_POPULATION)
+				living = new Boid(position);
 			break;
 		}
 		case Living_Predator:
 		{
-			living = new Predator(position);
+			if ((*CurrentGame).m_living_count[type] < PREDATOR_MAX_POPULATION)
+				living = new Predator(position);
 			break;
 		}
 		case Living_Plancton:
 		{
-			living = new Plancton(position);
+			if ((*CurrentGame).m_living_count[type] < PLANCTON_MAX_POPULATION)
+				living = new Plancton(position);
 			break;
 		}
 	}

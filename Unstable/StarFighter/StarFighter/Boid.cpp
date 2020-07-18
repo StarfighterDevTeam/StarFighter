@@ -30,9 +30,9 @@ void Boid::Init()
 
 	setRotation(angle_ * 180 / M_PI - 180);
 
-	int r = RandomizeIntBetweenValues(50, 200);
-	int g = RandomizeIntBetweenValues(50, 255);
-	int b = RandomizeIntBetweenValues(50, 255);
+	int r = 0;// RandomizeIntBetweenValues(50, 200);
+	int g = 160;// RandomizeIntBetweenValues(50, 255);
+	int b = 230;// RandomizeIntBetweenValues(50, 255);
 	setColor(sf::Color(r, g, b, 255));
 	m_eggs = RandomizeIntBetweenValues(EGG_NB_MIN, EGG_NB_MAX);
 	m_egg_cooldown = RandomizeFloatBetweenValues(sf::Vector2f(EGG_LAYING_COOLDOWN_MIN, EGG_LAYING_COOLDOWN_MAX));
@@ -259,10 +259,10 @@ void Boid::update(sf::Time deltaTime)
 
 void Boid::AddToBoidNeighbours(GameObject* boid)
 {
-	if (boid)
+	if (boid != NULL)
 	{
 		Boid* new_boid = (Boid*)boid;
-		m_boid_neighbours.push_back(new_boid);
+			m_boid_neighbours.push_back(new_boid);
 	}
 }
 
@@ -380,7 +380,6 @@ sf::Vector2f Boid::Separate()
 				sum_y -= vector.y;
 				count++;
 			}
-			
 		}
 	}
 
@@ -461,42 +460,45 @@ bool Boid::IsGrown()
 
 void Boid::EggLaying()
 {
-	if (m_growth < 100 || m_eggs == 0 || !m_threats.empty())//condition to star laying egggs
+	if (m_growth < 100 || m_eggs == 0 || !m_threats.empty())//condition to start laying egggs
 	{
 		m_egg_clock.restart();
 		return;
 	}
 
-	if (m_egg_clock.getElapsedTime().asSeconds() > m_egg_cooldown || m_state == Boid_Laying_Egg)//the second condition has purpose when laying egg has already started, then we want to ignore threats
+	if ((*CurrentGame).m_living_count[Living_Boid] < BOID_MAX_POPULATION)
 	{
-		m_state = Boid_Laying_Egg;
-		ScaleSpeed(&m_speed, m_randomized_speed * 0.5);
-
-		if (m_between_two_eggs_clock.getElapsedTime().asSeconds() > EGG_LAYING_TIME_BETWEEN_TWO_EGGS)
+		if (m_egg_clock.getElapsedTime().asSeconds() > m_egg_cooldown || m_state == Boid_Laying_Egg)//the second condition has purpose when laying egg has already started, then we want to ignore threats
 		{
-			Boid* baby_boid = new Boid(getPosition());
-			baby_boid->ScaleObject(BABY_BOID_SCALE);
-			baby_boid->setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
-			baby_boid->m_growth = 100 * BABY_BOID_SCALE;
-			float angle = (getRotation() + 180) * M_PI / 180;
-			baby_boid->SetSpeedVectorFromAbsoluteSpeedAndAngle(baby_boid->m_randomized_speed, angle);
+			m_state = Boid_Laying_Egg;
+			ScaleSpeed(&m_speed, m_randomized_speed * 0.5);
 
-			(*CurrentGame).addToScene(baby_boid, BoidLayer, BoidObject);
-
-			m_between_two_eggs_clock.restart();
-			m_eggs--;
-
-			if (m_eggs == 0)
+			if (m_between_two_eggs_clock.getElapsedTime().asSeconds() > EGG_LAYING_TIME_BETWEEN_TWO_EGGS)
 			{
-				m_change_dir_clock.restart();
-				SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, getRotation() * M_PI / 180);
-				m_state = Boid_Swimming_Solo;
-				m_egg_clock.restart();
+				Boid* baby_boid = new Boid(getPosition());
+				baby_boid->ScaleObject(BABY_BOID_SCALE);
+				baby_boid->setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
+				baby_boid->m_growth = 100 * BABY_BOID_SCALE;
+				float angle = (getRotation() + 180) * M_PI / 180;
+				baby_boid->SetSpeedVectorFromAbsoluteSpeedAndAngle(baby_boid->m_randomized_speed, angle);
+
+				(*CurrentGame).addToScene(baby_boid, BoidLayer, BoidObject);
+
+				m_between_two_eggs_clock.restart();
+				m_eggs--;
+
+				if (m_eggs == 0)
+				{
+					m_change_dir_clock.restart();
+					SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, getRotation() * M_PI / 180);
+					m_state = Boid_Swimming_Solo;
+					m_egg_clock.restart();
+				}
 			}
 		}
-	}
-	else
-	{
-		m_between_two_eggs_clock.restart();
+		else
+		{
+			m_between_two_eggs_clock.restart();
+		}
 	}
 }
