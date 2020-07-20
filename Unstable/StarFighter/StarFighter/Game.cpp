@@ -326,7 +326,7 @@ void Game::drawScene()
 
 				if ((*(*it)).m_visible)
 				{
-					m_mainScreen.draw((*(*it)));
+					(*it)->Draw(m_mainScreen);
 				}
 			}
 		}
@@ -344,10 +344,10 @@ void Game::colisionChecksV2()
 	sf::Clock dt;
 	dt.restart();
 
-	size_t BoidVectorSize = m_sceneGameObjectsTyped[GameObjectType::BoidObject].size();
+	size_t BoidVectorSize = m_sceneGameObjectsTyped[BoidObject].size();
 	for (size_t i = 0; i < BoidVectorSize; i++)
 	{
-		GameObject* ptr1 = m_sceneGameObjectsTyped[GameObjectType::BoidObject][i];
+		GameObject* ptr1 = m_sceneGameObjectsTyped[BoidObject][i];
 	
 		if (ptr1 == NULL)
 			continue;

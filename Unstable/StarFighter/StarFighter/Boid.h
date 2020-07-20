@@ -29,6 +29,7 @@ public :
 
 	virtual ~Boid();
 	void update(sf::Time deltaTime) override;
+	void Draw(RenderTarget& screen) override;
 
 	void AddToBoidNeighbours(GameObject* boid) override;
 	void ClearBoidNeighbours() override;
@@ -65,6 +66,9 @@ public :
 
 	sf::Vector2f m_oscillation_offset;
 	sf::Clock m_oscillation_clock;
+
+	sf::CircleShape m_debug_flocking_radius;
+	sf::CircleShape m_debug_separation_radius;
 };
 
 #endif // BOID_H_INCLUDED

@@ -135,6 +135,11 @@ GameObject::~GameObject()
 	//delete this->weapon_loot;
 }
 
+void GameObject::Draw(RenderTarget& screen)
+{
+	screen.draw(*this);
+}
+
 void GameObject::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset, newspeed;

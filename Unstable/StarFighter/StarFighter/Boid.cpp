@@ -24,7 +24,7 @@ void Boid::Init()
 	m_growth = 100;
 
 	//random speed, direction and color
-	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLOCKING_BASE_SPEED_MIN, FLOCKING_BASE_SPEED_MAX));
+	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(BOID_BASE_SPEED_MIN, BOID_BASE_SPEED_MAX));
 	float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ * M_PI / 180);
 
@@ -40,12 +40,36 @@ void Boid::Init()
 
 	m_oscillation_offset.x = 0;
 	m_oscillation_offset.y = 0;
+
+	//debug circles
+	m_debug_flocking_radius.setRadius(FLOCKING_RADIUS);
+	m_debug_flocking_radius.setOrigin(sf::Vector2f(m_debug_flocking_radius.getRadius(), m_debug_flocking_radius.getRadius()));
+	m_debug_flocking_radius.setOutlineColor(sf::Color::Blue);
+	m_debug_flocking_radius.setOutlineThickness(2);
+	m_debug_flocking_radius.setFillColor(sf::Color::Transparent);
+	m_debug_flocking_radius.setPosition(getPosition());
+
+	m_debug_separation_radius.setRadius(FLOCKING_SEPARATION_RADIUS);
+	m_debug_separation_radius.setOrigin(sf::Vector2f(m_debug_separation_radius.getRadius(), m_debug_separation_radius.getRadius()));
+	m_debug_separation_radius.setOutlineColor(sf::Color::Green);
+	m_debug_separation_radius.setOutlineThickness(2);
+	m_debug_separation_radius.setFillColor(sf::Color::Transparent);
+	m_debug_separation_radius.setPosition(getPosition());
 }
 
 Boid::~Boid()
 {
 	for (Threat* threat : m_threats)
 		delete threat;
+}
+
+
+void Boid::Draw(RenderTarget& screen)
+{
+	GameObject::Draw(screen);
+
+	//screen.draw(m_debug_flocking_radius);
+	//screen.draw(m_debug_separation_radius);
 }
 
 void Boid::update(sf::Time deltaTime)
@@ -255,11 +279,15 @@ void Boid::update(sf::Time deltaTime)
 	{
 		m_speed -= m_oscillation_offset;//oscillations are just cosmetical, so they must be ignored from further speed calculations
 	}
+
+	//debug circles
+	m_debug_flocking_radius.setPosition(getPosition());
+	m_debug_separation_radius.setPosition(getPosition());
 }
 
 void Boid::AddToBoidNeighbours(GameObject* boid)
 {
-	if (boid != NULL)
+	if (boid != NULL && m_boid_neighbours.size())// < FLOCKING_MAX_NB_INFLUENCERS)
 	{
 		Boid* new_boid = (Boid*)boid;
 			m_boid_neighbours.push_back(new_boid);

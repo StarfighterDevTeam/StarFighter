@@ -77,6 +77,7 @@ public:
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
+	virtual void Draw(RenderTarget& screen);
 
 	bool m_visible;
 	bool m_isOnScene;

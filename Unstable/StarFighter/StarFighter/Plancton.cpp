@@ -23,7 +23,7 @@ void Plancton::Init()
 	m_collider_type = PlanctonObject;
 
 	//random speed, direction and color
-	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLOCKING_BASE_SPEED_MIN, FLOCKING_BASE_SPEED_MAX));
+	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(PLANCTON_BASE_SPEED_MIN, PLANCTON_BASE_SPEED_MAX));
 	float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ * M_PI / 180);
 

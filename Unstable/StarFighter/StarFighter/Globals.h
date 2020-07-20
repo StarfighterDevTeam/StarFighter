@@ -44,15 +44,14 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define AVOID_BORDERS_RADIUS_COEFF			1.0f
 
 //FLOCKING
-#define FLOCKING_RADIUS						100
-#define FLOCKING_BASE_SPEED_MIN				170
-#define FLOCKING_BASE_SPEED_MAX				170
+#define FLOCKING_RADIUS						150
+#define FLOCKING_MAX_NB_INFLUENCERS			10
 
 #define FLOCKING_PREVIOUS_SPEED_WEIGHT		5.0f
 #define FLOCKING_COHESION_WEIGHT				0.8f
 #define FLOCKING_ALIGNMENT_WEIGHT			0.15f
 #define FLOCKING_SEPARATION_WEIGHT			2.0f
-#define FLOCKING_SEPARATION_RADIUS			50
+#define FLOCKING_SEPARATION_RADIUS			100
 
 //FLEEING
 #define FLEEING_MAX_SPEED					500
@@ -61,6 +60,9 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define FLEEING_DURATION						0.8f
 
 //BOIDS
+#define BOID_BASE_SPEED_MIN					170
+#define BOID_BASE_SPEED_MAX					170
+
 #define BOID_MIN_CHANGE_DIR_TIME				1.f
 #define BOID_MAX_CHANGE_DIR_TIME				4.f
 #define BOID_MIN_CHANGE_DIR_ANGLE			20.f
@@ -74,8 +76,10 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //PLANCTONS
 #define PLANCTON_SCALE						0.25f
-
 #define PLANCTON_MAX_POPULATION				1000
+#define PLANCTON_BASE_SPEED_MIN				50
+#define PLANCTON_BASE_SPEED_MAX				50
+
 
 //PREDATORS
 #define PREDATOR_MIN_CHANGE_DIR_TIME			5.f
