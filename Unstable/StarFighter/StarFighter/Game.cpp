@@ -395,8 +395,6 @@ void Game::colisionChecksV2()
 
 							ptr1->AddToBoidNeighbours(ptr2);
 							ptr2->AddToBoidNeighbours(ptr1);
-
-							printf("new flock\n");
 						}
 						//case2: add to an existing flock
 						else if (ptr1->GetFlock() != NULL && ptr1->GetFlock()->m_members.size() < FLOCKING_MAX_NB_INFLUENCERS)
@@ -406,8 +404,6 @@ void Game::colisionChecksV2()
 
 							ptr1->AddToBoidNeighbours(ptr2);
 							ptr2->AddToBoidNeighbours(ptr1);
-						
-							printf("existing flock\n");
 						}
 						else if (ptr2->GetFlock() != NULL && ptr2->GetFlock()->m_members.size() < FLOCKING_MAX_NB_INFLUENCERS)
 						{
@@ -416,8 +412,6 @@ void Game::colisionChecksV2()
 
 							ptr1->AddToBoidNeighbours(ptr2);
 							ptr2->AddToBoidNeighbours(ptr1);
-						
-							printf("existing flock\n");
 						}
 						//case 3: merging flocks
 						else if (ptr1->GetFlock() != NULL && ptr2->GetFlock() != NULL && ptr1->GetFlock() != ptr2->GetFlock())

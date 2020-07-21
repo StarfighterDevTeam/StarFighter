@@ -291,6 +291,18 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	return angle;
 }
 
+float GameObject::GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
+{
+	float angle = GetAngleRadBetweenPositions(target_position, ref_position) * 180.f / M_PI;
+	float delta_angle = angle - ref_rotation_in_deg;
+	if (delta_angle > 180)
+		delta_angle -= 180.f * 2;
+	else if (delta_angle < -180)
+		delta_angle += 180.f * 2;
+
+	return delta_angle;
+}
+
 sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
 	sf::Vector2f speed;

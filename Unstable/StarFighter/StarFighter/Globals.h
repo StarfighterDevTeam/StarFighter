@@ -60,8 +60,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define FLEEING_DURATION						0.8f
 
 //BOIDS
-#define BOID_BASE_SPEED_MIN					170
-#define BOID_BASE_SPEED_MAX					170
+#define BOID_BASE_SPEED_MIN					100
+#define BOID_BASE_SPEED_MAX					100
 
 #define BOID_MIN_CHANGE_DIR_TIME				1.f
 #define BOID_MAX_CHANGE_DIR_TIME				4.f

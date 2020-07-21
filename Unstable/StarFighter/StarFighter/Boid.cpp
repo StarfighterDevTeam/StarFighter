@@ -157,9 +157,14 @@ void Boid::update(sf::Time deltaTime)
 					NormalizeSpeed(&separation_vector, m_randomized_speed);
 
 					//TOTAL
-					m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
-					m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
+					float new_speed_x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
+					float new_speed_y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
 
+					//smoothing
+					if (GetAngleDegToTargetPosition(getPosition(), getRotation(), sf::Vector2f(getPosition().x + new_speed_x, getPosition().y + new_speed_y)) > 5)
+						m_speed = sf::Vector2f(new_speed_x, new_speed_y);
+
+					//applying
 					NormalizeSpeed(&m_speed, m_randomized_speed);
 				}
 
@@ -179,73 +184,45 @@ void Boid::update(sf::Time deltaTime)
 					if (getPosition().x < border_size)
 					{
 						if (m_speed.y < 0)
-						{
 							if (angle_increment < 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
+
 						if (m_speed.y > 0)
-						{
 							if (angle_increment > 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
 					}
 
 					if (getPosition().x > REF_WINDOW_RESOLUTION_X - border_size)
 					{
 						if (m_speed.y < 0)
-						{
 							if (angle_increment > 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
+
 						if (m_speed.y > 0)
-						{
 							if (angle_increment < 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
 					}
 
 					if (getPosition().y < border_size)
 					{
 						if (m_speed.x < 0)
-						{
 							if (angle_increment > 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
+
 						if (m_speed.x > 0)
-						{
 							if (angle_increment < 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
 					}
 
 					if (getPosition().y > REF_WINDOW_RESOLUTION_Y - border_size)
 					{
 						if (m_speed.x < 0)
-						{
 							if (angle_increment < 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
+
 						if (m_speed.x > 0)
-						{
 							if (angle_increment > 0)
-							{
 								angle_increment = -angle_increment;
-							}
-						}
 					}
 					
 					float angle_ = getRotation() + angle_increment;
