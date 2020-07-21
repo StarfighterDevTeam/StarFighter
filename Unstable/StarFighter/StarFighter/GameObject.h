@@ -17,6 +17,7 @@ using namespace sf;
 class Equipment;
 class Weapon;
 class Loot;
+struct Flock;
 
 enum LayerType {
 	BackgroundLayer,
@@ -140,7 +141,9 @@ public:
 	virtual void ClearBoidNeighbours();
 	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle, bool multidirectional=false);
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown);
-	
+	virtual Flock* GetFlock();
+	virtual void SetFlock(Flock* flock);
+
 	virtual bool IsGrown();
 	virtual bool Eat(GameObject* prey);
 	virtual GameObject* GetPrey();

@@ -344,6 +344,9 @@ void Game::colisionChecksV2()
 	sf::Clock dt;
 	dt.restart();
 
+	//Boids
+	vector<Flock*> flocks;
+
 	size_t BoidVectorSize = m_sceneGameObjectsTyped[BoidObject].size();
 	for (size_t i = 0; i < BoidVectorSize; i++)
 	{
@@ -357,9 +360,10 @@ void Game::colisionChecksV2()
 			ptr1->ClearBoidNeighbours();
 		}
 
-		ptr1->m_collision_check_begun = false;
+		ptr1->m_collision_check_begun = false;//reset flag for next frame
 	
 		//Grouping boids
+
 		if (i != BoidVectorSize - 1)
 		{
 			for (size_t j = i + 1; j < BoidVectorSize; j++)
@@ -379,8 +383,68 @@ void Game::colisionChecksV2()
 				{
 					if (GameObject::GetDistanceSquaredBetweenObjects(ptr1, ptr2) < FLOCKING_RADIUS * FLOCKING_RADIUS)
 					{
-						ptr1->AddToBoidNeighbours(ptr2);
-						ptr2->AddToBoidNeighbours(ptr1);
+						//case1: create a new flock
+						if (ptr1->GetFlock() == NULL && ptr2->GetFlock() == NULL)
+						{
+							Flock* flock = new Flock();
+							flock->m_members.push_back(ptr1);
+							flock->m_members.push_back(ptr2);
+							ptr1->SetFlock(flock);
+							ptr2->SetFlock(flock);
+							flocks.push_back(flock);
+
+							ptr1->AddToBoidNeighbours(ptr2);
+							ptr2->AddToBoidNeighbours(ptr1);
+
+							printf("new flock\n");
+						}
+						//case2: add to an existing flock
+						else if (ptr1->GetFlock() != NULL && ptr1->GetFlock()->m_members.size() < FLOCKING_MAX_NB_INFLUENCERS)
+						{
+							ptr1->GetFlock()->m_members.push_back(ptr2);
+							ptr2->SetFlock(ptr1->GetFlock());
+
+							ptr1->AddToBoidNeighbours(ptr2);
+							ptr2->AddToBoidNeighbours(ptr1);
+						
+							printf("existing flock\n");
+						}
+						else if (ptr2->GetFlock() != NULL && ptr2->GetFlock()->m_members.size() < FLOCKING_MAX_NB_INFLUENCERS)
+						{
+							ptr2->GetFlock()->m_members.push_back(ptr1);
+							ptr1->SetFlock(ptr2->GetFlock());
+
+							ptr1->AddToBoidNeighbours(ptr2);
+							ptr2->AddToBoidNeighbours(ptr1);
+						
+							printf("existing flock\n");
+						}
+						//case 3: merging flocks
+						else if (ptr1->GetFlock() != NULL && ptr2->GetFlock() != NULL && ptr1->GetFlock() != ptr2->GetFlock())
+						{
+							Flock* flock2 = ptr2->GetFlock();
+							Flock* new_flock2 = new Flock();
+							for (GameObject* member : flock2->m_members)
+							{
+								if (ptr1->GetFlock()->m_members.size() < FLOCKING_MAX_NB_INFLUENCERS)
+									member->SetFlock(ptr1->GetFlock());
+								else
+									new_flock2->m_members.push_back(member);
+							}
+
+							flock2->m_members.clear();
+							for (GameObject* member : new_flock2->m_members)
+								flock2->m_members.push_back(member);
+							new_flock2->m_members.clear();
+							delete new_flock2;
+
+							if (ptr1->GetFlock() == ptr2->GetFlock())
+							{
+								ptr1->AddToBoidNeighbours(ptr2);
+								ptr2->AddToBoidNeighbours(ptr1);
+							}
+						}
+						//else they are already in existing flocks => do nothing
 					}
 				}
 			}
@@ -428,7 +492,12 @@ void Game::colisionChecksV2()
 				}
 			}
 		}
+	
+		ptr1->SetFlock(NULL);//clear flags
 	}
+
+	for (Flock* flock : flocks)//clear temporary vector
+		delete flock;
 
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }

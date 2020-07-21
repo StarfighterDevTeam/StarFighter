@@ -505,6 +505,17 @@ void GameObject::ClearBoidNeighbours()
 	//see override function in class Boid
 }
 
+Flock* GameObject::GetFlock()
+{
+	//see override function in class Boid
+	return NULL;
+}
+
+void GameObject::SetFlock(Flock* flock)
+{
+	//see override function in class Boid
+}
+
 bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle, bool multidirectional)
 {
 	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos) - m_diag - threat_size;

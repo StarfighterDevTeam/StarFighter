@@ -41,6 +41,12 @@ enum FontsStyle
 
 using namespace sf;
 
+struct Flock
+{
+public:
+	vector<GameObject*> m_members;
+};
+
 struct Game
 {
 public:

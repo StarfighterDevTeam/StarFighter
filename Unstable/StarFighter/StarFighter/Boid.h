@@ -35,6 +35,8 @@ public :
 	void ClearBoidNeighbours() override;
 	void AddToBoidThreats(GameObject* predator) override;
 	void AddToBoidThreats(sf::Vector2f pos) override;
+	Flock* GetFlock() override;
+	void SetFlock(Flock* flock) override;
 
 	vector<Boid*> m_boid_neighbours;
 	sf::Vector2f m_avg_position;
@@ -42,6 +44,7 @@ public :
 	sf::Vector2f m_avg_speed;
 	sf::Vector2f GetAverageSpeed();
 	sf::Vector2f Separate();
+	Flock* m_flock;
 
 	vector<Threat*> m_threats;
 

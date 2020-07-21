@@ -22,6 +22,7 @@ void Boid::Init()
 
 	m_state = Boid_Swimming_Solo;
 	m_growth = 100;
+	m_flock = NULL;
 
 	//random speed, direction and color
 	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(BOID_BASE_SPEED_MIN, BOID_BASE_SPEED_MAX));
@@ -68,7 +69,12 @@ void Boid::Draw(RenderTarget& screen)
 {
 	GameObject::Draw(screen);
 
-	//screen.draw(m_debug_flocking_radius);
+	if (m_boid_neighbours.empty() == true)
+		m_debug_flocking_radius.setOutlineColor(sf::Color::Blue);
+	else
+		m_debug_flocking_radius.setOutlineColor(sf::Color::Red);
+
+	screen.draw(m_debug_flocking_radius);
 	//screen.draw(m_debug_separation_radius);
 }
 
@@ -134,25 +140,28 @@ void Boid::update(sf::Time deltaTime)
 			else
 			{
 				//Flocking
-				//1. cohesion
-				m_avg_position = GetAveragePosition();
-				sf::Vector2f cohesion_vector = sf::Vector2f(m_avg_position.x - getPosition().x, m_avg_position.y - getPosition().y);
-				NormalizeSpeed(&cohesion_vector, m_randomized_speed);
+				if (m_state == Boid_Swimming_Flocked)
+				{
+					//1. cohesion
+					m_avg_position = GetAveragePosition();
+					sf::Vector2f cohesion_vector = sf::Vector2f(m_avg_position.x - getPosition().x, m_avg_position.y - getPosition().y);
+					NormalizeSpeed(&cohesion_vector, m_randomized_speed);
 
-				//2. alignment
-				m_avg_speed = GetAverageSpeed();
-				sf::Vector2f alignment_vector = sf::Vector2f(m_avg_speed.x - m_speed.x, m_avg_speed.y - m_speed.y);
-				NormalizeSpeed(&alignment_vector, m_randomized_speed);
+					//2. alignment
+					m_avg_speed = GetAverageSpeed();
+					sf::Vector2f alignment_vector = sf::Vector2f(m_avg_speed.x - m_speed.x, m_avg_speed.y - m_speed.y);
+					NormalizeSpeed(&alignment_vector, m_randomized_speed);
 
-				//3. separation
-				sf::Vector2f separation_vector = Separate();
-				NormalizeSpeed(&separation_vector, m_randomized_speed);
+					//3. separation
+					sf::Vector2f separation_vector = Separate();
+					NormalizeSpeed(&separation_vector, m_randomized_speed);
 
-				//TOTAL
-				m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
-				m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
+					//TOTAL
+					m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
+					m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
 
-				NormalizeSpeed(&m_speed, m_randomized_speed);
+					NormalizeSpeed(&m_speed, m_randomized_speed);
+				}
 
 				//Change direction randomly
 				sf::Vector2f change_dir = sf::Vector2f(0, 0);
@@ -249,7 +258,7 @@ void Boid::update(sf::Time deltaTime)
 		}
 	}
 
-	EggLaying();
+	//EggLaying();
 	Growing();
 
 	//AvoidBorders(m_speed, deltaTime);
@@ -287,7 +296,7 @@ void Boid::update(sf::Time deltaTime)
 
 void Boid::AddToBoidNeighbours(GameObject* boid)
 {
-	if (boid != NULL && m_boid_neighbours.size())// < FLOCKING_MAX_NB_INFLUENCERS)
+	if (boid != NULL)
 	{
 		Boid* new_boid = (Boid*)boid;
 			m_boid_neighbours.push_back(new_boid);
@@ -332,6 +341,16 @@ void Boid::AddToBoidThreats(sf::Vector2f pos)
 	new_threat->m_object = NULL;
 
 	m_threats.push_back(new_threat);
+}
+
+Flock* Boid::GetFlock()
+{
+	return m_flock;
+}
+
+void Boid::SetFlock(Flock* flock)
+{
+	m_flock = flock;
 }
 
 sf::Vector2f Boid::GetAveragePosition()

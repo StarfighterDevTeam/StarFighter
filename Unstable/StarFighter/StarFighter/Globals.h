@@ -45,7 +45,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //FLOCKING
 #define FLOCKING_RADIUS						150
-#define FLOCKING_MAX_NB_INFLUENCERS			10
+#define FLOCKING_MAX_NB_INFLUENCERS			6
 
 #define FLOCKING_PREVIOUS_SPEED_WEIGHT		5.0f
 #define FLOCKING_COHESION_WEIGHT				0.8f
