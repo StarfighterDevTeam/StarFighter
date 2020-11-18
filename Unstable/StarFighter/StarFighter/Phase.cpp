@@ -9,25 +9,16 @@ Phase::Phase()
 
 Phase::~Phase()
 {
-	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
-	{
-		delete (*it);
-	}
-	m_weapons_list.clear();
+	for (Weapon* weapon : m_weapons_list)
+		delete weapon;
 
 	delete m_welcomeWeapon;
 
-	for (std::vector<Dialog*>::iterator it = m_dialogs.begin(); it != m_dialogs.end(); it++)
-	{
-		delete (*it);
-	}
-	m_dialogs.clear();
+	for (Dialog* dialog : m_dialogs)
+		delete dialog;
 
-	for (std::vector<ConditionTransition*>::iterator it = m_transitions_list.begin(); it != m_transitions_list.end(); it++)
-	{
-		delete (*it);
-	}
-	m_transitions_list.clear();
+	for (ConditionTransition* condition : m_transitions_list)
+		delete condition;
 
 	delete m_Pattern;
 }

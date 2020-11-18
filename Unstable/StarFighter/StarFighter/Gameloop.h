@@ -1,5 +1,5 @@
-#ifndef METAGAME_H_INCLUDED
-#define METAGAME_H_INCLUDED
+#ifndef GAMELOOP_H_INCLUDED
+#define GAMELOOP_H_INCLUDED
 
 #include "SFMapPanel.h"
 #include "SFDialogPanel.h"
@@ -13,7 +13,7 @@
 
 extern Game* CurrentGame;
 
-class InGameState : public GameState
+class Gameloop : public GameState
 {
 public:
 	Ship* m_playerShip;
@@ -56,4 +56,4 @@ private:
 	sf::Text* framerate;
 };
 
-#endif //METAGAME_H_INCLUDED
+#endif //GAMELOOP_H_INCLUDED

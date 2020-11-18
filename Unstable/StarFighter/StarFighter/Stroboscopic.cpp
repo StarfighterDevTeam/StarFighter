@@ -6,6 +6,9 @@ using namespace sf;
 
 Stroboscopic::Stroboscopic(sf::Time decade_time, GameObject* parent) : GameObject(parent->getPosition(), sf::Vector2f(0, 0), parent->m_textureName, parent->m_size, sf::Vector2f(parent->m_size.x/2, parent->m_size.y/2), parent->m_frameNumber, parent->m_animationNumber)
 {
+	m_collider_type = BackgroundObject;
+	m_layer = PlayerStroboscopicLayer;
+
 	m_alpha = 255;
 	m_decay_time = decade_time;
 

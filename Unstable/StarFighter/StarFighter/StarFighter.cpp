@@ -49,7 +49,7 @@ int main()
 	//Loading InGame state
 	LOGGER_WRITE(Logger::DEBUG, "Starting game");
 	GameManager gameManager;
-	InGameState inGameState;
+	Gameloop inGameState;
 	gameManager.PushState(inGameState, player);
 
 	//Handling various window resolutions
@@ -148,7 +148,7 @@ int main()
 
 		dt = deltaClock.restart();
 
-		if (!(*CurrentGame).m_Pause)
+		if (!(*CurrentGame).m_Pause && dt.asSeconds() < 0.5)
 		{
 			//Update
 			gameManager.GetCurrentState()->Update(dt);

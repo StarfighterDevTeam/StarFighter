@@ -33,7 +33,8 @@ Weapon::Weapon(Ammo* Ammunition)
 
 Weapon::~Weapon()
 {
-	delete m_ammunition;
+	if (m_ammunition != NULL)
+		delete m_ammunition;
 }
 
 void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)
@@ -64,14 +65,10 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 	bullet->m_collider_type = m_collider_type;
 	bullet->m_isOnScene = true;
 
-	if (m_collider_type == FriendlyFire)
-	{
-		(*CurrentGame).addToScene(bullet, FriendlyFireLayer, m_collider_type);
-	}
-	else
-	{
-		(*CurrentGame).addToScene(bullet, EnemyFireLayer, m_collider_type);
-	}
+	bullet->m_collider_type = m_collider_type;
+	bullet->m_layer = m_collider_type == EnemyFire ? EnemyFireLayer : FriendlyFireLayer;
+	
+	(*CurrentGame).addToScene(bullet, true);
 }
 
 bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)

@@ -9,6 +9,7 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	m_visible = true;
 	m_isOnScene = true;
 	m_collider_type = Neutral;
+	m_layer = ExplosionLayer;
 }
 
 void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -52,12 +53,16 @@ FX* FX::Clone()
 	return new_FX;
 }
 
+// AURA
+
 Aura::Aura(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber) : FX(target->getPosition(), sf::Vector2f(0, 0), textureName, size, frameNumber, sf::seconds(0), animationNumber)
 {
 	m_target = target;
 	m_visible = true;
 	m_isOnScene = true;
 	m_offset = sf::Vector2f(0, 0);
+	m_collider_type = Neutral;
+	m_layer = FakeShipLayer;
 }
 
 void Aura::Init(std::string textureName, sf::Vector2f size, int frameNumber)
@@ -96,9 +101,12 @@ Aura* Aura::Clone()
 	return new_aura;
 }
 
+// FAKE SHIP
+
 FakeShip::FakeShip(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : Aura(m_target, textureName, size, m_frameNumber, m_animationNumber)
 {
-
+	m_collider_type = FakePlayerShip;
+	m_layer = FakeShipLayer;
 }
 
 void FakeShip::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -126,7 +134,7 @@ void FakeShip::PlayStroboscopicEffect(Time effect_duration, Time time_between_po
 	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
 	{
 		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
-		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+		(*CurrentGame).addToScene(strobo, true);
 
 		m_stroboscopic_effect_clock.restart();
 	}

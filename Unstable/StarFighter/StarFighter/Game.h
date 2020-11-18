@@ -62,7 +62,7 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(GameObject *object, LayerType m_layer, GameObjectType type);
+	void addToScene(GameObject* object, bool during_update);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(SFPanel* panel);
 	void addToFeedbacks(Text* text);
@@ -74,8 +74,8 @@ public:
 	void updateScene(Time deltaTime);
 	void drawScene();
 	void colisionChecksV2(Time deltaTime);
-	void cleanGarbage();
-	void collectGarbage();
+	//void cleanGarbage();
+	//void collectGarbage();
 	void garbageLayer(LayerType layer, bool only_offscene = false);
 	void killGameObjectType(GameObjectType type);
 	void damageGameObjectType(GameObjectType type, int damage);
@@ -144,11 +144,6 @@ public:
 	string m_next_music_name;
 	Music_Bank m_curMusic_type;
 
-	//utilitary methods
-	static void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
-	static void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
-	static bool isVectorEmpty(vector <GameObject*>* vector);
-
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	
@@ -162,10 +157,11 @@ private:
 	std::list<Text*> m_sceneFeedbackTexts;
 	std::vector<SFText*> m_sceneFeedbackSFTexts;
 	std::vector<GameObject*> m_sceneGameObjects;
+	std::vector<GameObject*> m_sceneGameObjectsCreated;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
-	std::vector<GameObject*> m_garbage;
-	std::vector<SFText*> m_garbageTexts;
+	//std::vector<GameObject*> m_garbage;
+	//std::vector<SFText*> m_garbageTexts;
 };
 
 #endif // GAME_H_INCLUDED

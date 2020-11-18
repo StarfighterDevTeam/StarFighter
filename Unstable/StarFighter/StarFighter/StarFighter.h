@@ -22,7 +22,7 @@
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
 #include "Bot.h"
-#include "InGameState.h"
+#include "Gameloop.h"
 #include "FileLoader.h"
 #include "GameManager.h"
 #include "Player.h"

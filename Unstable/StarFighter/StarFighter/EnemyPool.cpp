@@ -55,7 +55,7 @@ void EnemyPool::CreateCluster()
 				n->m_enemy_class = (*it)->m_enemy_class;
 				//n->enemy_class = ENEMYPOOL_GAMMA;
 
-			(*CurrentGame).addToScene(n,EnemyObjectLayer, EnemyObject);
+			(*CurrentGame).addToScene(n, true);
 		}
 		index++;
 	}

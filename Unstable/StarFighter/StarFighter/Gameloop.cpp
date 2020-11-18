@@ -1,8 +1,8 @@
-#include "InGameState.h"
+#include "Gameloop.h"
 
 extern Game* CurrentGame;
 
-void InGameState::Initialize(Player player)
+void Gameloop::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
@@ -86,10 +86,10 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, false);
 }
 
-void InGameState::UpdateShipConfig(Ship* ship, string config_name)
+void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 {
 	if (!ship || config_name.empty())
 		return;
@@ -150,7 +150,7 @@ void InGameState::UpdateShipConfig(Ship* ship, string config_name)
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ship config '%s'. Please check the config file", (char*)config_name.c_str()));
 }
 
-void InGameState::Update(Time deltaTime)
+void Gameloop::Update(Time deltaTime)
 {
 	//debug command
 	#ifndef NDEBUG
@@ -218,18 +218,18 @@ void InGameState::Update(Time deltaTime)
 	this->mainWindow->clear();
 }
 
-void InGameState::Draw()
+void Gameloop::Draw()
 {
 	(*CurrentGame).drawScene();
 	//(*CurrentGame).drawHud();
 }
 
-void InGameState::Release()
+void Gameloop::Release()
 {
 	//TODO
 }
 
-bool InGameState::AddToKnownScenes(string scene_name, Ship* playerShip)
+bool Gameloop::AddToKnownScenes(string scene_name, Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -250,7 +250,7 @@ bool InGameState::AddToKnownScenes(string scene_name, Ship* playerShip)
 	return false;
 }
 
-void InGameState::SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip)
+void Gameloop::SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -268,7 +268,7 @@ void InGameState::SaveSceneHazardLevelUnlocked(string scene_name, int hazard_lev
 	}
 }
 
-int InGameState::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip)
+int Gameloop::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -286,7 +286,7 @@ int InGameState::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip
 	return 0;
 }
 
-int InGameState::SavePlayer(Ship* playerShip)
+int Gameloop::SavePlayer(Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -319,7 +319,7 @@ int InGameState::SavePlayer(Ship* playerShip)
 	return 0;
 }
 
-string InGameState::LoadPlayerSave(Ship* playerShip)
+string Gameloop::LoadPlayerSave(Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -359,7 +359,7 @@ string InGameState::LoadPlayerSave(Ship* playerShip)
 	return return_current_scene;
 }
 
-void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
+void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 {
 	float w = m_currentScene->m_bg->m_size.x;
 	float h = m_currentScene->m_bg->m_size.y;
@@ -705,7 +705,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 	}
 }
 
-void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip)
+void Gameloop::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip)
 {
 	//getting the max hazard value for the upcoming scene
 	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene->m_name);
@@ -738,7 +738,7 @@ void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* player
 	}
 }
 
-void InGameState::RespawnInLastSafePoint()
+void Gameloop::RespawnInLastSafePoint()
 {
 	//cleaning layers
 	(*CurrentGame).garbageLayer(FriendlyFireLayer);
@@ -758,7 +758,7 @@ void InGameState::RespawnInLastSafePoint()
 	(*CurrentGame).m_playerShip->Respawn();
 }
 
-void InGameState::DestroySFPanel(Ship* playerShip)
+void Gameloop::DestroySFPanel(Ship* playerShip)
 {
 	if (playerShip->m_SFTargetPanel)
 	{
@@ -768,7 +768,7 @@ void InGameState::DestroySFPanel(Ship* playerShip)
 	}
 }
 
-void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
+void Gameloop::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 {
 	switch (panel_type)
 	{
@@ -810,7 +810,7 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 	(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFTargetPanel);
 }
 
-void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
+void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 {
 	if (playerShip)
 	{
@@ -889,7 +889,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 	}
 }
 
-void InGameState::LoadAllScenes(string scenes_file)
+void Gameloop::LoadAllScenes(string scenes_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all scenes scripts.");
 
@@ -913,7 +913,7 @@ void InGameState::LoadAllScenes(string scenes_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
 
-void InGameState::LoadAllEnemies(string enemies_file)
+void Gameloop::LoadAllEnemies(string enemies_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all enemies.");
 
@@ -929,7 +929,7 @@ void InGameState::LoadAllEnemies(string enemies_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
 
-void InGameState::LoadAllFX(string FX_file)
+void Gameloop::LoadAllFX(string FX_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all FX.");
 
@@ -945,7 +945,7 @@ void InGameState::LoadAllFX(string FX_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
 
-void InGameState::PlayerTakesExit()
+void Gameloop::PlayerTakesExit()
 {
 	m_currentScene->m_bg->SetPortalsState(PortalGhost);
 
@@ -980,7 +980,7 @@ void InGameState::PlayerTakesExit()
 	m_IG_State = TRANSITION_PHASE1_2;
 }
 
-void InGameState::CheckScriptedDialogs()
+void Gameloop::CheckScriptedDialogs()
 {
 	size_t dialogsVectorSize = m_currentScene->m_dialogs.size();
 	for (size_t i = 0; i < dialogsVectorSize; i++)

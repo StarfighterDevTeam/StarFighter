@@ -219,24 +219,12 @@ void Game::PlaySFX(SFX_Bank sfx_name)
 	m_sounds[sfx_name].play();
 }
 
-void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
+void Game::addToScene(GameObject* object, bool during_update)
 {
-	object->m_layer = m_layer;
-	object->m_collider_type = type;
-
-	//Window resolution adjustements
-	//object->setScale(scale_factor.x, scale_factor.y);
-
-	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
-	{
-		AddGameObjectToVector(object, &m_sceneGameObjectsTyped[(int)type]);
-		AddGameObjectToVector(object, &m_sceneGameObjectsLayered[(int)m_layer]);
-		AddGameObjectToVector(object, &m_sceneGameObjects);
-	}
+	if (during_update == false)
+		m_sceneGameObjects.push_back(object);
 	else
-	{
-		throw invalid_argument(TextUtils::format("Game error: Unable to add GameObject '%s' to layer '%d'", object->getName().c_str(), (int)m_layer));
-	}
+		m_sceneGameObjectsCreated.push_back(object);
 }
 
 void Game::addToFeedbacks(RectangleShape* feedback)
@@ -256,10 +244,7 @@ void Game::addToFeedbacks(Text* text)
 
 void Game::addToFeedbacks(SFText* text)
 {
-	if (text)
-	{
-		AddSFTextToVector(text, &this->m_sceneFeedbackSFTexts);
-	}
+	m_sceneFeedbackSFTexts.push_back(text);
 }
 
 void Game::removeFromFeedbacks(RectangleShape* feedback)
@@ -285,42 +270,61 @@ void Game::updateScene(Time deltaTime)
 	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
-	//Clean garbage
-	cleanGarbage();
+	//Clearing garbage and updating the rest + adding newly created objects
+	vector<GameObject*> sceneGameObjects_tmp;
 
-	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
-
-	for (int i = 0; i < sceneGameObjectsSize; i++)
+	//delete "garbage" objects, keep the rest in a temporary vector
+	for (GameObject* object : m_sceneGameObjects)
 	{
-		if (m_sceneGameObjects[i] == NULL)
-			continue;
+		object->GarbageWhenOutOfScreen();
 
-		m_sceneGameObjects[i]->update(deltaTime, m_hyperspeedMultiplier);
+		if (object->m_GarbageMe == true)
+			delete object;
+		else
+			sceneGameObjects_tmp.push_back(object);
 	}
 
-	for (int i = 0; i < sceneGameObjectsSize; i++)
-	{
-		if (m_sceneGameObjects[i] == NULL)
-			continue;
+	m_sceneGameObjects.clear();
+	for (int i = 0; i < NBVAL_Layer; i++)
+		m_sceneGameObjectsLayered[i].clear();
+	for (int i = 0; i < NBVAL_GameObject; i++)
+		m_sceneGameObjectsTyped[i].clear();
 
-		m_sceneGameObjects[i]->updatePostCollision();
+	//add in newly created objects
+	for (GameObject* object : m_sceneGameObjectsCreated)
+		sceneGameObjects_tmp.push_back(object);
+	
+	m_sceneGameObjectsCreated.clear();
+
+	//update all remaining objects and order them by collider type and layer type
+	for (GameObject* object : sceneGameObjects_tmp)
+	{
+		m_sceneGameObjects.push_back(object);
+		m_sceneGameObjectsTyped[object->m_collider_type].push_back(object);
+		m_sceneGameObjectsLayered[object->m_layer].push_back(object);
+
+		object->update(deltaTime, m_hyperspeedMultiplier);
 	}
 
 	//Checking colisions
-	colisionChecksV2(deltaTime);
+	colisionChecksV2(deltaTime);  
 
 	//SFTextPop (text feedbacks)
-	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
-	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
+	vector<SFText*> sceneFeedbackSFTexts_tmp;
+
+	for (SFText* text : m_sceneFeedbackSFTexts)
+		if (text->m_GarbageMe == true)
+			delete text;
+		else
+			sceneFeedbackSFTexts_tmp.push_back(text);
+
+	m_sceneFeedbackSFTexts.clear();
+
+	for (SFText* text : sceneFeedbackSFTexts_tmp)
 	{
-		if (m_sceneFeedbackSFTexts[i] == NULL)
-			continue;
-
-		m_sceneFeedbackSFTexts[i]->update(deltaTime, m_hyperspeedMultiplier);
+		m_sceneFeedbackSFTexts.push_back(text);
+		text->update(deltaTime, m_hyperspeedMultiplier);
 	}
-
-	//Collect the dust
-	collectGarbage();
 
 	//Update music transitions
 	ManageMusicTransitions(deltaTime);
@@ -341,7 +345,6 @@ void Game::killGameObjectType(GameObjectType type)
 				{
 					GameObject* obj = (GameObject*)m_playerShip;
 					obj->AddComboCount(10);
-					obj = NULL;
 				}
 			}
 		}
@@ -578,181 +581,6 @@ void Game::colisionChecksV2(Time deltaTime)
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
-void Game::cleanGarbage()
-{
-	sf::Clock dt;
-	dt.restart();
-
-	// On "cache" les size, pour éviter d'appeler des fonctions à chaque itération
-	const size_t garbageSize = m_garbage.size();
-	const size_t sceneGameObjectsSize = m_sceneGameObjects.size();
-	//Size layer
-	size_t sceneGameObjectsLayeredSize[NBVAL_Layer];
-	for (int layer = 0; layer < NBVAL_Layer; layer++)
-	{
-		sceneGameObjectsLayeredSize[layer] = m_sceneGameObjectsLayered[layer].size();
-	}
-	//Size ind type
-	size_t m_sceneGameObjectsTypedSize[NBVAL_GameObject];
-	for (int layer = 0; layer < NBVAL_GameObject; layer++)
-	{
-		m_sceneGameObjectsTypedSize[layer] = m_sceneGameObjectsTyped[layer].size();
-	}
-
-	//Scene objects
-	for (size_t i = 0; i < garbageSize; i++)
-	{
-		GameObject*    pCurGameObject = m_garbage[i];
-
-		// On remet à NULL lorsqu'on a trouvé un élément à dégager
-		for (size_t j = 0; j < sceneGameObjectsSize; j++)
-		{
-			if (m_sceneGameObjects[j] == pCurGameObject)
-			{
-				m_sceneGameObjects[j] = NULL;
-				break;
-			}
-		}
-
-		// "layered"...
-		const int layer = pCurGameObject->m_layer;
-		for (size_t j = 0; j < sceneGameObjectsLayeredSize[layer]; j++)
-		{
-			if (m_sceneGameObjectsLayered[layer][j] == pCurGameObject)
-			{
-				m_sceneGameObjectsLayered[layer][j] = NULL;
-				break;
-			}
-		}
-
-		// "typed"
-		const int type = pCurGameObject->m_collider_type;
-		for (size_t j = 0; j < m_sceneGameObjectsTypedSize[type]; j++)
-		{
-			if (m_sceneGameObjectsTyped[type][j] == pCurGameObject)
-			{
-				m_sceneGameObjectsTyped[type][j] = NULL;
-				break;
-			}
-		}
-
-		// A la fin, on delete l'élément
-		delete pCurGameObject;
-	}
-
-	//Texts and feedbacks
-	size_t garbageTextsSize = m_garbageTexts.size();
-	for (size_t i = 0; i < garbageTextsSize; i++)
-	{
-		SFText*    pSFText = m_garbageTexts[i];
-
-		size_t VectorTextsSize = m_sceneFeedbackSFTexts.size();
-		for (size_t j = 0; j < VectorTextsSize; j++)
-		{
-			if (m_sceneFeedbackSFTexts[j] == pSFText)
-			{
-				m_sceneFeedbackSFTexts[j] = NULL;
-				break;
-			}
-		}
-
-		delete pSFText;
-	}
-
-	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
-}
-
-void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector)
-{
-	const size_t vectorSize = vector->size();
-	for (size_t i = 0; i < vectorSize; i++)
-	{
-		if ((*vector)[i] == NULL)
-		{
-			(*vector)[i] = pGameObject;
-			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
-		}
-	}
-
-	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
-	vector->push_back(pGameObject);
-}
-
-void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)
-{
-	const size_t vectorSize = vector->size();
-	for (size_t i = 0; i < vectorSize; i++)
-	{
-		if ((*vector)[i] == NULL)
-		{
-			(*vector)[i] = pSFText;
-			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
-		}
-	}
-
-	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
-	vector->push_back(pSFText);
-}
-
-void Game::collectGarbage()
-{
-	sf::Clock dt;
-	dt.restart();
-
-	m_garbage.clear();
-	m_garbageTexts.clear();
-
-	for (std::vector<GameObject*>::iterator it = (m_sceneGameObjects).begin(); it != (m_sceneGameObjects).end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
-		{
-			m_garbage.push_back(*it);
-			continue;
-		}
-
-		if (!(**it).m_isOnScene)
-		{
-			//objects that are spawning out of screen are not deleted
-			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
-			{
-				(**it).m_isOnScene = true;
-			}
-		}
-
-		//Content that went on scene and then exited have to be deleted
-		if (!(**it).m_DontGarbageMe && (**it).m_isOnScene)
-		{
-			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > SCENE_SIZE_X
-				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > SCENE_SIZE_Y)
-			{
-				m_garbage.push_back(*it);
-				continue;
-			}
-		}
-	}
-
-	//Texts and feedbacks
-	for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
-		{
-			m_garbageTexts.push_back(*it);
-			continue;
-		}
-	}
-
-	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
-
-}
-
 void Game::garbageLayer(LayerType layer, bool only_offscene)
 {
 	int clear_count = 0;
@@ -822,28 +650,9 @@ void Game::SetLayerSpeed(LayerType layer, sf::Vector2f speed)
 	}
 }
 
-bool Game::isVectorEmpty(vector <GameObject*>* vector)
-{
-	const size_t vectorSize = vector->size();
-	for (size_t i = 0; i < vectorSize; i++)
-	{
-		if ((*vector)[i] != NULL)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
 bool Game::isLastEnemyDead()
 {
-	if (!isVectorEmpty(&m_sceneGameObjectsTyped[EnemyFire]))
-		return false;
-	else if (!isVectorEmpty(&m_sceneGameObjectsTyped[EnemyObject]))
-		return false;
-	
-	return true;
+	return m_sceneGameObjectsTyped[EnemyFire].empty() == true && m_sceneGameObjectsTyped[EnemyObject].empty() == true;
 }
 
 int Game::getHazard()

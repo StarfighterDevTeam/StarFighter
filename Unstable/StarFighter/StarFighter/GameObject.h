@@ -210,6 +210,7 @@ public:
 	virtual void updateAnimation(sf::Time deltaTime);
 	virtual void updatePostCollision();
 	virtual void Draw(sf::RenderTexture& screen);
+	void GarbageWhenOutOfScreen();
 
 	bool m_visible;
 	bool m_isOnScene;

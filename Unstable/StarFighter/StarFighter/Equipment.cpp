@@ -59,8 +59,6 @@ Equipment::Equipment()
 
 Equipment::~Equipment()
 {
-	m_bots.clear();
-
 	m_level = 1;
 	m_credits = 0;
 }

@@ -9,13 +9,15 @@ extern Game* CurrentGame;
 #define WEAPON_LOOT_PROBABILITY		30
 #define MODULE_LOOT_PROBABILITY		1
 
-Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name) : GameObject(position, speed, textureName, size)
+Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string display_name) : GameObject(position, speed, textureName, size)
 {
+	m_collider_type = LootObject;
+	m_layer = LootLayer;
+
 	 m_visible = true;
 	 m_isOnScene = true;
-	 m_collider_type = LootObject;
 	 m_money = 0;
-	 m_display_name = m_display_name;
+	 m_display_name = display_name;
 }
 
 void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)

@@ -4,6 +4,9 @@ extern Game* CurrentGame;
 
 Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
+	m_collider_type = BackgroundObject;
+	m_layer = BackgroundLayer;
+
 	m_shop = NULL;
 	m_visible = true;
 	m_DontGarbageMe = true;
@@ -13,28 +16,18 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 	for (int i = 0; i < NO_DIRECTION; i++)
 	{
-		m_portals[(Directions)i] = NULL;
+		m_portals[i] = NULL;
 	}
 }
 
 Background::~Background()
 {
-	if (m_shop)
-	{
-		m_shop->m_GarbageMe = true;
-		m_shop->m_visible = false;
-		m_shop = NULL;
-	}
+	if (m_shop != NULL)
+		m_shop->Death();
 
 	for (int i = 0; i < NO_DIRECTION; i++)
-	{
-		if (m_portals[(Directions)i])
-		{
-			m_portals[(Directions)i]->m_GarbageMe = true;
-			m_portals[(Directions)i]->m_visible = false;
-			m_portals[(Directions)i] = NULL;
-		}
-	}
+		if (m_portals[i] != NULL)
+			m_portals[i]->Death();
 }
 
 void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)

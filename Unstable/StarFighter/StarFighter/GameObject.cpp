@@ -35,6 +35,31 @@ void GameObject::Draw(sf::RenderTexture& screen)
 	}
 }
 
+void GameObject::GarbageWhenOutOfScreen()
+{
+	if (m_GarbageMe == true)
+		return;
+
+	//Garbage if gone out of screen
+	if (m_isOnScene == false)
+	{
+		//objects that are spawning out of screen are not deleted
+		if (getPosition().x + (m_size.x / 2) >= 0 && getPosition().x - (m_size.x / 2) <= SCENE_SIZE_X && getPosition().y + (m_size.y / 2) >= 0 && getPosition().y - (m_size.y / 2) <= SCENE_SIZE_Y)
+		{
+			m_isOnScene = true;
+		}
+	}
+
+	//Content that went on scene and then exited have to be deleted
+	if (m_DontGarbageMe == false && m_isOnScene == true)
+	{
+		if (getPosition().x + (m_size.x / 2) < 0 || getPosition().x - (m_size.x / 2) > SCENE_SIZE_X || getPosition().y + (m_size.y / 2) < 0 || getPosition().y - (m_size.y / 2) > SCENE_SIZE_Y)
+		{
+			m_GarbageMe = true;
+		}
+	}
+}
+
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
 	//because yeah, if you don't have an animation, this is not happening
@@ -50,7 +75,7 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 	}
 
 	//bulletproof verifications
-	if (animation >= m_animationNumber)
+	if (animation >= m_animationNumber || animation < 0)
 	{
 		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
 		animation = m_animationNumber - 1;
@@ -111,7 +136,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_speed = speed;
 	setPosition(position.x, position.y);
 	m_visible = true;
-	m_isOnScene = false;
+	m_isOnScene = /*false*/getPosition().x + (m_size.x / 2) >= 0 && getPosition().x - (m_size.x / 2) <= SCENE_SIZE_X && getPosition().y + (m_size.y / 2) >= 0 && getPosition().y - (m_size.y / 2) <= SCENE_SIZE_Y;
 	m_immune = false;
 	m_startPattern = false;
 	m_GarbageMe = false;
@@ -143,10 +168,11 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 
 GameObject::~GameObject()
 {
-	//TODO
+	if (m_equipment_loot)
+		delete m_equipment_loot;
 
-	//delete this->equipment_loot;
-	//delete this->weapon_loot;
+	if (m_weapon_loot)
+		delete m_weapon_loot;
 }
 
 void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -311,7 +337,8 @@ void GameObject::setMoney(int loot_value)
 
 void GameObject::Death()
 {
-
+	m_visible = false;
+	m_GarbageMe = true;
 }
 
 void GameObject::GenerateLoot()

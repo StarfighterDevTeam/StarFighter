@@ -5,6 +5,8 @@ extern Game* CurrentGame;
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), frameNumber, animationNumber)
 {
 	m_collider_type = EnemyObject;
+	m_layer = EnemyObjectLayer;
+
 	m_visible = true;
 	m_angspeed = 0;
 	m_radius = 0;
@@ -1189,7 +1191,7 @@ void Enemy::Death()
 {
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(getPosition().x, getPosition().y);
-	(*CurrentGame).addToScene(myFX,ExplosionLayer, Neutral);
+	(*CurrentGame).addToScene(myFX, true);
 
 	//Combo
 	(*CurrentGame).m_playerShip->AddComboCount(m_enemy_class * 100);
@@ -1210,9 +1212,7 @@ void Enemy::Death()
 		GenerateLoot();
 	}
 
-	m_visible = false;
-	m_isOnScene = false;
-	m_GarbageMe = true;
+	GameObject::Death();
 
 	if (m_enemy_class < ENEMYPOOL_DELTA)
 	{
@@ -1253,12 +1253,8 @@ Enemy::~Enemy()
 	
 	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
 
-	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
-	{
-		delete (*it);
-	}
-	m_weapons_list.clear();
-	m_phases.clear();
+	for (Weapon* weapon : m_weapons_list)
+		delete weapon;
 }
 
 void Enemy::DeletePhases()
@@ -1278,21 +1274,21 @@ void Enemy::GenerateLoot()
 	{
 		Loot* new_loot = new Loot(getPosition(), speed, m_weapon_loot->m_textureName, m_weapon_loot->m_size, m_weapon_loot->m_display_name);
 		new_loot->get_weapon_from(*this);
-		(*CurrentGame).addToScene((GameObject*)new_loot, LootLayer, LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, true);
 	}
 
 	else if (m_equipment_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, m_equipment_loot->m_textureName, m_equipment_loot->m_size, m_equipment_loot->m_display_name);
 		new_loot->get_equipment_from(*this);
-		(*CurrentGame).addToScene((GameObject*)new_loot, LootLayer, LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, true);
 	}
 
 	else if (m_money > 0)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Money");
 		new_loot->setMoney(m_money);
-		(*CurrentGame).addToScene((GameObject*)new_loot, LootLayer, LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, true);
 	}
 	else
 	{

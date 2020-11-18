@@ -98,7 +98,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 			m_bg = new Background(sf::Vector2f(0, 0), speed, (*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).m_direction, first_screen_offset);
 			m_bg->m_display_name = scene_name;
-			(*CurrentGame).addToScene(m_bg, BackgroundLayer, BackgroundObject);
+			(*CurrentGame).addToScene(m_bg, true);
 
 			//Getting the display name of the scene and loading it into the scene portals
 			for (int i = 0; i < NO_DIRECTION; i++)
@@ -128,7 +128,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					m_bg->m_portals[(Directions)i]->m_level = stoi((*CurrentGame).m_generalScenesConfig[m_links[(Directions)i]][SCENE_LEVEL]);
 
 					//Displaying the portals
-					(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], PortalLayer, PortalObject);
+					(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], true);
 				}
 			}
 
@@ -152,7 +152,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			ostringstream ss;
 			ss << m_bg->m_display_name << " Shop (Level " << m_bg->m_shop->m_level << ")";
 			m_bg->m_shop->m_display_name = ss.str();
-			(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
+			(*CurrentGame).addToScene(m_bg->m_shop, true);
 
 			//creating shop content
 			//Ship::FillShopWithRandomObjets(NUMBER_OF_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_ALPHA, -1);
@@ -323,53 +323,27 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 
 Scene::~Scene()
 {
-	if (m_bg)
+	if (m_bg != NULL)
 	{
 		for (int i = 0; i < NO_DIRECTION; i++)
-		{
-			if (m_bg->m_portals[(Directions)i])
-			{
-				m_bg->m_portals[(Directions)i]->m_GarbageMe = true;
-				m_bg->m_portals[(Directions)i]->m_visible = false;
-				m_bg->m_portals[(Directions)i] = NULL;
-			}
-		}
+			if (m_bg->m_portals[i] != NULL)
+				m_bg->m_portals[i]->Death();
 
-		if (m_bg->m_shop)
-		{
-			m_bg->m_shop->m_GarbageMe = true;
-			m_bg->m_shop->m_visible = false;
-			m_bg->m_shop = NULL;
-		}
+		if (m_bg->m_shop != NULL)
+			m_bg->m_shop->Death();
 
-		m_bg->m_GarbageMe = true;
-		m_bg->m_visible = false;
-		m_bg = NULL;
+		m_bg->Death();
 	}
 
 	for (int i = 0; i < NBVAL_EnemyClass; i++)
-	{
-		size_t enemiesVectorSize = m_enemies_ranked_by_class[i].size();
-		for (size_t j = 0; j < enemiesVectorSize; j++)
-		{
-			delete m_enemies_ranked_by_class[i][j];
-		}
-		m_enemies_ranked_by_class[i].clear();
-	}
+		for (EnemyBase* enemy : m_enemies_ranked_by_class[i])
+			delete enemy;
 
-	size_t bossVectorSize = m_boss_list.size();
-	for (size_t i = 0; i < bossVectorSize; i++)
-	{
-		delete m_boss_list[i];
-	}
-	m_boss_list.clear();
+	for (EnemyBase* boss : m_boss_list)
+		delete boss;
 
-	size_t generatosrVectorSize = m_sceneEnemyGenerators.size();
-	for (size_t i = 0; i < generatosrVectorSize; i++)
-	{
-		delete m_sceneEnemyGenerators[i];
-	}
-	m_sceneEnemyGenerators.clear();
+	for (EnemyGenerator* generator : m_sceneEnemyGenerators)
+		delete generator;
 }
 
 void Scene::PlayTitleFeedback()
@@ -751,7 +725,7 @@ void Scene::SpawnEnemy(int enemy_class)
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).m_direction, enemy->m_size);
 	enemy->setPosition(pos);
 	enemy->UpdateHealthBars();//update health bar position
-	(*CurrentGame).addToScene(enemy, EnemyObjectLayer, EnemyObject);
+	(*CurrentGame).addToScene(enemy, true);
 
 	//counting spawned enemies
 	(*CurrentGame).m_hazardSpawned += enemy->m_money;
@@ -763,7 +737,7 @@ void Scene::GenerateBoss()
 	{
 		Enemy* boss = (*it)->m_enemy->Clone();
 		boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
-		(*CurrentGame).addToScene(boss, EnemyObjectLayer, EnemyObject);
+		(*CurrentGame).addToScene(boss, true);
 
 		boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + boss->getRotation());
 		boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));

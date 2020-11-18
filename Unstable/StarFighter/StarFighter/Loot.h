@@ -9,7 +9,7 @@
 class Loot : public GameObject
 {
 public:
-	Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name);
+	Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string display_name);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier);
 	Loot* Clone();
 };

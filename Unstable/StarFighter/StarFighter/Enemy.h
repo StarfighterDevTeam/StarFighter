@@ -37,7 +37,8 @@ public:
 	void DeletePhases();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void UpdateHealthBars();
-	Enemy* Clone(); void Death() override;
+	Enemy* Clone();
+	void Death() override;
 
 	vector<Weapon*> m_weapons_list;
 	FX* m_FX_death;

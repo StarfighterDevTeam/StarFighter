@@ -7,9 +7,10 @@ using namespace sf;
 Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), ship_model->m_textureName, ship_model->m_size, Vector2f((ship_model->m_size.x / 2), (ship_model->m_size.y / 2)), ship_model->m_frameNumber)
 {
 	if (!ship_model)
-	{
 		return;
-	}
+
+	m_collider_type = PlayerShip;
+	m_layer = PlayerShipLayer;
 
 	m_ship_model = ship_model;
 
@@ -23,10 +24,10 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_display_name = "Wisteria";
 	m_weapon = NULL;
 	m_FX_death = NULL;
-	m_collider_type = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
 	m_visible = true;
+	m_DontGarbageMe = true;
 	m_damage = 0;
 	m_hyperspeed = 1.0f;
 	m_armor = 1;
@@ -61,7 +62,8 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	if (!ship_model->m_fake_textureName.empty())
 	{
 		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
+		
+		(*CurrentGame).addToScene(m_fake_ship, false);
 	}
 
 	m_combo_aura = new Aura(this, "2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
@@ -70,7 +72,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_trail = new Aura(this, "2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
-	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
+	(*CurrentGame).addToScene(m_trail, false);
 
 	m_graze_radius_feedback.setRadius(GRAZE_DISTANCE);
 	m_graze_radius_feedback.setOrigin(sf::Vector2f(m_graze_radius_feedback.getRadius(), m_graze_radius_feedback.getRadius()));
@@ -115,39 +117,26 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 Ship::~Ship()
 {
 	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
 		delete m_equipment[i];
-		
-	}
 
 	delete m_ship_model;
 	delete m_weapon;
 	delete m_FX_death;
 
-	size_t botListSize = m_bot_list.size();
-	for (size_t i = 0; i < botListSize; i++)
-	{
-		delete m_bot_list[i];
-	}
-	m_bot_list.clear();
+	for (Bot* bot : m_bot_list)
+		delete bot;
 
 	//game objects
-	if (m_combo_aura)
-	{
-		m_combo_aura->m_GarbageMe = true;
-		m_combo_aura->m_visible = false;
-	}
-	if (m_fake_ship)
-	{
-		m_fake_ship->m_GarbageMe = true;
-		m_fake_ship->m_visible = false;
-	}
-	if (m_trail)
-	{
-		m_trail->m_GarbageMe = true;
-		m_trail->m_visible = false;
-	}
-	if (m_recall_text)
+	if (m_combo_aura != NULL)
+		m_combo_aura->Death();
+
+	if (m_fake_ship != NULL)
+		m_fake_ship->Death();
+
+	if (m_trail != NULL)
+		m_trail->Death();
+
+	if (m_recall_text != NULL)
 	{
 		m_recall_text->m_GarbageMe = true;
 		m_recall_text->m_visible = false;
@@ -258,8 +247,6 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 	if (!equipment->m_bots.empty())
 	{
 		GenerateBots(this);
-
-		
 	}
 	
 	if (!no_save)
@@ -1283,7 +1270,7 @@ void Ship::SellingItem()
 		if (success)
 		{
 			//save shop: flag object as added into shop
-			Game::AddGameObjectToVector(m_SFTargetPanel->GetFocusedItem(), &m_targetShop->m_items);
+			m_targetShop->m_items.push_back(m_SFTargetPanel->GetFocusedItem());
 
 			//finish moving the object
 			m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
@@ -1859,7 +1846,7 @@ void Ship::Death()
 {
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	(*CurrentGame).addToScene(myFX, ExplosionLayer, Neutral);
+	(*CurrentGame).addToScene(myFX, true);
 
 	SetVisibility(false);
 	m_graze_count = 0;
@@ -2173,7 +2160,7 @@ void Ship::GetDamageFrom(GameObject& object)
 			
 			float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
 			fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x/2, getPosition().y + cos(angle)*GetShipSize().y/2);
-			(*CurrentGame).addToScene(fx, ExplosionLayer, Neutral);
+			(*CurrentGame).addToScene(fx, true);
 		}
 	}
 
@@ -3284,14 +3271,15 @@ int Ship::getFighterIntStatValue(FighterStats stat)
 void Ship::GenerateBots(GameObject* target)
 {
 	int j = 0;
-	for (std::vector<Bot*>::iterator it = m_bot_list.begin(); it != m_bot_list.end(); it++)
+	for (Bot* bot : m_bot_list)
 	{
-		(*it)->m_automatic_fire = m_automatic_fire;
-		//(*it)->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, (*it)->m_spread);
-		(*it)->setTarget(target);
-		(*it)->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-		(*it)->m_visible = !m_disable_bots;
-		(*CurrentGame).addToScene((*it), BotLayer, Neutral);
+		bot->m_automatic_fire = m_automatic_fire;
+		//bot->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, (*it)->m_spread);
+		bot->setTarget(target);
+		bot->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+		bot->m_visible = !m_disable_bots;
+
+		(*CurrentGame).addToScene(bot, true);
 
 		//bots auto spreading based on number of bots
 		//int s = j % 2 == 0 ? 1 : -1;
@@ -3306,26 +3294,26 @@ void Ship::GenerateBots(GameObject* target)
 		//	int x = i / 2;
 		//	bot->m_spread.x *= s * (1 + x);
 		//}
-		
 	}
 }
 
 void Ship::SetBotsVisibility(bool visible)
 {
-	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+	for (Bot* bot : m_bot_list)
 	{
-		(*it)->m_visible = visible;
-		(*it)->setGhost(m_ghost);
+		bot->m_visible = visible;
+		bot->setGhost(m_ghost);
 	}
 }
 
 void Ship::DestroyBots()
 {
-	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+	for (Bot* bot : m_bot_list)
 	{
-		(*it)->m_visible = false;
-		(*it)->m_GarbageMe = true;
+		bot->m_visible = false;
+		bot->m_GarbageMe = true;
 	}
+
 	m_bot_list.clear();
 }
 
@@ -3368,7 +3356,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 		if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
 		{
 			Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
-			(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+			(*CurrentGame).addToScene(strobo, true);
 
 			m_stroboscopic_effect_clock.restart();
 		}
