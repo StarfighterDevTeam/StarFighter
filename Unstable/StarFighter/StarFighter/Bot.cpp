@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : GameObject(position, speed,  textureName, size)
 {
-	m_collider_type = Neutral;
+	m_collider_type = BackgroundObject;
 	m_layer = BotLayer;
 	m_visible = false;
 	m_isOnScene = true;

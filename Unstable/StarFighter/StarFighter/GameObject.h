@@ -134,7 +134,6 @@ enum GameObjectType {
 	PlayerShip,
 	FakePlayerShip,
 	FriendlyFire,
-	Neutral,
 	EnemyFire,
 	EnemyObject,
 	NBVAL_GameObject

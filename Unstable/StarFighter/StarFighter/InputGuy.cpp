@@ -17,7 +17,7 @@ bool InputGuy::isFiring()
 				return true;
 			}
 		}
-		if (sf::Joystick::isButtonPressed(0, 0)) // A button
+		if (sf::Joystick::isButtonPressed(0, 0))// A button
 		{
 			return true;
 		}
@@ -66,7 +66,7 @@ bool InputGuy::isBraking()
 
 	if (sf::Joystick::isConnected(0))
 	{
-		if (sf::Joystick::isButtonPressed(0, 2)) // X button
+		if (sf::Joystick::isButtonPressed(0, 2))// X button
 			return true;
 	}
 
@@ -123,7 +123,7 @@ bool InputGuy::isUsingDebugCommand()
 
 bool InputGuy::spawnInSandbox()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F4))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F6))
 	{
 		return true;
 	}

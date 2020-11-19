@@ -8,7 +8,7 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	m_duration = duration;
 	m_visible = true;
 	m_isOnScene = true;
-	m_collider_type = Neutral;
+	m_collider_type = BackgroundObject;
 	m_layer = ExplosionLayer;
 }
 
@@ -61,7 +61,7 @@ Aura::Aura(GameObject* target, std::string textureName, sf::Vector2f size, int f
 	m_visible = true;
 	m_isOnScene = true;
 	m_offset = sf::Vector2f(0, 0);
-	m_collider_type = Neutral;
+	m_collider_type = BackgroundObject;
 	m_layer = FakeShipLayer;
 }
 

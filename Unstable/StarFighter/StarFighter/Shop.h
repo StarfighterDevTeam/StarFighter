@@ -2,6 +2,7 @@
 #define SHOP_H_INCLUDED
 
 #include "HudGrid.h"
+#include "Game.h"
 #include "GameObject.h"
 
 class Shop : public GameObject

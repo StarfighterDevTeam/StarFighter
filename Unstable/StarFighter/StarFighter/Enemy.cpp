@@ -1259,11 +1259,8 @@ Enemy::~Enemy()
 
 void Enemy::DeletePhases()
 {
-	for (std::vector<Phase*>::iterator it = m_phases.begin(); it != m_phases.end(); it++)
-	{
-		delete (*it);
-	}
-	m_phases.clear();
+	for (Phase* phase : m_phases)
+		delete phase;
 }
 
 void Enemy::GenerateLoot()
@@ -1533,12 +1530,11 @@ void Enemy::ApplyLevelModifiers()
 	m_enemyLevel.setString(to_string(m_level));
 }
 
+// ENEMY BASE
 EnemyBase::~EnemyBase()
 {
-	if (m_enemy)
-	{
+	if (m_enemy != NULL)
 		m_enemy->DeletePhases();
-	}
 	
 	delete m_enemy;
 }

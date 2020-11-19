@@ -77,10 +77,10 @@ int main()
 			}
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-		{
-			renderWindow.close();
-		}
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		//{
+		//	renderWindow.close();
+		//}
 
 		//Resolution switch
 		if (InputGuy::isChangingResolution())
@@ -148,7 +148,7 @@ int main()
 
 		dt = deltaClock.restart();
 
-		if (!(*CurrentGame).m_Pause && dt.asSeconds() < 0.5)
+		if (!(*CurrentGame).m_Pause && dt.asSeconds() < 1)
 		{
 			//Update
 			gameManager.GetCurrentState()->Update(dt);

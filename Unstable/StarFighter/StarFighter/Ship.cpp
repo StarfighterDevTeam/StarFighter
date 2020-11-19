@@ -392,6 +392,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		m_targetShop = NULL;
 	}
+	m_isCollidingWithInteractiveObject = No_Interaction;
 	m_movingX = false;
 	m_movingY = false;
 	m_moving = false;
@@ -1270,7 +1271,14 @@ void Ship::SellingItem()
 		if (success)
 		{
 			//save shop: flag object as added into shop
-			m_targetShop->m_items.push_back(m_SFTargetPanel->GetFocusedItem());
+			for (GameObject* item : m_targetShop->m_items)
+			{
+				if (item == NULL)
+				{
+					item = m_SFTargetPanel->GetFocusedItem();
+					break;
+				}
+			}
 
 			//finish moving the object
 			m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
