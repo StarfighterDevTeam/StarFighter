@@ -41,6 +41,8 @@ enum LayerType
 {
 	BackgroundLayer,
 	PortalLayer,
+	FriendlyBeamLayer,
+	EnemyBeamLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
 	AuraLayer,
@@ -52,7 +54,6 @@ enum LayerType
 	PlayerStroboscopicLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
-
 	BlackStripesLayer,
 	PanelLayer,
 	NBVAL_Layer
@@ -113,6 +114,7 @@ enum AmmoData
 	AMMO_CLOCKWISE,//12
 	AMMO_CENTERED,//13
 	AMMO_ROTATION_SPEED,//14
+	AMMO_BEAM,//15
 };
 
 enum FXData
@@ -275,7 +277,7 @@ public:
 	int m_animationNumber;
 	int m_frameNumber;
 	int m_currentAnimationIndex;
-	sf::Time m_collision_timer;
+	float m_collision_timer;
 
 	//TIPS:
 	// direction = the scene border you refer too

@@ -26,7 +26,8 @@ Weapon::Weapon(Ammo* Ammunition)
 	m_level = 1;
 	m_credits = 0;
 	m_quality = 0;
-	m_readyFireTimer = sf::seconds(0);
+	m_readyFireTimer = 0;
+	m_beam_timer = 0;
 
 	m_ammunition = Ammunition;
 }
@@ -35,6 +36,9 @@ Weapon::~Weapon()
 {
 	if (m_ammunition != NULL)
 		delete m_ammunition;
+
+	for (Ammo* beam : m_beams)
+		beam->Death();
 }
 
 void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)
@@ -48,62 +52,85 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 	}
 
 	//transmitting the value to the bullet
-	bullet->m_shot_angle = this->m_shot_angle;
+	bullet->m_shot_angle = m_shot_angle;
+	bullet->m_offset_x = offsetX;
 
 	//calculation of bullet offset respect to the weapon position
-	float bullet_offset_x = offsetX * cos(this->m_shot_angle) - this->m_ammunition->m_size.y / 2 * sin(this->m_shot_angle);
-	float bullet_offset_y = offsetX * sin(this->m_shot_angle) + this->m_ammunition->m_size.y / 2 * cos(this->m_shot_angle);
+	float bullet_offset_x = bullet->m_offset_x * cos(m_shot_angle) - (bullet->m_size.y / 2 - (bullet->m_size.y * (int)bullet->m_isBeam)) * sin(m_shot_angle);
+	float bullet_offset_y = bullet->m_offset_x * sin(m_shot_angle) + (bullet->m_size.y / 2 - (bullet->m_size.y * (int)bullet->m_isBeam)) * cos(m_shot_angle);
 
-	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
+	bullet->setPosition(getPosition().x + bullet_offset_x, getPosition().y + bullet_offset_y);
 
-	bullet->m_speed.x = bullet->m_ref_speed * sin(this->m_shot_angle + (l_dispersion *  M_PI / 180)) * (-this->m_fire_direction.y);
-	bullet->m_speed.y = bullet->m_ref_speed * cos(this->m_shot_angle + (l_dispersion *  M_PI / 180)) * (this->m_fire_direction.y);
+	bullet->m_speed.x = bullet->m_ref_speed * sin(m_shot_angle + (l_dispersion *  M_PI / 180)) * (- m_fire_direction.y);
+	bullet->m_speed.y = bullet->m_ref_speed * cos(m_shot_angle + (l_dispersion *  M_PI / 180)) * (m_fire_direction.y);
 
-	bullet->setRotation((this->m_shot_angle * 180.0f / M_PI) + l_dispersion);
+	bullet->setRotation((m_shot_angle * 180.0f / M_PI) + l_dispersion);
 
 	bullet->m_visible = true;
 	bullet->m_collider_type = m_collider_type;
 	bullet->m_isOnScene = true;
 
 	bullet->m_collider_type = m_collider_type;
-	bullet->m_layer = m_collider_type == EnemyFire ? EnemyFireLayer : FriendlyFireLayer;
 	
+	if (bullet->m_isBeam == false)
+		bullet->m_layer = m_collider_type == EnemyFire ? EnemyFireLayer : FriendlyFireLayer;
+	else
+		bullet->m_layer = m_collider_type == EnemyFire ? EnemyBeamLayer : FriendlyBeamLayer;
+
 	(*CurrentGame).addToScene(bullet, true);
+
+	if (m_rafale < 0)//continuous beam created, we need to keep track of it
+	{
+		m_beams.push_back(bullet);
+	}
 }
 
 bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (hyperspeedMultiplier < 1.0f)
 	{
-		m_readyFireTimer += deltaTime * hyperspeedMultiplier;
+		m_readyFireTimer += deltaTime.asSeconds() * hyperspeedMultiplier;
+		m_beam_timer += deltaTime.asSeconds() * hyperspeedMultiplier;
 	}
 	else
 	{
-		m_readyFireTimer += deltaTime;
+		m_readyFireTimer += deltaTime.asSeconds();
+		m_beam_timer += deltaTime.asSeconds();
 	}
 
-	bool rafale_ended = true;
-	if (m_rafale > 0)
+	//enf of beam timer
+	if (m_beams.empty() == false && m_rafale_cooldown > 0 && m_beam_timer > m_rafale_cooldown)
 	{
-		rafale_ended = false;
+		for (Ammo* beam : m_beams)
+			beam->Death();
+
+		m_beams.clear();
+		m_readyFireTimer = 0;
 	}
-	if (m_rafale > 0 && m_rafale_index > m_rafale - 1 && m_readyFireTimer > sf::seconds(m_rafale_cooldown))//if you wait long enough, you can reset your rafale
+
+	//rafale
+	bool rafale_ready = (m_rafale == 0);
+	if (m_rafale > 0 && m_readyFireTimer > m_rafale_cooldown)
 	{
 		m_rafale_index = 0;
 		m_shot_index = 0;
-		rafale_ended = true;
+		rafale_ready = true;
 	}
 
-	if (m_readyFireTimer > sf::seconds(m_rate_of_fire) && rafale_ended)
+	if (m_readyFireTimer > m_rate_of_fire && rafale_ready == true)
 	{
 		m_firing_ready = true;
 	}
 	else if (m_rafale > 0)
 	{
-		if (m_readyFireTimer > sf::seconds(m_rate_of_fire) && m_rafale_index <= m_rafale - 1)
+		if (m_readyFireTimer > m_rate_of_fire && m_rafale_index <= m_rafale - 1)
 		{
 			m_firing_ready = true;
 		}
+	}
+	else if (m_rafale < 0)
+	{
+		m_firing_ready = (m_beams.empty() == true && m_readyFireTimer > m_rate_of_fire);
 	}
 
 	return m_firing_ready;
@@ -172,12 +199,16 @@ void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime)
 		FireSingleShot(collider_type);
 	}
 
-	m_readyFireTimer = sf::seconds(0);
+	m_readyFireTimer = 0;
 	m_firing_ready = false;
 
 	if (m_rafale > 0 && m_shot_index == 0)
 	{
 		m_rafale_index++;
+	}
+	else if (m_rafale < 0)//continuous beam started
+	{
+		m_beam_timer = 0;
 	}
 }
 
@@ -370,28 +401,6 @@ Weapon* Weapon::Clone()
 	weapon->m_quality = this->m_quality;
 
 	return weapon;
-}
-
-sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
-{
-	sf::Vector2i fire_direction = sf::Vector2i(0, m_fire_direction.y);
-
-	if (direction == DIRECTION_DOWN)
-	{
-		fire_direction.y = -m_fire_direction.y;
-	}
-	else if (direction == DIRECTION_RIGHT)
-	{
-		fire_direction.x = -m_fire_direction.y;
-		fire_direction.y = 0;
-	}
-	else if (direction == DIRECTION_LEFT)
-	{
-		fire_direction.x = m_fire_direction.y;
-		fire_direction.y = 0;
-	}
-
-	return fire_direction;
 }
 
 Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)

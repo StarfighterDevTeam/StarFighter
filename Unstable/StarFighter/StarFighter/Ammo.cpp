@@ -15,6 +15,8 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_explosion = explosion;
 	m_radius = 0;
 	m_angspeed = 0;
+	m_offset_x = 0;
+	m_isBeam = false;
 	m_range = 0;
 	m_current_range = 0;
 	m_shot_angle = 0;
@@ -31,15 +33,17 @@ Ammo* Ammo::Clone()
 	ammo->m_angspeed = this->m_angspeed;
 	ammo->m_range = this->m_range;
 	ammo->m_rotation_speed = this->m_rotation_speed;
+	ammo->m_offset_x = this->m_offset_x;
+	ammo->m_isBeam = this->m_isBeam;
 
 	return ammo;
 }
 
 void Ammo::Death()
 {
-	FX* myFX = m_explosion->Clone();
-	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-    (*CurrentGame).addToScene(myFX, true);
+	//FX* myFX = m_explosion->Clone();
+	//myFX->setPosition(this->getPosition().x, this->getPosition().y);
+    //(*CurrentGame).addToScene(myFX, true);
 
 	GameObject::Death();
 }
@@ -54,12 +58,17 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
-	else if (hyperspeedMultiplier < 1)
+	else if (hyperspeedMultiplier < 1)//slow motion
 	{
 		newspeed.x = m_speed.x * hyperspeedMultiplier;
 		newspeed.y = m_speed.y * hyperspeedMultiplier;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
+
+	if (hyperspeedMultiplier < 1.0f)
+		m_collision_timer -= deltaTime.asSeconds() * hyperspeedMultiplier;
+	else
+		m_collision_timer -= deltaTime.asSeconds();
 
 	this->setGhost(hyperspeedMultiplier > 1.0f);
 

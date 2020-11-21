@@ -28,6 +28,8 @@ public:
 	float m_range;
 	float m_current_range;
 	float m_shot_angle;
+	float m_offset_x;//offset respect to weapon on firing
+	bool m_isBeam;
 };
 
 #endif // AMMO_H_INCLUDED

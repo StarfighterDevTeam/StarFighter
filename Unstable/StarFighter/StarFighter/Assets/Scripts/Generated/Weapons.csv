@@ -5,7 +5,8 @@ laser_360,Laser 360°,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,3,
 laser_player,Laser player,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
 laser_bot,Default_laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
 laser_arc,Laser arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,homing
-fireball_sinus,Fireball sinus,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_homing
+fireball_sinus,Fireball sinus,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,25,1.5f,1,0,0,0,0,semi_homing
+laserbeam,Laser beam,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,-1,3,1,0,0,0,0,0
 #,,,,,,,,,,,,,,,
 V_Alpha1_laser,Vanguard Alpha1 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3,3,1.5f,1,10,0,0,0,homing
 V_Alpha2_laserInt,Vanguard Alpha2 Laser Interior,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,0,2.57142857142857,2,40,0,0,0,homing
@@ -73,4 +74,4 @@ V_BetaGold_laser,Vanguard BetaGold Laser,2D/Equipment/laser_red.png,48,48,1,Soun
 V_AlphaGold_laser_double,Vanguard AlphaGold Laser Double,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3f,15,3.f,3,0,30,alternate,0,homing
 V_BetaGold_dragonball_arc,Vanguard BetaGold Dragonballs Arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8f,0,3.f,12,0,120,0,0,0
 V_BetaGold_dragonball_homing,Vanguard BetaGold Dragonballs Homing,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,20,7,alternate,0,homing
-V_BetaGold_dragonball_arc_alt,Vanguard BetaGold Dragonballs Arc Alt,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.01,1,0.2f,16,0,150,ascending,0,0
+V_BetaGold_dragonball_arc_alt,Vanguard BetaGold Dragonballs Arc Alt,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.01f,1,0.2f,16,0,150,ascending,0,0

@@ -132,7 +132,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (m_feedbackTimer > sf::seconds(0))
 	{
 		m_feedbackTimer -= deltaTime;
-		m_collision_timer -= deltaTime;
+		m_collision_timer -= deltaTime.asSeconds();
 		UpdateHealthBars();
 	}
 
@@ -159,13 +159,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		m_phaseTimer += deltaTime * hyperspeedMultiplier;
 		m_enemyTimer += deltaTime * hyperspeedMultiplier;
-		m_collision_timer -= deltaTime * hyperspeedMultiplier;
+		m_collision_timer -= deltaTime.asSeconds() * hyperspeedMultiplier;
 	}
 	else
 	{
 		m_phaseTimer += deltaTime;
 		m_enemyTimer += deltaTime;
-		m_collision_timer -= deltaTime;
+		m_collision_timer -= deltaTime.asSeconds();
 	}
 
 	//shield regen if not maximum
@@ -300,29 +300,30 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//calculating the weapons cooldown and targets
 	bool isDoneFiringOnLockedTarget = true;
-	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
+	for (Weapon* weapon : m_weapons_list)
 	{
-		if ((*it)->isFiringReady(deltaTime, hyperspeedMultiplier))//update all weapons cooldown
+		//update all weapons cooldown
+		if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			(*it)->m_isReadyToFire = true;
+			weapon->m_isReadyToFire = true;
 			//now acquire target is the weapons needs to
 			if (!isNearestTargetIsKnown)//maybe we know it already?
 			{
-				if ((*it)->m_target_homing == HOMING || ((*it)->m_target_homing == SEMI_HOMING && (*it)->m_rafale_index == 0))
+				if (weapon->m_target_homing == HOMING || (weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale_index == 0))
 				{
-					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, this->getPosition()), 360);
+					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, getPosition()), 360);
 				}
 			}
 		}
 		else
 		{
-			(*it)->m_isReadyToFire = false;
+			weapon->m_isReadyToFire = false;
 		}
 
 		//semi-HOMING and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_HOMING"
-		if (m_face_target)
+		if (m_face_target == true)
 		{
-			if ((*it)->m_target_homing == SEMI_HOMING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
+			if (weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale > 0 && ((weapon->m_rafale_index > 0 && weapon->m_rafale_index < weapon->m_rafale) || (weapon->m_multishot > 1 && weapon->m_shot_index > 0)))
 			{
 				isDoneFiringOnLockedTarget = false;
 			}
@@ -454,11 +455,43 @@ void Enemy::RotateFeedbacks(float angle)
 
 void Enemy::GetDamageFrom(GameObject& object)
 {
-	if (object.m_collision_timer < sf::seconds(0))
+	if (object.m_collider_type == FriendlyFire)
+	{
+		//display impact FX regardless of damage
+		Ammo& ammo = (Ammo&)object;
+		if (ammo.m_isBeam == false)
+			ammo.Death();
+
+		//position of FX impact
+		if (ammo.m_isBeam == false || ammo.m_collision_timer < 0)
+		{
+			FX* impactFX = ammo.m_explosion->Clone();
+			float angle_impact = ammo.getRotation() * M_PI / 180;
+			float impact_offset_x = -getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * sin(angle_impact);
+			float impact_offset_y = getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * cos(angle_impact);
+			impactFX->setPosition(getPosition().x + impact_offset_x, getPosition().y + impact_offset_y);
+
+			(*CurrentGame).addToScene(impactFX, true);
+		}
+	}
+
+
+	if (object.m_collision_timer < 0)
 	{
 		GetDamage(object.m_damage);
 
-		object.m_collision_timer = sf::seconds(TIME_BETWEEN_COLLISION_DAMAGE_TICK);
+		if (object.m_collider_type == FriendlyFire)//bullet versus ship
+		{
+			Ammo& ammo = (Ammo&)object;
+			if (ammo.m_isBeam == false)
+				object.m_collision_timer = TIME_BETWEEN_BULLET_DAMAGE_TICK;
+			else
+				object.m_collision_timer = TIME_BETWEEN_BEAM_DAMAGE_TICK;
+		}
+		else//collision ship versus ship
+		{
+			object.m_collision_timer = TIME_BETWEEN_COLLISION_DAMAGE_TICK;
+		}	
 	}
 }
 
@@ -1469,6 +1502,7 @@ Ammo* Enemy::LoadAmmo(string name)
 		{
 			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, stoi((*it)[AMMO_SPEED])), (*it)[AMMO_IMAGE_NAME],
 				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_DAMAGE]), LoadFX((*it)[AMMO_FX]));
+
 			new_ammo->m_display_name = (*it)[AMMO_NAME];
 			new_ammo->m_range = stoi((*it)[AMMO_RANGE]);
 
@@ -1481,6 +1515,7 @@ Ammo* Enemy::LoadAmmo(string name)
 			new_ammo->m_Pattern.SetPattern(bobby->m_currentPattern, bobby->m_patternSpeed, bobby->m_patternParams);
 
 			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);
+			new_ammo->m_isBeam = (bool)(stoi((*it)[AMMO_BEAM]));
 			return new_ammo;
 		}
 	}

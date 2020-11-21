@@ -104,7 +104,7 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 	}
 
 	if (m_currentAnimation)
-		delete m_currentAnimation;
+ 		delete m_currentAnimation;
 	m_currentAnimation = anim;
 	play(*m_currentAnimation);
 	m_currentAnimationIndex = animation;
@@ -151,7 +151,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_equipment_loot = NULL;
 	m_weapon_loot = NULL;
 	m_isCollidingWithInteractiveObject = No_Interaction;
-	m_collision_timer = sf::seconds(-1);
+	m_collision_timer = -1;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -255,11 +255,11 @@ void GameObject::setGhost(bool ghost)
 
 void GameObject::GetDamageFrom(GameObject& object)
 {
-	if (object.m_collision_timer < sf::seconds(0))
+	if (object.m_collision_timer < 0)
 	{
 		GetDamage(object.m_damage);
 
-		object.m_collision_timer = sf::seconds(TIME_BETWEEN_COLLISION_DAMAGE_TICK);
+		object.m_collision_timer = TIME_BETWEEN_BULLET_DAMAGE_TICK;
 	}
 }
 

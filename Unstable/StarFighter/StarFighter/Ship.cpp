@@ -355,7 +355,7 @@ void Ship::UpdateInputStates()
 	GetInputState(InputGuy::isRecalling(), Action_Recalling);
 	GetInputState(InputGuy::isOpeningHud(), Action_OpeningHud);
 	GetInputState(InputGuy::isChangingResolution(), Action_ChangingResolution);
-	//GetInputState(InputGuy::setAutomaticFire(), Action_AutomaticFire);
+	GetInputState(InputGuy::setAutomaticFire(), Action_AutomaticFire);
 	GetInputState(InputGuy::isUsingDebugCommand(), Action_DebugCommand);
 }
 
@@ -407,15 +407,12 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	ManageInputs(deltaTime, hyperspeedMultiplier, directions);
 
 	m_trail->m_visible = (hyperspeedMultiplier > 1.0f);
+
 	//slow motion
 	if (hyperspeedMultiplier < 1.0f)
-	{
-		m_collision_timer -= deltaTime * hyperspeedMultiplier;
-	}
+		m_collision_timer -= deltaTime.asSeconds() * hyperspeedMultiplier;
 	else
-	{
-		m_collision_timer -= deltaTime;
-	}
+		m_collision_timer -= deltaTime.asSeconds();
 
 	GameObject::update(deltaTime, hyperspeedMultiplier);
 
@@ -538,53 +535,77 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//Fire function
-	if (m_weapon)
+	if (m_weapon != NULL)
 	{
+		//UPDATE WEAPON POSITION
+		float target_angle = getRotation();//calculating the angle we want to face, if any
+		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
+		{
+			target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
+		}
+
+		float current_angle = getRotation();
+		float delta = current_angle - target_angle;
+		if (delta > 180)
+			delta -= 360;
+		else if (delta < -180)
+			delta += 360;
+
+		float theta = getRotation() / 180 * M_PI;
+		if (m_weapon->m_target_homing != NO_HOMING)
+		{
+			theta -= delta / 180 * M_PI;
+		}
+
+		if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
+		{
+			//semi-HOMING and rafale not ended => no update of target or weapon position
+		}
+		else
+		{
+			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.x / 2 * sin(theta);
+			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.y - m_size.y / 2 * cos(theta);
+
+			//transmitting the angle to the weapon, which will pass it to the bullets
+			m_weapon->m_shot_angle = theta;
+		}
+
+		m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
+
+		//UPDATE FIRING COOLDOWN AND FIRE
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY && !m_actions_states[Action_Recalling])
+			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY && m_actions_states[Action_Recalling] == false)
 			{
-				if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
+				if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
 				{
-					//calculating the angle we want to face, if any
-					float target_angle = getRotation();
-					if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
-					{
-						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
-					}
-
-					float current_angle = getRotation();
-					float delta = current_angle - target_angle;
-					if (delta > 180)
-						delta -= 360;
-					else if (delta < -180)
-						delta += 360;
-
-					//float theta = (this->getRotation() - delta) / 180 * M_PI;
-					float theta = getRotation() / 180 * M_PI;
-					if (m_weapon->m_target_homing != NO_HOMING)
-					{
-						theta -= delta / 180 * M_PI;
-					}
-
-					if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
-					{
-						//semi-HOMING and rafale not ended = no update of target or weapon position
-					}
-					else
-					{
-						m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.x / 2 * sin(theta);
-						m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.y - m_size.y / 2 * cos(theta);
-
-						//transmitting the angle to the weapon, which will pass it to the bullets
-						m_weapon->m_shot_angle = theta;
-					}
-
-					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
 					m_weapon->Fire(FriendlyFire, deltaTime);
 
 					(*CurrentGame).PlaySFX(SFX_Fire);
 				}
+			}
+		}
+
+		//UPDATE BEAMS
+		for (Ammo* beam : m_weapon->m_beams)
+		{
+			//update beam positions
+			float beam_offset_x = beam->m_offset_x * cos(beam->m_shot_angle) - (beam->m_size.y / 2 - (beam->m_size.y * (int)beam->m_isBeam)) * sin(beam->m_shot_angle);
+			float beam_offset_y = beam->m_offset_x * sin(beam->m_shot_angle) + (beam->m_size.y / 2 - (beam->m_size.y * (int)beam->m_isBeam)) * cos(beam->m_shot_angle);
+
+			beam->setPosition(m_weapon->getPosition().x + beam_offset_x, m_weapon->getPosition().y + beam_offset_y);
+		}
+
+		if (m_weapon->m_beams.empty() == false)//end of beam because no valid fire input
+		{
+			if (m_disable_inputs == true || m_disable_fire == true || m_actions_states[Action_Recalling] == true || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() <= END_OF_DIALOGS_DELAY
+				|| (m_actions_states[Action_Firing] == false && m_automatic_fire == false))
+			{
+				for (Ammo* beam : m_weapon->m_beams)
+						beam->Death();
+
+				m_weapon->m_beams.clear();
+				m_weapon->m_readyFireTimer = 0;
 			}
 		}
 	}
@@ -696,12 +717,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 			//Weapon firing
 			ManageFiring(deltaTime, hyperspeedMultiplier);
+
 			//Bots firing
 			for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 			{
 				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
 			}
-			if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
+			if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
 			{
 				m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 				m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -910,7 +932,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 				//Braking and speed malus on firing
 				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
-				if (m_actions_states[Action_Braking] || m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
+				if (m_actions_states[Action_Braking] == true || m_actions_states[Action_Firing] == true || m_automatic_fire == true)
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -940,7 +962,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
 				}
-				if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
+				if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -2142,6 +2164,26 @@ float Ship::getShipBeastScore()
 
 void Ship::GetDamageFrom(GameObject& object)
 {
+	if (object.m_collider_type == EnemyFire)
+	{
+		//display impact FX regardless of damage
+		Ammo& ammo = (Ammo&)object;
+		if (ammo.m_isBeam == false)
+			ammo.Death();
+
+		//position of FX impact
+		if (ammo.m_isBeam == false || ammo.m_collision_timer < 0)
+		{
+			FX* impactFX = ammo.m_explosion->Clone();
+			float angle_impact = ammo.getRotation() * M_PI / 180;
+			float impact_offset_x = -getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * sin(angle_impact);
+			float impact_offset_y = getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * cos(angle_impact);
+			impactFX->setPosition(getPosition().x + impact_offset_x, getPosition().y + impact_offset_y);
+
+			(*CurrentGame).addToScene(impactFX, true);
+		}
+	}
+
 	if (m_immune || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
 	{
 		return;
@@ -2152,23 +2194,39 @@ void Ship::GetDamageFrom(GameObject& object)
 		return;
 	}
 
-	if (object.m_collision_timer >= sf::seconds(0))
+	if (object.m_collision_timer >= 0)
 	{
 		return;
 	}
 	else
 	{
-		object.m_collision_timer = sf::seconds(TIME_BETWEEN_COLLISION_DAMAGE_TICK);
-
-		if (object.m_collider_type == EnemyObject)
+		if (object.m_collision_timer < 0)
 		{
-			string fx_name = "explosion_S";
-			float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
-			FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
-			
-			float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
-			fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x/2, getPosition().y + cos(angle)*GetShipSize().y/2);
-			(*CurrentGame).addToScene(fx, true);
+			GetDamage(object.m_damage);
+
+			if (object.m_collider_type == EnemyFire)//bullet versus ship
+			{
+				Ammo& ammo = (Ammo&)object;
+				if (ammo.m_isBeam == false)
+					object.m_collision_timer = TIME_BETWEEN_BULLET_DAMAGE_TICK;
+				else
+					object.m_collision_timer = TIME_BETWEEN_BEAM_DAMAGE_TICK;
+			}
+			else//collision ship versus ship
+			{
+				object.m_collision_timer = TIME_BETWEEN_COLLISION_DAMAGE_TICK;
+
+				if (object.m_collider_type == EnemyObject)//FX mutal collision
+				{
+					string fx_name = "explosion_S";
+					float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
+					FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
+
+					float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
+					fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x / 2, getPosition().y + cos(angle)*GetShipSize().y / 2);
+					(*CurrentGame).addToScene(fx, true);
+				}
+			}
 		}
 	}
 

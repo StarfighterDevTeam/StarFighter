@@ -6,8 +6,8 @@
 #include "Assets.h"
 #include "Ammo.h"
 
-#define LASER_RATE_OF_FIRE			0.4f
-#define LASER_DAMAGE				100
+#define LASER_RATE_OF_FIRE				0.4f
+#define LASER_DAMAGE					100
 #define LASERFAST_RATE_OF_FIRE			0.2f
 #define LASERFAST_DAMAGE				50
 
@@ -37,7 +37,7 @@ public:
 
 	sf::Vector2i m_fire_direction;
 	float m_rate_of_fire;
-	sf::Time m_readyFireTimer;
+	float m_readyFireTimer;
 	Ammo* m_ammunition;
 	bool m_isReadyToFire;
 	TargetHoming m_target_homing;
@@ -57,12 +57,13 @@ public:
 	sf::Vector2f m_weapon_current_offset;
 	float m_shot_angle;
 	bool m_face_target;
+	vector<Ammo*> m_beams;
+	float m_beam_timer;
 
 	int m_level;
 	int m_credits;
 	float m_quality;
 	
-	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	Weapon* Clone();
 
 	static Weapon* CreateRandomWeapon(int level, bool is_bot, float beastScore);
