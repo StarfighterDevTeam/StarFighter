@@ -1,7 +1,7 @@
 #ifndef HUDGRID_H_INCLUDED
 #define HUDGRID_H_INCLUDED
 
-#include "GameObject.h"
+#include "Includes/SimpleCollision.hpp"
 
 enum SlotFeedbackStates
 {

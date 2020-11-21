@@ -1,17 +1,7 @@
 #ifndef ENEMY_H_INCLUDED
 #define ENEMY_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include "TextureLoader.h"
-#include "GameObject.h"
-#include "Weapon.h"
-#include "Loot.h"
-#include "Ship.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#include "FileLoadUtils.h"
-#include "Phase.h"
+#include "Background.h"
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR			100

@@ -1,7 +1,6 @@
 #ifndef STROBOSCOPIC_H_INCLUDED
 #define STROBOSCOPIC_H_INCLUDED
 
-#include "Globals.h"
 #include "Game.h"
 
 class Stroboscopic : public GameObject

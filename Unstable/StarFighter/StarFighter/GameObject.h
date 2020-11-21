@@ -1,15 +1,10 @@
 #ifndef INDEPENDANT_H_INCLUDED
 #define INDEPENDANT_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include "TextureLoader.h"
-#include "AnimatedSprite.hpp"
-#include "TextUtils.h"
-#include <vector>
+#include "Dialog.h"
+
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "PatternBobby.h"
-#include "Globals.h"
 
 using namespace std;
 using namespace sf;
@@ -17,6 +12,21 @@ using namespace sf;
 class Equipment;
 class Weapon;
 class Loot;
+
+enum SFPanelTypes
+{
+	SFPanel_None,
+	SFPanel_ItemStats,
+	SFPanel_HUD,
+	SFPanel_Action,
+	SFPanel_Portal,
+	SFPanel_Shop,
+	SFPanel_Dialog,
+	SFPanel_DialogNext,
+	SFPanel_Map,
+	SFPanel_MapInfo,
+	SFPanel_Trade,
+};
 
 enum FighterStats
 {
@@ -265,7 +275,7 @@ public:
 	int m_shield_regen;
 	float m_shield_recovery_time;
 	sf::Vector2f m_speed;
-	PatternBobby m_Pattern;
+	GeometryPattern m_Pattern;
 	float m_diag;
 	std::string m_display_name;
 	bool m_transparent;
@@ -320,6 +330,10 @@ public:
 	virtual float getFighterFloatStatValue(FighterStats stat);
 	virtual int getFighterIntStatValue(FighterStats stat);
 	virtual bool CheckCondition();
+	virtual void AddDialog(Dialog* dialog);
+	virtual void SetInputBlocker(GameObject* blocker);
+	virtual GameObject* GetInputBlocker();
+	virtual void SetAskingPanel(SFPanelTypes type);
 
 protected:
 	sf::Vector2f m_initial_position;

@@ -1,12 +1,7 @@
 #ifndef ENEMYPOOL_H_INCLUDED
 #define ENEMYPOOL_H_INCLUDED
 
-#include <vector>
-#include <string>
-#include <SFML/Graphics.hpp>
 #include "Enemy.h"
-#include "PatternBobby.h"
-#include "Game.h"
 
 struct EnemyPoolElement
 {

@@ -1,4 +1,4 @@
-#include "SFTextPop.h"
+#include "Game.h"
 
 extern Game* CurrentGame;
 

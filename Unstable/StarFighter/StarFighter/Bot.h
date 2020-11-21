@@ -1,9 +1,7 @@
 #ifndef BOT_H_INCLUDED
 #define BOT_H_INCLUDED
 
-#include "GameObject.h"
 #include "Weapon.h"
-#include "InputGuy.h"
 
 //forward declaration
 

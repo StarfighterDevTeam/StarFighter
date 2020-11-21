@@ -1,11 +1,7 @@
 #ifndef AMMO_H_INCLUDED
 #define AMMO_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include "TextureLoader.h"
-#include "GameObject.h"
 #include "FX.h"
-#include "Game.h"
 
 enum AmmoType {
 	LaserBeam,

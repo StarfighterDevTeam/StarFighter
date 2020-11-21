@@ -4,7 +4,7 @@ Phase::Phase()
 {
 	m_welcomeWeapon = NULL;
 	m_freeze_player = false;
-	m_Pattern = new PatternBobby();
+	m_Pattern = new GeometryPattern();
 }
 
 Phase::~Phase()

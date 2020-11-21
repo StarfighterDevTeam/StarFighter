@@ -1,12 +1,11 @@
-#ifndef PATTERNBOBBY_H_INCLUDED
-#define PATTERNBOBBY_H_INCLUDED
+#ifndef GeometryPattern_H_INCLUDED
+#define GeometryPattern_H_INCLUDED
 
 #define _USE_MATH_DEFINES // for C++
 #include <cmath>
 #include <string>
-#include "IPatternHandler.h"
-#include "TextUtils.h"
-#include "Logger.h"
+
+#include "InputGuy.h"
 
 using namespace std;
 
@@ -20,24 +19,23 @@ enum PatternType
 	NBVAL_PatternType
 };
 
-enum BobbyPatternData
+enum GeometryPatternData
 {
-	BOBBY_PATTERN_TYPE,//0
-	BOBBY_PATTERN_SPEED,//1
-	BOBBY_PATTERN_ARG1,//2
-	BOBBY_PATTERN_ARG2,//3
-	BOBBY_PATTERN_ARG3,//4
+	GEOMETRY_PATTERN_TYPE,//0
+	GEOMETRY_PATTERN_SPEED,//1
+	GEOMETRY_PATTERN_ARG1,//2
+	GEOMETRY_PATTERN_ARG2,//3
+	GEOMETRY_PATTERN_ARG3,//4
 };
 
-class PatternBobby : virtual public IPatternHandler
+class GeometryPattern
 {
-
 public:
-	PatternBobby();
+	GeometryPattern();
 	void SetPattern(PatternType pt, float patternSpeed, vector<float> args);
 	void StartPattern();
-	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
-	static PatternBobby* PatternLoader(vector<string> line_data, int index);
+	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false);
+	static GeometryPattern* PatternLoader(vector<string> line_data, int index);
 
 	PatternType m_currentPattern;
 	vector<float> m_patternParams;
@@ -58,4 +56,4 @@ private:
 };
 
 
-#endif // PATTERNBOBBY_H_INCLUDED
+#endif // GeometryPattern_H_INCLUDED

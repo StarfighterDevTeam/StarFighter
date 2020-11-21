@@ -1,16 +1,7 @@
 #ifndef FILELOADER_H_INCLUDED
 #define FILELOADER_H_INCLUDED
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
-#include "Globals.h"
-#include "Enemy.h"
 #include "Ship.h"
-#include "EnemyPool.h"
-#include "FileLoadUtils.h"
-#include "Background.h"
 
 enum SceneBooleans
 {
@@ -187,8 +178,8 @@ class FileLoader
 public:
 	static Ship* LoadShipConfig(string name);
 	static ShipModel* LoadShipModel(string name);
-	static EnemyBase*  LoadEnemyBase(string name, int probability, int enemyClass);
-	static EnemyPool*  LoadEnemyPool(string name);
+	static EnemyBase* LoadEnemyBase(string name, int probability, int enemyClass);
+	static EnemyPool* LoadEnemyPool(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);

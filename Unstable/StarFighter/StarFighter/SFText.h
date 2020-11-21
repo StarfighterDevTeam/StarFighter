@@ -1,9 +1,7 @@
 #ifndef SFTEXT_H_INCLUDED
 #define SFTEXT_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include "Globals.h"
+#include "HudGrid.h"
 
 using namespace sf;
 

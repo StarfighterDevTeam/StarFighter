@@ -1,6 +1,8 @@
 #ifndef TEXTUTILS_H_INCLUDED
 #define TEXTUTILS_H_INCLUDED
 
+#include "Logger.h"
+
 #include <vector>
 #include <string>
 #include <cstdarg>
@@ -10,7 +12,6 @@ using namespace std;
 
 class TextUtils
 {
-
 public:
 	static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 		std::stringstream ss(s);
@@ -20,7 +21,6 @@ public:
 		}
 		return elems;
 	}
-
 
 	static std::vector<std::string> split(const std::string &s, char delim) {
 		std::vector<std::string> elems;

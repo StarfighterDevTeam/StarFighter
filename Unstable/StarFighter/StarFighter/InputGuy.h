@@ -3,7 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <stdlib.h>
-#include "Globals.h"
+
+#include "FileLoadUtils.h"
 
 #define SQRT2BY2 0.707 // racine(2) / 2
 

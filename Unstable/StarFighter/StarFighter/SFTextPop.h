@@ -1,9 +1,7 @@
 #ifndef SFTEXTPOP_H_INCLUDED
 #define SFTEXTPOP_H_INCLUDED
 
-#include "GameObject.h"
 #include "SFText.h"
-#include "Game.h"
 
 using namespace sf;
 

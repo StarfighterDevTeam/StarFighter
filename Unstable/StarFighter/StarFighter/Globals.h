@@ -4,8 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "TextureLoader.h"
-#include "TextUtils.h"
-#include "Logger.h"
 #include <assert.h>
 #include <math.h>
 

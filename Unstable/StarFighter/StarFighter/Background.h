@@ -1,7 +1,6 @@
 #ifndef BACKGROUND_H_INCLUDED
 #define BACKGROUND_H_INCLUDED
 
-#include "Portal.h"
 #include "Shop.h"
 
 struct Background : public GameObject

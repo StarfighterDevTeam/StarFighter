@@ -107,7 +107,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
     <ClCompile Include="Gameloop.cpp" />
-    <ClCompile Include="PatternBobby.cpp" />
+    <ClCompile Include="GeometryPattern.cpp" />
     <ClCompile Include="Phase.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Portal.cpp" />
@@ -155,7 +155,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Loot.h" />
     <ClInclude Include="Gameloop.h" />
-    <ClInclude Include="PatternBobby.h" />
+    <ClInclude Include="GeometryPattern.h" />
     <ClInclude Include="Phase.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Portal.h" />

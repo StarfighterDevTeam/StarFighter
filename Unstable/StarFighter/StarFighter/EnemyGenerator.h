@@ -1,9 +1,7 @@
 #ifndef ENEMYGENERATOR_H_INCLUDED
 #define ENEMYGENERATOR_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include <assert.h>
-#include "Globals.h"
+#include "EnemyPool.h"
 
 const float spawnCostCollateralMultiplierTable[NB_HAZARD_LEVELS] = { 0.30, 0.30, 0.30, 0.30, 0.30 };
 const float spawnCostMultiplierTable[NB_HAZARD_LEVELS] = { 1.0, 1.5, 2.0, 3.0, 4.0 };

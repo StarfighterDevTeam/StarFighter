@@ -612,6 +612,8 @@ Phase* Enemy::getPhase(string phaseName)
 
 bool Enemy::CheckCondition()
 {
+	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+
 	for (std::vector<ConditionTransition*>::iterator it = this->m_currentPhase->m_transitions_list.begin(); it != this->m_currentPhase->m_transitions_list.end(); it++)
 	{
 		switch ((*it)->m_condition)
@@ -642,7 +644,7 @@ bool Enemy::CheckCondition()
 
 			case PlayerVerticalPosition:
 			{
-				FloatCompare result = (*CurrentGame).m_playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
+				FloatCompare result = playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
 				if (result == (*it)->m_op)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
@@ -654,7 +656,7 @@ bool Enemy::CheckCondition()
 
 			case PlayerHorizontalPosition:
 			{
-				FloatCompare result = (*CurrentGame).m_playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				FloatCompare result = playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				if (result == (*it)->m_op)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
@@ -839,6 +841,8 @@ bool Enemy::CheckCondition()
 
 void Enemy::setPhase(Phase* phase)
 {
+	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+
 	if (!phase)
 	{
 		m_currentPhase = NULL;
@@ -1044,11 +1048,11 @@ void Enemy::setPhase(Phase* phase)
 	{
 		if (!(*CurrentGame).m_waiting_for_dialog_validation)
 		{
-			(*CurrentGame).m_playerShip->m_is_asking_SFPanel = SFPanel_Dialog;
+			playerShip->SetAskingPanel(SFPanel_Dialog);
 			size_t dialogsVectorSize = phase->m_dialogs.size();
 			for (size_t i = 0; i < dialogsVectorSize; i++)
 			{
-				(*CurrentGame).m_playerShip->m_targetDialogs.push_back(phase->m_dialogs[i]->Clone());
+				playerShip->AddDialog(phase->m_dialogs[i]->Clone());
 			}
 		}
 	}
@@ -1057,14 +1061,14 @@ void Enemy::setPhase(Phase* phase)
 	if (phase->m_freeze_player)
 	{
 		//lock player
-		(*CurrentGame).m_playerShip->m_input_blocker = this;
+		playerShip->SetInputBlocker(this);
 	}
 	else
 	{
 		//unlock player
-		if ((*CurrentGame).m_playerShip->m_input_blocker == this)
+		if (playerShip->GetInputBlocker() == this)
 		{
-			(*CurrentGame).m_playerShip->m_input_blocker = NULL;
+			playerShip->SetInputBlocker(NULL);
 		}
 	}
 
@@ -1135,7 +1139,7 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//loading phases
-			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), PHASE_PATTERN);
+			GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*it), PHASE_PATTERN);
 			phase->m_Pattern = m_bobby;
 
 			//loading rotation speed
@@ -1235,12 +1239,14 @@ Phase* Enemy::LoadPhase(string name)
 
 void Enemy::Death()
 {
+	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(getPosition().x, getPosition().y);
 	(*CurrentGame).addToScene(myFX, true);
 
 	//Combo
-	(*CurrentGame).m_playerShip->AddComboCount(m_enemy_class * 100);
+	playerShip->AddComboCount(m_enemy_class * 100);
 
 	//Score
 	(*CurrentGame).m_hazard += m_money;
@@ -1270,9 +1276,9 @@ void Enemy::Death()
 	}
 
 	//unlock player if blocked
-	if ((*CurrentGame).m_playerShip->m_input_blocker == this)
+	if (playerShip->GetInputBlocker() == this)
 	{
-		(*CurrentGame).m_playerShip->m_input_blocker = NULL;
+		playerShip->SetInputBlocker(NULL);
 	}
 
 	//phase transition "Death" (post-mortem phase of 1 frame)
@@ -1529,7 +1535,7 @@ Ammo* Enemy::LoadAmmo(string name)
 				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
 			}
 			
-			PatternBobby* bobby = PatternBobby::PatternLoader((*it), AMMO_PATTERN);
+			GeometryPattern* bobby = GeometryPattern::PatternLoader((*it), AMMO_PATTERN);
 			new_ammo->m_Pattern.SetPattern(bobby->m_currentPattern, bobby->m_patternSpeed, bobby->m_patternParams);
 
 			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);

@@ -1,10 +1,7 @@
 #ifndef LOOT_H_INCLUDED
 #define LOOT_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include "TextureLoader.h"
-#include "GameObject.h"
-#include "Ship.h"
+#include "Equipment.h"
 
 class Loot : public GameObject
 {

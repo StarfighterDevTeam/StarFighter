@@ -1,7 +1,6 @@
 #ifndef GAMESTATE_H_INCLUDED
 #define GAMESTATE_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
 #include "Player.h"
 
 class GameManager;

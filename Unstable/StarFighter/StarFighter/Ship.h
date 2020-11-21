@@ -1,8 +1,7 @@
 #ifndef SHIP_H_INCLUDED
 #define SHIP_H_INCLUDED
 
-#include "Equipment.h"
-#include "SFTextPop.h"
+#include "EnemyGenerator.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -21,6 +20,7 @@
 class Loot;
 class Dialog;
 class ShipModel;
+class Enemy;
 
 static float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 1.5, 2.0 };
 
@@ -215,9 +215,6 @@ public :
 	bool m_is_asking_scene_transition;
 	SFTextPop* m_recall_text;
 
-	int getFighterIntStatValue(FighterStats stat) override;
-	float getFighterFloatStatValue(FighterStats stat) override;
-
 	string m_respawnSceneName;
 	int m_last_hazard_level_played;
 
@@ -232,8 +229,6 @@ public :
 	int m_combo_count;
 	int m_combo_count_max;
 	int m_combo_level;
-
-	void AddComboCount(int value) override;
 
 	int GetFocusedPortalMaxUnlockedHazardLevel();
 
@@ -263,12 +258,19 @@ public :
 	float m_deceleration;
 
 	sf::Clock m_shield_recovery_clock;
+
+	int getFighterIntStatValue(FighterStats stat) override;
+	float getFighterFloatStatValue(FighterStats stat) override;
+	void AddComboCount(int value) override;
+	void AddDialog(Dialog* dialog) override;
+	void SetInputBlocker(GameObject* blocker) override;
+	GameObject* GetInputBlocker() override;
+	void SetAskingPanel(SFPanelTypes type) override;
 	
 private:
 	bool m_moving;
 	bool m_movingX;
 	bool m_movingY;
-
 };
 
 #endif // SHIP_H_INCLUDED

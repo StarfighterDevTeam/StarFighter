@@ -1,13 +1,7 @@
 #ifndef GAMEMANAGER_H_INCLUDED
 #define GAMEMANAGER_H_INCLUDED
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stack>
-#include "Globals.h"
-#include "GameState.h"
-#include "Player.h"
-
+#include "Gameloop.h"
 
 class GameManager
 {

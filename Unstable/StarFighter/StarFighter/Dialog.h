@@ -1,9 +1,7 @@
 #ifndef DIALOG_H_INCLUDED
 #define DIALOG_H_INCLUDED
 
-#include "GameObject.h"
-#include "Weapon.h"
-#include "TextUtils.h"
+#include "AnimatedSprite.hpp"
 
 enum DialogData
 {

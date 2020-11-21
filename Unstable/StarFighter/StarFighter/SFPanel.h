@@ -1,27 +1,11 @@
 #ifndef SFPANEL_H_INCLUDED
 #define SFPANEL_H_INCLUDED
 
-#include "HudGrid.h"
-#include "Includes/SimpleCollision.hpp"
+#include "SFTextPop.h"
 
 class Ship;
 class Dialog;
 class SFItemStatsPanel;
-
-enum SFPanelTypes
-{
-	SFPanel_None,
-	SFPanel_ItemStats,
-	SFPanel_HUD,
-	SFPanel_Action,
-	SFPanel_Portal,
-	SFPanel_Shop,
-	SFPanel_Dialog,
-	SFPanel_DialogNext,
-	SFPanel_Map,
-	SFPanel_MapInfo,
-	SFPanel_Trade,
-};
 
 enum TradeGrids
 {

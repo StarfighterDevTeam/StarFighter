@@ -1,57 +1,57 @@
-#include "PatternBobby.h"
+#include "GeometryPattern.h"
 
-PatternBobby::PatternBobby()
+GeometryPattern::GeometryPattern()
 {
 	m_currentPattern = NoMovePattern;
 }
 
-PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
+GeometryPattern* GeometryPattern::PatternLoader(vector<string> line_data, int index)
 {
-	PatternBobby* bobby = new PatternBobby();
+	GeometryPattern* pattern = new GeometryPattern();
 
 	PatternType pattern_type = NoMovePattern;
 
 	if (line_data[index].compare("0") != 0)
 	{
-		bobby->m_patternSpeed = stoi(line_data[index + BOBBY_PATTERN_SPEED]);//angular speed, horizontal speed
+		pattern->m_patternSpeed = stoi(line_data[index + GEOMETRY_PATTERN_SPEED]);//angular speed, horizontal speed
 
 		if (line_data[index].compare("line") == 0)
 		{
 			pattern_type = Line_;
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2])); // opposite sign of speed (-1), random sign (0), normal (1)
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2])); // opposite sign of speed (-1), random sign (0), normal (1)
 		}
 		else if (line_data[index].compare("circle") == 0)
 		{
 			pattern_type = Circle_;
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG1])); // radius
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG1])); // radius
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
 		}
 		else if (line_data[index].compare("oscillator") == 0)
 		{
 			pattern_type = Oscillator;
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG1])); // radius
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG3]));  // counterclockwise (-1), random (0), clockwise (1)
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG1])); // radius
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG3]));  // counterclockwise (-1), random (0), clockwise (1)
 		}
 		else if (line_data[index].compare("rectangle") == 0)
 		{
 			pattern_type = Rectangle_;
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG1])); // width
-			bobby->m_patternParams.push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2]));  // height
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG1])); // width
+			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2]));  // height
 		}
 	}
 
-	bobby->m_currentPattern = pattern_type;
+	pattern->m_currentPattern = pattern_type;
 
-	return bobby;
+	return pattern;
 }
 
-void PatternBobby::StartPattern()
+void GeometryPattern::StartPattern()
 {
 	SetPattern(m_currentPattern, m_patternSpeed, m_patternParams);
 }
 
-void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float> args)
+void GeometryPattern::SetPattern(PatternType pt, float patternSpeed, vector<float> args)
 {
 	//Note that patternSpeed is 
 	// - px/sec on the canvas for Rectangle
@@ -144,7 +144,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float> 
 	}
 }
 
-sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
+sf::Vector2f  GeometryPattern::GetOffset(float seconds, bool absolute_coordinate)
 {
 	static sf::Vector2f offset;
 
@@ -321,7 +321,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
  	return offset;
 }
 
-sf::Vector2f PatternBobby::ToCartesianCoords(sf::Vector2f polarCoords)
+sf::Vector2f GeometryPattern::ToCartesianCoords(sf::Vector2f polarCoords)
 {
 	sf::Vector2f v;
 	v.x = polarCoords.x*cos(polarCoords.y);
@@ -329,7 +329,7 @@ sf::Vector2f PatternBobby::ToCartesianCoords(sf::Vector2f polarCoords)
 	return v;
 }
 
-void PatternBobby::ToCartesianCoords(sf::Vector2f* polarCoords)
+void GeometryPattern::ToCartesianCoords(sf::Vector2f* polarCoords)
 {
 	static float r;
 	r = polarCoords->x;
@@ -337,10 +337,10 @@ void PatternBobby::ToCartesianCoords(sf::Vector2f* polarCoords)
 	polarCoords->y = r*sin(polarCoords->y);
 }
 
-void PatternBobby::CheckArgSize(size_t expected)
+void GeometryPattern::CheckArgSize(size_t expected)
 {
 	if(m_patternParams.size() < expected)
 	{
-		throw invalid_argument(TextUtils::format("PatternBobby error: Invalid # or arges for pattern '%d' (received %d, expected %d)", m_currentPattern, m_patternParams.size(),expected));
+		throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", m_currentPattern, m_patternParams.size(),expected));
 	}
 }

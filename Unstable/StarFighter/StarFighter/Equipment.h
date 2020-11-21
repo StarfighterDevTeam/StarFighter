@@ -1,19 +1,7 @@
 #ifndef EQUIPMENT_H_INCLUDED
 #define EQUIPMENT_H_INCLUDED
 
-#include "Globals.h"
-#include <SFML/Graphics.hpp>
-#include "Weapon.h"
-#include "AnimatedSprite.hpp"
-#include "TextureLoader.h"
-#include "Assets.h"
-#include "InputGuy.h"
-#include <cmath>
 #include "Bot.h"
-#include "PatternBobby.h"
-#include "Portal.h"
-#include "Shop.h"
-#include "Enemy.h"
 
 class ShipModel
 {

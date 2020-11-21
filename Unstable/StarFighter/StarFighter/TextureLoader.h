@@ -5,9 +5,8 @@
 #include <string>
 #include <map>
 #include <tuple>
-#include "Assets.h"
+
 #include "TextUtils.h"
-#include "Logger.h"
 
 std::string makePath(const std::string& srcPath);
 

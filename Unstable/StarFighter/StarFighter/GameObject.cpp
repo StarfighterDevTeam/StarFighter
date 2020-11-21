@@ -1054,3 +1054,24 @@ bool GameObject::CheckCondition()
 	//see override in Enemy class
 	return false;
 }
+
+void GameObject::AddDialog(Dialog* dialog)
+{
+	//see override in Ship class
+}
+
+void GameObject::SetInputBlocker(GameObject* blocker)
+{
+	//see override in Ship class
+}
+
+GameObject* GameObject::GetInputBlocker()
+{
+	//see override in Ship class
+	return NULL;
+}
+
+void GameObject::SetAskingPanel(SFPanelTypes type)
+{
+
+}

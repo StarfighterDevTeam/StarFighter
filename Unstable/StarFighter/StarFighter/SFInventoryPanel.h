@@ -1,7 +1,7 @@
 #ifndef SFINVENTORYPANEL_H_INCLUDED
 #define SFINVENTORYPANEL_H_INCLUDED
 
-#include "Scene.h"
+#include "SFMapPanel.h"
 
 class SFItemStatsPanel : public SFPanel
 {

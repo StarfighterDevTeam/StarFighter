@@ -2,8 +2,6 @@
 #define SCENE_H_INCLUDED
 
 #include "FileLoader.h"
-#include "EnemyGenerator.h"
-#include "SFTextPop.h"
 
 using namespace std;
 

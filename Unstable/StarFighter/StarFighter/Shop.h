@@ -1,9 +1,7 @@
 #ifndef SHOP_H_INCLUDED
 #define SHOP_H_INCLUDED
 
-#include "HudGrid.h"
-#include "Game.h"
-#include "GameObject.h"
+#include "Portal.h"
 
 class Shop : public GameObject
 {

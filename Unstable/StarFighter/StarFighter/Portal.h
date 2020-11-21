@@ -1,9 +1,7 @@
 #ifndef PORTAL_H_INCLUDED
 #define PORTAL_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include "GameObject.h"
-#include "Game.h"
+#include "Phase.h"
 
 enum PortalState
 {

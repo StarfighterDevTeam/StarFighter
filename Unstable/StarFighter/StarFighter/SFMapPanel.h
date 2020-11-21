@@ -1,7 +1,7 @@
 #ifndef SFMAPPANEL_H_INCLUDED
 #define SFMAPPANEL_H_INCLUDED
 
-#include "Scene.h"
+#include "SFMenuPanel.h"
 
 #define STELLARMAP_SCALE			70
 #define STELLAR_SEGMENT_THICKNESS	4

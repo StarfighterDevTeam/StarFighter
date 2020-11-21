@@ -3581,3 +3581,23 @@ void Ship::AddComboCount(int value)
 		(*CurrentGame).addToFeedbacks(pop_feedback);
 	}
 }
+
+void Ship::AddDialog(Dialog* dialog)
+{
+	m_targetDialogs.push_back(dialog);
+}
+
+void Ship::SetInputBlocker(GameObject* blocker)
+{
+	m_input_blocker = blocker;
+}
+
+GameObject* Ship::GetInputBlocker()
+{
+	return m_input_blocker;
+}
+
+void Ship::SetAskingPanel(SFPanelTypes type)
+{
+	m_is_asking_SFPanel = type;
+}

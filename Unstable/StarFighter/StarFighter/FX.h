@@ -1,9 +1,7 @@
 #ifndef FX_H_INCLUDED
 #define FX_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include "GameObject.h"
-#include "Game.h"
+#include "Stroboscopic.h"
 
 class FX : public GameObject
 {

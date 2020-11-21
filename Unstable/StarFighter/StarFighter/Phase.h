@@ -1,9 +1,7 @@
 #ifndef PHASE_H_INCLUDED
 #define PHASE_H_INCLUDED
 
-#include "GameObject.h"
-#include "TextUtils.h"
-#include "Dialog.h"
+#include "Loot.h"
 
 enum ConditionData
 {
@@ -113,7 +111,7 @@ public:
 	string m_display_name;
 	string m_name;
 	vector<Weapon*> m_weapons_list;
-	PatternBobby* m_Pattern;
+	GeometryPattern* m_Pattern;
 	vector <Modifier> m_modifiers;
 	float m_angspeed;
 	float m_radius;

@@ -1,6 +1,8 @@
 #ifndef FILE_LOADER_UTILS_H_INCLUDED
 #define FILE_LOADER_UTILS_H_INCLUDED
 
+#include "Globals.h"
+
 #include <vector>
 #include <string>
 using namespace std;

@@ -1,15 +1,7 @@
 #ifndef GAMELOOP_H_INCLUDED
 #define GAMELOOP_H_INCLUDED
 
-#include "SFMapPanel.h"
-#include "SFDialogPanel.h"
-#include "SFInventoryPanel.h"
-#include "SFMenuPanel.h"
-#include "Scene.h"
-#include "GameState.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include "Gamestate.h"
 
 extern Game* CurrentGame;
 

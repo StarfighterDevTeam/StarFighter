@@ -1,17 +1,19 @@
 #ifndef GAME_H_INCLUDED
 #define GAME_H_INCLUDED
 
-#include "Globals.h"
-#include "GameObject.h"
 #include <list>
 #include <vector>
-#include "TextUtils.h"
-#include "Includes/SimpleCollision.hpp"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stack>
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "SFText.h"
+
 #include "SFPanel.h"
-#include "Stroboscopic.h"
 
 #include <SFML/Audio.hpp>
 

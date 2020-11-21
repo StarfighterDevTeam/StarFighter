@@ -5,29 +5,9 @@
 #include <stdlib.h>
 #include <cmath>
 #include <SFML/Audio.hpp>
-#include "Globals.h"
+
 #include "PrefsManager.h"
-#include "Ship.h"
-#include "Background.h"
-#include "Weapon.h"
-#include "TextureLoader.h"
-#include "Assets.h"
-#include "Enemy.h"
-#include "Phase.h"
-#include "Ammo.h"
-#include "FX.h"
-#include "Loot.h"
-#include "Scene.h"
-#include "Logger.h"
-#include "EnemyPool.h"
-#include "FileLoadUtils.h"
-#include "Bot.h"
-#include "Gameloop.h"
-#include "FileLoader.h"
 #include "GameManager.h"
-#include "Player.h"
-#include "HudGrid.h"
-#include "Shop.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();
