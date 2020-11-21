@@ -33,12 +33,12 @@ void Game::init(RenderWindow* window)
 	m_Pause = false;
 
 	//Sounds
-	m_SFX_Activated = true;
+	m_SFX_Activated = false;
 	LoadSFX();
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	//if (!SpaceCowboys.openFromFile("Music/SpaceCowboys.ogg"))
@@ -464,10 +464,7 @@ void Game::colisionChecksV2(Time deltaTime)
 
 				if (SimpleCollision::AreColliding((*it1), (*it2)))
 				{
-					//Do something (like, kill ship) -> OK
 					(*it1)->GetDamageFrom(*(*it2));
-					//explosion
-					(*it2)->Death();
 				}
 			}
 		}
@@ -480,13 +477,8 @@ void Game::colisionChecksV2(Time deltaTime)
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				//Do something (like, kill ship)
 				(*it1)->GetDamageFrom(*(*it2));
-
-				//player may also deal contact damage to enemy ships
 				(*it2)->GetDamageFrom(*(*it1));
-
-				//TODO: display contact feedback (small explosion?)
 			}
 		}
 
@@ -547,10 +539,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			//Bullets are invisible after impact
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				//Do something (like, kill the enemy ship ?)
 				(*it1)->GetDamageFrom(*(*it2));
-				//explosion
-				(*it2)->Death();
 			}
 		}
 	}

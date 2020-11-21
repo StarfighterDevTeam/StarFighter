@@ -6,7 +6,7 @@ laser_player,Laser player,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.
 laser_bot,Default_laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
 laser_arc,Laser arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,homing
 fireball_sinus,Fireball sinus,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,25,1.5f,1,0,0,0,0,semi_homing
-laserbeam,Laser beam,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,-1,3,1,0,0,0,0,0
+laserbeam,Laser beam,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,-1,2,1,0,0,0,0,0
 #,,,,,,,,,,,,,,,
 V_Alpha1_laser,Vanguard Alpha1 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3,3,1.5f,1,10,0,0,0,homing
 V_Alpha2_laserInt,Vanguard Alpha2 Laser Interior,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,0,2.57142857142857,2,40,0,0,0,homing

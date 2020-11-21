@@ -563,8 +563,8 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 		else
 		{
-			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.x / 2 * sin(theta);
-			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.y - m_size.y / 2 * cos(theta);
+			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta);
+			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta);
 
 			//transmitting the angle to the weapon, which will pass it to the bullets
 			m_weapon->m_shot_angle = theta;
@@ -590,8 +590,8 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		for (Ammo* beam : m_weapon->m_beams)
 		{
 			//update beam positions
-			float beam_offset_x = beam->m_offset_x * cos(beam->m_shot_angle) - (beam->m_size.y / 2 - (beam->m_size.y * (int)beam->m_isBeam)) * sin(beam->m_shot_angle);
-			float beam_offset_y = beam->m_offset_x * sin(beam->m_shot_angle) + (beam->m_size.y / 2 - (beam->m_size.y * (int)beam->m_isBeam)) * cos(beam->m_shot_angle);
+			float beam_offset_x = beam->m_offset_x * cos(m_weapon->m_shot_angle) + beam->m_size.y / 2 * sin(m_weapon->m_shot_angle);
+			float beam_offset_y = beam->m_offset_x * sin(m_weapon->m_shot_angle) - beam->m_size.y / 2 * cos(m_weapon->m_shot_angle);
 
 			beam->setPosition(m_weapon->getPosition().x + beam_offset_x, m_weapon->getPosition().y + beam_offset_y);
 		}

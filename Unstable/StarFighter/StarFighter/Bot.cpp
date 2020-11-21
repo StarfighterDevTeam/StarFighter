@@ -147,8 +147,8 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 					}
 					else
 					{
-						m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.x / 2 * sin(theta);
-						m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.y - m_size.y / 2 * cos(theta);
+						m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.y / 2 * sin(theta);
+						m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x - m_size.y / 2 * cos(theta);
 
 						//transmitting the angle to the weapon, which will pass it to the bullets
 						m_weapon->m_shot_angle = theta;

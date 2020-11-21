@@ -35,6 +35,7 @@ Ammo* Ammo::Clone()
 	ammo->m_rotation_speed = this->m_rotation_speed;
 	ammo->m_offset_x = this->m_offset_x;
 	ammo->m_isBeam = this->m_isBeam;
+	ammo->m_DontGarbageMe = this->m_isBeam;
 
 	return ammo;
 }

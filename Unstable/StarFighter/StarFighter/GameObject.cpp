@@ -40,11 +40,13 @@ void GameObject::GarbageWhenOutOfScreen()
 	if (m_GarbageMe == true)
 		return;
 
+	sf::Vector2f size = sf::Vector2f(getGlobalBounds().width, getGlobalBounds().height);
+
 	//Garbage if gone out of screen
 	if (m_isOnScene == false)
 	{
 		//objects that are spawning out of screen are not deleted
-		if (getPosition().x + (m_size.x / 2) >= 0 && getPosition().x - (m_size.x / 2) <= SCENE_SIZE_X && getPosition().y + (m_size.y / 2) >= 0 && getPosition().y - (m_size.y / 2) <= SCENE_SIZE_Y)
+		if (getPosition().x + (size.x / 2) >= 0 && getPosition().x - (size.x / 2) <= SCENE_SIZE_X && getPosition().y + (size.y / 2) >= 0 && getPosition().y - (size.y / 2) <= SCENE_SIZE_Y)
 		{
 			m_isOnScene = true;
 		}
@@ -53,7 +55,7 @@ void GameObject::GarbageWhenOutOfScreen()
 	//Content that went on scene and then exited have to be deleted
 	if (m_DontGarbageMe == false && m_isOnScene == true)
 	{
-		if (getPosition().x + (m_size.x / 2) < 0 || getPosition().x - (m_size.x / 2) > SCENE_SIZE_X || getPosition().y + (m_size.y / 2) < 0 || getPosition().y - (m_size.y / 2) > SCENE_SIZE_Y)
+		if (getPosition().x + (size.x / 2) < 0 || getPosition().x - (size.x / 2) > SCENE_SIZE_X || getPosition().y + (size.y / 2) < 0 || getPosition().y - (size.y / 2) > SCENE_SIZE_Y)
 		{
 			m_GarbageMe = true;
 		}
@@ -168,11 +170,8 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 
 GameObject::~GameObject()
 {
-	if (m_equipment_loot)
-		delete m_equipment_loot;
-
-	if (m_weapon_loot)
-		delete m_weapon_loot;
+	delete m_equipment_loot;
+	delete m_weapon_loot;
 }
 
 void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)

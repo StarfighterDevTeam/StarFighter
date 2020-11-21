@@ -39,7 +39,6 @@ public:
 	float m_rate_of_fire;
 	float m_readyFireTimer;
 	Ammo* m_ammunition;
-	bool m_isReadyToFire;
 	TargetHoming m_target_homing;
 
 	//special weapon abilities
