@@ -100,7 +100,7 @@ public :
 	void ManageJumpFeedbacks();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
+	bool ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	void UpdateInputStates();
 	void UpdateHUDStates();

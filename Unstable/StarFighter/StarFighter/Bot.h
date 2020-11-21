@@ -31,7 +31,7 @@ public:
 	bool m_automatic_fire;
 	bool m_key_repeat;
 
-	void Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool hyperspeeding);
+	void Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing);
 };
 
 

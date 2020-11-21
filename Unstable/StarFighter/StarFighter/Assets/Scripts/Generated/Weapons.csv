@@ -1,77 +1,71 @@
 #weapon_name,display_name,image,width,height,frames,sound_name,time_between_shots,rafale,rafale_cooldown,multishot,xspread,dispersion,alternate,angle_offset,target_homing
-laser,Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,3,0.8f,3,15,0,0,0,semi_homing
-laser_fast,Laser fast,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,homing
-laser_360,Laser 360°,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
-laser_player,Laser player,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
-laser_bot,Default_laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
-laser_arc,Laser arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,homing
-fireball_sinus,Fireball sinus,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,25,1.5f,1,0,0,0,0,semi_homing
-laserbeam,Laser beam,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,-1,2,1,0,0,0,0,0
+laser,Default_laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
+laserbeam,Laser_beam,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,-1,0,1,0,0,0,0,0
 #,,,,,,,,,,,,,,,
-V_Alpha1_laser,Vanguard Alpha1 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3,3,1.5f,1,10,0,0,0,homing
-V_Alpha2_laserInt,Vanguard Alpha2 Laser Interior,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,0,2.57142857142857,2,40,0,0,0,homing
-V_Alpha2_laserExt,Vanguard Alpha2 Laser Exterior,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,0,2.57142857142857,2,60,10,0,0,homing
-V_Alpha2_death,Vanguard Alpha2 PostMortemShot,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.857142857142856,0,,12,0,360,0,0,0
-V_Alpha3_laser,Vanguard Alpha3 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,3,1,5,0,90,alternate,0,homing
-V_Sigma1_laser,Vanguard Sigma1 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,0,0
-V_Sigma1_laser180,Vanguard Sigma1 Laser 180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,180,0
-V_Sigma1_laser90,Vanguard Sigma1 Laser 90,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,90,0
-V_Sigma1_laser270,Vanguard Sigma1 Laser 270,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,270,0
-V_Sigma2_laser,Vanguard Sigma2 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,0,0
-V_Sigma2_laser180,Vanguard Sigma2 Laser 180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,180,0
-V_Sigma2_laser90,Vanguard Sigma2 Laser 90,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,90,0
-V_Sigma2_laser270,Vanguard Sigma2 Laser 270,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,270,0
-V_Sigma3_laser,Vanguard Sigma3 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2,1,2.f,7,0,90,0,0,0
-V_Sigma3_laser180,Vanguard Sigma3 Laser 180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2,1,2.f,7,0,90,0,180,0
-V_Beta1_laser_supportL,Vanguard Beta1 Laser Support Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,60,ascending2,50,0
-V_Beta1_laser_supportR,Vanguard Beta1 Laser Support Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,60,descending2,-50,0
-V_Beta1_laser_supportL_exit,Vanguard Beta1 Laser Support Left Exit,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,120,ascending2,50,0
-V_Beta1_laser_supportR_exit,Vanguard Beta1 Laser Support Right Exit,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,120,descending2,-50,0
-V_Beta1_dragonball,Vanguard Beta1 Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,30,7,alternate,0,semi_homing
-V_Beta1_dragonballNoLock,Vanguard Beta1 Dragonballs NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,0,3,30,7,alternate,0,0
-V_Beta2_dragonball,Vanguard Beta2 Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,1,0.4f,3,0,10,ascending,0,semi_homing
-V_Beta2_laser_support40,Vanguard Beta2 Laser Support 40,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,30,2.f,5,10,30,0,40,0
-V_Beta2_laser_support180,Vanguard Beta2 Laser Support 180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,30,2.f,5,10,30,0,180,0
-V_Beta2_laser_support320,Vanguard Beta2 Laser Support 320,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,30,2.f,5,10,30,0,-40,0
-V_Beta3_laser1,Vanguard Beta3 Laser 1,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,6,16,60,0,0,homing
-V_Beta3_laser2,Vanguard Beta3 Laser 2,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,5,8,45,0,0,homing
-V_Beta3_dragonball,Vanguard Beta3 Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,4,4,30,0,0,homing
-V_Beta3_laser_support,Vanguard Beta3 Laser Support,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,0,4.f,16,0,200,descending2,180,0
-V_Beta3_laser1NoLock,Vanguard Beta3 Laser 1 NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,6,16,60,0,0,0
-V_Beta3_laser2NoLock,Vanguard Beta3 Laser 2 NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,5,8,45,0,0,0
-V_Beta3_dragonballNoLock,Vanguard Beta3 Dragonballs NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,4,4,30,0,0,0
-V_Delta1_laser_extL,Vanguard Delta1 Laser Exterior Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,ascending2,25,0
-V_Delta1_laser_extR,Vanguard Delta1 Laser Exterior Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,descending2,335,0
-V_Delta1_laser_intL,Vanguard Delta1 Laser Interior Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,ascending2,12,0
-V_Delta1_laser_intR,Vanguard Delta1 Laser Interior Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,descending2,348,0
-V_Delta1_blast,Vanguard Delta1 Blast,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2.64,0,0,2,40,0,0,0,homing
-V_Delta2_ring1L,Vanguard Delta2 Ring1 Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,2.f,9,8,120,0,2,semi_homing
-V_Delta2_ring1M,Vanguard Delta2 Ring1 Mid,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,2.f,9,8,120,0,0,semi_homing
-V_Delta2_ring1R,Vanguard Delta2 Ring1 Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,2.f,9,8,120,0,358,semi_homing
-V_Delta2_ring2L,Vanguard Delta2 Ring2 Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,2,semi_homing
-V_Delta2_ring2M,Vanguard Delta2 Ring2 Mid,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,0,semi_homing
-V_Delta2_ring2R,Vanguard Delta2 Ring2 Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,358,semi_homing
-V_Delta3_blast,Vanguard Delta3 Blast,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,4,3.f,2,50,0,alternate,0,homing
-V_Delta3_laser1,Vanguard Delta3 Laser1,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,15,4,160,0,7,semi_homing
-V_Delta3_laser2L,Vanguard Delta3 Laser2 Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,1,semi_homing
-V_Delta3_laser2R,Vanguard Delta3 Laser2 Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,359,semi_homing
-V_Delta3_laser3L,Vanguard Delta3 Laser3 Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,1,semi_homing
-V_Delta3_laser3R,Vanguard Delta3 Laser3 Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,359,semi_homing
-V_Delta3_blast_exit,Vanguard Delta3 Blast Exit,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,10,1,0,0,alternate,0,homing
-V_Gamma1_laser,Vanguard Gamma1 Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,12,1.71428571428571,3,20,0,0,0,homing
-V_Gamma2_ball,Vanguard Gamma2 Ball,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.5,0,0,10,0,100,0,0,homing
-V_Gamma2_missile,Vanguard Gamma2 Missile,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,1,2.f,2,40,0,alternate,0,homing
-V_Gamma3_laserL,Vanguard Gamma3 Laser Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,20,0,120,ascending2,-15,homing
-V_Gamma3_laserR,Vanguard Gamma3 Laser Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,20,0,120,descending2,15,homing
+V_Alpha1_laser,Vanguard_Alpha1_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3,3,1.5f,1,10,0,0,0,homing
+V_Alpha2_laserInt,Vanguard_Alpha2_Laser_Interior,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,0,2.57142857142857,2,40,0,0,0,homing
+V_Alpha2_laserExt,Vanguard_Alpha2_Laser_Exterior,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1,0,2.57142857142857,2,60,10,0,0,homing
+V_Alpha2_death,Vanguard_Alpha2_PostMortemShot,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.857142857142856,0,,12,0,360,0,0,0
+V_Alpha3_laser,Vanguard_Alpha3_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,3,1,5,0,90,alternate,0,homing
+V_Sigma1_laser,Vanguard_Sigma1_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,0,0
+V_Sigma1_laser180,Vanguard_Sigma1_Laser_180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,180,0
+V_Sigma1_laser90,Vanguard_Sigma1_Laser_90,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,90,0
+V_Sigma1_laser270,Vanguard_Sigma1_Laser_270,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,1,1,0,90,0,270,0
+V_Sigma2_laser,Vanguard_Sigma2_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,0,0
+V_Sigma2_laser180,Vanguard_Sigma2_Laser_180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,180,0
+V_Sigma2_laser90,Vanguard_Sigma2_Laser_90,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,90,0
+V_Sigma2_laser270,Vanguard_Sigma2_Laser_270,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,1,2,20,0,alternate,270,0
+V_Sigma3_laser,Vanguard_Sigma3_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2,1,2.f,7,0,90,0,0,0
+V_Sigma3_laser180,Vanguard_Sigma3_Laser_180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2,1,2.f,7,0,90,0,180,0
+V_Beta1_laser_supportL,Vanguard_Beta1_Laser_Support_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,60,ascending2,50,0
+V_Beta1_laser_supportR,Vanguard_Beta1_Laser_Support_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,60,descending2,-50,0
+V_Beta1_laser_supportL_exit,Vanguard_Beta1_Laser_Support_Left_Exit,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,120,ascending2,50,0
+V_Beta1_laser_supportR_exit,Vanguard_Beta1_Laser_Support_Right_Exit,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,,7,0,120,descending2,-50,0
+V_Beta1_dragonball,Vanguard_Beta1_Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,30,7,alternate,0,semi_homing
+V_Beta1_dragonballNoLock,Vanguard_Beta1_Dragonballs_NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,0,0,3,30,7,alternate,0,0
+V_Beta2_dragonball,Vanguard_Beta2_Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,1,0.4f,3,0,10,ascending,0,semi_homing
+V_Beta2_laser_support40,Vanguard_Beta2_Laser_Support_40,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,30,2.f,5,10,30,0,40,0
+V_Beta2_laser_support180,Vanguard_Beta2_Laser_Support_180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,30,2.f,5,10,30,0,180,0
+V_Beta2_laser_support320,Vanguard_Beta2_Laser_Support_320,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,30,2.f,5,10,30,0,-40,0
+V_Beta3_laser1,Vanguard_Beta3_Laser_1,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,6,16,60,0,0,homing
+V_Beta3_laser2,Vanguard_Beta3_Laser_2,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,5,8,45,0,0,homing
+V_Beta3_dragonball,Vanguard_Beta3_Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,4,4,30,0,0,homing
+V_Beta3_laser_support,Vanguard_Beta3_Laser_Support,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,0,4.f,16,0,200,descending2,180,0
+V_Beta3_laser1NoLock,Vanguard_Beta3_Laser_1_NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,6,16,60,0,0,0
+V_Beta3_laser2NoLock,Vanguard_Beta3_Laser_2_NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,5,8,45,0,0,0
+V_Beta3_dragonballNoLock,Vanguard_Beta3_Dragonballs_NoLock,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.4,0,4.f,4,4,30,0,0,0
+V_Delta1_laser_extL,Vanguard_Delta1_Laser_Exterior_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,ascending2,25,0
+V_Delta1_laser_extR,Vanguard_Delta1_Laser_Exterior_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,descending2,335,0
+V_Delta1_laser_intL,Vanguard_Delta1_Laser_Interior_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,ascending2,12,0
+V_Delta1_laser_intR,Vanguard_Delta1_Laser_Interior_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.12,0,0,10,0,30,descending2,348,0
+V_Delta1_blast,Vanguard_Delta1_Blast,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2.64,0,0,2,40,0,0,0,homing
+V_Delta2_ring1L,Vanguard_Delta2_Ring1_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,2.f,9,8,120,0,2,semi_homing
+V_Delta2_ring1M,Vanguard_Delta2_Ring1_Mid,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,2.f,9,8,120,0,0,semi_homing
+V_Delta2_ring1R,Vanguard_Delta2_Ring1_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,2.f,9,8,120,0,358,semi_homing
+V_Delta2_ring2L,Vanguard_Delta2_Ring2_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,2,semi_homing
+V_Delta2_ring2M,Vanguard_Delta2_Ring2_Mid,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,0,semi_homing
+V_Delta2_ring2R,Vanguard_Delta2_Ring2_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,358,semi_homing
+V_Delta3_blast,Vanguard_Delta3_Blast,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,4,3.f,2,50,0,alternate,0,homing
+V_Delta3_laser1,Vanguard_Delta3_Laser1,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,15,4,160,0,7,semi_homing
+V_Delta3_laser2L,Vanguard_Delta3_Laser2_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,1,semi_homing
+V_Delta3_laser2R,Vanguard_Delta3_Laser2_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,359,semi_homing
+V_Delta3_laser3L,Vanguard_Delta3_Laser3_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,1,semi_homing
+V_Delta3_laser3R,Vanguard_Delta3_Laser3_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,359,semi_homing
+V_Delta3_blast_exit,Vanguard_Delta3_Blast_Exit,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.6,3,10,1,0,0,alternate,0,homing
+V_Gamma1_laser,Vanguard_Gamma1_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,12,1.71428571428571,3,20,0,0,0,homing
+V_Gamma2_ball,Vanguard_Gamma2_Ball,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,1.5,0,0,10,0,100,0,0,homing
+V_Gamma2_missile,Vanguard_Gamma2_Missile,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,1,2.f,2,40,0,alternate,0,homing
+V_Gamma3_laserL,Vanguard_Gamma3_Laser_Left,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,20,0,120,ascending2,-15,homing
+V_Gamma3_laserR,Vanguard_Gamma3_Laser_Right,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,20,0,120,descending2,15,homing
 #,,,,,,,,,,,,,,,
-V_AlphaGold_laser50,Vanguard AlphaGold Laser 50,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,20,1.5f,3,0,50,0,0,0
-V_AlphaGold_laser30,Vanguard AlphaGold Laser 30,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,20,1.5f,3,0,30,0,0,0
-V_AlphaGold_laser0,Vanguard AlphaGold Laser 0,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,20,1.5f,3,40,0,0,0,0
-V_AlphaGold_laser180,Vanguard AlphaGold Laser 180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2.f,0,2.f,15,0,180,0,0,semi_homing
-V_AlphaGold_sniper,Vanguard AlphaGold Sniper,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2.f,0,1.5f,1,40,0,0,0,homing
-V_BetaGold_dragonball,Vanguard BetaGold Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2f,7,2.f,2,20,0,0,0,homing
-V_BetaGold_laser,Vanguard BetaGold Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.02f,5,2.22f,10,0,120,ascending2,0,semi_homing
-V_AlphaGold_laser_double,Vanguard AlphaGold Laser Double,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3f,15,3.f,3,0,30,alternate,0,homing
-V_BetaGold_dragonball_arc,Vanguard BetaGold Dragonballs Arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8f,0,3.f,12,0,120,0,0,0
-V_BetaGold_dragonball_homing,Vanguard BetaGold Dragonballs Homing,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,20,7,alternate,0,homing
-V_BetaGold_dragonball_arc_alt,Vanguard BetaGold Dragonballs Arc Alt,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.01f,1,0.2f,16,0,150,ascending,0,0
+V_AlphaGold_laser50,Vanguard_AlphaGold_Laser_50,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,20,1.5f,3,0,50,0,0,0
+V_AlphaGold_laser30,Vanguard_AlphaGold_Laser_30,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,20,1.5f,3,0,30,0,0,0
+V_AlphaGold_laser0,Vanguard_AlphaGold_Laser_0,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05,20,1.5f,3,40,0,0,0,0
+V_AlphaGold_laser180,Vanguard_AlphaGold_Laser_180,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2.f,0,2.f,15,0,180,0,0,semi_homing
+V_AlphaGold_sniper,Vanguard_AlphaGold_Sniper,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,2.f,0,1.5f,1,40,0,0,0,homing
+V_BetaGold_dragonball,Vanguard_BetaGold_Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2f,7,2.f,2,20,0,0,0,homing
+V_BetaGold_laser,Vanguard_BetaGold_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.02f,5,2.22f,10,0,120,ascending2,0,semi_homing
+V_AlphaGold_laser_double,Vanguard_AlphaGold_Laser_Double,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3f,15,3.f,3,0,30,alternate,0,homing
+V_BetaGold_dragonball_arc,Vanguard_BetaGold_Dragonballs_Arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8f,0,3.f,12,0,120,0,0,0
+V_BetaGold_dragonball_homing,Vanguard_BetaGold_Dragonballs_Homing,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,20,7,alternate,0,homing
+V_BetaGold_dragonball_arc_alt,Vanguard_BetaGold_Dragonballs_Arc_Alt,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.01f,1,0.2f,16,0,150,ascending,0,0

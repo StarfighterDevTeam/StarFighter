@@ -532,8 +532,11 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 }
 
-void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
+bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	bool firing = m_disable_inputs == false && m_disable_fire == false && m_actions_states[Action_Recalling] == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
+		&& hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
+
 	//Fire function
 	if (m_weapon != NULL)
 	{
@@ -575,14 +578,11 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		//UPDATE FIRING COOLDOWN AND FIRE
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY && m_actions_states[Action_Recalling] == false)
+			if (firing == true)
 			{
-				if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
-				{
-					m_weapon->Fire(FriendlyFire, deltaTime);
+				m_weapon->Fire(FriendlyFire, deltaTime);
 
-					(*CurrentGame).PlaySFX(SFX_Fire);
-				}
+				(*CurrentGame).PlaySFX(SFX_Fire);
 			}
 		}
 
@@ -598,8 +598,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 		if (m_weapon->m_beams.empty() == false)//end of beam because no valid fire input
 		{
-			if (m_disable_inputs == true || m_disable_fire == true || m_actions_states[Action_Recalling] == true || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() <= END_OF_DIALOGS_DELAY
-				|| (m_actions_states[Action_Firing] == false && m_automatic_fire == false))
+			if (firing == false)
 			{
 				for (Ammo* beam : m_weapon->m_beams)
 						beam->Death();
@@ -609,6 +608,17 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 	}
+
+	//not considered "firing" between rafales
+	if (firing == true)
+	{
+		if (m_weapon->m_rafale < 0 && m_weapon->m_beams.empty() == true)
+			firing = false;
+		else if (m_weapon->m_rafale > 0 && m_weapon->m_rafale_index > 0)
+			firing = false;
+	}
+
+	return firing;
 }
 
 void Ship::UpdateHUDStates()
@@ -716,12 +726,12 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			m_previously_focused_item = m_SFHudPanel->GetFocusedItem();
 
 			//Weapon firing
-			ManageFiring(deltaTime, hyperspeedMultiplier);
+			bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
 
 			//Bots firing
 			for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 			{
-				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
+				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
 			}
 			if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
 			{
@@ -923,16 +933,18 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire);
 
 				//Weapon firing
-				ManageFiring(deltaTime, hyperspeedMultiplier);
+				bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
+
 				//Bots firing
 				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 				{
-					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding] || m_actions_states[Action_Recalling]);
+					(*it)->Fire(deltaTime, hyperspeedMultiplier, firing);
 				}
 
 				//Braking and speed malus on firing
 				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
-				if (m_actions_states[Action_Braking] == true || m_actions_states[Action_Firing] == true || m_automatic_fire == true)
+				//brake speed malus
+				if (firing == true)
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -955,14 +967,16 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//Weapon firing
-				ManageFiring(deltaTime, hyperspeedMultiplier);
+				bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
 
 				//Bots firing
-				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+				for (Bot* bot : m_bot_list)
 				{
-					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
+					bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
 				}
-				if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
+
+				//brake speed malus
+				if (firing == true)
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -2998,6 +3012,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, ammo_speed), ammo_texture_name, sf::Vector2f(ammo_width, ammo_height), ammo_damage, Enemy::LoadFX(ammo_explosion_name));
 	ammo->m_display_name = ammo_name;
 	ammo->m_range = ammo_range;
+	ammo->m_isBeam = weapon_rafale < 0;
 	ammo->m_Pattern.m_currentPattern = (PatternType)ammo_pattern_type;
 	if (ammo->m_Pattern.m_currentPattern == Line_)
 	{
