@@ -1,6 +1,13 @@
 #include "SFText.h"
 
 //TEXTS
+SFText::SFText()
+{
+	m_visible = true;
+	m_garbageMe = false;
+	m_DontGarbageMe = false;
+}
+
 SFText::SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position)
 {
 	setFont(*font);
@@ -12,7 +19,6 @@ SFText::SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vec
 	m_garbageMe = false;
 	m_DontGarbageMe = false;
 }
-
 
 void SFText::GarbageMe()
 {

@@ -82,70 +82,73 @@ int main()
 		//	renderWindow.close();
 		//}
 
-		//Resolution switch
-		if (InputGuy::isChangingResolution())
+		if (renderWindow.hasFocus())
 		{
-			resolution = (WindowResolutions)(((int)resolution +1) % (NBVAL_RESOLUTIONS - 1));
-			switch (resolution)
+			//Resolution switch
+			if (InputGuy::isChangingResolution())
 			{
-				case RESOLUTION_1600x900:
+				resolution = (WindowResolutions)(((int)resolution + 1) % (NBVAL_RESOLUTIONS - 1));
+				switch (resolution)
 				{
-					fullscreen = false;
-					renderWindow.create(VideoMode(1600, 900), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1600, 900);
-					break;
+					case RESOLUTION_1600x900:
+					{
+						fullscreen = false;
+						renderWindow.create(VideoMode(1600, 900), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+						(*CurrentGame).m_screen_size = sf::Vector2i(1600, 900);
+						break;
+					}
+					case RESOLUTION_1920x1080_FullScreen:
+					{
+						fullscreen = true;
+						renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+						(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
+						break;
+					}
+					case RESOLUTION_1280x720:
+					{
+						fullscreen = false;
+						renderWindow.create(VideoMode(1280, 720), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+						(*CurrentGame).m_screen_size = sf::Vector2i(1280, 720);
+						break;
+					}
+					case RESOLUTION_1920x1080:
+					{
+						fullscreen = false;
+						renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+						(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
+						break;
+					}
 				}
-				case RESOLUTION_1920x1080_FullScreen:
+			}
+
+			if ((*CurrentGame).m_playerShip != NULL)
+			{
+				//Muting
+				(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
+				if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
 				{
-					fullscreen = true;
-					renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
-					break;
+					(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
+					(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
 				}
-				case RESOLUTION_1280x720:
+
+				//Pausing
+				(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
+				if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
 				{
-					fullscreen = false;
-					renderWindow.create(VideoMode(1280, 720), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1280, 720);
-					break;
-				}
-				case RESOLUTION_1920x1080:
-				{
-					fullscreen = false;
-					renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
-					break;
+					(*CurrentGame).m_Pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
+
+					if ((*CurrentGame).m_Pause)
+					{
+						(*CurrentGame).m_curMusic.pause();
+					}
+					else
+					{
+						(*CurrentGame).m_curMusic.play();
+					}
 				}
 			}
 		}
-
-		if ((*CurrentGame).m_playerShip)
-		{
-			//Muting
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
-			{
-				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-			}
-
-			//Pausing
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
-			{
-				(*CurrentGame).m_Pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
-
-				if ((*CurrentGame).m_Pause)
-				{
-					(*CurrentGame).m_curMusic.pause();
-				}
-				else
-				{
-					(*CurrentGame).m_curMusic.play();
-				}
-			}
-		}
-
+		
 		dt = deltaClock.restart();
 
 		if (!(*CurrentGame).m_Pause && dt.asSeconds() < 1 && renderWindow.hasFocus())

@@ -137,10 +137,7 @@ Ship::~Ship()
 		m_trail->Death();
 
 	if (m_recall_text != NULL)
-	{
-		m_recall_text->m_garbageMe = true;
-		m_recall_text->m_visible = false;
-	}
+		m_recall_text->GarbageMe();
 }
 
 void Ship::Init()
@@ -419,16 +416,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	ScreenBorderContraints();
 	SettingTurnAnimations();
 	ManageFeedbackExpiration(deltaTime);
-
-	//Update HUD
-	if (m_SFTargetPanel)
-	{
-		m_SFTargetPanel->Update(deltaTime, directions);
-	}
-	if (m_SFHudPanel)
-	{
-		m_SFHudPanel->Update(deltaTime, directions);
-	}
 
 	ManageGhost(deltaTime);
 	ManageImmunity();

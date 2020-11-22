@@ -533,7 +533,6 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).garbageLayer(FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LootLayer);
 				(*CurrentGame).garbageLayer(FeedbacksLayer);
-				(*CurrentGame).garbageLayer(TextPopsUnlimitedLayer);
 
 				//Optional script to skip boss procedures, for scripted missions, so they may still be alive at this point
 				if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss])
@@ -810,6 +809,7 @@ void Gameloop::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 			break;
 		}
 	}
+
 	(*CurrentGame).addToPanels((*CurrentGame).m_playerShip->m_SFTargetPanel);
 }
 
@@ -827,7 +827,6 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 		(*CurrentGame).garbageLayer(ExplosionLayer);
 		(*CurrentGame).garbageLayer(LootLayer);
 		(*CurrentGame).garbageLayer(FeedbacksLayer);
-		(*CurrentGame).garbageLayer(TextPopsUnlimitedLayer);
 		m_currentScene = new Scene(scene_name, 0, false, true);
 		playerShip->m_currentScene_name = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();

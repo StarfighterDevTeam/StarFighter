@@ -57,7 +57,6 @@ enum LayerType
 	EnemyObjectLayer,
 	AuraLayer,
 	FeedbacksLayer,
-	TextPopsUnlimitedLayer,
 	BotLayer,
 	FriendlyFireLayer,
 	FakeShipLayer,

@@ -70,7 +70,6 @@ public:
 
 	void addToPanels(SFPanel* panel);
 	void addToTextPops(SFTextPop* textpop);
-	void addToTextPopsUnlimited(SFTextPop* textpop);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -160,7 +159,6 @@ private:
 	vector<SFText*> m_sceneSFTexts;
 	vector<SFPanel*> m_sceneSFPanels;
 	vector<SFTextPop*> m_sceneSFTextPops;
-	vector<SFTextPop*> m_sceneSFTextPopsUnlimited;
 
 	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsCreated;

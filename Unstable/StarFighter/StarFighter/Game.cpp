@@ -247,11 +247,6 @@ void Game::addToTextPops(SFTextPop* textpop)
 	m_sceneSFTextPops.push_back(textpop);
 }
 
-void Game::addToTextPopsUnlimited(SFTextPop* textpop)
-{
-	m_sceneSFTextPopsUnlimited.push_back(textpop);
-}
-
 void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
@@ -282,7 +277,10 @@ void Game::updateScene(Time deltaTime)
 
 	//add in newly created objects
 	for (GameObject* object : m_sceneGameObjectsCreated)
-		sceneGameObjects_tmp.push_back(object);
+		if (object->m_garbageMe == true)
+			delete object;
+		else
+			sceneGameObjects_tmp.push_back(object);
 	
 	m_sceneGameObjectsCreated.clear();
 
@@ -350,21 +348,6 @@ void Game::updateScene(Time deltaTime)
 		m_sceneSFTextPops.push_back(textpop);
 	}
 
-	//SFTextPops Unlimited (fade out time < 0)
-	vector<SFTextPop*> sceneSFTextPopsUnlimited_tmp;
-	for (SFTextPop* textpop : m_sceneSFTextPopsUnlimited)
-		if (textpop->m_garbageMe == true)
-			delete textpop;
-		else
-			sceneSFTextPopsUnlimited_tmp.push_back(textpop);
-
-	m_sceneSFTextPopsUnlimited.clear();
-	for (SFTextPop* textpop : sceneSFTextPopsUnlimited_tmp)
-	{
-		textpop->update(deltaTime, m_hyperspeedMultiplier);
-		m_sceneSFTextPopsUnlimited.push_back(textpop);
-	}
-
 	//Update music transitions
 	ManageMusicTransitions(deltaTime);
 }
@@ -426,12 +409,6 @@ void Game::drawScene()
 			for (SFTextPop* textpop : m_sceneSFTextPops)
 				if (textpop->m_visible == true)
 					m_mainScreen.draw(*textpop);
-		}
-		else if (i == TextPopsUnlimitedLayer)
-		{
-			for (SFTextPop* textpop_unlimited : m_sceneSFTextPopsUnlimited)
-				if (textpop_unlimited->m_visible == true)
-					m_mainScreen.draw(*textpop_unlimited);
 		}
 		else if (i == BlackStripesLayer)
 		{
@@ -600,17 +577,11 @@ void Game::colisionChecksV2(Time deltaTime)
 
 void Game::garbageLayer(LayerType layer, bool only_offscene)
 {
-	if (layer == TextPopsUnlimitedLayer)
-	{
-		for (SFTextPop* textpop_unlimited : m_sceneSFTextPopsUnlimited)
-			textpop_unlimited->GarbageMe();
-
-		return;
-	}
-	else if (layer == FeedbacksLayer)
+	if (layer == FeedbacksLayer)
 	{
 		for (SFTextPop* textpop : m_sceneSFTextPops)
-			textpop->m_visible = false;
+			if (textpop->m_DontGarbageMe == false)
+				textpop->GarbageMe();
 
 		return;
 	}
@@ -618,30 +589,39 @@ void Game::garbageLayer(LayerType layer, bool only_offscene)
 	int clear_count = 0;
 	for (GameObject* object : m_sceneGameObjectsLayered[layer])
 	{
-		if (only_offscene == true)
-		{
-			if (object->m_isOnScene == false)
-			{
-				object->m_garbageMe = true;
-				clear_count++;
-				//don't count them as "spawned" enemies if we cut them off this way
-				if (layer == EnemyObjectLayer)
-				{
-					m_hazardSpawned -= object->m_money;
-				}
-			}
-		}
-		else
-		{
-			object->m_visible = false;
-			object->m_isOnScene = false;
-			object->m_garbageMe = true;
-			//don't count them as "spawned" enemies if we cut them off this way
-			if (layer == EnemyObjectLayer)
-			{
-				m_hazardSpawned -= object->m_money;
-			}
-		}
+		if (only_offscene == true && object->m_isOnScene == true)
+			continue;
+
+		if (object->m_DontGarbageMe == true)
+			continue;
+
+		object->m_visible = false;
+		object->m_garbageMe = true;
+		clear_count++;
+
+		//don't count them as "spawned" enemies if we cut them off this way
+		if (layer == EnemyObjectLayer)
+			m_hazardSpawned -= object->m_money;
+	}
+
+	for (GameObject* object : m_sceneGameObjectsCreated)
+	{
+		if (only_offscene == true && object->m_isOnScene == true)
+			continue;
+
+		if (object->m_layer != layer)
+			continue;
+
+		if (object->m_DontGarbageMe == true)
+			continue;
+
+		object->m_visible = false;
+		object->m_garbageMe = true;
+		clear_count++;
+
+		//don't count them as "spawned" enemies if we cut them off this way
+		if (layer == EnemyObjectLayer)
+			m_hazardSpawned -= object->m_money;
 	}
 }
 

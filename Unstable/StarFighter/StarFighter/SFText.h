@@ -8,7 +8,7 @@ using namespace sf;
 class SFText : public Text
 {
 public:
-	SFText(){};
+	SFText();
 	SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position);
 	~SFText() {};
 	SFText* Clone();
