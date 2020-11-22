@@ -292,34 +292,42 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				if (!obj->m_bots.empty())
 				{
 					ss_stats << "Adding " << obj->m_bots.size() << " drone. Drone stats:";
-					//if (obj->m_bots.front()->m_weapon->m_shot_mode != NoShotMode)
-					//{
-					//	ss_stats << "\nDPS: " << (floor)(1 / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
-					//}
-					//else
-					//{
-						ss_stats << "\nDPS: " << (floor)(1 / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
-					//}
+				
+
+					if (obj->m_bots.front()->m_weapon->m_ammunition->m_isBeam == false)
+						ss_stats << "\nDPS: " << (floor)(1.f / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
+					else
+						ss_stats << "\nDPS: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
 
 					ss_stats << "\nDamage: " << obj->m_bots.front()->m_weapon->m_ammunition->m_damage;
 					ss_stats << "\nAmmo speed: " << obj->m_bots.front()->m_weapon->m_ammunition->m_speed.y;
 					ss_stats.precision(1);
-					ss_stats << "\nFire rate: " << (floor)(1 / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
+
+					if (obj->m_bots.front()->m_weapon->m_ammunition->m_isBeam == false)
+						ss_stats << "\nFire rate: " << (floor)(1.f / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
+					else
+						ss_stats << "\nFire rate: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK);
+
 					ss_stats.precision(0);
 
 					if (obj->m_bots.front()->m_weapon->m_multishot > 1)
 					{
-						//ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nSpread: " << obj->m_bots.front()->m_weapon->m_xspread << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
 						ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
 					}
 					else
 					{
 						ss_stats << "\nSingle shot";
 					}
+
 					if (obj->m_bots.front()->m_weapon->m_rafale > 0)
 					{
 						ss_stats << "\nRafale: " << obj->m_bots.front()->m_weapon->m_rafale << " (cooldown: " << obj->m_bots.front()->m_weapon->m_rafale_cooldown << " sec";
 					}
+					else if (obj->m_bots.front()->m_weapon->m_rafale < 0)
+					{
+						ss_stats << "\nContinuous beam";
+					}
+
 
 					//ss_stats << "\nFiring style: ";
 					//switch (obj->m_bots.front()->m_weapon->m_shot_mode)
@@ -389,17 +397,23 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				//else
 				//{
 					ss_stats.precision(0);
-					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
+
+					if (obj->m_ammunition->m_isBeam == false)
+						ss_stats << "DPS: " << (floor)(1.f / obj->m_rate_of_fire * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
+					else
+						ss_stats << "DPS: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
 				//}
 				ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
 				ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
 				ss_stats.precision(1);
-				ss_stats << "\nFire rate: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 << " shots/sec";
+				if (obj->m_ammunition->m_isBeam == false)
+					ss_stats << "\nFire rate: " << (floor)(1.f / obj->m_rate_of_fire * 100) / 100 << " shots/sec";
+				else
+					ss_stats << "\nFire rate: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 << " shots/sec";
 				ss_stats.precision(0);
 
 				if (obj->m_multishot > 1)
 				{
-					//ss_stats << "\nMultishot: " << obj->m_multishot << "\nSpread: " << obj->m_xspread << "\nDispersion: " << obj->m_dispersion << "°";
 					ss_stats << "\nMultishot: " << obj->m_multishot << "\nDispersion: " << obj->m_dispersion << "°";
 				}
 				else
@@ -409,6 +423,10 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				if (obj->m_rafale > 0)
 				{
 					ss_stats << "\nRafale: " << obj->m_rafale << " (cooldown: " << obj->m_rafale_cooldown << " sec";
+				}
+				else if (obj->m_rafale < 0)
+				{
+					ss_stats << "\nContinuous beam";
 				}
 				
 				//ss_stats << "\nFiring style: ";
