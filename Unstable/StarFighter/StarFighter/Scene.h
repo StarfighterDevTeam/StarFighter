@@ -50,7 +50,7 @@ public:
 	Scene(string name);
 	~Scene();
 	void GenerateEnemies(Time deltaTime);
-	void GenerateBoss();
+	void SpawnBoss();
 	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
 	void PlayTitleFeedback();
 

@@ -227,39 +227,29 @@ void Game::addToScene(GameObject* object, bool during_update)
 		m_sceneGameObjectsCreated.push_back(object);
 }
 
-void Game::addToFeedbacks(RectangleShape* feedback)
+void Game::addToRectangles(SFRectangle& rectangle)
 {
-	m_sceneFeedbackBars.push_back(feedback);
+	m_sceneSFRectangles.push_back(&rectangle);
 }
 
-void Game::addToFeedbacks(SFPanel* panel)
+void Game::addToTexts(SFText& text)
+{
+	m_sceneSFTexts.push_back(&text);
+}
+
+void Game::addToPanels(SFPanel* panel)
 {
 	m_sceneSFPanels.push_back(panel);
 }
 
-void Game::addToFeedbacks(Text* text)
+void Game::addToTextPops(SFTextPop* textpop)
 {
-	m_sceneFeedbackTexts.push_back(text);
+	m_sceneSFTextPops.push_back(textpop);
 }
 
-void Game::addToFeedbacks(SFText* text)
+void Game::addToTextPopsUnlimited(SFTextPop* textpop)
 {
-	m_sceneFeedbackSFTexts.push_back(text);
-}
-
-void Game::removeFromFeedbacks(RectangleShape* feedback)
-{
-	m_sceneFeedbackBars.remove(feedback);
-}
-
-void Game::removeFromFeedbacks(SFPanel* panel)
-{
-	m_sceneSFPanels.remove(panel);
-}
-
-void Game::removeFromFeedbacks(Text* text)
-{
-	m_sceneFeedbackTexts.remove(text);
+	m_sceneSFTextPopsUnlimited.push_back(textpop);
 }
 
 void Game::updateScene(Time deltaTime)
@@ -278,7 +268,7 @@ void Game::updateScene(Time deltaTime)
 	{
 		object->GarbageWhenOutOfScreen();
 
-		if (object->m_GarbageMe == true)
+		if (object->m_garbageMe == true)
 			delete object;
 		else
 			sceneGameObjects_tmp.push_back(object);
@@ -309,21 +299,70 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2(deltaTime);  
 
-	//SFTextPop (text feedbacks)
-	vector<SFText*> sceneFeedbackSFTexts_tmp;
+	//HUD ELEMENTS
+	//SFRectangles
+	vector<SFRectangle*> sceneSFRectangles_tmp;
+	for (SFRectangle* rect : m_sceneSFRectangles)
+		if (rect->m_garbageMe == false)//we don't delete the "garbage" ones because the pointer is a reference to a member object of class Enemy, who will destroy them in its destructor
+			sceneSFRectangles_tmp.push_back(rect);
 
-	for (SFText* text : m_sceneFeedbackSFTexts)
-		if (text->m_GarbageMe == true)
-			delete text;
+	m_sceneSFRectangles.clear();
+	for (SFRectangle* rect : sceneSFRectangles_tmp)
+		m_sceneSFRectangles.push_back(rect);
+
+	//SFTexts
+	vector<SFText*> sceneSFTexts_tmp;
+	for (SFText* text : m_sceneSFTexts)
+		if (text->m_garbageMe == false)//we don't delete the "garbage" ones because the pointer is a reference to a member object of class Enemy, who will destroy them in its destructor
+			sceneSFTexts_tmp.push_back(text);
+
+	m_sceneSFTexts.clear();
+	for (SFText* text : sceneSFTexts_tmp)
+		m_sceneSFTexts.push_back(text);
+
+	//SFPanels
+	vector<SFPanel*> sceneSFPanels_tmp;
+	for (SFPanel* panel : m_sceneSFPanels)
+		if (panel->m_garbageMe == true)
+			delete panel;
 		else
-			sceneFeedbackSFTexts_tmp.push_back(text);
+			sceneSFPanels_tmp.push_back(panel);
 
-	m_sceneFeedbackSFTexts.clear();
-
-	for (SFText* text : sceneFeedbackSFTexts_tmp)
+	m_sceneSFPanels.clear();
+	for (SFPanel* panel : sceneSFPanels_tmp)
 	{
-		m_sceneFeedbackSFTexts.push_back(text);
-		text->update(deltaTime, m_hyperspeedMultiplier);
+		panel->Update(deltaTime, InputGuy::getDirections());
+		m_sceneSFPanels.push_back(panel);
+	}
+		
+	//SFTextPops
+	vector<SFTextPop*> sceneSFTextPops_tmp;
+	for (SFTextPop* textpop : m_sceneSFTextPops)
+		if (textpop->m_garbageMe == true)
+			delete textpop;
+		else
+			sceneSFTextPops_tmp.push_back(textpop);
+
+	m_sceneSFTextPops.clear();
+	for (SFTextPop* textpop : sceneSFTextPops_tmp)
+	{
+		textpop->update(deltaTime, m_hyperspeedMultiplier);
+		m_sceneSFTextPops.push_back(textpop);
+	}
+
+	//SFTextPops Unlimited (fade out time < 0)
+	vector<SFTextPop*> sceneSFTextPopsUnlimited_tmp;
+	for (SFTextPop* textpop : m_sceneSFTextPopsUnlimited)
+		if (textpop->m_garbageMe == true)
+			delete textpop;
+		else
+			sceneSFTextPopsUnlimited_tmp.push_back(textpop);
+
+	m_sceneSFTextPopsUnlimited.clear();
+	for (SFTextPop* textpop : sceneSFTextPopsUnlimited_tmp)
+	{
+		textpop->update(deltaTime, m_hyperspeedMultiplier);
+		m_sceneSFTextPopsUnlimited.push_back(textpop);
 	}
 
 	//Update music transitions
@@ -376,24 +415,23 @@ void Game::drawScene()
 	{
 		if (i == FeedbacksLayer)
 		{
-			for (std::list<RectangleShape*>::iterator it = m_sceneFeedbackBars.begin(); it != m_sceneFeedbackBars.end(); it++)
-			{
-				m_mainScreen.draw(*(*it));
-			}
-			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
-			{
-				m_mainScreen.draw(*(*it));
-			}
-			for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
-			{
-				if (*it == NULL)
-					continue;
+			for (SFRectangle* rect : m_sceneSFRectangles)
+				if (rect->m_visible == true)
+					m_mainScreen.draw(*rect);
 
-				if ((*(*it)).m_visible)
-				{
-					m_mainScreen.draw(*(*it));
-				}
-			}
+			for (SFText* text : m_sceneSFTexts)
+				if (text->m_visible == true)
+					m_mainScreen.draw(*text);
+
+			for (SFTextPop* textpop : m_sceneSFTextPops)
+				if (textpop->m_visible == true)
+					m_mainScreen.draw(*textpop);
+		}
+		else if (i == TextPopsUnlimitedLayer)
+		{
+			for (SFTextPop* textpop_unlimited : m_sceneSFTextPopsUnlimited)
+				if (textpop_unlimited->m_visible == true)
+					m_mainScreen.draw(*textpop_unlimited);
 		}
 		else if (i == BlackStripesLayer)
 		{
@@ -413,23 +451,13 @@ void Game::drawScene()
 		}
 		else if (i == PanelLayer)
 		{
-			for (std::list<SFPanel*>::iterator it = m_sceneSFPanels.begin(); it != m_sceneSFPanels.end(); it++)
-			{
-				(*(*it)).Draw(m_mainScreen);
-			}
+			for (SFPanel* panel : m_sceneSFPanels)
+				panel->Draw(m_mainScreen);
 		}
 		else
 		{
-			for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
-			{
-				if (*it == NULL)
-					continue;
-
-				if ((*(*it)).m_visible)
-				{
-					(*it)->Draw(m_mainScreen);	
-				}
-			}
+			for (GameObject* object : m_sceneGameObjectsLayered[i])
+				object->Draw(m_mainScreen);	
 		}
 	}
 
@@ -494,7 +522,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				if ((*it1)->GetLoot((*(*it2))))
 				{
 					(*it2)->m_visible = false;
-					(*it2)->m_GarbageMe = true;
+					(*it2)->m_garbageMe = true;
 				}
 			}
 		}
@@ -562,7 +590,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				{
 					(*it2)->m_visible = false;
 					(*it2)->m_isOnScene = false;
-					(*it2)->m_GarbageMe = true;
+					(*it2)->m_garbageMe = true;
 				}
 			}
 		}
@@ -572,47 +600,47 @@ void Game::colisionChecksV2(Time deltaTime)
 
 void Game::garbageLayer(LayerType layer, bool only_offscene)
 {
-	int clear_count = 0;
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[layer].begin(); it != m_sceneGameObjectsLayered[layer].end(); it++)
+	if (layer == TextPopsUnlimitedLayer)
 	{
-		if (*it == NULL)
-			continue;
+		for (SFTextPop* textpop_unlimited : m_sceneSFTextPopsUnlimited)
+			textpop_unlimited->GarbageMe();
 
-		if (only_offscene)
+		return;
+	}
+	else if (layer == FeedbacksLayer)
+	{
+		for (SFTextPop* textpop : m_sceneSFTextPops)
+			textpop->m_visible = false;
+
+		return;
+	}
+
+	int clear_count = 0;
+	for (GameObject* object : m_sceneGameObjectsLayered[layer])
+	{
+		if (only_offscene == true)
 		{
-			if (!(*it)->m_isOnScene)
+			if (object->m_isOnScene == false)
 			{
-				(*it)->m_GarbageMe = true;
+				object->m_garbageMe = true;
 				clear_count++;
 				//don't count them as "spawned" enemies if we cut them off this way
 				if (layer == EnemyObjectLayer)
 				{
-					m_hazardSpawned -= (*it)->m_money;
+					m_hazardSpawned -= object->m_money;
 				}
 			}
 		}
 		else
 		{
-			(*it)->m_visible = false;
-			(*it)->m_isOnScene = false;
-			(*it)->m_GarbageMe = true;
+			object->m_visible = false;
+			object->m_isOnScene = false;
+			object->m_garbageMe = true;
 			//don't count them as "spawned" enemies if we cut them off this way
 			if (layer == EnemyObjectLayer)
 			{
-				m_hazardSpawned -= (*it)->m_money;
+				m_hazardSpawned -= object->m_money;
 			}
-		}
-	}
-
-	if (layer == FeedbacksLayer)
-	{
-		for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
-		{
-			if (*it == NULL || (*it)->m_DontGarbageMe)
-				continue;
-
-			(*it)->m_visible = false;
-			(*it)->m_GarbageMe = true;
 		}
 	}
 }

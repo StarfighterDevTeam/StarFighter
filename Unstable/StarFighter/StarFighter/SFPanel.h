@@ -60,7 +60,7 @@ public:
 	int m_selected_index;
 };
 
-class SFPanel : public sf::RectangleShape
+class SFPanel : public SFRectangle
 {
 public:
 	SFPanel(){};

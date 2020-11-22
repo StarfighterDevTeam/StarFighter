@@ -80,12 +80,12 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		if (m_current_range > m_range)
 		{
 			m_visible = false;
-			m_GarbageMe = true;
+			m_garbageMe = true;
 		}
 	}
 
 	//if not disappeared, move it
-	if (m_GarbageMe == false)
+	if (m_garbageMe == false)
 	{
 		static sf::Vector2f newposition, offset, pattern_offset;
 		

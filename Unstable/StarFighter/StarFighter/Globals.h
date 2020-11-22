@@ -55,7 +55,7 @@ const char* getSavesPath();
 #define HUB_FAST_REGEN_DURATION					4.f
 
 #define	GHOST_ALPHA_VALUE						120
-#define DAMAGE_FEEDBACK_TIME					0.04f
+#define DAMAGE_FEEDBACK_TIME					0.1f
 #define ENEMY_HEALTH_FEEDBACK_TIME				2.f
 
 #define JOYSTICK_MIN_AXIS_VALUE					25

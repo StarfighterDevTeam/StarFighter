@@ -40,7 +40,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		return;
 	}
 
-	if (m_GarbageMe)
+	if (m_garbageMe)
 	{
 		return;
 	}

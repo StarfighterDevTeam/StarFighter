@@ -39,7 +39,7 @@ void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (m_deltaClockExploding.getElapsedTime() > sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES*m_frameNumber)) 
 	{
 		m_visible = false;
-		m_GarbageMe = true;
+		m_garbageMe = true;
 	}
 
 	AnimatedSprite::update(deltaTime);

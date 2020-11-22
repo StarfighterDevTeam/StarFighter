@@ -109,7 +109,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
 	m_recall_text->m_DontGarbageMe = true;
 	delete text_feedback;
-	(*CurrentGame).addToFeedbacks(m_recall_text);
+	(*CurrentGame).addToTextPops(m_recall_text);
 
 	Init();
 }
@@ -138,7 +138,7 @@ Ship::~Ship()
 
 	if (m_recall_text != NULL)
 	{
-		m_recall_text->m_GarbageMe = true;
+		m_recall_text->m_garbageMe = true;
 		m_recall_text->m_visible = false;
 	}
 }
@@ -2017,7 +2017,7 @@ bool Ship::GetLoot(GameObject& object)
 		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
 		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
-		(*CurrentGame).addToFeedbacks(pop_feedback);
+		(*CurrentGame).addToTextPops(pop_feedback);
 
 		//transfer money
 		get_money_from(object);
@@ -3397,7 +3397,7 @@ void Ship::DestroyBots()
 	for (Bot* bot : m_bot_list)
 	{
 		bot->m_visible = false;
-		bot->m_GarbageMe = true;
+		bot->m_garbageMe = true;
 	}
 
 	m_bot_list.clear();
@@ -3583,7 +3583,7 @@ void Ship::AddComboCount(int value)
 		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
 		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
-		(*CurrentGame).addToFeedbacks(pop_feedback);
+		(*CurrentGame).addToTextPops(pop_feedback);
 	}
 }
 

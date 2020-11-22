@@ -11,7 +11,7 @@ public:
 	SFTextPop();
 	~SFTextPop(){};
 	SFTextPop(SFText* text, float time_fade_in, float time_not_faded, float time_fade_out, GameObject* target, float speed_y, sf::Vector2f offset);
-	void update(Time deltaTime, float hyperspeedMultiplier) override;
+	void update(Time deltaTime, float hyperspeedMultiplier);
 
 	float m_time_fade_in;
 	float m_time_not_faded;

@@ -183,7 +183,7 @@ void SFPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 
 void SFPanel::Draw(sf::RenderTexture& screen)
 {
-	if (m_visible)
+	if (m_visible == true)
 	{
 		//if (!m_title_text.getString().isEmpty())
 		//	m_title_text.draw(screen);

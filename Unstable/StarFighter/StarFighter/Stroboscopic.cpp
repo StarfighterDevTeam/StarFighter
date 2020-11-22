@@ -39,7 +39,7 @@ void Stroboscopic::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else
 	{
 		m_alpha = 0;
-		m_GarbageMe = true;
+		m_garbageMe = true;
 	}
 
 	setColor(Color(255, 255, 255, m_alpha));

@@ -27,22 +27,16 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_shieldBar_offsetY = - (m_size.y / 2) - (1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y) - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y;
 	//m_offsetBetweenHealthBars = armorBar_offsetY - shieldBar_offsetY;
 
-	m_armorBar.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	m_armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
-	m_armorBar.setOutlineThickness(0);
-	m_armorBar.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-
 	m_armorBarContainer.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 	m_armorBarContainer.setFillColor(sf::Color(0, 0, 0, 128));
 	m_armorBarContainer.setOutlineThickness(0);
 	//m_armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	m_armorBarContainer.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-
-	m_shieldBar.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	m_shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
-	m_shieldBar.setOutlineThickness(0);
-	m_shieldBar.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	m_shieldBar.setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+	
+	m_armorBar.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
+	m_armorBar.setOutlineThickness(0);
+	m_armorBar.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 
 	m_shieldBarContainer.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 	m_shieldBarContainer.setFillColor(sf::Color(0, 0, 0, 128));
@@ -50,7 +44,13 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	//m_shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	m_shieldBarContainer.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	m_shieldBarContainer.setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
-
+	
+	m_shieldBar.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
+	m_shieldBar.setOutlineThickness(0);
+	m_shieldBar.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_shieldBar.setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+	
 	try
 	{
 		m_font = new sf::Font();
@@ -88,8 +88,8 @@ void Enemy::UpdateHealthBars()
 	m_armorBar.setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 	if (m_feedbackTimer <= sf::seconds(0))
 	{
-		(*CurrentGame).removeFromFeedbacks(&m_armorBar);
-		(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);
+		m_armorBar.m_visible = false;
+		m_armorBarContainer.m_visible = false;
 	}
 		
 	m_shieldBar.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
@@ -106,8 +106,8 @@ void Enemy::UpdateHealthBars()
 
 	if (m_feedbackTimer <= sf::seconds(0))
 	{
-		(*CurrentGame).removeFromFeedbacks(&m_shieldBar);
-		(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
+		m_shieldBar.m_visible = false;
+		m_shieldBarContainer.m_visible = false;
 	}
 
 	//update enemy level display
@@ -118,7 +118,7 @@ void Enemy::UpdateHealthBars()
 
 	if (m_feedbackTimer <= sf::seconds(0))
 	{
-		(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
+		m_enemyLevel.m_visible = false;
 	}
 }
 
@@ -522,14 +522,14 @@ void Enemy::GetDamage(int damage)
 	
 	if (m_feedbackTimer <= sf::seconds(0))
 	{
-		(*CurrentGame).addToFeedbacks(&m_armorBarContainer);
-		(*CurrentGame).addToFeedbacks(&m_armorBar);
+		m_armorBarContainer.m_visible = true;
+		m_armorBar.m_visible = true;
 		if (m_shield_max > 0)
 		{
-			(*CurrentGame).addToFeedbacks(&m_shieldBarContainer);
-			(*CurrentGame).addToFeedbacks(&m_shieldBar);
+			m_shieldBarContainer.m_visible = true;
+			m_shieldBar.m_visible = true;
 		}
-		(*CurrentGame).addToFeedbacks(&m_enemyLevel);
+		m_enemyLevel.m_visible = true;
 	}
 
 	m_feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
@@ -1297,13 +1297,11 @@ void Enemy::Death()
 
 Enemy::~Enemy()
 {
-	(*CurrentGame).removeFromFeedbacks(&m_armorBar);
-	(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);
-	
-	(*CurrentGame).removeFromFeedbacks(&m_shieldBar);
-	(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
-	
-	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
+	m_armorBar.GarbageMe();
+	m_armorBarContainer.GarbageMe();
+	m_shieldBar.GarbageMe();
+	m_shieldBarContainer.GarbageMe();
+	m_enemyLevel.GarbageMe();
 
 	for (Weapon* weapon : m_weapons_list)
 		delete weapon;

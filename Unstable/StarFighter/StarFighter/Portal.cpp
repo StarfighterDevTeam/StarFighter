@@ -15,7 +15,7 @@ Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if (m_GarbageMe == false)
+	if (m_garbageMe == false)
 	{
 		//update animations (transitioning frop opening to open and from closing to close)
 		if (m_currentAnimationIndex == PortalOpening && m_currentFrame + 2 > m_currentAnimation->getSize())

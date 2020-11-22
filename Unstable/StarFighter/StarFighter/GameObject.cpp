@@ -29,15 +29,13 @@ GameObject::GameObject()
 
 void GameObject::Draw(sf::RenderTexture& screen)
 {
-	if (m_visible && !m_transparent)
-	{
+	if (m_visible == true && m_transparent == false)
 		screen.draw(*this);
-	}
 }
 
 void GameObject::GarbageWhenOutOfScreen()
 {
-	if (m_GarbageMe == true)
+	if (m_garbageMe == true)
 		return;
 
 	sf::Vector2f size = sf::Vector2f(getGlobalBounds().width, getGlobalBounds().height);
@@ -57,7 +55,7 @@ void GameObject::GarbageWhenOutOfScreen()
 	{
 		if (getPosition().x + (size.x / 2) < 0 || getPosition().x - (size.x / 2) > SCENE_SIZE_X || getPosition().y + (size.y / 2) < 0 || getPosition().y - (size.y / 2) > SCENE_SIZE_Y)
 		{
-			m_GarbageMe = true;
+			m_garbageMe = true;
 		}
 	}
 }
@@ -141,7 +139,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_isOnScene = /*false*/getPosition().x + (m_size.x / 2) >= 0 && getPosition().x - (m_size.x / 2) <= SCENE_SIZE_X && getPosition().y + (m_size.y / 2) >= 0 && getPosition().y - (m_size.y / 2) <= SCENE_SIZE_Y;
 	m_immune = false;
 	m_startPattern = false;
-	m_GarbageMe = false;
+	m_garbageMe = false;
 	m_DontGarbageMe = false;
 	m_money = 0;
 	m_diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
@@ -337,7 +335,7 @@ void GameObject::setMoney(int loot_value)
 void GameObject::Death()
 {
 	m_visible = false;
-	m_GarbageMe = true;
+	m_garbageMe = true;
 }
 
 void GameObject::GenerateLoot()

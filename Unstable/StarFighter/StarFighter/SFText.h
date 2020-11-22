@@ -8,13 +8,26 @@ using namespace sf;
 class SFText : public Text
 {
 public:
-	SFText() {};
+	SFText(){};
 	SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position);
 	~SFText() {};
-	virtual void update(Time deltaTime, float hyperspeedMultiplier);
 	SFText* Clone();
+	void GarbageMe();
+
 	bool m_visible;
-	bool m_GarbageMe;
+	bool m_garbageMe;
+	bool m_DontGarbageMe;
+};
+
+class SFRectangle : public RectangleShape
+{
+public:
+	SFRectangle();
+	~SFRectangle(){};
+	void GarbageMe();
+
+	bool m_visible;
+	bool m_garbageMe;
 	bool m_DontGarbageMe;
 };
 

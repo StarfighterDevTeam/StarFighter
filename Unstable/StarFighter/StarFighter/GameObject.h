@@ -57,6 +57,7 @@ enum LayerType
 	EnemyObjectLayer,
 	AuraLayer,
 	FeedbacksLayer,
+	TextPopsUnlimitedLayer,
 	BotLayer,
 	FriendlyFireLayer,
 	FakeShipLayer,
@@ -224,7 +225,7 @@ public:
 
 	bool m_visible;
 	bool m_isOnScene;
-	bool m_GarbageMe;
+	bool m_garbageMe;
 	bool m_DontGarbageMe;
 	GameObjectType m_collider_type;
 	LayerType m_layer;

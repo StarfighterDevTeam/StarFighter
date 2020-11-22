@@ -65,13 +65,12 @@ public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject* object, bool during_update);
-	void addToFeedbacks(RectangleShape* feedback);
-	void addToFeedbacks(SFPanel* panel);
-	void addToFeedbacks(Text* text);
-	void addToFeedbacks(SFText* text);
-	void removeFromFeedbacks(RectangleShape* feedback);
-	void removeFromFeedbacks(SFPanel* panel);
-	void removeFromFeedbacks(Text* text);
+	void addToRectangles(SFRectangle& rectangle);
+	void addToTexts(SFText& text);
+
+	void addToPanels(SFPanel* panel);
+	void addToTextPops(SFTextPop* textpop);
+	void addToTextPopsUnlimited(SFTextPop* textpop);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -146,6 +145,9 @@ public:
 	string m_next_music_name;
 	Music_Bank m_curMusic_type;
 
+
+	
+
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	
@@ -154,16 +156,16 @@ private:
 	float m_movementClock;
 	RenderWindow *m_window;
 
-	std::list<RectangleShape*> m_sceneFeedbackBars;
-	std::list<SFPanel*> m_sceneSFPanels;
-	std::list<Text*> m_sceneFeedbackTexts;
-	std::vector<SFText*> m_sceneFeedbackSFTexts;
-	std::vector<GameObject*> m_sceneGameObjects;
-	std::vector<GameObject*> m_sceneGameObjectsCreated;
-	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
-	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
-	//std::vector<GameObject*> m_garbage;
-	//std::vector<SFText*> m_garbageTexts;
+	vector<SFRectangle*> m_sceneSFRectangles;
+	vector<SFText*> m_sceneSFTexts;
+	vector<SFPanel*> m_sceneSFPanels;
+	vector<SFTextPop*> m_sceneSFTextPops;
+	vector<SFTextPop*> m_sceneSFTextPopsUnlimited;
+
+	vector<GameObject*> m_sceneGameObjects;
+	vector<GameObject*> m_sceneGameObjectsCreated;
+	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
+	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
 };
 
 #endif // GAME_H_INCLUDED

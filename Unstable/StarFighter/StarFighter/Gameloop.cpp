@@ -14,7 +14,7 @@ void Gameloop::Initialize(Player player)
 	//initializing HUD
 	LOGGER_WRITE(Logger::DEBUG, "Initializing HUD...");
 	m_playerShip->m_SFHudPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
-	(*CurrentGame).addToFeedbacks(m_playerShip->m_SFHudPanel);
+	(*CurrentGame).addToPanels(m_playerShip->m_SFHudPanel);
 
 	//Load saved items
 	if (!Ship::LoadPlayerItems(m_playerShip))
@@ -87,6 +87,9 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, false);
+
+	//DEBUG
+	//SpawnInScene("Vanguard_V1", (*CurrentGame).m_playerShip);
 }
 
 void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
@@ -420,7 +423,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
-						m_currentScene->GenerateBoss();
+						m_currentScene->SpawnBoss();
 						m_currentScene->m_generating_boss = false;
 						(*CurrentGame).m_curMusic_type = Music_Boss;//but we don't actually play Music_Boss so the scripted music is not overriden, because it's not really a boss, since you can pass it
 					}
@@ -449,7 +452,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
 						(*CurrentGame).PlayMusic(Music_Boss);
-						m_currentScene->GenerateBoss();
+						m_currentScene->SpawnBoss();
 						m_IG_State = BOSS_FIGHT;
 					}
 				}
@@ -530,6 +533,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).garbageLayer(FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LootLayer);
 				(*CurrentGame).garbageLayer(FeedbacksLayer);
+				(*CurrentGame).garbageLayer(TextPopsUnlimitedLayer);
 
 				//Optional script to skip boss procedures, for scripted missions, so they may still be alive at this point
 				if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss])
@@ -760,10 +764,9 @@ void Gameloop::RespawnInLastSafePoint()
 
 void Gameloop::DestroySFPanel(Ship* playerShip)
 {
-	if (playerShip->m_SFTargetPanel)
+	if (playerShip->m_SFTargetPanel != NULL)
 	{
-		(*CurrentGame).removeFromFeedbacks(playerShip->m_SFTargetPanel);
-		delete playerShip->m_SFTargetPanel;
+		playerShip->m_SFTargetPanel->GarbageMe();
 		playerShip->m_SFTargetPanel = NULL;
 	}
 }
@@ -807,7 +810,7 @@ void Gameloop::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 			break;
 		}
 	}
-	(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFTargetPanel);
+	(*CurrentGame).addToPanels((*CurrentGame).m_playerShip->m_SFTargetPanel);
 }
 
 void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
@@ -824,6 +827,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 		(*CurrentGame).garbageLayer(ExplosionLayer);
 		(*CurrentGame).garbageLayer(LootLayer);
 		(*CurrentGame).garbageLayer(FeedbacksLayer);
+		(*CurrentGame).garbageLayer(TextPopsUnlimitedLayer);
 		m_currentScene = new Scene(scene_name, 0, false, true);
 		playerShip->m_currentScene_name = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();

@@ -9,13 +9,15 @@ SFText::SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vec
 	setPosition(position);
 
 	m_visible = true;
-	m_GarbageMe = false;
+	m_garbageMe = false;
 	m_DontGarbageMe = false;
 }
 
-void SFText::update(Time deltaTime, float hyperspeedMultiplier)
+
+void SFText::GarbageMe()
 {
-	//see override function in class SFTextPop
+	m_visible = false;
+	m_garbageMe = true;
 }
 
 SFText* SFText::Clone()
@@ -24,4 +26,17 @@ SFText* SFText::Clone()
 	clone->setString(getString());
 
 	return clone;
+}
+
+//RECTANGLE
+SFRectangle::SFRectangle()
+{
+	m_garbageMe = false;
+	m_visible = true;
+}
+
+void SFRectangle::GarbageMe()
+{
+	m_garbageMe = true;
+	m_visible = false;
 }

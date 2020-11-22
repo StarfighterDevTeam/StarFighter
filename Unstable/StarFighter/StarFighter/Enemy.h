@@ -22,6 +22,7 @@ const int XPTable_PerEnemyClass[NBVAL_EnemyClass] = { 0, 10, 10, 30, 30, 100, 10
 class Enemy : public GameObject
 {
 public:
+	Enemy(){};
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber = 1, int animationNumber = 1);
 	~Enemy();
 	void DeletePhases();
@@ -68,11 +69,11 @@ public:
 	int m_shots_fired;
 	bool m_input_blocker;
 
-	sf::RectangleShape m_armorBar;
-	sf::RectangleShape m_armorBarContainer;
-	sf::RectangleShape m_shieldBar;
-	sf::RectangleShape m_shieldBarContainer;
-	sf::Text m_enemyLevel;
+	SFRectangle m_armorBar;
+	SFRectangle m_armorBarContainer;
+	SFRectangle m_shieldBar;
+	SFRectangle m_shieldBarContainer;
+	SFText m_enemyLevel;
 	sf::Font* m_font;
 	float m_armorBar_offsetY;
 	float m_shieldBar_offsetY;

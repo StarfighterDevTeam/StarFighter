@@ -24,7 +24,7 @@ SFTextPop::SFTextPop(SFText* text, float time_fade_in, float time_not_faded, flo
 	}
 	
 	m_visible = text->m_visible;
-	m_GarbageMe = false;
+	m_garbageMe = false;
 	m_DontGarbageMe = false;
 
 	m_time_fade_in = time_fade_in;
@@ -73,7 +73,7 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 		else
 		{
 			m_alpha = 0;
-			m_GarbageMe = true;
+			m_garbageMe = true;
 			m_visible = false;
 		}
 		//apply new alpha value

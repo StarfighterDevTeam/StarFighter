@@ -359,7 +359,7 @@ void Scene::PlayTitleFeedback()
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, SCENE_TILE_FADE_IN_TIME, SCENE_TILE_NOT_FADED_TIME, SCENE_TILE_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	delete text_feedback;
-	(*CurrentGame).addToFeedbacks(pop_feedback);
+	(*CurrentGame).addToTextPops(pop_feedback);
 }
 
 bool Scene::CheckHazardBreakConditions()
@@ -438,14 +438,14 @@ void Scene::DisplayDestructions(bool hazard_break)//OLD: to remove
 	text_feedback->setString(ss.str());
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
-	(*CurrentGame).addToFeedbacks(pop_feedback);
+	(*CurrentGame).addToTextPops(pop_feedback);
 
 	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
 		text_feedback->setString("HAZARD BREAK!!!");
 		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y + pop_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK));
-		(*CurrentGame).addToFeedbacks(pop_feedback2);
+		(*CurrentGame).addToTextPops(pop_feedback2);
 	}
 	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
@@ -453,7 +453,7 @@ void Scene::DisplayDestructions(bool hazard_break)//OLD: to remove
 		text_feedback->setCharacterSize(18);
 		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y + pop_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK));
-		(*CurrentGame).addToFeedbacks(pop_feedback2);
+		(*CurrentGame).addToTextPops(pop_feedback2);
 	}
 	
 	delete text_feedback;
@@ -564,14 +564,14 @@ void Scene::DisplayScore(bool hazard_break)
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	text_height = position.y;
-	(*CurrentGame).addToFeedbacks(pop_feedback);
+	(*CurrentGame).addToTextPops(pop_feedback);
 
 	//graze
 	text_feedback->setString(ss_graze.str());
 	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
 	SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, text_height));
-	(*CurrentGame).addToFeedbacks(pop_feedback2);
+	(*CurrentGame).addToTextPops(pop_feedback2);
 
 	//total
 	text_feedback->setString(ss_total.str());
@@ -580,7 +580,7 @@ void Scene::DisplayScore(bool hazard_break)
 	text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 	SFTextPop* pop_feedback3 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback3->setPosition(sf::Vector2f(position.x - pop_feedback3->getGlobalBounds().width / 2, text_height));
-	(*CurrentGame).addToFeedbacks(pop_feedback3);
+	(*CurrentGame).addToTextPops(pop_feedback3);
 
 	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
@@ -591,7 +591,7 @@ void Scene::DisplayScore(bool hazard_break)
 		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToFeedbacks(pop_feedback4);
+		(*CurrentGame).addToTextPops(pop_feedback4);
 	}
 	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
@@ -600,7 +600,7 @@ void Scene::DisplayScore(bool hazard_break)
 		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToFeedbacks(pop_feedback4);
+		(*CurrentGame).addToTextPops(pop_feedback4);
 	}
 	else
 	{
@@ -609,7 +609,7 @@ void Scene::DisplayScore(bool hazard_break)
 		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToFeedbacks(pop_feedback4);
+		(*CurrentGame).addToTextPops(pop_feedback4);
 	}
 	//else if (m_hazard_level < m_hazard_level_unlocked)
 	//{
@@ -618,7 +618,7 @@ void Scene::DisplayScore(bool hazard_break)
 	//	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
 	//	SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	//	pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-	//	(*CurrentGame).addToFeedbacks(pop_feedback4);
+	//	(*CurrentGame).addToTextPops(pop_feedback4);
 	//}
 	//else if (m_hazard_level == NB_HAZARD_LEVELS - 1)
 	//{
@@ -627,7 +627,7 @@ void Scene::DisplayScore(bool hazard_break)
 	//	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
 	//	SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	//	pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-	//	(*CurrentGame).addToFeedbacks(pop_feedback4);
+	//	(*CurrentGame).addToTextPops(pop_feedback4);
 	//}
 
 	delete text_feedback;
@@ -729,14 +729,21 @@ void Scene::SpawnEnemy(int enemy_class)
 
 	//counting spawned enemies
 	(*CurrentGame).m_hazardSpawned += enemy->m_money;
+
+	//adding enemy feebacks to HUD updates
+	(*CurrentGame).addToRectangles(enemy->m_armorBarContainer);
+	(*CurrentGame).addToRectangles(enemy->m_armorBar);
+	(*CurrentGame).addToRectangles(enemy->m_shieldBarContainer);
+	(*CurrentGame).addToRectangles(enemy->m_shieldBar);
+	(*CurrentGame).addToTexts(enemy->m_enemyLevel);
 }
 
-void Scene::GenerateBoss()
+void Scene::SpawnBoss()
 {
-	for (std::vector<EnemyBase*>::iterator it = m_boss_list.begin(); it != m_boss_list.end(); ++it)
+	for (EnemyBase* enemy_base : m_boss_list)
 	{
-		Enemy* boss = (*it)->m_enemy->Clone();
-		boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
+		Enemy* boss = enemy_base->m_enemy->Clone();
+		boss->m_enemy_class = (EnemyClass)(enemy_base->m_enemyclass);
 		(*CurrentGame).addToScene(boss, true);
 
 		boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + boss->getRotation());
@@ -744,6 +751,13 @@ void Scene::GenerateBoss()
 
 		//counting spawned enemies
 		(*CurrentGame).m_hazardSpawned += boss->m_money;
+
+		//adding enemy feebacks to HUD updates
+		(*CurrentGame).addToRectangles(boss->m_armorBarContainer);
+		(*CurrentGame).addToRectangles(boss->m_armorBar);
+		(*CurrentGame).addToRectangles(boss->m_shieldBarContainer);
+		(*CurrentGame).addToRectangles(boss->m_shieldBar);
+		(*CurrentGame).addToTexts(boss->m_enemyLevel);
 	}
 }
 
