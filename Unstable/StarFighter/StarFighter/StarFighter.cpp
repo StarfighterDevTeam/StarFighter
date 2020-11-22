@@ -148,7 +148,7 @@ int main()
 
 		dt = deltaClock.restart();
 
-		if (!(*CurrentGame).m_Pause && dt.asSeconds() < 1)
+		if (!(*CurrentGame).m_Pause && dt.asSeconds() < 1 && renderWindow.hasFocus())
 		{
 			//Update
 			gameManager.GetCurrentState()->Update(dt);

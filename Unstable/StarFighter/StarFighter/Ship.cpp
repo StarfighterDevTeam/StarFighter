@@ -1307,14 +1307,19 @@ void Ship::SellingItem()
 		if (success)
 		{
 			//save shop: flag object as added into shop
-			for (GameObject* item : m_targetShop->m_items)
+			bool found_hole = false;
+			for (int i = 0; i < m_targetShop->m_items.size(); i++)
 			{
-				if (item == NULL)
+				if (m_targetShop->m_items[i] == NULL)
 				{
-					item = m_SFTargetPanel->GetFocusedItem();
+					m_targetShop->m_items[i] = m_SFTargetPanel->GetFocusedItem();
+					found_hole = true;
 					break;
 				}
 			}
+
+			if (found_hole == false)
+				m_targetShop->m_items.push_back(m_SFTargetPanel->GetFocusedItem());
 
 			//finish moving the object
 			m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
