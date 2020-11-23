@@ -6,9 +6,9 @@ phase04,-200,laser_fast,fireball,0,0,0,fireball,0,0,0,fireball,0,0,0,fireball,0,
 phase05,200,0,0,0,0,laser_arc,fireball,0,0,0,fireball,0,0,0,fireball,0,0,0,,,,0,,,,0,,,1,0,0,0,0,0,laser_360,fireball,0,,,,0,,,,0
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-KatyushaIntro,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,line,-70,,1,0,0,ghost,0,0,0,,positionH,lesser,450,KatyushaWaiting,0,,,,0
-LSukhoiIntro,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,line,-90,,1,0,0,ghost,0,0,0,,positionH,lesser,380,LSuhkoiPhase1,wakeUp,0,0,LSuhkoiPhase1,0
-RSukhoiIntro,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,line,-60,,1,0,0,ghost,0,0,0,,positionH,lesser,520,RSuhkoiPhase1,wakeUp,0,0,RSuhkoiPhase1,0
+KatyushaIntro,100,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,line,-70,,1,0,0,ghost,0,0,0,,0,lesser,450,KatyushaWaiting,0,,,,0
+LSukhoiIntro,100,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,line,-90,,1,0,0,ghost,0,0,0,,0,lesser,380,LSuhkoiPhase1,wakeUp,0,0,LSuhkoiPhase1,0
+RSukhoiIntro,100,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,line,-60,,1,0,0,ghost,0,0,0,,0,lesser,520,RSuhkoiPhase1,wakeUp,0,0,RSuhkoiPhase1,0
 LSuhkoiPhase1,0,laser_fast,fireball,0,0,laser,fireball,0,0,0,,0,0,0,,0,0,0,,,,0,,,,oscillator,60,100,1,0,0,0,0,Hatsuki,0,,life,lesser,0,SukhoisDeath,0,,,,0
 RSuhkoiPhase1,0,laser_fast,fireball,0,0,laser,fireball,0,0,0,,0,0,0,,0,0,0,,,,0,,,,oscillator,60,100,1,0,0,0,0,Itsukhoi,0,,life,lesser,0,SukhoisDeath,0,,,,0
 SukhoisDeath,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,0,,,1,0,0,0,0,Katyusha,0,,0,,,,0,,,,0

@@ -1,9 +1,7 @@
 #enemy_name,armor,shield,shield_regen,damage,weapon_name,ammo_name,weapon2_name,ammo2_name,weapon3_name,ammo3_name,image,width,height,frames,vspeed,explosion_name,value,pattern,angspeed,radius,clockwise,centered,rotation_speed,phase
-robert,800,50,1,10,laser_fast,fireball,0,,0,,2D/SU35.png,82,100,1,90,death_explosion,20,oscillator,0,0,1,0,0,0
-roger,500,20,0,5,laser,fireball,laser_arc,fireball,0,fireball,2D/SU27.png,60,80,1,90,death_explosion,30,oscillator,30,40,1,0,0,phase01
-Katyusha,5000,20,1,100,laser,fireball,laser_arc,fireball,0,fireball,2D/SU35.png,82,100,1,90,death_explosion,10,oscillator,30,40,1,0,0,KatyushaIntro
-Itsukhoi,2000,20,1,50,laser,fireball,laser_arc,fireball,0,fireball,2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,0,0,LSukhoiIntro
-Hatsuki,2000,20,1,50,laser,fireball,laser_arc,fireball,0,fireball,2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,0,0,RSukhoiIntro
+Katyusha,5000,20,1,100,laser,fireball,laser_arc,fireball,0,fireball,2D/Vanguard/V_KappaGold.png,351,411,1,90,death_explosion,10,oscillator,30,40,1,0,0,KatyushaIntro
+Itsukhoi,2000,20,1,50,laser,fireball,laser_arc,fireball,0,fireball,2D/Vanguard/V_GammaGold.png,75,126,1,90,death_explosion,10,oscillator,30,40,1,0,0,LSukhoiIntro
+Hatsuki,2000,20,1,50,laser,fireball,laser_arc,fireball,0,fireball,2D/Vanguard/V_GammaGold.png,75,126,1,90,death_explosion,10,oscillator,30,40,1,0,0,RSukhoiIntro
 #,,,,,,,,,,,,,,,,,,,,,,,,
 V_Alpha1,60,0,0,100,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Alpha1.png,69,84,3,110,death_explosion,10,0,,,,,0,V_Alpha1_Entry
 V_Alpha2,70,0,0,100,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Alpha2.png,69,84,3,110,death_explosion,10,0,,,,,0,V_Alpha2_Entry
@@ -17,9 +15,11 @@ V_Beta3,60,150,15,300,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Beta3.png,135,156
 V_Delta1,800,0,0,500,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Delta1.png,288,390,1,50,death_explosion,50,0,,,,,0,V_Delta1_Entry
 V_Delta2,800,0,0,500,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Delta2.png,288,390,1,50,death_explosion,50,0,,,,,0,V_Delta2_Entry
 V_Delta3,800,0,0,500,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Delta3.png,288,390,1,50,death_explosion,50,0,,,,,0,V_Delta3_Entry
+V_DeltaGold,10000,0,0,500,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_DeltaGold.png,288,390,1,50,death_explosion,50,0,,,,,0,V_Delta3_Entry
 V_Gamma1,130,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Gamma1.png,75,126,1,50,death_explosion,50,0,,,,,0,V_Gamma1_Entry
 V_Gamma2,140,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Gamma2.png,75,126,1,50,death_explosion,50,0,,,,,0,V_Gamma2_Entry
 V_Gamma3,150,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Gamma3.png,75,126,1,50,death_explosion,50,0,,,,,0,V_Gamma3_Entry
+V_GammaGold,1000,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_GammaGold.png,75,126,1,50,death_explosion,50,0,,,,,0,V_Gamma3_Entry
 V_Zeta_01,20,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,,30,0
 V_Zeta_02,20,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Zeta.png,66,66,1,400,death_explosion,50,0,,,,,50,0
 V_Zeta_03,20,0,0,200,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,,-30,0

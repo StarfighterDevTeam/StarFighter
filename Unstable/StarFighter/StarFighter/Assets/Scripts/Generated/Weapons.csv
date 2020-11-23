@@ -1,5 +1,11 @@
 #weapon_name,display_name,image,width,height,frames,sound_name,time_between_shots,rafale,rafale_cooldown,multishot,xspread,dispersion,alternate,angle_offset,target_homing
 laser,Default_laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
+laser_fast,Laser_fast,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,homing
+laser_360,Laser_360,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
+laser_player,Laser_player,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
+laser_bot,Default_laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
+laser_arc,Laser_arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,homing
+fireball_sinus,Fireball_sinus,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_homing
 laserbeam,Laser_beam,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.5,-1,0,1,0,0,0,0,0
 #,,,,,,,,,,,,,,,
 V_Alpha1_laser,Vanguard_Alpha1_Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3,3,1.5f,1,10,0,0,0,homing

@@ -8,9 +8,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	srand(time(NULL));
 	m_name = name;
 	for (int i = 0; i < NBVAL_EnemyClass; i++)
-	{
 		m_total_class_probability[i] = 0;
-	}
+	
 	m_generating_enemies = false;
 	m_generating_boss = false;
 	m_hazard_level = hazard_level;
@@ -18,9 +17,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	m_canHazardBreak = false;
 
 	for (int i = 0; i < NBVAL_SceneScripts; i++)
-	{
 		m_scripts[i] = false;
-	}
 
 	int p = 0;
 	int enemy_count = 0;
@@ -51,34 +48,15 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 			//Assigning the right direction for the scene
 			if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("V") == 0)
-			{
 				if (!reverse_scene)
-				{
-					m_direction = DIRECTION_UP;
-				}
-				else
-				{
-					m_direction = DIRECTION_DOWN;
-				}
-			}
+					m_direction = reverse_scene ? DIRECTION_DOWN: DIRECTION_UP;
 			else if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("H") == 0)
-			{
 				if (!reverse_scene)
-				{
-					m_direction = DIRECTION_RIGHT;
-				}
-				else
-				{
-					m_direction = DIRECTION_LEFT;
-				}
-			}
-			else
+					m_direction = reverse_scene ? DIRECTION_LEFT : DIRECTION_RIGHT;
+			else if (!first_scene)
 			{
-				if (!first_scene)
-				{
-					hub = true;
-					m_direction = (*CurrentGame).m_direction;
-				}
+				hub = true;
+				m_direction = (*CurrentGame).m_direction;
 			}
 
 			//Setting the right initial position and speed
@@ -91,10 +69,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 			sf::Vector2f speed = GameObject::getSpeed_for_Scrolling(m_direction, m_vspeed);
 
-			if (hub)
-			{
+			if (hub == true)
 				m_direction = NO_DIRECTION;
-			}
 
 			m_bg = new Background(sf::Vector2f(0, 0), speed, (*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).m_direction, first_screen_offset);
 			m_bg->m_display_name = scene_name;
@@ -132,14 +108,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				}
 			}
 
-			if (first_scene)
-			{
-				m_bg->SetPortalsState(PortalOpen);
-			}
-			else
-			{
-				m_bg->SetPortalsState(PortalGhost);
-			}
+			m_bg->SetPortalsState(first_scene == true ? PortalOpen : PortalGhost);
 		}
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("shop") == 0)
 		{
@@ -168,7 +137,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("enemy") == 0)
 		{
 			EnemyBase* e = FileLoader::LoadEnemyBase((*CurrentGame).m_sceneConfigs[name][i][ENEMY], stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_PROBABILITY]), stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS]));
-			if (e)
+			if (e != NULL)
 			{
 				e->m_enemy->m_level = m_level;//stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_LEVEL]);
 				e->m_enemy->ApplyLevelModifiers();
@@ -201,14 +170,13 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("boss") == 0)
 		{
 			EnemyBase* boss = FileLoader::LoadEnemyBase((*CurrentGame).m_sceneConfigs[name][i][BOSS], 1, stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_CLASS]));
-			if (boss)
+			if (boss != NULL)
 			{
 				boss->m_enemy->m_level = m_level;//stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_LEVEL]);
 
 				if (boss->m_enemy->m_phases.empty())
-				{
 					boss->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, boss->m_enemy->m_speed.y);
-				}
+				
 				sf::Vector2f boss_pos = sf::Vector2f(atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
 				boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
 				boss->m_enemy->setPosition(boss_pos);
@@ -222,14 +190,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("script") == 0)
 		{
 			for (int j = 0; j < NBVAL_SceneScripts; j++)
-			{
 				m_scripts[j] = (bool)stoi((*CurrentGame).m_sceneConfigs[name][i][j+1]);
-			}
 
 			if (m_scripts[SceneScript_PortalOpenDuringBoss])
-			{
 				m_bg->SetPortalsState(PortalOpen);
-			}
 		}
 		//Loading dialogs
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("dialog") == 0)
@@ -247,9 +211,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 		}
 		//Loading specific music
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("music") == 0)
-		{
 			m_scene_music = (*CurrentGame).m_sceneConfigs[name][i][1];
-		}
 
 		if (enemy_count != 0 && m_direction != NO_DIRECTION)
 		{

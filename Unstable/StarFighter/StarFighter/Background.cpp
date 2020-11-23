@@ -15,9 +15,7 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 	this->setPosition_Y_for_Direction(direction, sf::Vector2f(size_.x / 2, (-size_.y / 2) + first_screen_offset), true);
 
 	for (int i = 0; i < NO_DIRECTION; i++)
-	{
 		m_portals[i] = NULL;
-	}
 }
 
 Background::~Background()
