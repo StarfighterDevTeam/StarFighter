@@ -10,3 +10,4 @@ Dial_Hub_Intro_05,0,0,1,2,Captain_Ellias,Ahaha_that's_a_stupid_move_Wisteria._At
 Dial_VIntro_01,0,0,0,4,Board_computer,Wisteria[COMA]_we_must_avoid_collision_at_all_cost.,2D/Dialogs/Computer.png,Dial_VIntro_02
 Dial_VIntro_02,0,0,0,6,Board_computer,Use_the_aerobrakes_to_fly_carefully_[Hold_X_Key].,2D/Dialogs/Computer.png,0
 Dial_VIntro_03,0,0,0,6,Board_computer,We_don't_have_any_weapon._Let's_dodge_those_shots_until_we_exit_this_area.,2D/Dialogs/Computer.png,0
+Dial_Sandbox,1,0,1,0,Katyusha,LET'S_FIGHT!!!,2D/Dialogs/Captain.png,0

@@ -47,6 +47,7 @@ enum EnemyPhaseData
 	PHASE_ROTATION_SPEED,
 	PHASE_MODIFIER,
 	PHASE_MODIFIER_2,
+	PHASE_MODIFIER_3,
 	PHASE_WAKEUP,
 	PHASE_WELCOME_WEAPON,
 	PHASE_WELCOME_AMMO,
@@ -75,6 +76,7 @@ enum ConditionType
 	ShotsFired,
 	PlayerVerticalPosition,
 	PlayerHorizontalPosition,
+	Rotation,
 };
 
 enum BouncingType
@@ -92,7 +94,7 @@ enum Modifier
 	GhostModifier,//no collision + alpha mask
 	DeathModifier,//suicide
 	FaceTarget,//rotate to always face player
-	ResetFacing,//rotate to always face player
+	ResetFacing,//rotate to default direction
 	Bouncing,//bounces on scene borders
 	BouncingH,//bounces on horizontal scene borders only
 	BouncingV,//bounces on horizontal scene borders only

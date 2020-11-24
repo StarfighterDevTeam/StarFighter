@@ -613,21 +613,13 @@ sf::Vector2f GameObject::getSpeed_for_Direction(Directions direction, sf::Vector
 float GameObject::getRotation_for_Direction(Directions direction)
 {
 	if (direction == DIRECTION_DOWN)
-	{
 		return 180;
-	}
 	else if (direction == DIRECTION_RIGHT)
-	{
 		return 90;
-	}
 	else if (direction == DIRECTION_LEFT)
-	{
 		return 270;
-	}
 	else
-	{
 		return 0;
-	}
 }
 
 sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale)
@@ -745,137 +737,71 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	if (direction == DIRECTION_UP)
-	{
-		if (this->getPosition().y > target_position.y)
-		{
+		if (getPosition().y > target_position.y)
 			return GREATER_THAN;
-		}
-		else if (this->getPosition().y == target_position.y)
-		{
+		else if (getPosition().y == target_position.y)
 			return EQUAL_TO;
-		}
 		else
-		{
 			return LESSER_THAN;
-		}
-	}
 
 	else if (direction == DIRECTION_DOWN)
-	{
-		if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
-		{
+		if (getPosition().y < SCENE_SIZE_Y - target_position.y)
 			return GREATER_THAN;
-		}
-		else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
-		{
+		else if (getPosition().y == SCENE_SIZE_Y - target_position.y)
 			return EQUAL_TO;
-		}
 		else
-		{
 			return LESSER_THAN;
-		}
-	}
 
 	else if (direction == DIRECTION_RIGHT)
-	{
-		if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
-		{
+		if (getPosition().x < SCENE_SIZE_X - target_position.x)
 			return GREATER_THAN;
-		}
-		if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
-		{
+		else if (getPosition().x == SCENE_SIZE_X - target_position.x)
 			return EQUAL_TO;
-		}
 		else
-		{
 			return LESSER_THAN;
-		}
-	}
 
 	else
-	{
-		if (this->getPosition().x > target_position.x)
-		{
+		if (getPosition().x > target_position.x)
 			return GREATER_THAN;
-		}
-		else if (this->getPosition().x == target_position.x)
-		{
+		else if (getPosition().x == target_position.x)
 			return EQUAL_TO;
-		}
 		else
-		{
 			return LESSER_THAN;
-		}
-	}
 }
 
 FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
-	{
-		if (direction == DIRECTION_UP)
-		{
-			if (this->getPosition().x > target_position.x)
-			{
-				return GREATER_THAN;
-			}
-			else if (this->getPosition().x == target_position.x)
-			{
-				return EQUAL_TO;
-			}
-			else
-			{
-				return LESSER_THAN;
-			}
-		}
-
-		else if (direction == DIRECTION_DOWN)
-		{
-			if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
-			{
-				return GREATER_THAN;
-			}
-			else if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
-			{
-				return EQUAL_TO;
-			}
-			else
-			{
-				return LESSER_THAN;
-			}
-		}
-
-		else if (direction == DIRECTION_RIGHT)
-		{
-			if (this->getPosition().y > target_position.y)
-			{
-				return GREATER_THAN;
-			}
-			if (this->getPosition().y == target_position.y)
-			{
-				return EQUAL_TO;
-			}
-			else
-			{
-				return LESSER_THAN;
-			}
-		}
-
+	if (direction == DIRECTION_UP)
+		if (getPosition().x > target_position.x)
+			return GREATER_THAN;
+		else if (getPosition().x == target_position.x)
+			return EQUAL_TO;
 		else
-		{
-			if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
-			{
-				return GREATER_THAN;
-			}
-			else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
-			{
-				return EQUAL_TO;
-			}
-			else
-			{
-				return LESSER_THAN;
-			}
-		}
-	}
+			return LESSER_THAN;
+
+	else if (direction == DIRECTION_DOWN)
+		if (getPosition().x < SCENE_SIZE_X - target_position.x)
+			return GREATER_THAN;
+		else if (getPosition().x == SCENE_SIZE_X - target_position.x)
+			return EQUAL_TO;
+		else
+			return LESSER_THAN;
+
+	else if (direction == DIRECTION_RIGHT)
+		if (getPosition().y > target_position.y)
+			return GREATER_THAN;
+		else if (getPosition().y == target_position.y)
+			return EQUAL_TO;
+		else
+			return LESSER_THAN;
+
+	else
+		if (getPosition().y < SCENE_SIZE_Y - target_position.y)
+			return GREATER_THAN;
+		else if (getPosition().y == SCENE_SIZE_Y - target_position.y)
+			return EQUAL_TO;
+		else
+			return LESSER_THAN;
 }
 
 sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
@@ -884,12 +810,12 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 	{
 		if (!centered)
 		{
-			this->setPosition(sf::Vector2f(this->getPosition().x, target_position.y));
-			return sf::Vector2f(this->getPosition().x, target_position.y);
+			setPosition(sf::Vector2f(getPosition().x, target_position.y));
+			return sf::Vector2f(getPosition().x, target_position.y);
 		}
 		else
 		{
-			this->setPosition(sf::Vector2f(target_position.x, target_position.y));
+			setPosition(sf::Vector2f(target_position.x, target_position.y));
 			return sf::Vector2f(target_position.x, target_position.y);
 		}
 	}
@@ -898,12 +824,12 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 	{
 		if (!centered)
 		{
-			this->setPosition(sf::Vector2f(this->getPosition().x, SCENE_SIZE_Y - target_position.y));
-			return sf::Vector2f(this->getPosition().x, SCENE_SIZE_Y - target_position.y);
+			setPosition(sf::Vector2f(getPosition().x, SCENE_SIZE_Y - target_position.y));
+			return sf::Vector2f(getPosition().x, SCENE_SIZE_Y - target_position.y);
 		}
 		else
 		{
-			this->setPosition(sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y));
+			setPosition(sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y));
 			return sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y);
 		}
 	}
@@ -912,12 +838,12 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 	{
 		if (!centered)
 		{
-			this->setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.x, this->getPosition().y));
-			return sf::Vector2f(SCENE_SIZE_X - target_position.x, this->getPosition().y);
+			setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.x, getPosition().y));
+			return sf::Vector2f(SCENE_SIZE_X - target_position.x, getPosition().y);
 		}
 		else
 		{
-			this->setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x));
+			setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x));
 			return sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x);
 		}
 	}
@@ -926,12 +852,12 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 	{
 		if (!centered)
 		{
-			this->setPosition(sf::Vector2f(target_position.x, this->getPosition().y));
-			return sf::Vector2f(target_position.x, this->getPosition().y);
+			setPosition(sf::Vector2f(target_position.x, getPosition().y));
+			return sf::Vector2f(target_position.x, getPosition().y);
 		}
 		else
 		{
-			this->setPosition(sf::Vector2f(target_position.y, target_position.x));
+			setPosition(sf::Vector2f(target_position.y, target_position.x));
 			return sf::Vector2f(target_position.y, target_position.x);
 		}
 	}

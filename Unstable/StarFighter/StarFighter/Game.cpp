@@ -38,7 +38,7 @@ void Game::init(RenderWindow* window)
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	//if (!SpaceCowboys.openFromFile("Music/SpaceCowboys.ogg"))
@@ -110,17 +110,20 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 		{
 			case Music_Hub:
 			{
-				m_next_music_name = makePath("Music/Hub.ogg");
+				//m_next_music_name = makePath("Music/Hub.ogg");
+				m_next_music_name = makePath("Music/ShadowWarrior/MasterNinjaTheme.ogg");
 				break;
 			}
 			case Music_Scene:
 			{
-				m_next_music_name = makePath("Music/Scene.ogg");
+				//m_next_music_name = makePath("Music/Scene.ogg");
+				m_next_music_name = makePath("Music/ShadowWarrior/Ruins.ogg");
 				break;
 			}
 			case Music_Boss:
 			{
-				m_next_music_name = makePath("Music/Boss.ogg");
+				//m_next_music_name = makePath("Music/Boss.ogg");
+				m_next_music_name = makePath("Music/ShadowWarrior/Pursuit.ogg");
 				break;
 			}
 		}
@@ -258,6 +261,11 @@ void Game::updateScene(Time deltaTime)
 	//Clearing garbage and updating the rest + adding newly created objects
 	vector<GameObject*> sceneGameObjects_tmp;
 
+	for (int i = 0; i < NBVAL_Layer; i++)
+		m_sceneGameObjectsLayered[i].clear();
+	for (int i = 0; i < NBVAL_GameObject; i++)
+		m_sceneGameObjectsTyped[i].clear();
+
 	//delete "garbage" objects, keep the rest in a temporary vector
 	for (GameObject* object : m_sceneGameObjects)
 	{
@@ -266,36 +274,39 @@ void Game::updateScene(Time deltaTime)
 		if (object->m_garbageMe == true)
 			delete object;
 		else
+		{
 			sceneGameObjects_tmp.push_back(object);
-	}
 
-	m_sceneGameObjects.clear();
-	for (int i = 0; i < NBVAL_Layer; i++)
-		m_sceneGameObjectsLayered[i].clear();
-	for (int i = 0; i < NBVAL_GameObject; i++)
-		m_sceneGameObjectsTyped[i].clear();
+			m_sceneGameObjectsTyped[object->m_collider_type].push_back(object);
+			m_sceneGameObjectsLayered[object->m_layer].push_back(object);
+		}
+	}
 
 	//add in newly created objects
 	for (GameObject* object : m_sceneGameObjectsCreated)
 		if (object->m_garbageMe == true)
 			delete object;
 		else
+		{
 			sceneGameObjects_tmp.push_back(object);
-	
+
+			m_sceneGameObjectsTyped[object->m_collider_type].push_back(object);
+			m_sceneGameObjectsLayered[object->m_layer].push_back(object);
+		}
+			
+	m_sceneGameObjects.clear();
 	m_sceneGameObjectsCreated.clear();
 
 	//update all remaining objects and order them by collider type and layer type
 	for (GameObject* object : sceneGameObjects_tmp)
 	{
-		m_sceneGameObjects.push_back(object);
-		m_sceneGameObjectsTyped[object->m_collider_type].push_back(object);
-		m_sceneGameObjectsLayered[object->m_layer].push_back(object);
-
 		object->update(deltaTime, m_hyperspeedMultiplier);
+		m_sceneGameObjects.push_back(object);//assuming we will never browse this vector directly during the update of objects
 	}
+		
 
 	//Checking colisions
-	colisionChecksV2(deltaTime);  
+	colisionChecksV2(deltaTime);
 
 	//HUD ELEMENTS
 	//SFRectangles
@@ -770,15 +781,12 @@ float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_po
 
 void Game::WakeUpEnemiesWithName(string display_name)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[EnemyObject].begin(); it != m_sceneGameObjectsTyped[EnemyObject].end(); it++)
+	for (GameObject* object : m_sceneGameObjectsTyped[EnemyObject])
 	{
-		if (*it == NULL)
-			continue;
-
-		if ((*it)->m_display_name == display_name)
+		if (object->m_display_name.compare(display_name) == 0)
 		{
-			(*it)->m_wake_up = true;
-			(*it)->CheckCondition();//apply phase change directly
+			object->m_wake_up = true;
+			object->CheckCondition();//apply phase change directly
 		}
 	}
 }

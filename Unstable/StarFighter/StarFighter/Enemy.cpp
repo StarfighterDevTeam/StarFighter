@@ -449,13 +449,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	AnimatedSprite::update(deltaTime);
 
 	//phases
-	if (!m_phases.empty())
-	{
-		if (!m_currentPhase->m_transitions_list.empty())
-		{
-			this->CheckCondition();
-		}
-	}
+	if (m_phases.empty() == false)
+		if (m_currentPhase->m_transitions_list.empty() == false)
+			CheckCondition();
 }
 
 void Enemy::RotateFeedbacks(float angle)
@@ -614,225 +610,105 @@ bool Enemy::CheckCondition()
 {
 	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
 
-	for (std::vector<ConditionTransition*>::iterator it = this->m_currentPhase->m_transitions_list.begin(); it != this->m_currentPhase->m_transitions_list.end(); it++)
+	for (ConditionTransition* cond : m_currentPhase->m_transitions_list)
 	{
-		switch ((*it)->m_condition)
+		FloatCompare result = ERROR_COMPARE;
+
+		//compute results
+		switch (cond->m_condition)
 		{
 			case VerticalPosition:
 			{
-				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
-				if (result == (*it)->m_op)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
-													  
+				result = compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, cond->m_value));
 				break;
 			}
-
 			case HorizontalPosition:
 			{
-				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
-				if (result == (*it)->m_op)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
-			
+				result = compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				break;
 			}
-
 			case PlayerVerticalPosition:
 			{
-				FloatCompare result = playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
-				if (result == (*it)->m_op)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
-
+				result = playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, cond->m_value));
 				break;
 			}
-
 			case PlayerHorizontalPosition:
 			{
-				FloatCompare result = playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
-				if (result == (*it)->m_op)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
-
+				result = playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				break;
 			}
-		
 			case phaseClock:
 			{
-				if ((this->m_phaseTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATER_THAN)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
-				else if ((this->m_phaseTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == LESSER_THAN)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
-
+				if (m_phaseTimer == sf::seconds(cond->m_value))
+					result = EQUAL_TO;
+				else
+					result = m_phaseTimer > sf::seconds(cond->m_value) ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
-		
 			case enemyClock:
 			{
-				if ((this->m_enemyTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATER_THAN)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					this->m_enemyTimer = sf::seconds(0);
-					return true;
-				}
-				else if ((this->m_enemyTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == LESSER_THAN)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					this->m_enemyTimer = sf::seconds(0);
-					return true;
-				}
-										   
+				if (m_enemyTimer == sf::seconds(cond->m_value))
+					result = EQUAL_TO;
+				else
+					result = m_enemyTimer > sf::seconds(cond->m_value) ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
-		
 			case LifePourcentage:
 			{
-				if ((*it)->m_value == 0)
-				{
-					break;//case of "death" condition handled in method Death(), when the enemy dies precisely
-				}
-
-				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == GREATER_THAN) || ((*it)->m_op == EQUAL_TO)))
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-
-					return true;
-				}
-				else if ((100.0f * m_armor / m_armor_max <= (*it)->m_value) && (((*it)->m_op == LESSER_THAN) || ((*it)->m_op == EQUAL_TO)))
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
+				if (cond->m_value == 0)//case of "death" condition handled in method Death(), when the enemy dies precisely
+					result = EQUAL_TO;
+				else
+					result = 100.0f * m_armor / m_armor_max >= cond->m_value ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
-		
 			case ShieldPourcentage:
 			{
-				//Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
-				if ((*it)->m_op == GREATER_THAN)
-				{
-					if (m_shield_max == 0)
-					{
-						break;
-					}
-					else if (100.0f * m_shield / m_shield_max >= (*it)->m_value)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-					break;
-				}
-				else if ((*it)->m_op == LESSER_THAN)
-				{
-					if (this->m_shield_max == 0)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-					else if (100.0f * m_shield / m_shield_max <= (*it)->m_value)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-					break;
-				}
-				else if ((*it)->m_op == EQUAL_TO)
-				{
-					if (m_shield_max == 0)
-					{
-						if ((*it)->m_value == 0)
-						{
-							this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-							return true;
-						}
-						break;
-					}
-					else if (100.0f * m_shield / m_shield_max == (*it)->m_value)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-					break;
-				}
+				if (m_shield_max == 0)//careful of the case where shield_max == 0, we don't want to be dividing by 0
+					result = cond->m_value == 0 ? EQUAL_TO : LESSER_THAN;
+				else
+					result = 100.0f * m_shield / m_shield_max >= cond->m_value ? GREATER_THAN : LESSER_THAN;
+				break;
 			}
-
 			case wakeUp:
 			{
-				if (this->m_wake_up)
-				{
-					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-					return true;
-				}
+				if (m_wake_up == true)
+					result = EQUAL_TO;
 				break;
 			}
-
 			case EnemyProximity:
 			{
-				//float distance = GameObject::GetDistanceBetweenObjects(this, (*CurrentGame).m_playerShip);
-				if ((*it)->m_op == GREATER_THAN)
-				{
-					//if (distance > (*it)->m_value)
-					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TARGET_OUT_OF_RANGE)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-				}
-				else if ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO)
-				{
-					//if (distance <= (*it)->m_value)
-					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TARGET_IN_RANGE)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-				}							  
+				TargetScan scan = (*CurrentGame).FoundNearestGameObject(PlayerShip, getPosition(), cond->m_value);
+				if (scan == TARGET_IN_RANGE)
+					result = EQUAL_TO;
+				else if (scan == TARGET_OUT_OF_RANGE)
+					result = GREATER_THAN;
+				else
+					break;
 				break;
 			}
-
 			case ShotsFired:
 			{
-				if ((*it)->m_op == GREATER_THAN)
-				{
-					if (this->m_shots_fired >= (*it)->m_value)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-				}
-				else if ((*it)->m_op == EQUAL_TO)
-				{
-					if (this->m_shots_fired == (*it)->m_value)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-				}
-				else if ((*it)->m_op == LESSER_THAN)
-				{
-					if (this->m_shots_fired < (*it)->m_value)
-					{
-						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-						return true;
-					}
-				}
+				if (m_shots_fired == cond->m_value)
+					result = EQUAL_TO;
+				else
+					result = m_shots_fired > cond->m_value ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
+			case Rotation:
+			{
+				if (getRotation() == cond->m_value)
+					result = EQUAL_TO;
+				else
+					result = getRotation() > cond->m_value ? GREATER_THAN : LESSER_THAN;
+				break;
+			}
+		}
+
+		//check results
+		if (result == EQUAL_TO || (cond->m_op == GREATER_THAN && result == GREATER_THAN) || (cond->m_op == LESSER_THAN && result == LESSER_THAN))
+		{
+			setPhase(getPhase(cond->m_nextPhase_name));
+			return true;
 		}
 	}
 
@@ -1146,7 +1022,7 @@ Phase* Enemy::LoadPhase(string name)
 			phase->m_rotation_speed = stoi((*it)[PHASE_ROTATION_SPEED]);
 
 			//loading modifier (immune to damage, etc.)
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				Modifier l_new_modifier = NoModifier;
 				if ((*it)[PHASE_MODIFIER + i].compare("0") != 0)
