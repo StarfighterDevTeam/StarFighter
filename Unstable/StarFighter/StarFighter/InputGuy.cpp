@@ -4,39 +4,29 @@
 bool InputGuy::isFiring()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
 	{
 		if (sf::Joystick::hasAxis(0, sf::Joystick::Axis::Z))
-		{
 			if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE)
-			{
 				return true;
-			}
-		}
+
 		if (sf::Joystick::isButtonPressed(0, 0))// A button
-		{
 			return true;
-		}
 	}
+		
 	return false;
 }
 
 bool InputGuy::isHyperspeeding()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 3))// Y button
 			return true;
-	}
 
 	return false;
 }
@@ -44,15 +34,11 @@ bool InputGuy::isHyperspeeding()
 bool InputGuy::isSlowMotion()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 1))// B button
 			return true;
-	}
 
 	return false;
 }
@@ -60,15 +46,11 @@ bool InputGuy::isSlowMotion()
 bool InputGuy::isBraking()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 2))// X button
 			return true;
-	}
 
 	return false;
 }
@@ -76,15 +58,11 @@ bool InputGuy::isBraking()
 bool InputGuy::setAutomaticFire()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 5))
 			return true;
-	}
 
 	return false;
 }
@@ -92,15 +70,11 @@ bool InputGuy::setAutomaticFire()
 bool InputGuy::isRecalling()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 5))
 			return true;
-	}
 
 	return false;
 }
@@ -108,15 +82,11 @@ bool InputGuy::isRecalling()
 bool InputGuy::isUsingDebugCommand()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 4)) //Left upper trigger
 			return true;
-	}
 
 	return false;
 }
@@ -124,35 +94,24 @@ bool InputGuy::isUsingDebugCommand()
 bool InputGuy::spawnInSandbox()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F6))
-	{
 		return true;
-	}
 
 	return false;
 }
 
 bool InputGuy::reloadCSVs()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F7))
-	{
-		return true;
-	}
-
-	return false;
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::F7);
 }
 
 bool InputGuy::isChangingResolution()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 7)) //Start button
 			return true;
-	}
 
 	return false;
 }
@@ -160,15 +119,11 @@ bool InputGuy::isChangingResolution()
 bool InputGuy::isOpeningHud()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-	{
 		return true;
-	}
 
 	if (sf::Joystick::isConnected(0))
-	{
 		if (sf::Joystick::isButtonPressed(0, 6)) //Select button
 			return true;
-	}
 
 	return false;
 }
@@ -176,9 +131,7 @@ bool InputGuy::isOpeningHud()
 bool InputGuy::isMuting()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
-	{
 		return true;
-	}
 
 	return false;
 }
@@ -186,9 +139,7 @@ bool InputGuy::isMuting()
 bool InputGuy::isPausing()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-	{
 		return true;
-	}
 
 	return false;
 }
@@ -200,21 +151,17 @@ Vector2f InputGuy::getDirections()
 
 	//Keyboard inputs
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-	{
 		dirX++;
-	}
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-	{
 		dirY--;
-	}
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-	{
 		dirX--;
-	}
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-	{
 		dirY++;
-	}
+
 
 	//Conputing directions
 	static float x;

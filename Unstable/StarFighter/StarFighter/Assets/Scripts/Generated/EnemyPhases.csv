@@ -22,8 +22,8 @@ R_HatsukiIntroTurn,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,0,,,1,0,50,ghost,rese
 R_Hatsuki_Phase1_kickoff,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,0,,,1,0,0,ghost,0,0,Katyusha,0,,wakeUp,0,0,R_Hatsuki_Phase1,0,,,,0
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Katyusha_Phase1,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,0,0,0,1,0,0,ghost,0,0,Itsukoi,0,,0,,,,0,,,,0
-L_Itsukoi_Phase1,0,laser_fast,fireball,0,0,laser,fireball,0,0,0,,0,0,0,,0,0,0,,,,0,,,,oscillator,50,100,1,0,0,0,0,0,Hatsuki,0,,0,,,,0,,,,0
-R_Hatsuki_Phase1,0,laser_fast,fireball,0,0,laser,fireball,0,0,0,,0,0,0,,0,0,0,,,,0,,,,oscillator,50,100,0,0,0,0,0,0,0,0,,0,,,,0,,,,0
+L_Itsukoi_Phase1,0,laser_fast,fireball,0,0,laser,fireball,0,0,0,,0,0,0,,0,0,0,,,,0,,,,oscillator,50,100,1,1,0,0,0,0,Hatsuki,0,,0,,,,0,,,,0
+R_Hatsuki_Phase1,0,laser_fast,fireball,0,0,laser,fireball,0,0,0,,0,0,0,,0,0,0,,,,0,,,,oscillator,50,100,0,1,0,0,0,0,0,0,,0,,,,0,,,,0
 KatyushaWaiting,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,0,,,1,0,0,ghost,0,0,0,0,,wakeUp,,,KatyushaWaiting2,0,,,,0
 KatyushaWaiting2,0,0,,0,0,0,,0,0,0,,0,0,0,,0,0,0,,,,0,,,,0,,,1,0,0,ghost,0,0,0,0,,wakeUp,,,KatyushaFullLife,0,,,,0
 KatyushaFullLife,0,laser_fast,fireball,0,0,laser_arc,fireball_blue,0,0,0,,0,0,0,,0,0,0,,,,0,,,,circle,70,70,1,0,0,0,0,0,0,0,,life,lesser,50,KatyushaMidLife,0,,,,0

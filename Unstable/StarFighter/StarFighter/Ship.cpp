@@ -108,6 +108,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size.y / 2));
 	m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
 	m_recall_text->m_DontGarbageMe = true;
+	m_recall_text->m_visible = false;
 	delete text_feedback;
 	(*CurrentGame).addToTextPops(m_recall_text);
 
@@ -522,7 +523,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	bool firing = m_disable_inputs == false && m_disable_fire == false && m_actions_states[Action_Recalling] == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
-		&& hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
+		&& (*CurrentGame).m_waiting_for_dialog_validation == false && hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
 
 	//Fire function
 	if (m_weapon != NULL)
@@ -852,14 +853,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			{
 				//Recalling back to last hub
 				UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
-				if (m_actions_states[Action_Recalling])
-				{
+
+				if (m_actions_states[Action_Recalling] == true)
 					Recalling();
-				}
 				else
-				{
 					m_recall_text->m_visible = false;
-				}
 
 				//Slow_motion and hyperspeed
 				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed && !m_actions_states[Action_Recalling]);
@@ -2593,6 +2591,8 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 
 int Ship::SaveItems(Ship* ship)
 {
+	return 0;
+
 	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 

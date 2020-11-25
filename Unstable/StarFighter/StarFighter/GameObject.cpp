@@ -29,8 +29,38 @@ GameObject::GameObject()
 
 void GameObject::Draw(sf::RenderTexture& screen)
 {
-	if (m_visible == true && m_transparent == false)
-		screen.draw(*this);
+	if (m_visible == true)
+	{
+		#ifndef NDEBUG
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8))
+		{
+			bool transparent = m_transparent;
+			m_transparent = false;
+		
+			float x = getLocalBounds().width * cos(getRotation() * M_PI / 180) + getLocalBounds().height * sin(getRotation() * M_PI / 180);
+			float y = getLocalBounds().height * cos(getRotation() * M_PI / 180) + getLocalBounds().width * sin(getRotation() * M_PI / 180);
+			
+			sf::RectangleShape rect;
+			rect.setSize(sf::Vector2f(x, y));
+			rect.setFillColor(sf::Color(0, 0, 0, 0));
+			rect.setOutlineColor(sf::Color(255, 0, 0, 120));
+			rect.setOutlineThickness(1);
+			rect.setOrigin(sf::Vector2f(x * 0.5, y * 0.5));
+			rect.setPosition(getPosition());
+
+			screen.draw(rect);
+
+			screen.draw(*this);
+
+			m_transparent = transparent;
+			return;
+		}
+		#endif
+
+		if (m_transparent == false)
+			screen.draw(*this);
+	}
+		
 }
 
 void GameObject::GarbageWhenOutOfScreen()

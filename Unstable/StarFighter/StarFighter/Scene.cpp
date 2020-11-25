@@ -708,6 +708,7 @@ void Scene::SpawnBoss()
 		boss->m_enemy_class = (EnemyClass)(enemy_base->m_enemyclass);
 		(*CurrentGame).addToScene(boss, true);
 
+		boss->UpdateHealthBars();//update health bar position
 		boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + boss->getRotation());
 		boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
