@@ -75,3 +75,6 @@ V_AlphaGold_laser_double,Vanguard_AlphaGold_Laser_Double,2D/Equipment/laser_red.
 V_BetaGold_dragonball_arc,Vanguard_BetaGold_Dragonballs_Arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8f,0,3.f,12,0,120,0,0,0
 V_BetaGold_dragonball_homing,Vanguard_BetaGold_Dragonballs_Homing,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,20,7,alternate,0,homing
 V_BetaGold_dragonball_arc_alt,Vanguard_BetaGold_Dragonballs_Arc_Alt,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.01f,1,0.2f,16,0,150,ascending,0,0
+#,,,,,,,,,,,,,,,
+V_Itsukoi_triple_shot,Vanguard_Itsukoi_Triple_Shot,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,8,1,5,0,100,0,0,semi_homing
+V_Itsukoi_laserXL_ascending,Vanguard_Itsukoi_LaserXL_Ascending,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.1,1,6,9,0,80,ascending,0,semi_homing

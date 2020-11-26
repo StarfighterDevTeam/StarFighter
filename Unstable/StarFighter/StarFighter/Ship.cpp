@@ -48,6 +48,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_input_blocker = NULL;
 	m_is_jumping = false;
 	m_hits_taken = 0;
+	m_release_to_fire = false;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -522,7 +523,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 
 bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	bool firing = m_disable_inputs == false && m_disable_fire == false && m_actions_states[Action_Recalling] == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
+	bool firing = m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_actions_states[Action_Recalling] == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
 		&& (*CurrentGame).m_waiting_for_dialog_validation == false && hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
 
 	//Fire function
@@ -645,10 +646,13 @@ void Ship::UpdateHUDStates()
 
 void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction)
 {
+	//Registering inputs
+	UpdateInputStates();
+
 	if (!m_disable_inputs)
 	{
-		//Registering inputs
-		UpdateInputStates();
+		if (m_release_to_fire == true && m_inputs_states[Action_Firing] == Input_Release)
+			m_release_to_fire = false;
 
 		//Debug command
 		#ifndef NDEBUG
@@ -720,11 +724,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 			{
 				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
-			}
-			if (m_actions_states[Action_Firing] == true || m_automatic_fire == true)
-			{
-				m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
-				m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
 			}
 
 			//Closing hud
@@ -929,7 +928,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Braking and speed malus on firing
 				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
 				//brake speed malus
-				if (firing == true)
+				if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -961,7 +960,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//brake speed malus
-				if (firing == true)
+				if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -2591,8 +2590,6 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 
 int Ship::SaveItems(Ship* ship)
 {
-	return 0;
-
 	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 
@@ -3401,6 +3398,7 @@ void Ship::ContinueDialog()
 	{
 		(*CurrentGame).m_waiting_for_dialog_validation = false;
 		(*CurrentGame).m_end_dialog_clock.restart();
+		m_release_to_fire = true;
 	}
 	delete m_targetDialogs.front();
 	m_targetDialogs.erase(m_targetDialogs.begin());

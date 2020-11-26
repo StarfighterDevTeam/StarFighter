@@ -214,6 +214,7 @@ public :
 	bool m_disableSlowmotion;
 	bool m_is_asking_scene_transition;
 	SFTextPop* m_recall_text;
+	bool m_release_to_fire;
 
 	string m_respawnSceneName;
 	int m_last_hazard_level_played;

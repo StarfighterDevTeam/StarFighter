@@ -142,9 +142,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			m_color_timer -= deltaTime;
 			setColor(m_color);
 			if (m_color_timer < sf::seconds(0))
-			{
 				setColor(Color(255, 255, 255, 255));
-			}
 		}
 		return;
 	}
@@ -185,13 +183,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	bool l_ghost = false;
-	if (!m_phases.empty())
-	{
-		for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
-		{
-			l_ghost = l_ghost || (m_currentPhase->m_modifiers[i] == GhostModifier);
-		}
-	}
+	//if (!m_phases.empty())
+	//	for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
+	//		l_ghost = l_ghost || (m_currentPhase->m_modifiers[i] == GhostModifier);
+	if (m_currentPhase != NULL)
+		for (Modifier modifier : m_currentPhase->m_modifiers)
+			l_ghost = l_ghost || modifier == GhostModifier;
+
 	setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
 	m_disable_fire = hyperspeedMultiplier > 1.0f;
 
@@ -200,13 +198,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//call bobbyPattern
 	if (hyperspeedMultiplier < 1.0f)
-	{
 		offset = m_Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
-	}
 	else
-	{
 		offset = m_Pattern.GetOffset(deltaTime.asSeconds());
-	}
 
 	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 
@@ -225,26 +219,20 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (newposition.x < size.x / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-				{
 					m_Pattern.m_patternSpeed *= -1;
-				}
 				else
-				{
 					m_speed.x *= -1;
-				}
-				this->setPosition(size.x / 2, newposition.y);
+				
+				setPosition(size.x / 2, newposition.y);
 			}
 
 			else if (newposition.x > SCENE_SIZE_X - size.x / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-				{
 					m_Pattern.m_patternSpeed *= -1;
-				}
 				else
-				{
 					m_speed.x *= -1;
-				}
+				
 				setPosition(SCENE_SIZE_X - size.x / 2, newposition.y);
 			}
 		}
@@ -255,27 +243,21 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (newposition.y < size.y / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-				{
 					m_speed.y *= -1;
-				}
 				else
-				{
 					m_Pattern.m_patternSpeed *= -1;
-				}
-				this->setPosition(newposition.x, size.y / 2);
+				
+				setPosition(newposition.x, size.y / 2);
 			}
 
 			else if (newposition.y > SCENE_SIZE_Y - size.y / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-				{
 					m_speed.y *= -1;
-				}
 				else
-				{
 					m_Pattern.m_patternSpeed *= -1;
-				}
-				this->setPosition(newposition.x, SCENE_SIZE_Y - size.y / 2);
+				
+				setPosition(newposition.x, SCENE_SIZE_Y - size.y / 2);
 			}
 		}
 	}
@@ -287,9 +269,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		float target_angle = getRotation();
 		bool isNearestTargetIsKnown = false;
 		if (m_reset_facing)
-		{
 			target_angle = GameObject::getRotation_for_Direction((*CurrentGame).m_direction);
-		}
 		else if (m_face_target)
 		{
 			target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, this->getPosition()), 360);
@@ -300,22 +280,14 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		for (Weapon* weapon : m_weapons_list)
 		{
 			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
-			{
 				//now acquire target if the weapons needs it
 				if (!isNearestTargetIsKnown)//maybe we know it already?
-				{
 					if (weapon->m_target_homing == HOMING || (weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale_index == 0))
-					{
 						target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, getPosition()), 360);
-					}
-				}
-			}
 
 			//semi-HOMING and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_HOMING"
 			if (m_face_target == true && weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale > 0 && ((weapon->m_rafale_index > 0 && weapon->m_rafale_index < weapon->m_rafale) || (weapon->m_multishot > 1 && weapon->m_shot_index > 0)))
-			{
 				isDoneFiringOnLockedTarget = false;
-			}
 		}
 
 		float current_angle = this->getRotation();
@@ -326,38 +298,20 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			delta += 360;
 
 		if (!m_face_target && !m_reset_facing)
-		{
 			rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-		}
 		else
-		{
 			if (isDoneFiringOnLockedTarget)
-			{
 				//now let's rotate toward the target (the player)
 				if (delta >= 0)
-				{
 					if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
-					{
 						rotate(-abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-					}
 					else
-					{
 						setRotation(target_angle);
-					}
-				}
 				else
-				{
 					if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
-					{
 						rotate(abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-					}
 					else
-					{
 						setRotation(target_angle);
-					}
-				}
-			}
-		}
 
 		//transition blocking firing and phase transitioning?
 		if ((*CurrentGame).m_waiting_for_scene_transition)
@@ -375,12 +329,14 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			else
 			{
-				if (m_face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+				/*
+				if (m_face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget == false)
 				{
 					//do nothing
 				}
 				else
 				{
+				*/
 					//UPDATE WEAPON POSITION
 					if (weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale > 0 && ((weapon->m_rafale_index > 0 && weapon->m_rafale_index < weapon->m_rafale) || (weapon->m_multishot > 1 && weapon->m_shot_index > 0)))
 					{
@@ -390,10 +346,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					{
 						//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
 						float theta = (getRotation() + weapon->m_angle_offset) / 180 * M_PI;
-						if (weapon->m_target_homing != NO_HOMING)
-						{
+						if (weapon->m_target_homing != NO_HOMING && abs(delta) > 1)//let's take delta>1 as an epsilon 
 							theta -= delta / 180 * M_PI;
-						}
 
 						//weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) - m_size.y / 2 * sin(theta);
 						//weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) + m_size.x / 2 * cos(theta);
@@ -406,16 +360,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 					weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);
 					weapon->m_face_target = m_face_target;
-				}
+				/*}*/
 
 				//FIRE
 				if (m_disable_fire == false && weapon->m_firing_ready == true)
-				{
 					weapon->Fire(EnemyFire, deltaTime);
-					{
 						m_shots_fired++;
-					}
-				}
 			}
 
 			//UPDATE BEAMS
