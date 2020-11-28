@@ -25,7 +25,6 @@ public:
 	Enemy(){};
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber = 1, int animationNumber = 1);
 	~Enemy();
-	void DeletePhases();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void UpdateHealthBars();
 	Enemy* Clone();

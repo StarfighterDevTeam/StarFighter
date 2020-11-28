@@ -143,10 +143,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				e->m_enemy->ApplyLevelModifiers();
 
 				//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
-				if (e->m_enemy->m_phases.empty())
-				{
+				if (e->m_enemy->m_phases.empty() == true)
 					e->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, e->m_enemy->m_speed.y);
-				}
 
 				//setting enemy generators: we need to create one generator per class
 				if (m_total_class_probability[e->m_enemyclass] == 0)
@@ -181,7 +179,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
 				boss->m_enemy->setPosition(boss_pos);
 				boss->m_enemy->setRotation(stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_ROTATION]));
-
 				m_boss_list.push_back(boss);
 				m_generating_boss = true;
 			}
@@ -706,6 +703,7 @@ void Scene::SpawnBoss()
 	{
 		Enemy* boss = enemy_base->m_enemy->Clone();
 		boss->m_enemy_class = (EnemyClass)(enemy_base->m_enemyclass);
+		boss->m_DontGarbageMe = true;
 		(*CurrentGame).addToScene(boss, true);
 
 		boss->UpdateHealthBars();//update health bar position

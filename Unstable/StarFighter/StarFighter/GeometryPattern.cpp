@@ -57,24 +57,21 @@ void GeometryPattern::setPattern(PatternType pt, float patternSpeed, vector<floa
 	// - px/sec on the canvas for Rectangle
 	// - time to do 360° for the circle
 
-	m_pattern_type = pt;
-	m_patternParams = args;
-	m_patternSpeed = patternSpeed;
-
-	switch(m_pattern_type)
+	switch (pt)
 	{
 		case Line_:
 		{
 			//ARGS 
 			// 0 = opposite speed ?
 			// v = speed in px/sec
-			CheckArgSize(1);
+			if (args.size() < 1)
+				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
 
-			if(m_patternParams[0] == 0)
+			if (args[0] == 0)
 			{
 				srand(time(NULL));
 				//random between 1 and -1
-				m_patternParams[0] = ((rand() % 2) * 2) - 1;
+				args[0] = ((rand() % 2) * 2) - 1;
 			}
 
 			break;
@@ -86,9 +83,10 @@ void GeometryPattern::setPattern(PatternType pt, float patternSpeed, vector<floa
 			// 0 = width
 			// 1 = height
 			// v = speed in px/sec
-			CheckArgSize(2);
+			if (args.size() < 2)
+				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
 
-			m_distance_left = m_patternParams[0];
+			m_distance_left = args[0];
 			m_direction = sf::Vector2i(1,0);
 
 			break;
@@ -100,16 +98,23 @@ void GeometryPattern::setPattern(PatternType pt, float patternSpeed, vector<floa
 			// 0 = rayon
 			// 1 = counterclockwise (-1), random (0), clockwise (1)
 			// v = vitesse angulaire (degres/s)
-			CheckArgSize(2);
+			if (args.size() < 2)
+				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
 
-			if (m_patternParams[1] == 0)
+			if (args[1] == 0)
 			{
-				srand(time(NULL));
-				//random between 1 and -1
-				m_patternParams[1] = ((rand() % 2) * 2) - 1;
+				if (m_pattern_type == pt)//if previous pattern is alreay this type, keep the same direction
+					args[1] = m_patternParams[1];
+				else
+				{
+					//random between 1 and -1
+					srand(time(NULL));
+					args[1] = ((rand() % 2) * 2) - 1;
+				}
 			}
+
 			m_patternSpeedInRadian = patternSpeed*M_PI / 180; //converting speed to radians
-			m_curSandboxPosition_polar = sf::Vector2f(m_patternParams[0], -M_PI_2*m_patternParams[1]); //starts on top of the circle (-pi/2)
+			m_curSandboxPosition_polar = sf::Vector2f(args[0], -M_PI_2 * args[1]); //starts on top of the circle (-pi/2)
 			m_curSandboxPosition_cartesian = ToCartesianCoords(m_curSandboxPosition_polar);
 
 			break;
@@ -122,26 +127,34 @@ void GeometryPattern::setPattern(PatternType pt, float patternSpeed, vector<floa
 			// 1 = counterclockwise (-1), random (0), clockwise (1)
 			// 2 = centered(1), not centered (0)
 			// v = speed of oscillation
-			CheckArgSize(3);
+			if (args.size() < 3)
+				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
 
-			if (m_patternParams[1] == 0)
+			if (args[1] == 0)//asking for random
 			{
-				srand(time(NULL));
-				//random between 1 and -1
-				m_patternParams[1] = ((rand() % 2) * 2) - 1;
+				if (m_pattern_type == pt)//if previous pattern is alreay this type, keep the same direction
+					args[1] = m_patternParams[1];
+				else
+				{
+					//random between 1 and -1
+					srand(time(NULL));
+					args[1] = ((rand() % 2) * 2) - 1;
+				}
 			}
 
-			m_patternSpeedInRadian = patternSpeed * 2 * M_PI / m_patternParams[0]; //converting speed to radians (2pi = 1 amplitude)
-
-			m_curSandboxPosition_polar = sf::Vector2f(m_patternParams[0] / 2, m_patternParams[1] * M_PI / 180); // r = ampl/2 + converting angle to radians
-			
-			m_curSandboxPosition_cartesian = m_patternParams[2] == 1 ? sf::Vector2f(0, 0) : ToCartesianCoords(m_curSandboxPosition_polar);
-			
+			m_patternSpeedInRadian = patternSpeed * 2 * M_PI / args[0]; //converting speed to radians (2pi = 1 amplitude)
+			m_curSandboxPosition_polar = sf::Vector2f(args[0] / 2, args[1] * M_PI / 180); // r = ampl/2 + converting angle to radians
+			m_curSandboxPosition_cartesian = args[2] == 1 ? sf::Vector2f(0, 0) : ToCartesianCoords(m_curSandboxPosition_polar);
 			m_currTheta = M_PI/2; //starting @the middle.
 
 			break;
 		}
 	}
+
+	m_pattern_type = pt;
+	m_patternParams = args;
+	m_patternSpeed = patternSpeed;
+
 }
 
 sf::Vector2f  GeometryPattern::getOffset(float seconds, bool absolute_coordinate)
@@ -179,7 +192,7 @@ sf::Vector2f  GeometryPattern::getOffset(float seconds, bool absolute_coordinate
 
 			if(m_distance_left > moved)
 			{
-				//Moving on the edge, like a boss
+				//Moving on the edge
 				m_distance_left -= moved;
 			}
 			else
@@ -335,12 +348,4 @@ void GeometryPattern::ToCartesianCoords(sf::Vector2f* polarCoords)
 	r = polarCoords->x;
 	polarCoords->x = polarCoords->x*cos(polarCoords->y);
 	polarCoords->y = r*sin(polarCoords->y);
-}
-
-void GeometryPattern::CheckArgSize(size_t expected)
-{
-	if(m_patternParams.size() < expected)
-	{
-		throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", m_pattern_type, m_patternParams.size(),expected));
-	}
 }

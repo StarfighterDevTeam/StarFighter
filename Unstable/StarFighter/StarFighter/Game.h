@@ -76,7 +76,7 @@ public:
 	void colisionChecksV2(Time deltaTime);
 	//void cleanGarbage();
 	//void collectGarbage();
-	void garbageLayer(LayerType layer, bool only_offscene = false);
+	void garbageLayer(LayerType layer, bool only_offscene = false, bool delete_DontGarbageMe = false);
 	void killGameObjectType(GameObjectType type);
 	void damageGameObjectType(GameObjectType type, int damage);
 	void SetLayerSpeed(LayerType layer, sf::Vector2f speed);

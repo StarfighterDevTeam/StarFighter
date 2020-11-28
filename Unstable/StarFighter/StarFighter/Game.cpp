@@ -548,7 +548,7 @@ void Game::colisionChecksV2(Time deltaTime)
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
-void Game::garbageLayer(LayerType layer, bool only_offscene)
+void Game::garbageLayer(LayerType layer, bool only_offscene, bool delete_DontGarbageMe)
 {
 	if (layer == FeedbacksLayer)
 	{
@@ -565,7 +565,7 @@ void Game::garbageLayer(LayerType layer, bool only_offscene)
 		if (only_offscene == true && object->m_isOnScene == true)
 			continue;
 
-		if (object->m_DontGarbageMe == true)
+		if (object->m_DontGarbageMe == true && delete_DontGarbageMe == false)
 			continue;
 
 		object->m_visible = false;

@@ -96,14 +96,26 @@ enum Modifier
 	KillBullets,//get all enemy bullets on screen to explode
 };
 
-//forward declaration
-class ConditionTransition;
+class Phase;//forward declaration
+
+class ConditionTransition
+{
+public:
+	ConditionTransition(ConditionType condition, FloatCompare op, float value, string nextPhase_name);
+
+	ConditionType m_condition;
+	FloatCompare m_op;
+	float m_value;
+	Phase* m_nextPhase;
+	std::string m_nextPhase_name;
+};
 
 class Phase
 {
 public:
 	Phase();
 	~Phase();
+
 	string m_display_name;
 	string m_name;
 	vector<Weapon*> m_weapons_list;
@@ -120,18 +132,6 @@ public:
 	vector <Dialog*> m_dialogs;
 
 	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);
-};
-
-class ConditionTransition
-{
-public:
-	ConditionTransition(ConditionType condition, FloatCompare op, float value, string nextPhase_name);
-
-	ConditionType m_condition;
-	FloatCompare m_op;
-	float m_value;
-	Phase* m_nextPhase;
-	std::string m_nextPhase_name;
 };
 
 #endif// PHASE_H_INCLUDED

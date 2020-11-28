@@ -448,23 +448,17 @@ void Enemy::GetDamageFrom(GameObject& object)
 				object.m_collision_timer = TIME_BETWEEN_BEAM_DAMAGE_TICK;
 		}
 		else//collision ship versus ship
-		{
 			object.m_collision_timer = TIME_BETWEEN_COLLISION_DAMAGE_TICK;
-		}	
 	}
 }
 
 void Enemy::GetDamage(int damage)
 {
-	if (m_immune || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
-	{
+	if (m_immune == true || (*CurrentGame).m_waiting_for_dialog_validation == true || (*CurrentGame).m_waiting_for_scene_transition == true)
 		return;
-	}
 
 	if (damage == 0)
-	{
 		return;
-	}
 	
 	if (m_feedbackTimer <= sf::seconds(0))
 	{
@@ -487,58 +481,48 @@ void Enemy::GetDamage(int damage)
 		m_shield = 0;
 	}
 	else
-	{
 		m_shield -= damage;
-	}
 
 	if (m_armor <= 0)
-	{
 		Death();
-	}
 }
 
 Enemy* Enemy::Clone()
 {
 	Enemy* enemy = new Enemy(getPosition(), m_speed, m_textureName, m_size, m_FX_death, m_frameNumber, m_animationNumber);
 
-	((GameObject*)enemy)->m_armor = this->m_armor;
-	((GameObject*)enemy)->m_armor_max = this->m_armor_max;
-	((GameObject*)enemy)->m_shield = this->m_shield;
-	((GameObject*)enemy)->m_shield_max = this->m_shield_max;
-	((GameObject*)enemy)->m_shield_regen = this->m_shield_regen;
-	((GameObject*)enemy)->m_damage = this->m_damage;
+	((GameObject*)enemy)->m_armor = m_armor;
+	((GameObject*)enemy)->m_armor_max = m_armor_max;
+	((GameObject*)enemy)->m_shield = m_shield;
+	((GameObject*)enemy)->m_shield_max = m_shield_max;
+	((GameObject*)enemy)->m_shield_regen = m_shield_regen;
+	((GameObject*)enemy)->m_damage = m_damage;
 
-	for (std::vector<Weapon*>::iterator it = (m_weapons_list.begin()); it != (m_weapons_list.end()); it++)
-	{
-		enemy->m_weapons_list.push_back((*it)->Clone());
-	}	
+	for (Weapon* weapon : m_weapons_list)
+		enemy->m_weapons_list.push_back(weapon->Clone());
 	
-	((GameObject*)enemy)->addMoney(this->m_money);
-	enemy->m_equipment_loot = this->getEquipmentLoot();
-	enemy->m_weapon_loot = this->getWeaponLoot();
-	enemy->m_display_name = this->m_display_name;
-	enemy->m_enemy_class = this->m_enemy_class;
+	((GameObject*)enemy)->addMoney(m_money);
+	enemy->m_equipment_loot = getEquipmentLoot();
+	enemy->m_weapon_loot = getWeaponLoot();
+	enemy->m_display_name = m_display_name;
+	enemy->m_enemy_class = m_enemy_class;
 
-	enemy->m_pattern = this->m_pattern;
-	enemy->m_angspeed = this->m_angspeed;
-	enemy->m_radius = this->m_radius;
-	enemy->m_input_blocker = this->m_input_blocker;
+	enemy->m_pattern = m_pattern;
+	enemy->m_angspeed = m_angspeed;
+	enemy->m_radius = m_radius;
+	enemy->m_input_blocker = m_input_blocker;
 
-	enemy->m_rotation_speed = this->m_rotation_speed;
-	enemy->setRotation(this->getRotation());
+	enemy->m_rotation_speed = m_rotation_speed;
+	enemy->setRotation(getRotation());
 
-	if (!this->m_phases.empty())
-	{
-		//enemy->m_currentPhase = this->m_currentPhase; 
-		for (std::vector<Phase*>::iterator it = (this->m_phases.begin()); it != (this->m_phases.end()); it++)
-		{
-			enemy->m_phases.push_back((*it));
-		}
+	for (Phase* phase : m_phases)
+		enemy->m_phases.push_back(phase);
+
+	if (m_phases.empty() == false)
 		enemy->setPhase(enemy->m_phases.front());
-	}
 
-	enemy->m_level = this->m_level;
-	enemy->m_enemyLevel.setString(to_string(this->m_level));
+	enemy->m_level = m_level;
+	enemy->m_enemyLevel.setString(to_string(m_level));
 
 	return enemy;
 }
@@ -1096,12 +1080,12 @@ Enemy::~Enemy()
 
 	for (Weapon* weapon : m_weapons_list)
 		delete weapon;
-}
 
-void Enemy::DeletePhases()
-{
-	for (Phase* phase : m_phases)
-		delete phase;
+	//Destroyed in ~EnemyBase after Scene~; for optimization
+	//for (Phase* phase : m_phases)
+	//	delete phase;
+	//
+	//delete m_FX_death;
 }
 
 void Enemy::GenerateLoot()
@@ -1876,8 +1860,10 @@ Equipment* Enemy::CreateRandomModule(int level, float beastScore)
 // ENEMY BASE
 EnemyBase::~EnemyBase()
 {
-	if (m_enemy != NULL)
-		m_enemy->DeletePhases();
-	
+	for (Phase* phase : m_enemy->m_phases)
+		delete phase;
+
+	delete m_enemy->m_FX_death;
+
 	delete m_enemy;
 }

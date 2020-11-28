@@ -1,7 +1,7 @@
 #enemy_name,armor,shield,shield_regen,damage,weapon_name,weapon2_name,weapon3_name,image,width,height,frames,vspeed,explosion_name,value,pattern,angspeed,radius,clockwise,centered,rotation_speed,phase
-Katyusha,5000,0,0,100,laser,laser_arc,0,2D/Vanguard/V_BetaGold.png,288,390,1,90,death_explosion,10,oscillator,30,40,1,0,0,KatyushaIntro
-Itsukoi,10,0,0,50,laser,laser_arc,0,2D/Vanguard/V_GammaGold.png,75,126,1,90,death_explosion,10,oscillator,30,40,1,0,0,L_ItsukoiIntro
-Hatsuki,2000,0,0,50,laser,laser_arc,0,2D/Vanguard/V_GammaGold.png,75,126,1,90,death_explosion,10,oscillator,30,40,1,0,0,R_HatsukiIntro
+Katyusha,1000,0,0,100,laser,laser_arc,0,2D/Vanguard/V_BetaGold.png,288,390,1,90,death_explosion,10,oscillator,30,40,1,0,0,KatyushaIntro
+Itsukoi,500,0,0,50,laser,laser_arc,0,2D/Vanguard/V_GammaGold.png,75,126,1,90,death_explosion,10,oscillator,30,40,1,0,0,L_ItsukoiIntro
+Hatsuki,500,0,0,50,laser,laser_arc,0,2D/Vanguard/V_GammaGold.png,75,126,1,90,death_explosion,10,oscillator,30,40,1,0,0,R_HatsukiIntro
 #,,,,,,,,,,,,,,,,,,,,,
 V_Alpha1,60,0,0,100,0,0,0,2D/Vanguard/V_Alpha1.png,69,84,3,110,death_explosion,10,0,,,,,0,V_Alpha1_Entry
 V_Alpha2,70,0,0,100,0,0,0,2D/Vanguard/V_Alpha2.png,69,84,3,110,death_explosion,10,0,,,,,0,V_Alpha2_Entry

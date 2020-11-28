@@ -159,9 +159,7 @@ void Gameloop::Update(Time deltaTime)
 	//debug command
 	#ifndef NDEBUG
 		if (InputGuy::spawnInSandbox() && !(*CurrentGame).m_waiting_for_dialog_validation)
-		{
 			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
-		}
 
 		if (InputGuy::reloadCSVs())
 		{
@@ -171,7 +169,7 @@ void Gameloop::Update(Time deltaTime)
 	#endif
 
 	//automatic respawn if dead
-	if (!(*CurrentGame).m_playerShip->m_visible)
+	if ((*CurrentGame).m_playerShip->m_visible == false)
 	{
 		RespawnInLastSafePoint();
 		//SpawnInScene((*CurrentGame).m_playerShip->m_respawnSceneName);
@@ -408,7 +406,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 					m_IG_State = LAST_SCREEN;
 
 					//Wipe out enemies that were spawned offscren
-					(*CurrentGame).garbageLayer(EnemyObjectLayer, true);
+					(*CurrentGame).garbageLayer(EnemyObjectLayer, true, true);
 				}
 			}
 
@@ -745,17 +743,16 @@ void Gameloop::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShi
 void Gameloop::RespawnInLastSafePoint()
 {
 	//cleaning layers
-	(*CurrentGame).garbageLayer(FriendlyFireLayer);
-	(*CurrentGame).garbageLayer(EnemyFireLayer);
-	(*CurrentGame).garbageLayer(EnemyObjectLayer);
-	(*CurrentGame).garbageLayer(ExplosionLayer);
-	(*CurrentGame).garbageLayer(LootLayer);
+	//(*CurrentGame).garbageLayer(FriendlyFireLayer);
+	//(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
+	//(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
+	//(*CurrentGame).garbageLayer(ExplosionLayer);
+	//(*CurrentGame).garbageLayer(LootLayer);
 
 	//loading last visited hub
 	if ((*CurrentGame).m_playerShip->m_respawnSceneName.empty())
-	{
 		(*CurrentGame).m_playerShip->m_respawnSceneName = STARTING_SCENE;
-	}
+	
 	SpawnInScene((*CurrentGame).m_playerShip->m_respawnSceneName);
 
 	//resetting ship
@@ -818,16 +815,19 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 {
 	if (playerShip)
 	{
-		delete m_currentScene;
-		delete m_nextScene;
-
 		//cleaning layers
 		(*CurrentGame).garbageLayer(FriendlyFireLayer);
-		(*CurrentGame).garbageLayer(EnemyFireLayer);
-		(*CurrentGame).garbageLayer(EnemyObjectLayer);
+		(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
+		(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
 		(*CurrentGame).garbageLayer(ExplosionLayer);
 		(*CurrentGame).garbageLayer(LootLayer);
 		(*CurrentGame).garbageLayer(FeedbacksLayer);
+
+		//delete current scene <!> to do after cleaning layers, otherwise Enemy class will be left with their vector<Phase*> m_phases and FX* m_FX_Death pointing to destroyed elemnts
+		delete m_currentScene;
+		delete m_nextScene;
+
+		//set new scene
 		m_currentScene = new Scene(scene_name, 0, false, true);
 		playerShip->m_currentScene_name = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
