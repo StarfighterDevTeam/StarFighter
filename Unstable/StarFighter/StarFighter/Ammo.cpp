@@ -28,7 +28,7 @@ Ammo* Ammo::Clone()
 	Ammo* ammo = new Ammo(this->getPosition(),this->m_speed,this->m_textureName,this->m_size,this->m_damage, this->m_explosion);
 	ammo->m_display_name = this->m_display_name;
 
-	ammo->m_Pattern = this->m_Pattern;
+	ammo->m_pattern = this->m_pattern;
 	ammo->m_radius = this->m_radius;
 	ammo->m_angspeed = this->m_angspeed;
 	ammo->m_range = this->m_range;
@@ -84,7 +84,7 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 		//call bobbyPattern
-		pattern_offset = m_Pattern.GetOffset(deltaTime.asSeconds());
+		pattern_offset = m_pattern.getOffset(deltaTime.asSeconds());
 		offset.x = pattern_offset.x * cos(m_shot_angle) + pattern_offset.y * sin(m_shot_angle);
 		offset.y = pattern_offset.x * sin(m_shot_angle) + pattern_offset.y * cos(m_shot_angle);
 		//offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);

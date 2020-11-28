@@ -2468,8 +2468,8 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 			data << equipment->m_bots.front()->m_spread.x << " ";
 			data << equipment->m_bots.front()->m_spread.y << " ";
 			data << equipment->m_bots.front()->m_rotation_speed << " ";
-			data << equipment->m_bots.front()->m_Pattern.m_currentPattern << " ";
-			switch (equipment->m_bots.front()->m_Pattern.m_currentPattern)
+			data << equipment->m_bots.front()->m_pattern.m_pattern_type << " ";
+			switch (equipment->m_bots.front()->m_pattern.m_pattern_type)
 			{
 				case NoMovePattern:
 				{
@@ -2477,23 +2477,23 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 				}
 				case Line_:
 				{
-					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
-					data << equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternSpeed << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternParams[1] << " ";
 					break;
 				}
 				case Circle_:
 				{
-					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
-					data << equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
-					data << equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternSpeed << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternParams[0] << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternParams[1] << " ";
 					break;
 				}
 				case Oscillator:
 				{
-					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
-					data << equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
-					data << equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
-					data << equipment->m_bots.front()->m_Pattern.m_patternParams[2] << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternSpeed << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternParams[0] << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_pattern.m_patternParams[2] << " ";
 					break;
 				}
 			}
@@ -2560,24 +2560,24 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 		data << weapon->m_ammunition->m_size.y << " ";
 		data << weapon->m_ammunition->m_frameNumber << " ";
 		data << weapon->m_ammunition->m_explosion->m_display_name << " ";
-		data << (int)weapon->m_ammunition->m_Pattern.m_currentPattern;
-		if (weapon->m_ammunition->m_Pattern.m_currentPattern == Line_)
+		data << (int)weapon->m_ammunition->m_pattern.m_pattern_type;
+		if (weapon->m_ammunition->m_pattern.m_pattern_type == Line_)
 		{
-			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
-			data << weapon->m_ammunition->m_Pattern.m_patternParams[1];
+			data << " " << weapon->m_ammunition->m_pattern.m_patternSpeed << " ";
+			data << weapon->m_ammunition->m_pattern.m_patternParams[1];
 		}
-		else if (weapon->m_ammunition->m_Pattern.m_currentPattern == Circle_)
+		else if (weapon->m_ammunition->m_pattern.m_pattern_type == Circle_)
 		{
-			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
-			data << weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
-			data << weapon->m_ammunition->m_Pattern.m_patternParams[1];
+			data << " " << weapon->m_ammunition->m_pattern.m_patternSpeed << " ";
+			data << weapon->m_ammunition->m_pattern.m_patternParams[0] << " ";
+			data << weapon->m_ammunition->m_pattern.m_patternParams[1];
 		}
-		else if (weapon->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
+		else if (weapon->m_ammunition->m_pattern.m_pattern_type == Oscillator)
 		{
-			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
-			data << weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
-			data << weapon->m_ammunition->m_Pattern.m_patternParams[1] << " ";
-			data << weapon->m_ammunition->m_Pattern.m_patternParams[2];
+			data << " " << weapon->m_ammunition->m_pattern.m_patternSpeed << " ";
+			data << weapon->m_ammunition->m_pattern.m_patternParams[0] << " ";
+			data << weapon->m_ammunition->m_pattern.m_patternParams[1] << " ";
+			data << weapon->m_ammunition->m_pattern.m_patternParams[2];
 		}
 	}
 	else
@@ -2672,7 +2672,7 @@ int Ship::SaveItems(Ship* ship)
 	return 0;
 }
 
-Equipment* Ship::LoadEquipmentFromLine(string line)
+Equipment* Ship::LoadSavedEquipmentFromLine(string line)
 {
 	string equipment_type;
 	string display_name;
@@ -2840,27 +2840,27 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 		bot->m_spread = sf::Vector2f(bot_spread_x, bot_spread_y);
 		bot->m_rotation_speed = bot_rotation_speed;
 
-		bot->m_Pattern.m_currentPattern = (PatternType)bot_pattern_type;
-		if (bot->m_Pattern.m_currentPattern == Line_)
+		bot->m_pattern.m_pattern_type = (PatternType)bot_pattern_type;
+		if (bot->m_pattern.m_pattern_type == Line_)
 		{
-			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
-			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
+			bot->m_pattern.m_patternSpeed = bot_pattern_speed;
+			bot->m_pattern.m_patternParams.push_back(bot_pattern_arg2);
 		}
-		else if (bot->m_Pattern.m_currentPattern == Circle_)
+		else if (bot->m_pattern.m_pattern_type == Circle_)
 		{
-			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
-			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
-			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
+			bot->m_pattern.m_patternSpeed = bot_pattern_speed;
+			bot->m_pattern.m_patternParams.push_back(bot_pattern_arg1);
+			bot->m_pattern.m_patternParams.push_back(bot_pattern_arg2);
 		}
-		else if (bot->m_Pattern.m_currentPattern == Oscillator)
+		else if (bot->m_pattern.m_pattern_type == Oscillator)
 		{
-			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
-			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
-			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
-			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg3);
+			bot->m_pattern.m_patternSpeed = bot_pattern_speed;
+			bot->m_pattern.m_patternParams.push_back(bot_pattern_arg1);
+			bot->m_pattern.m_patternParams.push_back(bot_pattern_arg2);
+			bot->m_pattern.m_patternParams.push_back(bot_pattern_arg3);
 		}
 
-		bot->m_Pattern.StartPattern();
+		bot->m_pattern.startPattern();
 
 		if (bot_weapon_name.compare("0") == 0)
 		{
@@ -2872,27 +2872,27 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			ammo->m_display_name = bot_ammo_name;
 			ammo->m_range = bot_ammo_range;
 			ammo->m_isBeam = bot_weapon_rafale < 0;
-			ammo->m_Pattern.m_currentPattern = (PatternType)bot_ammo_pattern_type;
-			if (ammo->m_Pattern.m_currentPattern == Line_)
+			ammo->m_pattern.m_pattern_type = (PatternType)bot_ammo_pattern_type;
+			if (ammo->m_pattern.m_pattern_type == Line_)
 			{
-				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
-				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
+				ammo->m_pattern.m_patternSpeed = bot_ammo_pattern_speed;
+				ammo->m_pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
 			}
-			else if (ammo->m_Pattern.m_currentPattern == Circle_)
+			else if (ammo->m_pattern.m_pattern_type == Circle_)
 			{
-				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
-				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
-				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
+				ammo->m_pattern.m_patternSpeed = bot_ammo_pattern_speed;
+				ammo->m_pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
+				ammo->m_pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
 			}
-			else if (ammo->m_Pattern.m_currentPattern == Oscillator)
+			else if (ammo->m_pattern.m_pattern_type == Oscillator)
 			{
-				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
-				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
-				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
-				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg3);
+				ammo->m_pattern.m_patternSpeed = bot_ammo_pattern_speed;
+				ammo->m_pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
+				ammo->m_pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
+				ammo->m_pattern.m_patternParams.push_back(bot_ammo_pattern_arg3);
 			}
 
-			ammo->m_Pattern.StartPattern();
+			ammo->m_pattern.startPattern();
 
 			Weapon* weapon = new Weapon(ammo);
 			weapon->m_display_name = bot_weapon_name;
@@ -2937,7 +2937,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	return equipment;
 }
 
-Weapon* Ship::LoadWeaponFromLine(string line)
+Weapon* Ship::LoadSavedWeaponFromLine(string line)
 {
 	string equipment_type;
 	string display_name;
@@ -3003,24 +3003,24 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	ammo->m_display_name = ammo_name;
 	ammo->m_range = ammo_range;
 	ammo->m_isBeam = weapon_rafale < 0;
-	ammo->m_Pattern.m_currentPattern = (PatternType)ammo_pattern_type;
-	if (ammo->m_Pattern.m_currentPattern == Line_)
+	ammo->m_pattern.m_pattern_type = (PatternType)ammo_pattern_type;
+	if (ammo->m_pattern.m_pattern_type == Line_)
 	{
-		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
-		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
+		ammo->m_pattern.m_patternSpeed = ammo_pattern_speed;
+		ammo->m_pattern.m_patternParams.push_back(ammo_pattern_arg2);
 	}
-	else if (ammo->m_Pattern.m_currentPattern == Circle_)
+	else if (ammo->m_pattern.m_pattern_type == Circle_)
 	{
-		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
-		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg1);
-		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
+		ammo->m_pattern.m_patternSpeed = ammo_pattern_speed;
+		ammo->m_pattern.m_patternParams.push_back(ammo_pattern_arg1);
+		ammo->m_pattern.m_patternParams.push_back(ammo_pattern_arg2);
 	}
-	else if (ammo->m_Pattern.m_currentPattern == Circle_)
+	else if (ammo->m_pattern.m_pattern_type == Circle_)
 	{
-		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
-		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg1);
-		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
-		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg3);
+		ammo->m_pattern.m_patternSpeed = ammo_pattern_speed;
+		ammo->m_pattern.m_patternParams.push_back(ammo_pattern_arg1);
+		ammo->m_pattern.m_patternParams.push_back(ammo_pattern_arg2);
+		ammo->m_pattern.m_patternParams.push_back(ammo_pattern_arg3);
 	}
 
 	Weapon* weapon = new Weapon(ammo);
@@ -3068,7 +3068,7 @@ bool Ship::LoadPlayerItems(Ship* ship)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					ship->setShipEquipment(Ship::LoadEquipmentFromLine(line), true, true);
+					ship->setShipEquipment(Ship::LoadSavedEquipmentFromLine(line), true, true);
 				}
 			}
 			//Loading weapon
@@ -3077,7 +3077,7 @@ bool Ship::LoadPlayerItems(Ship* ship)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					ship->setShipWeapon(Ship::LoadWeaponFromLine(line), true, true);
+					ship->setShipWeapon(Ship::LoadSavedWeaponFromLine(line), true, true);
 				}
 			}
 			//Loading stash
@@ -3105,14 +3105,14 @@ bool Ship::LoadPlayerItems(Ship* ship)
 					{
 						if (equipment_type.compare("Weapon") == 0)
 						{
-							Weapon* weapon = Ship::LoadWeaponFromLine(line);
+							Weapon* weapon = Ship::LoadSavedWeaponFromLine(line);
 							GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
 							ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*capsule, index, true);
 							delete weapon;
 						}
 						else
 						{
-							Equipment* equipment = Ship::LoadEquipmentFromLine(line);
+							Equipment* equipment = Ship::LoadSavedEquipmentFromLine(line);
 							GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
 							ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*capsule, index, true);
 							delete equipment;

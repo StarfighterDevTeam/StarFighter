@@ -107,7 +107,7 @@ public:
 	string m_display_name;
 	string m_name;
 	vector<Weapon*> m_weapons_list;
-	GeometryPattern* m_Pattern;
+	GeometryPattern* m_pattern;
 	vector <Modifier> m_modifiers;
 	float m_angspeed;
 	float m_radius;

@@ -43,13 +43,11 @@
 #define	COLOR_LIGHT_BLUE_A_VALUE		179
 
 //#define AIRBRAKE_FILENAME		"2D/Equipment/AirBrake.png"
-#define ARMOR_FILENAME			"2D/Equipment/Armor.png"
-#define LASER_RED_FILENAME		"2D/Equipment/laser_red.png"
-#define LASER_BLUE_FILENAME		"2D/Equipment/laser_blue1.png"
-#define SHIELD_FILENAME			"2D/Equipment/Shield.png"
-#define THRUSTER_FILENAME		"2D/Equipment/Thruster.png"
-#define MODULE_FILENAME			"2D/Equipment/Module.png"
-#define BOT_FILENAME			"2D/Equipment/bot.png"
+//#define ARMOR_FILENAME			"2D/Equipment/Armor.png"
+//#define SHIELD_FILENAME			"2D/Equipment/Shield.png"
+//#define THRUSTER_FILENAME		"2D/Equipment/Thruster.png"
+//#define MODULE_FILENAME			"2D/Equipment/Module.png"
+//#define BOT_FILENAME			"2D/Equipment/bot.png"
 
 #define QUALITY_BACKGROUND		"2D/Equipment/quality_background.png"
 #define EQUIPMENT_SIZE					48

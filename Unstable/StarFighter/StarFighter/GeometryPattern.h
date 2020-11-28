@@ -12,10 +12,10 @@ using namespace std;
 enum PatternType 
 {
 	NoMovePattern,
-	Line_,
-	Rectangle_,
 	Circle_,
 	Oscillator,
+	Line_,
+	Rectangle_,
 	NBVAL_PatternType
 };
 
@@ -32,12 +32,12 @@ class GeometryPattern
 {
 public:
 	GeometryPattern();
-	void SetPattern(PatternType pt, float patternSpeed, vector<float> args);
-	void StartPattern();
-	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false);
+	void setPattern(PatternType pt, float patternSpeed, vector<float> args);
+	void startPattern();
+	sf::Vector2f getOffset(float seconds, bool absolute_coordinate = false);
 	static GeometryPattern* PatternLoader(vector<string> line_data, int index);
 
-	PatternType m_currentPattern;
+	PatternType m_pattern_type;
 	vector<float> m_patternParams;
 	float m_patternSpeed;
 	float m_patternSpeedInRadian;

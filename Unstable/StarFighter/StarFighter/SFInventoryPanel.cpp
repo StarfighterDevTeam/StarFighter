@@ -293,14 +293,18 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				{
 					ss_stats << "Adding " << obj->m_bots.size() << " drone. Drone stats:";
 				
-
 					if (obj->m_bots.front()->m_weapon->m_ammunition->m_isBeam == false)
 						ss_stats << "\nDPS: " << (floor)(1.f / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
 					else
-						ss_stats << "\nDPS: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
+						ss_stats << "\nDPS: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
 
 					ss_stats << "\nDamage: " << obj->m_bots.front()->m_weapon->m_ammunition->m_damage;
-					ss_stats << "\nAmmo speed: " << obj->m_bots.front()->m_weapon->m_ammunition->m_speed.y;
+					
+					if (obj->m_bots.front()->m_weapon->m_rafale >= 0)
+						ss_stats << "\nAmmo speed: " << obj->m_bots.front()->m_weapon->m_ammunition->m_speed.y;
+					else 
+						ss_stats << "\nContinuous beam";
+
 					ss_stats.precision(1);
 
 					if (obj->m_bots.front()->m_weapon->m_ammunition->m_isBeam == false)
@@ -311,23 +315,17 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					ss_stats.precision(0);
 
 					if (obj->m_bots.front()->m_weapon->m_multishot > 1)
-					{
 						ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
-					}
 					else
-					{
 						ss_stats << "\nSingle shot";
-					}
 
 					if (obj->m_bots.front()->m_weapon->m_rafale > 0)
-					{
 						ss_stats << "\nRafale: " << obj->m_bots.front()->m_weapon->m_rafale << " (cooldown: " << obj->m_bots.front()->m_weapon->m_rafale_cooldown << " sec";
-					}
-					else if (obj->m_bots.front()->m_weapon->m_rafale < 0)
-					{
-						ss_stats << "\nContinuous beam";
-					}
 
+					if (obj->m_bots.front()->m_pattern.m_pattern_type == Oscillator)
+						ss_stats << "\nPattern: Oscillator";
+					else if (obj->m_bots.front()->m_pattern.m_pattern_type == Circle_)
+						ss_stats << "\nPattern: Circle";
 
 					//ss_stats << "\nFiring style: ";
 					//switch (obj->m_bots.front()->m_weapon->m_shot_mode)
@@ -371,15 +369,12 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						}
 					}
 
-					if (obj->m_bots.front()->m_weapon->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
-					{
+					if (obj->m_bots.front()->m_weapon->m_ammunition->m_pattern.m_pattern_type == Oscillator)
 						ss_stats << "\nEpic ability: waving trajectory";
-					}
 				}
 				else
-				{
 					ss_stats << "\nNo effect";
-				}
+
 				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
@@ -404,7 +399,12 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						ss_stats << "DPS: " << (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
 				//}
 				ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
-				ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
+
+				if (obj->m_rafale >= 0)
+					ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
+				else
+					ss_stats << "\nContinuous beam";
+				
 				ss_stats.precision(1);
 				if (obj->m_ammunition->m_isBeam == false)
 					ss_stats << "\nFire rate: " << (floor)(1.f / obj->m_rate_of_fire * 100) / 100 << " shots/sec";
@@ -413,21 +413,12 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_stats.precision(0);
 
 				if (obj->m_multishot > 1)
-				{
 					ss_stats << "\nMultishot: " << obj->m_multishot << "\nDispersion: " << obj->m_dispersion << "°";
-				}
 				else
-				{
 					ss_stats << "\nSingle shot";
-				}
+
 				if (obj->m_rafale > 0)
-				{
 					ss_stats << "\nRafale: " << obj->m_rafale << " (cooldown: " << obj->m_rafale_cooldown << " sec";
-				}
-				else if (obj->m_rafale < 0)
-				{
-					ss_stats << "\nContinuous beam";
-				}
 				
 				//ss_stats << "\nFiring style: ";
 				//switch (obj->m_shot_mode)
@@ -454,7 +445,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				//	}
 				//}
 
-				if (obj->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
+				if (obj->m_ammunition->m_pattern.m_pattern_type == Oscillator)
 				{
 					ss_stats << "\nEpic ability: waving trajectory";
 				}
@@ -1391,9 +1382,8 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		ostringstream ss_bg;
 		ss_bg << m_playerShip->m_currentScene_name;
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
-		{
 			ss_bg << " (" << m_playerShip->m_currentScene_hazard + 1 << ")";
-		}
+
 		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " "));
 	}
 
@@ -1405,36 +1395,18 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//ship global stats
 	ostringstream ss_ship_stats;
 	float DPS = 0;
-	if (m_playerShip->m_weapon)
-	{
+	if (m_playerShip->m_weapon != NULL)
 		if (m_playerShip->m_weapon->m_shot_mode != NoShotMode)
-		{
-			DPS += (floor)(1 / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage;
-		}
+			DPS += (floor)(1.f / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage;
 		else
-		{
-			DPS += (floor)(1 / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage * m_playerShip->m_weapon->m_multishot;
-		}
-		
-	}
-	if (!m_playerShip->m_bot_list.empty())
-	{
-		size_t botsVectorSize = m_playerShip->m_bot_list.size();
-		for (size_t i = 0; i < botsVectorSize; i++)
-		{
-			if (m_playerShip->m_bot_list[i]->m_weapon)
-			{
-				if (m_playerShip->m_bot_list[i]->m_weapon->m_shot_mode != NoShotMode)
-				{
-					DPS += (floor)(1 / m_playerShip->m_bot_list[i]->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_bot_list[i]->m_weapon->m_ammunition->m_damage;
-				}
-				else
-				{
-					DPS += (floor)(1 / m_playerShip->m_bot_list[i]->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_bot_list[i]->m_weapon->m_ammunition->m_damage *m_playerShip->m_bot_list[i]->m_weapon->m_multishot;
-				} 
-			}
-		}
-	}
+			DPS += (floor)(1.f / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage * m_playerShip->m_weapon->m_multishot;
+
+	for (Bot* bot : m_playerShip->m_bot_list)
+		if (bot->m_weapon != NULL)
+			if (bot->m_weapon->m_shot_mode != NoShotMode)
+				DPS += (floor)(1.f / bot->m_weapon->m_rate_of_fire * 100) / 100 * bot->m_weapon->m_ammunition->m_damage;
+			else
+				DPS += (floor)(1.f / bot->m_weapon->m_rate_of_fire * 100) / 100 * bot->m_weapon->m_ammunition->m_damage * bot->m_weapon->m_multishot;
 
 	ss_ship_stats << "DPS: " << DPS;
 	ss_ship_stats << "\nContact damage: " << m_playerShip->m_damage << "\nHyperspeed: " << m_playerShip->m_hyperspeed << "\nFuel: " << m_playerShip->m_hyperspeed_fuel_max

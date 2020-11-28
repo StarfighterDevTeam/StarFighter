@@ -62,8 +62,6 @@ public:
 	
 	Weapon* Clone();
 
-	static Weapon* CreateRandomWeapon(int level, bool is_bot, float beastScore);
-
 private:
 	bool m_fire_pattern_return;
 };

@@ -245,8 +245,8 @@ public :
 	static bool LoadPlayerMoney(Ship* ship);
 	static int SaveItems(Ship* ship);
 	static bool LoadPlayerItems(Ship* ship);
-	static Equipment* LoadEquipmentFromLine(string line);
-	static Weapon* LoadWeaponFromLine(string line);
+	static Equipment* LoadSavedEquipmentFromLine(string line);
+	static Weapon* LoadSavedWeaponFromLine(string line);
 	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
 	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
 

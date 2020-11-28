@@ -85,7 +85,7 @@ const char* getSavesPath();
 #define END_OF_DIALOGS_DELAY							0
 #define TIME_BETWEEN_BULLET_DAMAGE_TICK					1
 #define TIME_BETWEEN_COLLISION_DAMAGE_TICK				0.5
-#define TIME_BETWEEN_BEAM_DAMAGE_TICK					0.1
+#define TIME_BETWEEN_BEAM_DAMAGE_TICK					0.05
 #define SLOW_MOTION_MULTIPLIER							2.5
 
 //HUD
@@ -238,17 +238,17 @@ const char* getSavesPath();
 
 //ITEMS STATS
 #define LOOT_CREDITS_DEFAULT_BONUS						1
-#define FIRST_LEVEL_ARMOR								150
-#define FIRST_LEVEL_SHIELD								50
-#define FIRST_LEVEL_SHIELD_REGEN						5
-#define FIRST_LEVEL_SHIELD_RECOVERY_TIME				20.0f
-#define FIRST_LEVEL_COLLISION_DAMAGE					10
-#define FIRST_LEVEL_AMMO_DAMAGE							5
-#define FIRST_LEVEL_MULTISHOT							2
-#define FIRST_LEVEL_RATE_OF_FIRE						0.1f
-#define FIRST_LEVEL_HYPERSPEED							1.0f
-#define FIRST_LEVEL_FUEL								100
-#define DEFAULT_AMMO_SPEED								2200
+//#define FIRST_LEVEL_ARMOR								150
+//#define FIRST_LEVEL_SHIELD								50
+//#define FIRST_LEVEL_SHIELD_REGEN						5
+//#define FIRST_LEVEL_SHIELD_RECOVERY_TIME				20.0f
+//#define FIRST_LEVEL_COLLISION_DAMAGE					10
+//#define FIRST_LEVEL_AMMO_DAMAGE							5
+//#define FIRST_LEVEL_MULTISHOT							2
+//#define FIRST_LEVEL_RATE_OF_FIRE						0.1f
+//#define FIRST_LEVEL_HYPERSPEED							1.0f
+//#define FIRST_LEVEL_FUEL								100
+//#define DEFAULT_AMMO_SPEED								2200
 #define ASSUMED_SHIP_SIZE								70
 #define ASSUMED_BOT_SIZE								32
 

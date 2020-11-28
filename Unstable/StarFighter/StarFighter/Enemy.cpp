@@ -198,9 +198,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//call bobbyPattern
 	if (hyperspeedMultiplier < 1.0f)
-		offset = m_Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
+		offset = m_pattern.getOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
 	else
-		offset = m_Pattern.GetOffset(deltaTime.asSeconds());
+		offset = m_pattern.getOffset(deltaTime.asSeconds());
 
 	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 
@@ -219,7 +219,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (newposition.x < size.x / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_Pattern.m_patternSpeed *= -1;
+					m_pattern.m_patternSpeed *= -1;
 				else
 					m_speed.x *= -1;
 				
@@ -229,7 +229,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			else if (newposition.x > SCENE_SIZE_X - size.x / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_Pattern.m_patternSpeed *= -1;
+					m_pattern.m_patternSpeed *= -1;
 				else
 					m_speed.x *= -1;
 				
@@ -245,7 +245,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 					m_speed.y *= -1;
 				else
-					m_Pattern.m_patternSpeed *= -1;
+					m_pattern.m_patternSpeed *= -1;
 				
 				setPosition(newposition.x, size.y / 2);
 			}
@@ -255,7 +255,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 					m_speed.y *= -1;
 				else
-					m_Pattern.m_patternSpeed *= -1;
+					m_pattern.m_patternSpeed *= -1;
 				
 				setPosition(newposition.x, SCENE_SIZE_Y - size.y / 2);
 			}
@@ -519,7 +519,7 @@ Enemy* Enemy::Clone()
 	enemy->m_display_name = this->m_display_name;
 	enemy->m_enemy_class = this->m_enemy_class;
 
-	enemy->m_Pattern = this->m_Pattern;
+	enemy->m_pattern = this->m_pattern;
 	enemy->m_angspeed = this->m_angspeed;
 	enemy->m_radius = this->m_radius;
 	enemy->m_input_blocker = this->m_input_blocker;
@@ -787,16 +787,16 @@ void Enemy::setPhase(Phase* phase)
 	//movement
 	//check if identical patterns
 	bool identical_patterns = false;
-	if (m_currentPhase && m_currentPhase->m_Pattern->m_currentPattern == phase->m_Pattern->m_currentPattern)
+	if (m_currentPhase && m_currentPhase->m_pattern->m_pattern_type == phase->m_pattern->m_pattern_type)
 	{
-		if (m_currentPhase->m_Pattern->m_currentPattern == NoMovePattern)
+		if (m_currentPhase->m_pattern->m_pattern_type == NoMovePattern)
 		{
 			identical_patterns = true;
 		}
-		else if (m_currentPhase->m_Pattern->m_patternSpeed == phase->m_Pattern->m_patternSpeed)
+		else if (m_currentPhase->m_pattern->m_patternSpeed == phase->m_pattern->m_patternSpeed)
 		{
-			size_t paramsVectorSize = m_currentPhase->m_Pattern->m_patternParams.size();
-			if (paramsVectorSize == phase->m_Pattern->m_patternParams.size())
+			size_t paramsVectorSize = m_currentPhase->m_pattern->m_patternParams.size();
+			if (paramsVectorSize == phase->m_pattern->m_patternParams.size())
 			{
 				if (paramsVectorSize == 0)
 				{
@@ -806,7 +806,7 @@ void Enemy::setPhase(Phase* phase)
 				{
 					for (size_t i = 0; i < paramsVectorSize; i++)
 					{
-						if (m_currentPhase->m_Pattern->m_patternParams[i] != phase->m_Pattern->m_patternParams[i])
+						if (m_currentPhase->m_pattern->m_patternParams[i] != phase->m_pattern->m_patternParams[i])
 						{
 							break;
 						}
@@ -823,7 +823,7 @@ void Enemy::setPhase(Phase* phase)
 
 	if (!identical_patterns)
 	{
-		m_Pattern.SetPattern(phase->m_Pattern->m_currentPattern, phase->m_Pattern->m_patternSpeed, phase->m_Pattern->m_patternParams); //vitesse angulaire (degres/s)
+		m_pattern.setPattern(phase->m_pattern->m_pattern_type, phase->m_pattern->m_patternSpeed, phase->m_pattern->m_patternParams); //vitesse angulaire (degres/s)
 	}
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
@@ -960,7 +960,7 @@ Phase* Enemy::LoadPhase(string name)
 
 			//loading phases
 			GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*it), PHASE_PATTERN);
-			phase->m_Pattern = m_bobby;
+			phase->m_pattern = m_bobby;
 
 			//loading rotation speed
 			phase->m_rotation_speed = stoi((*it)[PHASE_ROTATION_SPEED]);
@@ -1202,27 +1202,27 @@ bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int level, GameO
 	{
 		case (int)Engine:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomEngine(level, beastScore));
+			return object->setEquipmentLoot(Enemy::CreateRandomEngine(level, beastScore));
 		}
 
 		case (int)Armor:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomArmor(level, beastScore));
+			return object->setEquipmentLoot(Enemy::CreateRandomArmor(level, beastScore));
 		}
 
 		case (int)Shield:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomShield(level, beastScore));
+			return object->setEquipmentLoot(Enemy::CreateRandomShield(level, beastScore));
 		}
 
 		case (int)Module:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomModule(level, beastScore));
+			return object->setEquipmentLoot(Enemy::CreateRandomModule(level, beastScore));
 		}
 
 		case (int)NBVAL_Equipment://WEAPON DROP
 		{
-			return object->setWeaponLoot(Weapon::CreateRandomWeapon(level, false, beastScore));
+			return object->setWeaponLoot(Enemy::CreateRandomWeapon(level, false, beastScore));
 		}
 	}
 
@@ -1260,7 +1260,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 			weapon->m_ammunition->m_range = stoi((*it)[WEAPON_RANGE]);
 
 			GeometryPattern* pattern = GeometryPattern::PatternLoader((*it), WEAPON_PATTERN);
-			weapon->m_ammunition->m_Pattern.SetPattern(pattern->m_currentPattern, pattern->m_patternSpeed, pattern->m_patternParams);
+			weapon->m_ammunition->m_pattern.setPattern(pattern->m_pattern_type, pattern->m_patternSpeed, pattern->m_patternParams);
 			delete pattern;
 
 			weapon->m_multishot = stoi((*it)[WEAPON_MULTISHOT]);
@@ -1358,7 +1358,91 @@ FX* Enemy::LoadFX(string name)
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file", (char*)name.c_str()));
+}
 
+Bot* Enemy::LoadBot(string name)
+{
+	vector<vector<string> >botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
+
+	for (std::vector<vector<string> >::iterator it = (botConfig).begin(); it != (botConfig).end(); it++)
+	{
+		if ((*it)[0].compare(name) == 0)
+		{
+			Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), (*it)[BOT_IMAGE_NAME], sf::Vector2f(stoi((*it)[BOT_WIDTH]), stoi((*it)[BOT_HEIGHT])));
+
+			((GameObject*)bot)->m_display_name = (*it)[BOT_NAME];
+			((GameObject*)bot)->m_armor = stoi((*it)[BOT_ARMOR]);
+			((GameObject*)bot)->m_armor_max = stoi((*it)[BOT_ARMOR]);
+			((GameObject*)bot)->m_shield = stoi((*it)[BOT_SHIELD]);
+			((GameObject*)bot)->m_shield_max = stoi((*it)[BOT_SHIELD]);
+			((GameObject*)bot)->m_shield_regen = stoi((*it)[BOT_SHIELD_REGEN]);
+			((GameObject*)bot)->m_damage = stoi((*it)[BOT_DAMAGE]);
+			bot->m_spread = Vector2f(stoi((*it)[BOT_XSPREAD]), stoi((*it)[BOT_YSPREAD]));
+
+			GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*it), BOT_PATTERN);
+			bot->m_pattern.setPattern(m_bobby->m_pattern_type, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
+
+			bot->m_rotation_speed = stoi((*it)[BOT_ROTATION_SPEED]);
+
+			if ((*it)[BOT_WEAPON].compare("0") != 0)
+				bot->m_weapon = Enemy::LoadWeapon((*it)[BOT_WEAPON], -1);
+
+			return bot;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Bot '%s'. Please check the config file", (char*)name.c_str()));
+}
+
+Equipment* Enemy::LoadEquipment(string name)
+{
+	vector<vector<string> >equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
+
+	for (std::vector<vector<string> >::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
+	{
+		if ((*it)[EQUIPMENT_NAME].compare(name) == 0)
+		{
+			Equipment* i = new Equipment();
+
+			i->Init(NBVAL_Equipment, stoi((*it)[EQUIPMENT_MAXSPEED]), stoi((*it)[EQUIPMENT_ACCELERATION]), stoi((*it)[EQUIPMENT_DECCELERATION]),
+				stoi((*it)[EQUIPMENT_HYPERSPEED]), stoi((*it)[EQUIPMENT_HYPERSPEED_FUEL]), stoi((*it)[EQUIPMENT_ARMOR]), stoi((*it)[EQUIPMENT_SHIELD]), stoi((*it)[EQUIPMENT_SHIELD_REGEN]),
+				atof((*it)[EQUIPMENT_SHIELD_RECOVERY].c_str()), stoi((*it)[EQUIPMENT_DAMAGE]),
+				(*it)[EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EQUIPMENT_WIDTH]), stoi((*it)[EQUIPMENT_HEIGHT])),
+				stoi((*it)[EQUIPMENT_FRAMES]), (*it)[EQUIPMENT_NAME]);
+
+			if ((*it)[EQUIPMENT_BOT].compare("0") != 0)
+			{
+				i->m_bots.push_back(LoadBot((*it)[EQUIPMENT_BOT]));
+			}
+
+			if (!(*it)[EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_WIDTH].compare("0") == 0
+				&& !(*it)[EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
+			{
+				i->m_fake_textureName = (*it)[EQUIPMENT_FAKE_TEXTURE];
+				i->m_fake_size = sf::Vector2f(stoi((*it)[EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EQUIPMENT_FAKE_HEIGHT]));
+				i->m_fake_frameNumber = stoi((*it)[EQUIPMENT_FAKE_FRAMES]);
+			}
+
+			//if((*it)[EQUIPMENT_COMPARE].compare("airbrake") == 0)
+			//	i->equipmentType = Airbrake;
+			if ((*it)[EQUIPMENT_COMPARE].compare("engine") == 0)
+				i->m_equipmentType = Engine;
+			else if ((*it)[EQUIPMENT_COMPARE].compare("armor") == 0)
+				i->m_equipmentType = Armor;
+			else if ((*it)[EQUIPMENT_COMPARE].compare("shield") == 0)
+				i->m_equipmentType = Shield;
+			else if ((*it)[EQUIPMENT_COMPARE].compare("module") == 0)
+				i->m_equipmentType = Module;
+			else
+				LOGGER_WRITE(Logger::DEBUG, ("Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file", (char*)name.c_str()));
+
+			i->m_display_name = (*it)[EQUIPMENT_DISPLAY_NAME];
+
+			return i;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Equipment '%s'. Please check the config file", (char*)name.c_str()));
 }
 
 void Enemy::ApplyLevelModifiers()
@@ -1379,6 +1463,415 @@ void Enemy::ApplyLevelModifiers()
 
 	m_enemyLevel.setString(to_string(m_level));
 }
+
+Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
+{
+	//beam weapon?
+	bool beam_weapon = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WEAPON_CHANCE_OF_BEAM;
+
+	//Creating the item with base stats
+	Weapon* weapon = beam_weapon == false ? Enemy::LoadWeapon("laser", -1) : Enemy::LoadWeapon("laserbeam", -1);
+
+	//Computing credits available for upgrades
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
+
+	int cost_per_multishot = 0;
+	//Spending credits on the possible bonuses
+	int bonus_multishot = 0;
+	int bonus_damage = 0;
+	int bonus_rate_of_fire = 0;
+	int dispersion = 0;//flag
+
+	int loot_credits_remaining = credits_;
+	loot_credits_remaining *= is_bot ? BOT_STATS_MULTIPLIER : 1;
+	while (loot_credits_remaining > 0)
+	{
+		int random_type_of_bonus = -1;
+
+		//checking bonus limitations
+		cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), bonus_multishot));
+		bool can_buy_multishot = loot_credits_remaining > cost_per_multishot;
+		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS;
+		bool can_buy_damage = floor(weapon->m_ammunition->m_damage * (1 + (1.0f * loot_credits_remaining / 100))) != weapon->m_ammunition->m_damage;
+
+		//and chosing among the authorized ones
+		if (!can_buy_damage && can_buy_rate_of_fire)
+			random_type_of_bonus = 2;
+		else if (can_buy_multishot && can_buy_rate_of_fire)
+			random_type_of_bonus = RandomizeIntBetweenValues(0, 2);
+		else if (!can_buy_multishot && can_buy_rate_of_fire)
+			random_type_of_bonus = RandomizeIntBetweenValues(1, 2);
+		else if (can_buy_multishot && !can_buy_rate_of_fire)
+			random_type_of_bonus = RandomizeIntBetweenValues(0, 1);
+		else
+			random_type_of_bonus = 1;
+
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus)
+		{
+		case 0://multishot
+		{
+			loot_credits_remaining -= cost_per_multishot;
+			bonus_multishot++;
+			break;
+		}
+		case 1://flat bonus damage
+		{
+			loot_credits_remaining--;
+			bonus_damage++;
+			break;
+		}
+		case 2://rate of fire
+		{
+			loot_credits_remaining--;
+			bonus_rate_of_fire++;
+			break;
+		}
+		default:
+			break;
+		}
+
+		//dispersion weapon?
+		int min_multishots_for_dispersion = is_bot ? MIN_MULTISHOTS_FOR_DISPERSION_FOR_BOT - MIN_VALUE_OF_MULTISHOT : MIN_MULTISHOTS_FOR_DISPERSION - MIN_VALUE_OF_MULTISHOT;
+		if (bonus_multishot == min_multishots_for_dispersion && dispersion == 0)
+			dispersion = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WEAPON_CHANCE_OF_DISPERSION ? 1 : -1;
+	}
+
+	//allocating bonuses to the weapon
+	weapon->m_multishot += bonus_multishot;
+	weapon->m_ammunition->m_damage += ceil((bonus_damage + cost_per_multishot * bonus_multishot) * weapon->m_ammunition->m_damage / weapon->m_multishot * 0.01);
+	weapon->m_rate_of_fire = weapon->m_rate_of_fire / (1 + bonus_rate_of_fire * 0.01);
+
+	//spread of multishot weapons
+	if (weapon->m_multishot > 1)
+	{
+		//int sprite_size = is_bot ? ASSUMED_BOT_SIZE : ASSUMED_SHIP_SIZE;
+		//weapon->m_xspread = RandomizeIntBetweenValues(MIN_WEAPON_XSPREAD, sprite_size * 2 / weapon->m_multishot);
+		weapon->m_xspread = MIN_WEAPON_XSPREAD;
+
+		if (dispersion > 0)
+		{
+			weapon->m_dispersion = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_DISPERSION, is_bot ? WEAPON_MAX_DISPERSION_FOR_BOT : WEAPON_MAX_DISPERSION));
+			weapon->m_ammunition->m_damage *= (1 + WEAPON_DISPERSION_DAMAGE_MALUS);
+
+			weapon->m_display_name = to_string(weapon->m_multishot) + "-shots_wide_laser";
+		}
+		else
+			weapon->m_display_name = to_string(weapon->m_multishot) + "-shots_laser";
+	}
+
+	//beam weapons
+	if (beam_weapon == true)
+	{
+		weapon->m_rafale = -1;
+		weapon->m_rafale_cooldown = 0;
+		weapon->m_rate_of_fire = 0;
+		weapon->m_ammunition->m_isBeam = true;
+		weapon->m_ammunition->m_damage *= weapon->m_multishot;
+		weapon->m_multishot = 1;
+		weapon->m_display_name = "Laserbeam";
+	}
+
+	//saving level and credits used
+	weapon->m_level = level;
+	weapon->m_credits = credits_;
+	weapon->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	//epic stats
+	if (Game::GetItemQualityClass(weapon->m_quality) == ItemQuality_Epic)
+	{
+		int random_epic_ability = RandomizeIntBetweenValues(0, 1);
+
+		switch (random_epic_ability)
+		{
+			case 0:
+			{
+				weapon->m_target_homing = HOMING;
+				weapon->m_ammunition->m_damage * (1 - WEAPON_HOMING_DAMAGE_MALUS);
+				break;
+			}
+			case 1:
+			{
+				weapon->m_ammunition->m_pattern.setPattern(Oscillator, 200, { 70, 0, 1 });
+				weapon->m_ammunition->m_speed.y *= 0.5;
+				break;
+			}
+		}
+	}
+
+#ifndef NDEBUG
+	if (!is_bot)
+		printf("\nNew weapon created: level %d, quality %f, xp: %d, bonus_multishot: %d, bonus_damage: %d, bonus_rof: %d\n\n", level, weapon->m_quality, credits_, bonus_multishot, bonus_damage, bonus_rate_of_fire);
+#endif
+
+	return weapon;
+}
+
+
+Equipment* Enemy::CreateRandomArmor(int level, float beastScore)
+{
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
+
+	//Spending credits on the possible bonuses
+	int bonus_armor = 0;
+	int bonus_damage = 0;
+
+	int loot_credits_remaining = credits_;
+	while (loot_credits_remaining > 0)
+	{
+		int random_type_of_bonus = RandomizeIntBetweenValues(0, 5);
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus)
+		{
+		case 0://damage
+		{
+			loot_credits_remaining--;
+			bonus_damage++;
+			break;
+		}
+
+		default://armor
+		{
+			loot_credits_remaining--;
+			bonus_armor++;
+			break;
+		}
+		}
+	}
+
+	//Creating the item with base stats
+	Equipment* equipment = Enemy::LoadEquipment("armor_default");
+
+	//allocating bonuses to the weapon
+	equipment->m_armor += bonus_armor * equipment->m_armor * 0.01;
+	//equipment->m_damage += bonus_damage * FIRST_LEVEL_COLLISION_DAMAGE * 0.01;
+
+	//saving level and credits used
+	equipment->m_level = level;
+	equipment->m_credits = credits_;
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	//bombs
+	equipment->m_bombs = BOMB_DEFAULT_NUMBER;
+
+	return equipment;
+}
+
+Equipment* Enemy::CreateRandomShield(int level, float beastScore)
+{
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
+
+	//Spending credits on the possible bonuses
+	int bonus_shield = 0;
+	int bonus_shield_regen = 0;
+	int bonus_shield_recovery = 0;
+
+	int loot_credits_remaining = credits_;
+
+	bool can_buy_shield_regen = loot_credits_remaining > 20;
+
+	while (loot_credits_remaining > 0)
+	{
+		int random_type_of_bonus = can_buy_shield_regen ? RandomizeIntBetweenValues(0, 3) : RandomizeIntBetweenValues(1, 3);
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus)
+		{
+			case 0://shield regen
+			{
+				loot_credits_remaining--;
+				bonus_shield_regen++;
+				break;
+			}
+			case 1://shield regen
+			{
+				loot_credits_remaining--;
+				bonus_shield_recovery++;
+				break;
+			}
+			default://shield
+			{
+				loot_credits_remaining--;
+				bonus_shield++;
+				break;
+			}
+		}
+	}
+
+	//Creating the item with base stats
+	Equipment* equipment = Enemy::LoadEquipment("shield_default");
+
+	//allocating bonuses to the weapon
+	equipment->m_shield += bonus_shield * equipment->m_shield * 0.01;
+	equipment->m_shield_regen += ceil(bonus_shield_regen * equipment->m_shield_regen * 0.01);
+	equipment->m_shield_recovery_time -= equipment->m_shield_recovery_time - equipment->m_shield_recovery_time / (1 + bonus_shield_recovery * 0.01);
+
+	//saving level and credits used
+	equipment->m_level = level;
+	equipment->m_credits = credits_;
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	return equipment;
+}
+
+Equipment* Enemy::CreateRandomEngine(int level, float beastScore)
+{
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
+
+	//Spending credits on the possible bonuses
+	int loot_credits_remaining = credits_;
+
+	int bonus_hyperspeed = 0;
+	int bonus_fuel = 0;
+
+	while (loot_credits_remaining > 0)
+	{
+		int random_type_of_bonus = RandomizeIntBetweenValues(0, 2);
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus)
+		{
+		case 0://hyperspeed
+		{
+			loot_credits_remaining--;
+			bonus_hyperspeed++;
+			break;
+		}
+		default://fuel
+		{
+			loot_credits_remaining--;
+			bonus_fuel++;
+			break;
+		}
+		}
+	}
+
+	//Creating the item with base stats
+	Equipment* equipment = Enemy::LoadEquipment("engine_default");
+
+	//allocating bonuses to the weapon
+	equipment->m_hyperspeed += bonus_hyperspeed * equipment->m_hyperspeed * 0.01;
+	equipment->m_hyperspeed_fuel += bonus_fuel * equipment->m_hyperspeed_fuel * 0.01;
+
+	//saving level and credits used
+	equipment->m_level = level;
+	equipment->m_credits = credits_;
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	//epic stats
+	if (Game::GetItemQualityClass(equipment->m_quality) >= ItemQuality_Medium)
+	{
+		int random_ability = RandomizeIntBetweenValues(0, 1);
+
+		switch (random_ability)
+		{
+			case 0://cruising
+			{
+				equipment->m_can_hyperspeed = true;
+				break;
+			}
+			case 1://jumping
+			{
+				equipment->m_can_jump = true;
+				break;
+			}
+		}
+	}
+
+#ifndef NDEBUG
+	printf("\nNew engine created: level %d, quality %f, xp: %d, bonus_hyperspeed: %d, bonus_fuel: %d\n\n", level, equipment->m_quality, credits_, bonus_hyperspeed, bonus_fuel);
+#endif
+
+	return equipment;
+}
+
+Equipment* Enemy::CreateRandomModule(int level, float beastScore)
+{
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
+
+	int cost_per_bot = CREDITS_COST_PER_ONE_ADDITIONAL_BOT;
+
+	//buying additional bots?
+	int loot_credits_remaining = credits_;
+	int number_of_bots = 0;
+	bool can_buy_additional_bot = true;
+	while (can_buy_additional_bot)
+	{
+		number_of_bots++;
+		loot_credits_remaining -= number_of_bots == 0 ? 0 : cost_per_bot;
+		cost_per_bot = floor(cost_per_bot * pow((1 + COST_PER_ONE_BOT_MULTIPLIER_PER_LEVEL), number_of_bots));
+		can_buy_additional_bot = loot_credits_remaining > cost_per_bot && number_of_bots < MAX_NUMBER_OF_BOTS_PER_ITEM;
+	}
+
+	loot_credits_remaining = credits_ / number_of_bots;
+
+	//Spending credits on the possible bonuses
+	//Weapon* weapon = Enemy::CreateRandomWeapon(level, true, beastScore);
+
+	//Creating the item with base stats
+	Equipment* equipment = Enemy::LoadEquipment("module_default");
+
+	//BOTS
+	if (equipment->m_bots.empty() == false)
+	{
+		Bot* bot = equipment->m_bots.front();
+
+		//Randomize pattern
+		int pattern_type = RandomizeIntBetweenValues(NoMovePattern, Oscillator);
+		int clockwise = ((rand() % 2) * 2) - 1;
+		
+		vector<float> patternParams;
+		patternParams.push_back(bot->m_pattern.m_patternParams[0]);
+		patternParams.push_back(clockwise);
+		if (pattern_type == Oscillator)
+		{
+			patternParams.push_back(1);
+			bot->m_pattern.m_patternSpeed *= 0.5;
+		}
+			
+		bot->m_pattern.setPattern((PatternType)pattern_type, bot->m_pattern.m_patternSpeed, patternParams);
+
+		//Randomize weapon
+		Weapon* weapon = Enemy::CreateRandomWeapon(level, true, beastScore);
+		delete bot->m_weapon;
+		bot->m_weapon = weapon;
+
+		//Multiple bots
+		for (int i = 1; i < number_of_bots; i++)
+		{
+			Bot* new_bot = bot->Clone();
+
+			//bots auto spreading based on number of bots
+			int s = i % 2 == 0 ? 1 : -1;
+			int x = i / 2;
+			new_bot->m_spread.x *= s * (1 + x);
+
+			equipment->m_bots.push_back(new_bot);
+		}
+	}
+
+	//saving level and credits used
+	equipment->m_level = level;
+	equipment->m_credits = credits_;
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	return equipment;
+}
+
+//#define EQUIPMENT_DECCELERATION_MULTIPLIER		10
+//#define EQUIPMENT_ACCELERATION_MULTIPLIER		10
+//#define EQUIPMENT_MAXSPEED_MULTIPLIER			10
+//#define EQUIPMENT_ARMOR_MULTIPLIER				10
+//#define EQUIPMENT_SHIELD_MULTIPLIER				10
+//#define EQUIPMENT_SHIELD_REGEN_MULTIPLIER		10
+//#define EQUIPMENT_DAMAGE_MULTIPLIER				10
 
 // ENEMY BASE
 EnemyBase::~EnemyBase()

@@ -147,7 +147,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 		}
 
 		GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*CurrentGame).m_enemiesConfig[name], ENEMY_PATTERN);
-		base->m_enemy->m_Pattern.SetPattern(m_bobby->m_currentPattern, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
+		base->m_enemy->m_pattern.setPattern(m_bobby->m_pattern_type, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
 
 		base->m_enemy->m_rotation_speed = stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_ROTATION_SPEED]);
 	}
@@ -173,53 +173,12 @@ FX* FileLoader::LoadFX(string name)
 
 Equipment* FileLoader::LoadEquipment(string name)
 {
-	vector<vector<string> >equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
+	return Enemy::LoadEquipment(name);
+}
 
-	for (std::vector<vector<string> >::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
-	{
-		if((*it)[EQUIPMENT_NAME].compare(name) == 0)
-		{
-			Equipment* i = new Equipment();
-
-			i-> Init(NBVAL_Equipment, stoi((*it)[EQUIPMENT_MAXSPEED]), stoi((*it)[EQUIPMENT_ACCELERATION]), stoi((*it)[EQUIPMENT_DECCELERATION]), 
-				stoi((*it)[EQUIPMENT_HYPERSPEED]), stoi((*it)[EQUIPMENT_HYPERSPEED_FUEL]), stoi((*it)[EQUIPMENT_ARMOR]), stoi((*it)[EQUIPMENT_SHIELD]), stoi((*it)[EQUIPMENT_SHIELD_REGEN]),
-				atof((*it)[EQUIPMENT_SHIELD_RECOVERY].c_str()), stoi((*it)[EQUIPMENT_DAMAGE]),
-				(*it)[EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EQUIPMENT_WIDTH]), stoi((*it)[EQUIPMENT_HEIGHT])),
-				stoi((*it)[EQUIPMENT_FRAMES]), (*it)[EQUIPMENT_NAME]);
-
-			if ((*it)[EQUIPMENT_BOT].compare("0") != 0)
-			{
-				i->m_bots.push_back(LoadBot((*it)[EQUIPMENT_BOT]));
-			}
-
-			if(!(*it)[EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_WIDTH].compare("0") == 0
-				&& !(*it)[EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
-			{
-				i->m_fake_textureName = (*it)[EQUIPMENT_FAKE_TEXTURE];
-				i->m_fake_size = sf::Vector2f(stoi((*it)[EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EQUIPMENT_FAKE_HEIGHT]));
-				i->m_fake_frameNumber = stoi((*it)[EQUIPMENT_FAKE_FRAMES]);
-			}
-
-			//if((*it)[EQUIPMENT_COMPARE].compare("airbrake") == 0)
-			//	i->equipmentType = Airbrake;
-			if((*it)[EQUIPMENT_COMPARE].compare("engine") == 0)
-				i->m_equipmentType = Engine;
-			else if((*it)[EQUIPMENT_COMPARE].compare("armor") == 0)
-				i->m_equipmentType = Armor;
-			else if((*it)[EQUIPMENT_COMPARE].compare("shield") == 0)
-				i->m_equipmentType = Shield;
-			else if((*it)[EQUIPMENT_COMPARE].compare("module") == 0)
-				i->m_equipmentType = Module;
-			else 
-				LOGGER_WRITE(Logger::DEBUG, ("Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file", (char*)name.c_str()));
-
-			i->m_display_name = (*it)[EQUIPMENT_DISPLAY_NAME];
-
-			return i;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Equipment '%s'. Please check the config file", (char*)name.c_str()));
+Bot* FileLoader::LoadBot(string name)
+{
+	return Enemy::LoadBot(name);
 }
 
 ShipModel* FileLoader::LoadShipModel(string name)
@@ -257,38 +216,4 @@ ShipModel* FileLoader::LoadShipModel(string name)
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find ShipModel '%s'. Please check the config file", (char*)name.c_str()));
-}
-
-Bot* FileLoader::LoadBot(string name)
-{
-	vector<vector<string> >botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
-
-	for (std::vector<vector<string> >::iterator it = (botConfig).begin(); it != (botConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			Bot* bot = new Bot(Vector2f(0,0), Vector2f(0,0),(*it)[BOT_IMAGE_NAME],sf::Vector2f(stoi((*it)[BOT_WIDTH]),stoi((*it)[BOT_HEIGHT])));
-
-			((GameObject*)bot)->m_display_name = (*it)[BOT_NAME];
-			((GameObject*)bot)->m_armor = stoi((*it)[BOT_ARMOR]);
-			((GameObject*)bot)->m_armor_max = stoi((*it)[BOT_ARMOR]);
-			((GameObject*)bot)->m_shield = stoi((*it)[BOT_SHIELD]);
-			((GameObject*)bot)->m_shield_max = stoi((*it)[BOT_SHIELD]);
-			((GameObject*)bot)->m_shield_regen = stoi((*it)[BOT_SHIELD_REGEN]);
-			((GameObject*)bot)->m_damage = stoi((*it)[BOT_DAMAGE]);
-			bot->m_spread = Vector2f(stoi((*it)[BOT_XSPREAD]), stoi((*it)[BOT_YSPREAD]));
-
-			GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*it), BOT_PATTERN);
-			bot->m_Pattern.SetPattern(m_bobby->m_currentPattern, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
-
-			bot->m_rotation_speed = stoi((*it)[BOT_ROTATION_SPEED]);
-
-			if ((*it)[BOT_WEAPON].compare("0") != 0)
-				bot->m_weapon = FileLoader::LoadWeapon((*it)[BOT_WEAPON], -1);
-
-			return bot;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Bot '%s'. Please check the config file", (char*)name.c_str()));
 }

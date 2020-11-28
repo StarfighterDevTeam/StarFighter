@@ -45,6 +45,12 @@ public:
 
 	EnemyClass m_enemy_class;
 
+	static Weapon* CreateRandomWeapon(int level, bool is_bot, float beastScore);
+	static Equipment* CreateRandomArmor(int level, float beastScore);
+	static Equipment* CreateRandomShield(int level, float beastScore);
+	static Equipment* CreateRandomEngine(int level, float beastScore);
+	static Equipment* CreateRandomModule(int level, float beastScore);
+
 	//phases
 	void setPhase(Phase* phase);
 	Phase* getPhase(string phaseName);
@@ -62,7 +68,9 @@ public:
 	static Weapon* LoadWeapon(string name, int fire_direction);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
-
+	static Bot* LoadBot(string name);
+	static Equipment* LoadEquipment(string name);
+	
 	bool m_face_target;
 	bool m_reset_facing;
 	BouncingType m_bouncing;

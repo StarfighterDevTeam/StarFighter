@@ -2,7 +2,7 @@
 
 GeometryPattern::GeometryPattern()
 {
-	m_currentPattern = NoMovePattern;
+	m_pattern_type = NoMovePattern;
 }
 
 GeometryPattern* GeometryPattern::PatternLoader(vector<string> line_data, int index)
@@ -41,27 +41,27 @@ GeometryPattern* GeometryPattern::PatternLoader(vector<string> line_data, int in
 		}
 	}
 
-	pattern->m_currentPattern = pattern_type;
+	pattern->m_pattern_type = pattern_type;
 
 	return pattern;
 }
 
-void GeometryPattern::StartPattern()
+void GeometryPattern::startPattern()
 {
-	SetPattern(m_currentPattern, m_patternSpeed, m_patternParams);
+	setPattern(m_pattern_type, m_patternSpeed, m_patternParams);
 }
 
-void GeometryPattern::SetPattern(PatternType pt, float patternSpeed, vector<float> args)
+void GeometryPattern::setPattern(PatternType pt, float patternSpeed, vector<float> args)
 {
 	//Note that patternSpeed is 
 	// - px/sec on the canvas for Rectangle
 	// - time to do 360° for the circle
 
-	m_currentPattern = pt;
+	m_pattern_type = pt;
 	m_patternParams = args;
 	m_patternSpeed = patternSpeed;
 
-	switch(m_currentPattern)
+	switch(m_pattern_type)
 	{
 		case Line_:
 		{
@@ -144,11 +144,11 @@ void GeometryPattern::SetPattern(PatternType pt, float patternSpeed, vector<floa
 	}
 }
 
-sf::Vector2f  GeometryPattern::GetOffset(float seconds, bool absolute_coordinate)
+sf::Vector2f  GeometryPattern::getOffset(float seconds, bool absolute_coordinate)
 {
 	static sf::Vector2f offset;
 
-	switch(m_currentPattern)
+	switch(m_pattern_type)
 	{
 		case NoMovePattern:
 		{
@@ -314,7 +314,7 @@ sf::Vector2f  GeometryPattern::GetOffset(float seconds, bool absolute_coordinate
 
 		default:
 		{
-			throw invalid_argument(TextUtils::format("Game error: Unknow pattern # '%d'", m_currentPattern));
+			throw invalid_argument(TextUtils::format("Game error: Unknow pattern # '%d'", m_pattern_type));
 		}
 	}
 	
@@ -341,6 +341,6 @@ void GeometryPattern::CheckArgSize(size_t expected)
 {
 	if(m_patternParams.size() < expected)
 	{
-		throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", m_currentPattern, m_patternParams.size(),expected));
+		throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", m_pattern_type, m_patternParams.size(),expected));
 	}
 }

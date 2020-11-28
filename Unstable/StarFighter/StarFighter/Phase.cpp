@@ -4,7 +4,7 @@ Phase::Phase()
 {
 	m_welcomeWeapon = NULL;
 	m_freeze_player = false;
-	m_Pattern = new GeometryPattern();
+	m_pattern = new GeometryPattern();
 }
 
 Phase::~Phase()
@@ -20,7 +20,7 @@ Phase::~Phase()
 	for (ConditionTransition* condition : m_transitions_list)
 		delete condition;
 
-	delete m_Pattern;
+	delete m_pattern;
 }
 
 ConditionTransition::ConditionTransition(ConditionType condition, FloatCompare op, float value, std::string nextPhase_name)

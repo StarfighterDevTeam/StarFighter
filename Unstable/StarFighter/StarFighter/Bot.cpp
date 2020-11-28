@@ -76,15 +76,15 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 
 		//call bobbyPattern
-		//offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
+		//offset = m_pattern.getOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
 
 		if (hyperspeedMultiplier < 1.0f)
 		{
-			offset = m_Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
+			offset = m_pattern.getOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
 		}
 		else
 		{
-			offset = m_Pattern.GetOffset(deltaTime.asSeconds(), true);
+			offset = m_pattern.getOffset(deltaTime.asSeconds(), true);
 		}
 
 		offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
@@ -193,7 +193,7 @@ Bot* Bot::Clone()
 	bot->m_radius = this->m_radius;
 	bot->m_angspeed = this->m_angspeed;
 	bot->m_vspeed = this->m_vspeed;
-	bot->m_Pattern = this->m_Pattern;
+	bot->m_pattern = this->m_pattern;
 	bot->m_spread = this->m_spread;
 	bot->m_weapon = this->m_weapon->Clone();
 	bot->m_damage = this->m_damage;
@@ -212,5 +212,5 @@ void Bot::setRadius(float m_radius, float clockwise)
 	vector<float> patternParams;
 	patternParams.push_back(m_radius);
 	patternParams.push_back(clockwise);  // clockwise (>)
-	m_Pattern.SetPattern(m_Pattern.m_currentPattern, m_vspeed, patternParams); //vitesse angulaire (degres/s)in
+	m_pattern.setPattern(m_pattern.m_pattern_type, m_vspeed, patternParams); //vitesse angulaire (degres/s)in
 }

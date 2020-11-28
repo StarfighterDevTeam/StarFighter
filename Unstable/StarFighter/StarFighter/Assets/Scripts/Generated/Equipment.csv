@@ -1,6 +1,6 @@
 #type,item_name,display_name,texture,width,height,frames,max_speed,decceleration,acceleration,hyperspeed,fuel,armor,shield,shield_regen,shield_recovery,damage,bot,fake_texture,fake_width,fake_height,fake_frames
-engine,engine_default,Default_engine,2D/Equipment/Thruster.png,48,48,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-armor,armor_default,Default_armor,2D/Equipment/Armor.png,48,48,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-shield,shield_default,Default_shield,2D/Equipment/Shield.png,48,48,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-module,module_default,Default_module,2D/Equipment/Module.png,48,48,1,0,0,0,0,0,0,0,0,0,0,bot,0,0,0,0
-shipmodel,shipmodel_default,Default_ship,2D/Equipment/Natalia.png,8,8,3,750,2000,800,10.0f,0,500,0,0,0,0,0,2D/Equipment/ShipModel_default.png,70,80,3
+engine,engine_default,Engine,2D/Equipment/Thruster.png,48,48,1,0,0,0,1,100,0,0,0,0,0,0,0,0,0,0
+armor,armor_default,Armor,2D/Equipment/Armor.png,48,48,1,0,0,0,0,0,150,0,0,0,0,0,0,0,0,0
+shield,shield_default,Shield,2D/Equipment/Shield.png,48,48,1,0,0,0,0,0,0,50,5,20,0,0,0,0,0,0
+module,module_default,Module,2D/Equipment/Module.png,48,48,1,0,0,0,0,0,0,0,0,0,0,bot,0,0,0,0
+shipmodel,shipmodel_default,Ship,2D/Equipment/Natalia.png,8,8,3,750,2000,800,10.0f,0,500,0,0,0,0,0,2D/Equipment/ShipModel_default.png,70,80,3
