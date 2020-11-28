@@ -77,10 +77,8 @@ enum ShipConfigData
 	SHIPCONFIG_SHIELD,//3
 	SHIPCONFIG_MODULE,//4
 	SHIPCONFIG_WEAPON,//5
-	SHIPCONFIG_AMMO,//6
-	SHIPCONFIG_SHIPMODEL,//7
-	SHIPCONFIG_DEATH_FX,//8
-
+	SHIPCONFIG_SHIPMODEL,//6
+	SHIPCONFIG_DEATH_FX,//7
 };
 
 enum EquipmentData
@@ -117,25 +115,22 @@ enum EnemyData
 	ENEMY_SHIELD_REGEN,//3
 	ENEMY_DAMAGE,//4
 	ENEMY_WEAPON,//5
-	ENEMY_AMMO,//6
-	ENEMY_WEAPON_2,//7
-	ENEMY_AMMO_2,//8
-	ENEMY_WEAPON_3,//9
-	ENEMY_AMMO_3,//10
-	ENEMY_IMAGE_NAME,//11
-	ENEMY_WIDTH,//12
-	ENEMY_HEIGHT,//13
-	ENEMY_FRAMES,//14
-	ENEMY_SPEED,//15
-	ENEMY_FX_DEATH,//16
-	ENEMY_VALUE,//17
-	ENEMY_PATTERN,//18
-	ENEMY_ANGSPEED,//19
-	ENEMY_RADIUS,//20
-	ENEMY_CLOCKWISE,//21
-	ENEMY_CENTERED,//22
-	ENEMY_ROTATION_SPEED,//23
-	ENEMY_PHASE,//24
+	ENEMY_WEAPON_2,//6
+	ENEMY_WEAPON_3,//7
+	ENEMY_IMAGE_NAME,//8
+	ENEMY_WIDTH,//9
+	ENEMY_HEIGHT,//10
+	ENEMY_FRAMES,//11
+	ENEMY_SPEED,//12
+	ENEMY_FX_DEATH,//13
+	ENEMY_VALUE,//14
+	ENEMY_PATTERN,//15
+	ENEMY_ANGSPEED,//16
+	ENEMY_RADIUS,//17
+	ENEMY_CLOCKWISE,//18
+	ENEMY_CENTERED,//19
+	ENEMY_ROTATION_SPEED,//20
+	ENEMY_PHASE,//21
 };
 
 enum EnemyPoolData
@@ -157,20 +152,19 @@ enum BotData
 	BOT_SHIELD_REGEN,//3
 	BOT_DAMAGE,//4
 	BOT_WEAPON,//5
-	BOT_AMMO,//6
-	BOT_IMAGE_NAME,//7
-	BOT_WIDTH,//8
-	BOT_HEIGHT,//9
-	BOT_FRAMES,//10
-	BOT_FX_DEATH,//11
-	BOT_PATTERN,//12
-	BOT_ANGSPEED,//13
-	BOT_RADIUS,//14
-	BOT_CLOCKWISE,//15
-	BOT_CENTERED,//16
-	BOT_ROTATION_SPEED,//17
-	BOT_XSPREAD,//18
-	BOT_YSPREAD,//19
+	BOT_IMAGE_NAME,//6
+	BOT_WIDTH,//7
+	BOT_HEIGHT,//8
+	BOT_FRAMES,//9
+	BOT_FX_DEATH,//10
+	BOT_PATTERN,//11
+	BOT_ANGSPEED,//12
+	BOT_RADIUS,//13
+	BOT_CLOCKWISE,//14
+	BOT_CENTERED,//15
+	BOT_ROTATION_SPEED,//16
+	BOT_XSPREAD,//17
+	BOT_YSPREAD,//18
 };
 
 class FileLoader
@@ -180,7 +174,7 @@ public:
 	static ShipModel* LoadShipModel(string name);
 	static EnemyBase* LoadEnemyBase(string name, int probability, int enemyClass);
 	static EnemyPool* LoadEnemyPool(string name);
-	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
+	static Weapon* LoadWeapon(string name, int fire_direction);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
 	static Equipment* LoadEquipment(string name);

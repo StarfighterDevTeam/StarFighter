@@ -59,7 +59,7 @@ public:
 
 	static Phase* LoadPhase(string name);
 	static Dialog* LoadDialog(string name);
-	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
+	static Weapon* LoadWeapon(string name, int fire_direction);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
 

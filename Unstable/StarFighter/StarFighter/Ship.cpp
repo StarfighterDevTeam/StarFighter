@@ -2871,6 +2871,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, bot_ammo_speed), bot_ammo_texture_name, sf::Vector2f(bot_ammo_width, bot_ammo_height), bot_ammo_damage, Enemy::LoadFX(bot_ammo_explosion_name));
 			ammo->m_display_name = bot_ammo_name;
 			ammo->m_range = bot_ammo_range;
+			ammo->m_isBeam = bot_weapon_rafale < 0;
 			ammo->m_Pattern.m_currentPattern = (PatternType)bot_ammo_pattern_type;
 			if (ammo->m_Pattern.m_currentPattern == Line_)
 			{

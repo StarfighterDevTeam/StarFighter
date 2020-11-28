@@ -605,7 +605,7 @@ bool Enemy::CheckCondition()
 			}
 			case LifePourcentage:
 			{
-				if (cond->m_value == 0)//case of "death" condition handled in method Death(), when the enemy dies precisely
+				if (cond->m_value == m_armor)//case of "death" condition handled in method Death(), when the enemy dies precisely
 					result = EQUAL_TO;
 				else
 					result = 100.0f * m_armor / m_armor_max >= cond->m_value ? GREATER_THAN : LESSER_THAN;
@@ -668,12 +668,6 @@ bool Enemy::CheckCondition()
 void Enemy::setPhase(Phase* phase)
 {
 	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
-
-	if (!phase)
-	{
-		m_currentPhase = NULL;
-		return;
-	}
 
 	m_shots_fired = 0;
 
@@ -955,11 +949,11 @@ Phase* Enemy::LoadPhase(string name)
 			//loading weapons and ammos
 			for (int i = 0; i < 6; i++)
 			{
-				if ((*it)[PHASE_WEAPON + (i * 4)].compare("0") != 0)
+				if ((*it)[PHASE_WEAPON + (i * 3)].compare("0") != 0)
 				{
-					Weapon* m_weapon = Enemy::LoadWeapon((*it)[PHASE_WEAPON + (i * 4)], 1, Enemy::LoadAmmo((*it)[PHASE_AMMO + (i * 4)]));
-					m_weapon->m_weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 4)].c_str());
-					m_weapon->m_delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 4)].c_str());
+					Weapon* m_weapon = Enemy::LoadWeapon((*it)[PHASE_WEAPON + (i * 3)], 1);
+					m_weapon->m_weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 3)].c_str());
+					m_weapon->m_delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 3)].c_str());
 					phase->m_weapons_list.push_back(m_weapon);
 				}
 			}
@@ -978,45 +972,25 @@ Phase* Enemy::LoadPhase(string name)
 				if ((*it)[PHASE_MODIFIER + i].compare("0") != 0)
 				{
 					if ((*it)[PHASE_MODIFIER + i].compare("immune") == 0)
-					{
 						l_new_modifier = Immune;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("ghost") == 0)
-					{
 						l_new_modifier = GhostModifier;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("death") == 0)
-					{
 						l_new_modifier = DeathModifier;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("face_target") == 0)
-					{
 						l_new_modifier = FaceTarget;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("reset_facing") == 0)
-					{
 						l_new_modifier = ResetFacing;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("bouncing") == 0)
-					{
 						l_new_modifier = Bouncing;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingH") == 0)
-					{
 						l_new_modifier = BouncingH;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingV") == 0)
-					{
 						l_new_modifier = BouncingV;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("freeze") == 0)
-					{
 						l_new_modifier = FreezePlayer;
-					}
 					else if ((*it)[PHASE_MODIFIER + i].compare("kill_bullets") == 0)
-					{
 						l_new_modifier = KillBullets;
-					}
 				}
 
 				phase->m_modifiers.push_back(l_new_modifier);
@@ -1024,25 +998,18 @@ Phase* Enemy::LoadPhase(string name)
 
 			//loading welcome shot
 			if ((*it)[PHASE_WELCOME_WEAPON].compare("0") != 0)
-			{
-				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[PHASE_WELCOME_AMMO]));
-			}
+				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[PHASE_WELCOME_WEAPON], 1);
 			
 			//load enemies (by name) to wake up
 			if ((*it)[PHASE_WAKEUP].compare("0") != 0)
-			{
 				phase->m_wake_up_name = (*it)[PHASE_WAKEUP];
-			}
 
 			//loading transition to next phase
 			if ((*it)[PHASE_CONDITION].compare("0") != 0)
-			{
 				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), PHASE_CONDITION));
-			}
+
 			if ((*it)[PHASE_CONDITION_2].compare("0") != 0)
-			{
 				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), PHASE_CONDITION_2));
-			}
 
 			//loading dialogs
 			if ((*it)[PHASE_DIALOG_NAME].compare("0") != 0)
@@ -1108,17 +1075,15 @@ void Enemy::Death()
 	}
 
 	//phase transition "Death" (post-mortem phase of 1 frame)
-	if (!m_phases.empty())
+	for (ConditionTransition* transition : m_currentPhase->m_transitions_list)
 	{
-		for (std::vector<ConditionTransition*>::iterator it = m_currentPhase->m_transitions_list.begin(); it != m_currentPhase->m_transitions_list.end(); it++)
+		if (transition->m_condition == LifePourcentage && transition->m_value == 0 && (transition->m_op == LESSER_THAN || transition->m_op == EQUAL_TO))
 		{
-			if ((*it)->m_condition == LifePourcentage && (*it)->m_value == 0 && ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO))
-			{
-				this->setPhase(this->getPhase((*it)->m_nextPhase_name));
-				break;
-			}
+			setPhase(getPhase(transition->m_nextPhase_name));
+			break;
 		}
 	}
+	
 }
 
 Enemy::~Enemy()
@@ -1275,7 +1240,7 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 	return chosen_property;
 }
 
-Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
+Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 {
 	vector<vector<string> > weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 
@@ -1283,11 +1248,20 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
-			Weapon* weapon = new Weapon(ammo);
+			Weapon* weapon = new Weapon(Enemy::LoadAmmo((*it)[WEAPON_AMMO]));
 			weapon->m_display_name = (*it)[WEAPON_DISPLAY_NAME];
 			weapon->m_fire_direction = Vector2i(0, fire_direction);
 			weapon->m_rate_of_fire = atof((*it)[WEAPON_RATE_OF_FIRE].c_str());
 			weapon->m_shot_mode = NoShotMode;
+
+			weapon->m_ammunition->m_damage = stoi((*it)[WEAPON_DAMAGE]);
+			weapon->m_ammunition->m_ref_speed = stoi((*it)[WEAPON_SPEED]);
+			weapon->m_ammunition->m_speed = sf::Vector2f(0, weapon->m_ammunition->m_ref_speed);
+			weapon->m_ammunition->m_range = stoi((*it)[WEAPON_RANGE]);
+
+			GeometryPattern* pattern = GeometryPattern::PatternLoader((*it), WEAPON_PATTERN);
+			weapon->m_ammunition->m_Pattern.SetPattern(pattern->m_currentPattern, pattern->m_patternSpeed, pattern->m_patternParams);
+			delete pattern;
 
 			weapon->m_multishot = stoi((*it)[WEAPON_MULTISHOT]);
 			if (weapon->m_multishot > 1)
@@ -1348,19 +1322,13 @@ Ammo* Enemy::LoadAmmo(string name)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
-			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, stoi((*it)[AMMO_SPEED])), (*it)[AMMO_IMAGE_NAME],
-				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_DAMAGE]), LoadFX((*it)[AMMO_FX]));
+			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), (*it)[AMMO_IMAGE_NAME],
+				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), 0, LoadFX((*it)[AMMO_FX]));
 
 			new_ammo->m_display_name = (*it)[AMMO_NAME];
-			new_ammo->m_range = stoi((*it)[AMMO_RANGE]);
 
 			if (!(*it)[AMMO_FX].empty())
-			{
 				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
-			}
-			
-			GeometryPattern* bobby = GeometryPattern::PatternLoader((*it), AMMO_PATTERN);
-			new_ammo->m_Pattern.SetPattern(bobby->m_currentPattern, bobby->m_patternSpeed, bobby->m_patternParams);
 
 			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);
 			return new_ammo;

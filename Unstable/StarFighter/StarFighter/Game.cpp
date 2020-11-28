@@ -38,7 +38,7 @@ void Game::init(RenderWindow* window)
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	//if (!SpaceCowboys.openFromFile("Music/SpaceCowboys.ogg"))
@@ -465,32 +465,21 @@ void Game::colisionChecksV2(Time deltaTime)
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
 	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[PlayerShip].end(); it1++)
 	{
-		if (*it1 == NULL)
-			continue;
-
 		//Enemy bullets hitting the player
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[EnemyFire].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			if (SimpleCollision::IsGrazing((*it1), (*it2)))
 			{
 				(*it1)->GetGrazing(deltaTime, m_hyperspeedMultiplier);
 
 				if (SimpleCollision::AreColliding((*it1), (*it2)))
-				{
 					(*it1)->GetDamageFrom(*(*it2));
-				}
 			}
 		}
 
 		//Enemy objects
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyObject].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				(*it1)->GetDamageFrom(*(*it2));
@@ -501,9 +490,6 @@ void Game::colisionChecksV2(Time deltaTime)
 		//Loot
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LootObject].begin(); it2 != m_sceneGameObjectsTyped[LootObject].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			if (SimpleCollision::AreColliding((*it1), (*it2), false))
 			{
 				//Do something (like, take the loot)
@@ -518,59 +504,35 @@ void Game::colisionChecksV2(Time deltaTime)
 		//Portal
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[PortalObject].begin(); it2 != m_sceneGameObjectsTyped[PortalObject].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
-			{
 				(*it1)->GetPortal((*it2));
-			}
 		}
 
 		//Shop
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[ShopObject].begin(); it2 != m_sceneGameObjectsTyped[ShopObject].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
-			{
 				(*it1)->GetShop((*it2));
-			}
 		}
 	}
 
 	//Then, check if any allied bullet collide with any enemy
 	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[EnemyObject].begin(); it1 != m_sceneGameObjectsTyped[EnemyObject].end(); it1++)
 	{
-		if (*it1 == NULL)
-			continue;
-
 		//Player bullets on enemy
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[FriendlyFire].begin(); it2 != m_sceneGameObjectsTyped[FriendlyFire].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			//Bullets are invisible after impact
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
-			{
 				(*it1)->GetDamageFrom(*(*it2));
-			}
 		}
 	}
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
 	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[FakePlayerShip].begin(); it1 != m_sceneGameObjectsTyped[FakePlayerShip].end(); it1++)
 	{
-		if (*it1 == NULL)
-			continue;
-
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LootObject].begin(); it2 != m_sceneGameObjectsTyped[LootObject].end(); it2++)
 		{
-			if (*it2 == NULL)
-				continue;
-
 			if (SimpleCollision::AreColliding((*it1), (*it2), false))
 			{
 				//Do something (like, take the loot)

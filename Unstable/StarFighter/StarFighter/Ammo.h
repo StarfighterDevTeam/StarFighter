@@ -14,7 +14,6 @@ class Ammo : public GameObject
 public:
 	Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int damage, FX* explosion);
 	Ammo* Clone();
-	void Death() override;
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 
 	FX* m_explosion;

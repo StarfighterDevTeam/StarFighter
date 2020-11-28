@@ -38,7 +38,7 @@ Ship* FileLoader::LoadShipConfig(string name)
 				if ((*it)[SHIPCONFIG_WEAPON].compare("0") != 0)
 				{
 					LOGGER_WRITE(Logger::DEBUG, "Loading ship weapon\n");
-					ship->m_weapon = FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[SHIPCONFIG_AMMO]));//false because of shipC->Init() below that will recompute the ship config stats
+					ship->m_weapon = FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1);//false because of shipC->Init() below that will recompute the ship config stats
 				}
 
 				//Computing the ship config
@@ -135,15 +135,15 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 	{
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON].compare("0") != 0)
 		{
-			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*CurrentGame).m_enemiesConfig[name][ENEMY_AMMO])));
+			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON], 1));
 		}
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_2].compare("0") != 0)
 		{
-			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_2], 1, FileLoader::LoadAmmo((*CurrentGame).m_enemiesConfig[name][ENEMY_AMMO_2])));
+			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_2], 1));
 		}
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3].compare("0") != 0)
 		{
-			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3], 1, FileLoader::LoadAmmo((*CurrentGame).m_enemiesConfig[name][ENEMY_AMMO_3])));
+			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3], 1));
 		}
 
 		GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*CurrentGame).m_enemiesConfig[name], ENEMY_PATTERN);
@@ -156,9 +156,9 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 		
 }
 
-Weapon* FileLoader::LoadWeapon(string name, int fire_direction, Ammo* ammo)
+Weapon* FileLoader::LoadWeapon(string name, int fire_direction)
 {
-	return Enemy::LoadWeapon(name, fire_direction, ammo);
+	return Enemy::LoadWeapon(name, fire_direction);
 }
 
 Ammo* FileLoader::LoadAmmo(string name)
@@ -284,9 +284,7 @@ Bot* FileLoader::LoadBot(string name)
 			bot->m_rotation_speed = stoi((*it)[BOT_ROTATION_SPEED]);
 
 			if ((*it)[BOT_WEAPON].compare("0") != 0)
-			{
-				bot->m_weapon = FileLoader::LoadWeapon((*it)[BOT_WEAPON], -1, FileLoader::LoadAmmo((*it)[BOT_AMMO]));
-			}
+				bot->m_weapon = FileLoader::LoadWeapon((*it)[BOT_WEAPON], -1);
 
 			return bot;
 		}

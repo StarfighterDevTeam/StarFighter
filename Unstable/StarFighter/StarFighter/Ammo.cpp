@@ -40,15 +40,6 @@ Ammo* Ammo::Clone()
 	return ammo;
 }
 
-void Ammo::Death()
-{
-	//FX* myFX = m_explosion->Clone();
-	//myFX->setPosition(this->getPosition().x, this->getPosition().y);
-    //(*CurrentGame).addToScene(myFX, true);
-
-	GameObject::Death();
-}
-
 void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	sf::Vector2f newspeed = m_speed;

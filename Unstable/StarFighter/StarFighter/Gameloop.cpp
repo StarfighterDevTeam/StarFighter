@@ -22,6 +22,7 @@ void Gameloop::Initialize(Player player)
 		//or create a new save file
 		Ship::SaveItems(m_playerShip);
 	}
+
 	//load money
 	if (!Ship::LoadPlayerMoney(m_playerShip))
 	{
@@ -89,7 +90,7 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, false);
 
 	//DEBUG
-	//SpawnInScene("Vanguard_V1", (*CurrentGame).m_playerShip);
+	//SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
 }
 
 void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
@@ -129,7 +130,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 				//Loading weapon
 				if ((*it)[SHIPCONFIG_WEAPON].compare("0") != 0)
 				{
-					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[SHIPCONFIG_AMMO])), true);
+					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1), true);
 
 					GameObject* capsule = Ship::CloneWeaponIntoGameObject(ship->m_weapon);
 					ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, NBVAL_Equipment);
