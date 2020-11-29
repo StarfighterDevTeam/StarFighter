@@ -61,7 +61,6 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	if (!ship_model->m_fake_textureName.empty())
 	{
 		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
-		
 		(*CurrentGame).addToScene(m_fake_ship, false);
 	}
 
@@ -69,6 +68,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	//(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
 
 	m_trail = new Aura(this, "2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
+	m_trail->m_DontGarbageMe = true;
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
 	(*CurrentGame).addToScene(m_trail, false);
@@ -3374,9 +3374,11 @@ void Ship::ContinueDialog()
 		m_is_asking_SFPanel = SFPanel_DialogNext;
 	else
 	{
+		if ((*CurrentGame).m_waiting_for_dialog_validation == true)
+			m_release_to_fire = true;
+
 		(*CurrentGame).m_waiting_for_dialog_validation = false;
 		(*CurrentGame).m_end_dialog_clock.restart();
-		m_release_to_fire = true;
 	}
 
 	delete m_targetDialogs.front();

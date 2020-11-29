@@ -48,11 +48,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 			//Assigning the right direction for the scene
 			if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("V") == 0)
-				if (!reverse_scene)
-					m_direction = reverse_scene ? DIRECTION_DOWN: DIRECTION_UP;
+				m_direction = reverse_scene == true ? DIRECTION_DOWN : DIRECTION_UP;
 			else if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("H") == 0)
-				if (!reverse_scene)
-					m_direction = reverse_scene ? DIRECTION_LEFT : DIRECTION_RIGHT;
+				m_direction = reverse_scene == true ? DIRECTION_LEFT : DIRECTION_RIGHT;
 			else if (!first_scene)
 			{
 				hub = true;

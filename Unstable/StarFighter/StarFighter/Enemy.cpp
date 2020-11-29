@@ -1005,15 +1005,13 @@ void Enemy::Death()
 	}
 
 	//phase transition "Death" (post-mortem phase of 1 frame)
-	for (ConditionTransition* transition : m_currentPhase->m_transitions_list)
-	{
-		if (transition->m_condition == LifePourcentage && transition->m_value == 0 && (transition->m_op == LESSER_THAN || transition->m_op == EQUAL_TO))
-		{
-			setPhase(getPhase(transition->m_nextPhase_name));
-			break;
-		}
-	}
-	
+	if (m_currentPhase != NULL)
+		for (ConditionTransition* transition : m_currentPhase->m_transitions_list)
+			if (transition->m_condition == LifePourcentage && transition->m_value == 0 && (transition->m_op == LESSER_THAN || transition->m_op == EQUAL_TO))
+			{
+				setPhase(getPhase(transition->m_nextPhase_name));
+				break;
+			}
 }
 
 Enemy::~Enemy()
