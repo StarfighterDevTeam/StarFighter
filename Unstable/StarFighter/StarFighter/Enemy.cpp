@@ -1129,29 +1129,19 @@ bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int level, GameO
 	switch (equipment_type)
 	{
 		case (int)Engine:
-		{
 			return object->setEquipmentLoot(Enemy::CreateRandomEngine(level, beastScore));
-		}
 
 		case (int)Armor:
-		{
 			return object->setEquipmentLoot(Enemy::CreateRandomArmor(level, beastScore));
-		}
 
 		case (int)Shield:
-		{
 			return object->setEquipmentLoot(Enemy::CreateRandomShield(level, beastScore));
-		}
 
 		case (int)Module:
-		{
 			return object->setEquipmentLoot(Enemy::CreateRandomModule(level, beastScore));
-		}
 
 		case (int)NBVAL_Equipment://WEAPON DROP
-		{
 			return object->setWeaponLoot(Enemy::CreateRandomWeapon(level, false, beastScore));
-		}
 	}
 
 	return false;
@@ -1254,6 +1244,7 @@ Ammo* Enemy::LoadAmmo(string name)
 				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), 0, LoadFX((*it)[AMMO_FX]));
 
 			new_ammo->m_display_name = (*it)[AMMO_NAME];
+			new_ammo->m_sound_name = (*it)[AMMO_SOUND];
 
 			if (!(*it)[AMMO_FX].empty())
 				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
@@ -1530,8 +1521,8 @@ Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	}
 
 #ifndef NDEBUG
-	if (!is_bot)
-		printf("\nNew weapon created: level %d, quality %f, xp: %d, bonus_multishot: %d, bonus_damage: %d, bonus_rof: %d\n\n", level, weapon->m_quality, credits_, bonus_multishot, bonus_damage, bonus_rate_of_fire);
+	//if (!is_bot)
+		//printf("\nNew weapon created: level %d, quality %f, xp: %d, bonus_multishot: %d, bonus_damage: %d, bonus_rof: %d\n\n", level, weapon->m_quality, credits_, bonus_multishot, bonus_damage, bonus_rate_of_fire);
 #endif
 
 	return weapon;
@@ -1713,7 +1704,7 @@ Equipment* Enemy::CreateRandomEngine(int level, float beastScore)
 	}
 
 #ifndef NDEBUG
-	printf("\nNew engine created: level %d, quality %f, xp: %d, bonus_hyperspeed: %d, bonus_fuel: %d\n\n", level, equipment->m_quality, credits_, bonus_hyperspeed, bonus_fuel);
+	//printf("\nNew engine created: level %d, quality %f, xp: %d, bonus_hyperspeed: %d, bonus_fuel: %d\n\n", level, equipment->m_quality, credits_, bonus_hyperspeed, bonus_fuel);
 #endif
 
 	return equipment;

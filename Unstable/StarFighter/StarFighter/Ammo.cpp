@@ -27,6 +27,7 @@ Ammo* Ammo::Clone()
 {
 	Ammo* ammo = new Ammo(this->getPosition(),this->m_speed,this->m_textureName,this->m_size,this->m_damage, this->m_explosion);
 	ammo->m_display_name = this->m_display_name;
+	ammo->m_sound_name = this->m_sound_name;
 
 	ammo->m_pattern = this->m_pattern;
 	ammo->m_radius = this->m_radius;

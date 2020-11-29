@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Weapon::Weapon(Ammo* Ammunition)
+Weapon::Weapon(Ammo* ammunition)
 {
 	m_speed.x = 0;
 	m_speed.y = 0;
@@ -28,8 +28,9 @@ Weapon::Weapon(Ammo* Ammunition)
 	m_quality = 0;
 	m_readyFireTimer = 0;
 	m_beam_timer = 0;
+	m_shot_angle = 0;
 
-	m_ammunition = Ammunition;
+	m_ammunition = ammunition;
 }
 
 Weapon::~Weapon()
@@ -141,80 +142,47 @@ void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime)
 	if (m_multishot > 1)
 	{
 		if (m_dispersion == 360)//treating this particular case to avoid a double bullet on the 360th degree
-		{
 			m_dispersion *= (1 - (1 / m_multishot));//ex: 10 shots at 360°, we make it shots at 324° instead (360 - 360/10 to avoid the double bullet)
-		}
 
 		if (m_shot_mode == NoShotMode)
-		{
 			FireMultiShot(collider_type);
-		}
 		else if (m_shot_mode == AlternateShotMode)
-		{
 			FireAlternateShot(collider_type);
-		}
 		else if (m_shot_mode == AscendingShotMode)
-		{
 			FireAscendingShot(collider_type);
-		}
 		else if (m_shot_mode == DescendingShotMode)
-		{
 			FireDescendingShot(collider_type);
-		}
 		else if (m_shot_mode == Ascending2ShotMode)
 		{
 			if (!m_fire_pattern_return)
-			{
 				FireAscendingShot(collider_type);
-			}
 			else
-			{
 				FireDescendingShot(collider_type);
-			}
 
 			if (m_shot_index == 0)
-			{
 				m_fire_pattern_return = !m_fire_pattern_return;
-			}
 		}
 		else if (m_shot_mode == Descending2ShotMode)
 		{
 			if (!m_fire_pattern_return)
-			{
 				FireDescendingShot(collider_type);
-			}
 			else
-			{
 				FireAscendingShot(collider_type);
-			}
 
 			if (m_shot_index == 0)
-			{
 				m_fire_pattern_return = !m_fire_pattern_return;
-			}
 		}
 	}
-	else
-	{
-		FireSingleShot(collider_type);
-	}
+	else//single shot
+		CreateBullet(collider_type);
 
 	m_readyFireTimer = 0;
 	m_firing_ready = false;
 
 	if (m_rafale > 0 && m_shot_index == 0)
-	{
 		m_rafale_index++;
-	}
 	else if (m_rafale < 0)//continuous beam started
-	{
 		m_beam_timer = 0;
-	}
-}
-
-void Weapon::FireSingleShot(GameObjectType collider_type)
-{
-	CreateBullet(collider_type);
 }
 
 void Weapon::FireMultiShot(GameObjectType collider_type)

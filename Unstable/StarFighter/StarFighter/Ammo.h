@@ -25,6 +25,7 @@ public:
 	float m_shot_angle;
 	float m_offset_x;//offset respect to weapon on firing
 	bool m_isBeam;
+	string m_sound_name;
 };
 
 #endif // AMMO_H_INCLUDED

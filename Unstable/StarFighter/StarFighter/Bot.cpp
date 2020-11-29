@@ -106,9 +106,8 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 		//calculating the angle we want to face, if any
 		float target_angle = getRotation();
 		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
-		{
 			target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
-		}
+		
 		float current_angle = getRotation();
 		float delta = current_angle - target_angle;
 		if (delta > 180)
@@ -118,9 +117,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 
 		float theta = getRotation() / 180 * M_PI;
 		if (m_weapon->m_target_homing != NO_HOMING)
-		{
 			theta -= delta / 180 * M_PI;
-		}
 
 		if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
 		{
@@ -143,14 +140,15 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 			if (firing == true)
 			{
 				m_weapon->Fire(FriendlyFire, deltaTime);
-
-				(*CurrentGame).PlaySFX(SFX_Fire);
+				//(*CurrentGame).PlaySFX(SFX_Fire);//todo: use ammo->sound file
 			}
 		}
 
 		//UPDATE BEAMS
 		for (Ammo* beam : m_weapon->m_beams)
 		{
+			beam->setRotation(m_weapon->m_shot_angle * 180 / M_PI);
+
 			//update beam positions
 			float beam_offset_x = beam->m_offset_x * cos(m_weapon->m_shot_angle) + beam->m_size.y / 2 * sin(m_weapon->m_shot_angle);
 			float beam_offset_y = beam->m_offset_x * sin(m_weapon->m_shot_angle) - beam->m_size.y / 2 * cos(m_weapon->m_shot_angle);

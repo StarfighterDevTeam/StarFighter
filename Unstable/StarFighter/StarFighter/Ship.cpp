@@ -539,9 +539,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		//UPDATE WEAPON POSITION
 		float target_angle = getRotation();//calculating the angle we want to face, if any
 		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
-		{
 			target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
-		}
 
 		float current_angle = getRotation();
 		float delta = current_angle - target_angle;
@@ -552,9 +550,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 		float theta = getRotation() / 180 * M_PI;
 		if (m_weapon->m_target_homing != NO_HOMING)
-		{
 			theta -= delta / 180 * M_PI;
-		}
 
 		if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
 		{
@@ -577,14 +573,15 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (firing == true)
 			{
 				m_weapon->Fire(FriendlyFire, deltaTime);
-
-				(*CurrentGame).PlaySFX(SFX_Fire);
+				//(*CurrentGame).PlaySFX(SFX_Fire);//todo: use ammo->sound file
 			}
 		}
 
 		//UPDATE BEAMS
 		for (Ammo* beam : m_weapon->m_beams)
 		{
+			beam->setRotation(m_weapon->m_shot_angle * 180 / M_PI);
+
 			//update beam positions
 			float beam_offset_x = beam->m_offset_x * cos(m_weapon->m_shot_angle) + beam->m_size.y / 2 * sin(m_weapon->m_shot_angle);
 			float beam_offset_y = beam->m_offset_x * sin(m_weapon->m_shot_angle) - beam->m_size.y / 2 * cos(m_weapon->m_shot_angle);
@@ -613,6 +610,10 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		else if (m_weapon->m_rafale > 0 && m_weapon->m_rafale_index > 0)
 			firing = false;
 	}
+
+	//Bots firing
+	for (Bot* bot : m_bot_list)
+		bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
 
 	return firing;
 }
@@ -656,9 +657,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		//Debug command
 		#ifndef NDEBUG
 			if (m_inputs_states[Action_DebugCommand] == Input_Tap || m_inputs_states[Action_DebugCommand] == Input_Hold)
-			{
 				(*CurrentGame).killGameObjectType(EnemyObject);
-			}
 		#endif
 
 		//Update HUD state
@@ -673,9 +672,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//	ContinueDialog();
 			//}
 			if (m_SFTargetPanel && m_SFTargetPanel->GetDuration() == 0 && m_inputs_states[Action_Firing] == Input_Tap)
-			{
 				ContinueDialog();
-			}
 		}
 		//Enemy blocking movement?
 		else if (m_input_blocker)
@@ -690,20 +687,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			m_SFHudPanel->GetCursor()->m_visible = true;
 			MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
 
-			//Swapping items
+			//Actions
 			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == Trade_StashGrid)
-			{
 				EquipItem();
-			}
 			else if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == Trade_EquippedGrid)
-			{
 				DesequipItem();
-			}
-			//Garbaging item
 			else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_SFHudPanel->GetFocusedItem())
-			{
 				GarbagingItem();
-			}
 			else
 			{
 				m_SFHudPanel->SetPrioritaryFeedback(false);
@@ -712,12 +702,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 			//Weapon firing
 			bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
-
-			//Bots firing
-			for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
-			{
-				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
-			}
 
 			//Closing hud
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))

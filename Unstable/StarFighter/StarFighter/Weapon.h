@@ -12,7 +12,7 @@ class Weapon : public sf::Sprite
 {
 
 public:
-	Weapon(Ammo* Ammunition);
+	Weapon(Ammo* ammunition);
 	~Weapon();
 
 	std::string m_textureName;
@@ -26,7 +26,6 @@ public:
 	bool isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier);
 	void CreateBullet(GameObjectType collider_type, float offsetX=0, float dispersion=0);
 
-	void FireSingleShot(GameObjectType collider_type);
 	void FireMultiShot(GameObjectType collider_type);
 	void FireAlternateShot(GameObjectType collider_type);
 	void FireAscendingShot(GameObjectType collider_type);

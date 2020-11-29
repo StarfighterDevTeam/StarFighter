@@ -32,7 +32,7 @@ void GameObject::Draw(sf::RenderTexture& screen)
 	if (m_visible == true)
 	{
 		#ifndef NDEBUG
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8))//display hitbox on holding key
 		{
 			bool transparent = m_transparent;
 			m_transparent = false;
