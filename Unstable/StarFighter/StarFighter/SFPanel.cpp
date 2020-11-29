@@ -277,7 +277,7 @@ float SFPanel::GetDuration()
 	//see override function in SFDialogPanel and other types of SF panels
 }
 
-float SFPanel::GetDurationClockElpased()
+float SFPanel::GetDurationTimer()
 {
 	return -1;
 	//see override function in SFDialogPanel and other types of SF panels

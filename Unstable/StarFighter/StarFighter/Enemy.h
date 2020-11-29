@@ -88,7 +88,7 @@ public:
 	//float offsetBetweenHealthBars;
 	void RotateFeedbacks(float angle);
 
-	sf::Time m_feedbackTimer;
+	float m_health_feedbackTimer;
 
 	int m_level;
 

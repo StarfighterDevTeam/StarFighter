@@ -3,7 +3,7 @@
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber, animationNumber);
-	this->setOrigin(origin.x, origin.y);
+	setOrigin(origin.x, origin.y);
 }
 
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
@@ -181,7 +181,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_equipment_loot = NULL;
 	m_weapon_loot = NULL;
 	m_isCollidingWithInteractiveObject = No_Interaction;
-	m_collision_timer = -1;
+	m_collision_timer = 0;
+	m_damage_feedbackTimer = 0;
+	m_color = Color(255, 255, 255, 255);
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -258,7 +260,7 @@ void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
 
 void GameObject::Respawn()
 {
-
+	//see override function in class Ship
 }
 
 void GameObject::setGhost(bool ghost)
@@ -271,9 +273,8 @@ void GameObject::setGhost(bool ghost)
 	else
 	{
 		m_ghost = false;
-		setColor(Color(255, 255, 255, 255));
+		setColor(m_color);
 	}
-	
 }
 //void GameObject::Follow(GameObject* target)
 //{
@@ -282,7 +283,7 @@ void GameObject::setGhost(bool ghost)
 
 void GameObject::GetDamageFrom(GameObject& object)
 {
-	if (object.m_collision_timer < 0)
+	if (object.m_collision_timer <= 0)
 	{
 		GetDamage(object.m_damage);
 
@@ -302,7 +303,7 @@ void GameObject::GetDamage(int damage)
 		return;
 	}
 
-	setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+	setColor(Color(255, 0, 0, 255), true);
 	if (damage > m_shield)
 	{
 		m_armor -= (damage - m_shield);

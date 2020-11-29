@@ -26,7 +26,7 @@
 AnimatedSprite::AnimatedSprite(sf::Time frameTime, bool paused, bool looped) :
 m_animation(NULL), m_frameTime(frameTime), m_currentFrame(0), m_isPaused(paused), m_isLooped(looped), m_texture(NULL)
 {
-
+	
 }
 
 void AnimatedSprite::setAnimation(const Animation& animation)
@@ -71,7 +71,7 @@ void AnimatedSprite::setLooped(bool looped)
 	m_isLooped = looped;
 }
 
-void AnimatedSprite::setColor(const sf::Color& color, sf::Time color_timer)
+void AnimatedSprite::setColor(const sf::Color& color, bool set_as_new_default_color)
 {
 	// Update the vertices' color
 	m_vertices[0].color = color;
@@ -79,11 +79,8 @@ void AnimatedSprite::setColor(const sf::Color& color, sf::Time color_timer)
 	m_vertices[2].color = color;
 	m_vertices[3].color = color;
 
-	if (color_timer > sf::seconds(0))
-	{
+	if (set_as_new_default_color == true)
 		m_color = color;
-		m_color_timer = color_timer;
-	}
 }
 
 const Animation* AnimatedSprite::getAnimation() const

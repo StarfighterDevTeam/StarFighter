@@ -158,7 +158,7 @@ void Gameloop::Update(Time deltaTime)
 {
 	//debug command
 	#ifndef NDEBUG
-		if (InputGuy::spawnInSandbox() && !(*CurrentGame).m_waiting_for_dialog_validation)
+		if (InputGuy::spawnInSandbox() && (*CurrentGame).m_waiting_for_dialog_validation == false)
 			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
 
 		if (InputGuy::reloadCSVs())
@@ -813,7 +813,7 @@ void Gameloop::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 
 void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 {
-	if (playerShip)
+	if (playerShip != NULL)
 	{
 		//cleaning layers
 		(*CurrentGame).garbageLayer(FriendlyFireLayer);
@@ -853,13 +853,9 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
 
 			if (!m_currentScene->m_scene_music.empty())
-			{
 				(*CurrentGame).PlayMusic(Music_Scene, m_currentScene->m_scene_music);
-			}
 			else
-			{
 				(*CurrentGame).PlayMusic(Music_Scene);
-			}
 		}
 		else
 		{
@@ -885,9 +881,14 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 				(*CurrentGame).PlayMusic(Music_Hub);
 			}
 		}
+
 		m_playerShip->setPosition(ship_pos);
 
 		UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
+
+		for (Dialog* dialog : m_playerShip->m_targetDialogs)
+			delete dialog;
+		m_playerShip->m_targetDialogs.clear();
 
 		SavePlayer();
 	}

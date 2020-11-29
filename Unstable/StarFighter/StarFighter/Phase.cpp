@@ -59,6 +59,9 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 		cond = PlayerVerticalPosition;
 	else if (line_data[index].compare("rotation") == 0)
 		cond = Rotation;
+	else
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Invalid condition found when loading condition of transition of enemy phase named 'EnemyPhases.csv'. Please check config file"));
+
 
 	//loading operator type
 	FloatCompare op = ERROR_COMPARE;
@@ -70,7 +73,7 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 		else if (line_data[index + CONDITION_OPERATOR].compare("equal") == 0)
 			op = EQUAL_TO;
 		else
-			LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition 1 of enemy phase named 'EnemyPhases.csv'. Please check config file"));
+			LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition of enemy phase named 'EnemyPhases.csv'. Please check config file"));
 
 	float value = 0;
 	if (cond != wakeUp)

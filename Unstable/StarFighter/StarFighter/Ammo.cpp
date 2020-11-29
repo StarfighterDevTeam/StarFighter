@@ -58,9 +58,9 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	if (hyperspeedMultiplier < 1.0f)
-		m_collision_timer -= deltaTime.asSeconds() * hyperspeedMultiplier;
+		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() * hyperspeedMultiplier : 0;
 	else
-		m_collision_timer -= deltaTime.asSeconds();
+		m_collision_timer -= m_collision_timer > 0 ?deltaTime.asSeconds() : 0;
 
 	this->setGhost(hyperspeedMultiplier > 1.0f);
 

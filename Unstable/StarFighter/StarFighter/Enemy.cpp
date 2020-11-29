@@ -21,7 +21,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_currentPhase = NULL;
 
 	//life bars
-	m_feedbackTimer = sf::seconds(0);
+	m_health_feedbackTimer = 0;
 
 	m_armorBar_offsetY = - (m_size.y / 2) - (ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2) - ENEMY_HP_BAR_OFFSET_Y;
 	m_shieldBar_offsetY = - (m_size.y / 2) - (1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y) - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y;
@@ -86,7 +86,7 @@ void Enemy::UpdateHealthBars()
 
 	//update size (damage)
 	m_armorBar.setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	if (m_feedbackTimer <= sf::seconds(0))
+	if (m_health_feedbackTimer <= 0)
 	{
 		m_armorBar.m_visible = false;
 		m_armorBarContainer.m_visible = false;
@@ -104,7 +104,7 @@ void Enemy::UpdateHealthBars()
 
 	m_shieldBar.setSize(sf::Vector2f(1.0f * m_shield / m_shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 
-	if (m_feedbackTimer <= sf::seconds(0))
+	if (m_health_feedbackTimer <= 0)
 	{
 		m_shieldBar.m_visible = false;
 		m_shieldBarContainer.m_visible = false;
@@ -116,7 +116,7 @@ void Enemy::UpdateHealthBars()
 	else if ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)
 		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y, m_armorBarContainer.getPosition().y - m_armorBarContainer.getGlobalBounds().height / 2 - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X));
 
-	if (m_feedbackTimer <= sf::seconds(0))
+	if (m_health_feedbackTimer <= 0)
 	{
 		m_enemyLevel.m_visible = false;
 	}
@@ -124,41 +124,41 @@ void Enemy::UpdateHealthBars()
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if (m_feedbackTimer > sf::seconds(0))
+	//update timers
+	if (m_health_feedbackTimer > 0)
 	{
-		m_feedbackTimer -= deltaTime;
-		m_collision_timer -= deltaTime.asSeconds();
+		m_health_feedbackTimer -= deltaTime.asSeconds();
 		UpdateHealthBars();
 	}
 
-	//dialog blocking the update?
-	if ((*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)
+	if (m_damage_feedbackTimer > 0)
+	{
+		m_damage_feedbackTimer -= deltaTime.asSeconds();
+		if (m_damage_feedbackTimer <= 0)
+			setColor(Color(255, 255, 255, 255), true);
+	}
+
+	if (hyperspeedMultiplier < 1.0f)
+		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() * hyperspeedMultiplier : 0;
+	else
+		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() : 0;
+
+	//if a dialog awaits validation or has just ended, only update animations then stop the update
+	if ((*CurrentGame).m_waiting_for_dialog_validation == true || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)
 	{
 		AnimatedSprite::update(deltaTime);
-
-		//damage feedback expires?
-		if (m_color_timer > sf::seconds(0))
-		{
-			m_color_timer -= deltaTime;
-			setColor(m_color);
-			if (m_color_timer < sf::seconds(0))
-				setColor(Color(255, 255, 255, 255));
-		}
 		return;
 	}
 
-	//slow motion
 	if (hyperspeedMultiplier < 1.0f)
 	{
 		m_phaseTimer += deltaTime * hyperspeedMultiplier;
 		m_enemyTimer += deltaTime * hyperspeedMultiplier;
-		m_collision_timer -= deltaTime.asSeconds() * hyperspeedMultiplier;
 	}
 	else
 	{
 		m_phaseTimer += deltaTime;
 		m_enemyTimer += deltaTime;
-		m_collision_timer -= deltaTime.asSeconds();
 	}
 
 	//shield regen if not maximum
@@ -183,14 +183,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	bool l_ghost = false;
-	//if (!m_phases.empty())
-	//	for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
-	//		l_ghost = l_ghost || (m_currentPhase->m_modifiers[i] == GhostModifier);
 	if (m_currentPhase != NULL)
 		for (Modifier modifier : m_currentPhase->m_modifiers)
 			l_ghost = l_ghost || modifier == GhostModifier;
 
 	setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
+
 	m_disable_fire = hyperspeedMultiplier > 1.0f;
 
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -314,7 +312,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						setRotation(target_angle);
 
 		//transition blocking firing and phase transitioning?
-		if ((*CurrentGame).m_waiting_for_scene_transition)
+		if ((*CurrentGame).m_waiting_for_scene_transition == true)
 		{
 			AnimatedSprite::update(deltaTime);
 			return;
@@ -422,7 +420,7 @@ void Enemy::GetDamageFrom(GameObject& object)
 			ammo.Death();
 
 		//position of FX impact
-		if (ammo.m_isBeam == false || ammo.m_collision_timer < 0)
+		if (ammo.m_isBeam == false || ammo.m_collision_timer <= 0)
 		{
 			FX* impactFX = ammo.m_explosion->Clone();
 			float angle_impact = ammo.getRotation() * M_PI / 180;
@@ -434,8 +432,7 @@ void Enemy::GetDamageFrom(GameObject& object)
 		}
 	}
 
-
-	if (object.m_collision_timer < 0)
+	if (object.m_collision_timer <= 0)
 	{
 		GetDamage(object.m_damage);
 
@@ -460,20 +457,18 @@ void Enemy::GetDamage(int damage)
 	if (damage == 0)
 		return;
 	
-	if (m_feedbackTimer <= sf::seconds(0))
+	m_armorBarContainer.m_visible = true;
+	m_armorBar.m_visible = true;
+	if (m_shield_max > 0)
 	{
-		m_armorBarContainer.m_visible = true;
-		m_armorBar.m_visible = true;
-		if (m_shield_max > 0)
-		{
-			m_shieldBarContainer.m_visible = true;
-			m_shieldBar.m_visible = true;
-		}
-		m_enemyLevel.m_visible = true;
+		m_shieldBarContainer.m_visible = true;
+		m_shieldBar.m_visible = true;
 	}
+	m_enemyLevel.m_visible = true;
+	m_health_feedbackTimer = ENEMY_HEALTH_FEEDBACK_TIME;
 
-	m_feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
-	setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+	setColor(Color(255, 0, 0, 255), true);
+	m_damage_feedbackTimer = m_damage_feedbackTimer <= 0 ? DAMAGE_FEEDBACK_TIME : m_damage_feedbackTimer;
 
 	if (damage > m_shield)
 	{
@@ -518,8 +513,8 @@ Enemy* Enemy::Clone()
 	for (Phase* phase : m_phases)
 		enemy->m_phases.push_back(phase);
 
-	if (m_phases.empty() == false)
-		enemy->setPhase(enemy->m_phases.front());
+	//if (m_currentPhase != NULL)
+	//	enemy->m_currentPhase = enemy->m_phases.front();
 
 	enemy->m_level = m_level;
 	enemy->m_enemyLevel.setString(to_string(m_level));
@@ -739,29 +734,21 @@ void Enemy::setPhase(Phase* phase)
 		for (size_t i = 0; i < weaponsVectorSize; i++)
 		{
 			if (m_weapons_list[i]->m_display_name != phase->m_weapons_list[i]->m_display_name)
-			{
 				break;
-			}
 
 			if (i == weaponsVectorSize - 1)
-			{
 				identical_weapons = true;
-			}
 		}
 	}
 	//clearing old weapons and setting new ones
-	if (!identical_weapons)
+	if (identical_weapons == false)
 	{
-		for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
-		{
-			delete (*it);
-		}
+		for (Weapon* weapon : m_weapons_list)
+			delete weapon;
 		m_weapons_list.clear();
 
-		for (std::vector<Weapon*>::iterator it = phase->m_weapons_list.begin(); it != phase->m_weapons_list.end(); it++)
-		{
-			m_weapons_list.push_back((*it)->Clone());
-		}
+		for (Weapon* weapon : phase->m_weapons_list)
+			m_weapons_list.push_back(weapon->Clone());
 	}
 
 	//movement
@@ -770,44 +757,34 @@ void Enemy::setPhase(Phase* phase)
 	if (m_currentPhase && m_currentPhase->m_pattern->m_pattern_type == phase->m_pattern->m_pattern_type)
 	{
 		if (m_currentPhase->m_pattern->m_pattern_type == NoMovePattern)
-		{
 			identical_patterns = true;
-		}
 		else if (m_currentPhase->m_pattern->m_patternSpeed == phase->m_pattern->m_patternSpeed)
 		{
 			size_t paramsVectorSize = m_currentPhase->m_pattern->m_patternParams.size();
 			if (paramsVectorSize == phase->m_pattern->m_patternParams.size())
 			{
 				if (paramsVectorSize == 0)
-				{
 					identical_patterns = true;
-				}
 				else
 				{
 					for (size_t i = 0; i < paramsVectorSize; i++)
 					{
 						if (m_currentPhase->m_pattern->m_patternParams[i] != phase->m_pattern->m_patternParams[i])
-						{
 							break;
-						}
 
 						if (i == paramsVectorSize - 1)
-						{
 							identical_patterns = true;
-						}
 					}
 				}
 			}
 		}
 	}
 
-	if (!identical_patterns)
-	{
+	if (identical_patterns == false)
 		m_pattern.setPattern(phase->m_pattern->m_pattern_type, phase->m_pattern->m_patternSpeed, phase->m_pattern->m_patternParams); //vitesse angulaire (degres/s)
-	}
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
-	if (phase->m_welcomeWeapon)
+	if (phase->m_welcomeWeapon != NULL)
 	{
 		float theta = this->getRotation() / 180 * M_PI;
 		float weapon_offset_x = phase->m_welcomeWeapon->m_weaponOffset.x - m_size.y / 2 * sin(theta);
@@ -822,26 +799,9 @@ void Enemy::setPhase(Phase* phase)
 	//setting up wake_up condition
 	m_wake_up = false;
 
-	//bool wake_up_condition_exists = false;
-	//for (std::vector<ConditionTransition*>::iterator it = (phase->m_transitions_list.begin()); it != (phase->m_transitions_list.end()); it++)
-	//{
-	//	if ((*it)->m_condition == wakeUp)
-	//	{
-	//		m_wake_up = false;
-	//		wake_up_condition_exists = true;
-	//	}
-	//}
-	////reset the flag "wake_up" if this phase doesn't use the condition (it means the awakening has been skipped by another phase transition
-	//if (!wake_up_condition_exists)
-	//{
-	//	m_wake_up = true;
-	//}
-
 	//waking up enemies
-	if (!phase->m_wake_up_name.empty())
-	{
+	if (phase->m_wake_up_name.empty() == false)
 		(*CurrentGame).WakeUpEnemiesWithName(phase->m_wake_up_name);
-	}
 
 	//dialogs
 	if (!phase->m_dialogs.empty())
@@ -851,26 +811,16 @@ void Enemy::setPhase(Phase* phase)
 			playerShip->SetAskingPanel(SFPanel_Dialog);
 			size_t dialogsVectorSize = phase->m_dialogs.size();
 			for (size_t i = 0; i < dialogsVectorSize; i++)
-			{
 				playerShip->AddDialog(phase->m_dialogs[i]->Clone());
-			}
 		}
 	}
 
 	//freeze player?
 	if (phase->m_freeze_player)
-	{
-		//lock player
-		playerShip->SetInputBlocker(this);
-	}
+		playerShip->SetInputBlocker(this);//lock player
 	else
-	{
-		//unlock player
-		if (playerShip->GetInputBlocker() == this)
-		{
+		if (playerShip->GetInputBlocker() == this)//unlock player
 			playerShip->SetInputBlocker(NULL);
-		}
-	}
 
 	m_phaseTimer = sf::seconds(0);
 

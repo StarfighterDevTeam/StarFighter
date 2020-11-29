@@ -34,18 +34,13 @@ void Bot::setTarget (GameObject* target)
 
 void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if ((*CurrentGame).m_waiting_for_dialog_validation)
-	{
-		AnimatedSprite::update(deltaTime);
-		return;
-	}
+	//if ((*CurrentGame).m_waiting_for_dialog_validation == true)
+	//{
+	//	AnimatedSprite::update(deltaTime);
+	//	return;
+	//}
 
-	if (m_garbageMe)
-	{
-		return;
-	}
-
-	if (m_visible)
+	if (m_visible == true)
 	{
 		static sf::Vector2f newposition, offset, newspeed;
 		newspeed = m_speed;
@@ -75,17 +70,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 		}
 
-		//call bobbyPattern
-		//offset = m_pattern.getOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
-
+		//pattern
 		if (hyperspeedMultiplier < 1.0f)
-		{
 			offset = m_pattern.getOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
-		}
 		else
-		{
 			offset = m_pattern.getOffset(deltaTime.asSeconds(), true);
-		}
 
 		offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 		newposition.x += offset.x;
@@ -96,14 +85,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newposition.x += spread.x;
 		newposition.y += spread.y;
 
-		this->setPosition(newposition.x, newposition.y);
-
-		//rotation
-		this->rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+		setPosition(newposition.x, newposition.y);
+		rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 
 		AnimatedSprite::update(deltaTime);
 	}
-	
 }
 
 void Bot::setGhost(bool ghost)

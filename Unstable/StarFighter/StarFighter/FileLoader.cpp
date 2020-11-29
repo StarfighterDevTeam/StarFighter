@@ -129,22 +129,19 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 		}
 
 		//setting the starting phase
-		base->m_enemy->setPhase(base->m_enemy->m_phases.front());
+		//base->m_enemy->m_currentPhase = base->m_enemy->m_phases.front();
 	}
 	else
 	{
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON].compare("0") != 0)
-		{
 			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON], 1));
-		}
+		
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_2].compare("0") != 0)
-		{
 			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_2], 1));
-		}
+		
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3].compare("0") != 0)
-		{
 			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3], 1));
-		}
+		
 
 		GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*CurrentGame).m_enemiesConfig[name], ENEMY_PATTERN);
 		base->m_enemy->m_pattern.setPattern(m_bobby->m_pattern_type, m_bobby->m_patternSpeed, m_bobby->m_patternParams);

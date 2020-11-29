@@ -11,13 +11,13 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 	Dialog* GetDialog() override;
 	float GetDuration() override;
-	float GetDurationClockElpased() override;
+	float GetDurationTimer() override;
 
 	Dialog* m_dialog;
 	GameObject m_picture;
 	sf::Vector2f m_target_position;
 	bool m_is_downscreen;
-	sf::Clock m_duration_clock;
+	float m_durationTimer;
 };
 
 #endif // SFDIALOGPANEL_H_INCLUDED

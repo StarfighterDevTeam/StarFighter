@@ -109,9 +109,8 @@ public :
 	void ManageGhost(sf::Time deltaTime);
 	bool ResplenishHealth();
 	void RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel);
-	void ManageFeedbackExpiration(sf::Time deltaTime);
 	void IdleDecelleration(sf::Time deltaTime);
-	void ScreenBorderContraints();
+	void ScreenBorderConstraints();
 	void SettingTurnAnimations();
 	void RotateShip(float angle);
 	void setGhost(bool ghost) override;

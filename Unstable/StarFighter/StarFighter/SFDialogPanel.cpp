@@ -6,11 +6,10 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 {
 	m_playerShip = playerShip;
  	m_dialog = playerShip->m_targetDialogs.front();
+	m_durationTimer = m_dialog->m_duration;
 
 	if (m_dialog->m_duration == 0)
-	{
 		(*CurrentGame).m_waiting_for_dialog_validation = true;
-	}
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -77,33 +76,28 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 
 void SFDialogPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
+	if (m_durationTimer > 0)
+		m_durationTimer -= deltaTime.asSeconds();
+
 	//fade in
 	if (m_dialog && m_dialog->m_fade_in)
-	{
 		if (m_is_downscreen && getPosition().x < m_target_position.x)
-		{
 			setPosition(getPosition().x + 1, getPosition().y);
-		}
 		else if (!m_is_downscreen && getPosition().x > m_target_position.x)
-		{
 			setPosition(getPosition().x - 1, getPosition().y);
-		}
-	}
 }
 
 void SFDialogPanel::Draw(sf::RenderTexture& screen)
 {
-	if (m_visible)
+	if (m_visible == true)
 	{
 		SFPanel::Draw(screen);
 		screen.draw(m_title_text);
 		screen.draw(m_text);
 		screen.draw(m_picture);
 
-		if (m_actions)
-		{
+		if (m_actions != NULL)
 			m_actions->Draw(screen);
-		}
 	}
 }
 
@@ -117,7 +111,7 @@ float SFDialogPanel::GetDuration()
 	return m_dialog->m_duration;
 }
 
-float SFDialogPanel::GetDurationClockElpased()
+float SFDialogPanel::GetDurationTimer()
 {
-	return m_duration_clock.getElapsedTime().asSeconds();
+	return m_durationTimer;
 }

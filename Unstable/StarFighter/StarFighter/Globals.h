@@ -55,8 +55,8 @@ const char* getSavesPath();
 #define HUB_FAST_REGEN_DURATION					4.f
 
 #define	GHOST_ALPHA_VALUE						120
-#define DAMAGE_FEEDBACK_TIME					0.1f
-#define ENEMY_HEALTH_FEEDBACK_TIME				2.f
+#define DAMAGE_FEEDBACK_TIME					0.02
+#define ENEMY_HEALTH_FEEDBACK_TIME				2
 
 #define JOYSTICK_MIN_AXIS_VALUE					25
 
@@ -87,6 +87,8 @@ const char* getSavesPath();
 #define TIME_BETWEEN_COLLISION_DAMAGE_TICK				0.5
 #define TIME_BETWEEN_BEAM_DAMAGE_TICK					0.05
 #define SLOW_MOTION_MULTIPLIER							2.5
+#define SCREEN_BORDER_OFFSET_CONSTRAINT_X				0
+#define SCREEN_BORDER_OFFSET_CONSTRAINT_Y				0
 
 //HUD
 #define ARMOR_BAR_SIZE_X								320

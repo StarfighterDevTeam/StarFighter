@@ -96,7 +96,7 @@ public:
 	virtual SFItemStatsPanel* GetItemStatsPanel();
 	virtual void SetItemStatsPanel(SFItemStatsPanel* panel);
 	virtual float GetDuration();
-	virtual float GetDurationClockElpased();
+	virtual float GetDurationTimer();
 	virtual int GetItemsStatsPanelIndex();
 	virtual void SetItemsStatsPanelIndex(int index);
 	

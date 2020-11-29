@@ -1,6 +1,6 @@
 #ammo_name,image,width,height,frames,FX_explosion,sound_name,rotation_speed
 laser,2D/Ammo/P_laser.png,6,32,1,explosion_S_blue,Sounds/laser.ogg,0
-laserbeam,2D/Ammo/P_laserbeam.png,66,1280,1,explosion_S,Sounds/laser.ogg,0
+laserbeam,2D/Ammo/P_laserbeam.png,66,1280,1,explosion_S_blue,Sounds/laser.ogg,0
 #,,,,,,,
 V_laserS,2D/Ammo/V_laserS.png,12,33,1,explosion_S,Sounds/laser.ogg,0
 V_laserL,2D/Ammo/V_laserL.png,36,30,1,explosion_S,Sounds/laser.ogg,0

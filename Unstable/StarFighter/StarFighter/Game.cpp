@@ -33,12 +33,12 @@ void Game::init(RenderWindow* window)
 	m_Pause = false;
 
 	//Sounds
-	m_SFX_Activated = false;
+	m_SFX_Activated = true;
 	LoadSFX();
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	//if (!SpaceCowboys.openFromFile("Music/SpaceCowboys.ogg"))
@@ -303,7 +303,6 @@ void Game::updateScene(Time deltaTime)
 		object->update(deltaTime, m_hyperspeedMultiplier);
 		m_sceneGameObjects.push_back(object);//assuming we will never browse this vector directly during the update of objects
 	}
-		
 
 	//Checking colisions
 	colisionChecksV2(deltaTime);

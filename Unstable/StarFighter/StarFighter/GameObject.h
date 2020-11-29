@@ -280,6 +280,8 @@ public:
 	LayerType m_layer;
 	sf::Vector2f m_size;
 
+	float m_damage_feedbackTimer;
+
 	virtual void GetDamageFrom(GameObject& object);
 	virtual void GetDamage(int damage);
 	string getName();
