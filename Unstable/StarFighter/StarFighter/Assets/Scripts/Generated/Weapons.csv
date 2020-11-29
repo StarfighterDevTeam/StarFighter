@@ -68,3 +68,5 @@ V_BetaGold_dragonball_arc_alt,Vanguard_BetaGold_Dragonballs_Arc_Alt,2D/Equipment
 V_Itsukoi_triple_shot,Vanguard_Itsukoi_Triple_Shot,2D/Equipment/laser_red.png,48,48,1,V_laserM,20,600,0,0.2,8,1,5,0,100,0,0,semi_homing,0,,,,
 V_Itsukoi_laserXL_ascending,Vanguard_Itsukoi_LaserXL_Ascending,2D/Equipment/laser_red.png,48,48,1,V_laserXL,50,800,0,0.1,1,6,9,0,80,ascending,0,semi_homing,0,,,,
 V_Katyusha_dragonball_support,Vanguard_Katyusha_Dragonball_Support,2D/Equipment/laser_red.png,48,48,1,V_fireball,150,550,0,2,0,3,12,0,120,0,0,semi_homing,0,,,,
+V_Itsukoi_carpet_bombing_right,Vanguard_Itsukoi_Carpet_Bombing,2D/Equipment/laser_red.png,48,48,1,V_ballS,10,200,0,0.05,5,0.3,1,0,0,0,-70,0,0,,,,
+V_Itsukoi_carpet_bombing_left,Vanguard_Itsukoi_Carpet_Bombing,2D/Equipment/laser_red.png,48,48,1,V_ballS,10,200,0,0.05,5,0.3,1,0,0,0,70,0,0,,,,

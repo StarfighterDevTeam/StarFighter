@@ -529,14 +529,10 @@ Enemy* Enemy::Clone()
 
 Phase* Enemy::getPhase(string phaseName)
 {
-	for (vector<Phase*>::iterator it = this->m_phases.begin(); it != this->m_phases.end(); it++)
-	{
-		if ((*it)->m_name == phaseName)
-		{
-			return (*it);
-		}
-	}
-	
+	for (Phase* phase : m_phases)
+		if (phase->m_name.compare(phaseName) == 0)
+			return phase;
+
 	return NULL;
 }
 
