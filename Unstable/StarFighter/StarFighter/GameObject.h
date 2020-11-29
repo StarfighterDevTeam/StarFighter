@@ -346,7 +346,7 @@ public:
 	// outside_screen = true if the sprite is on the outside (example: if direction is UP, if the sprite is northern than the border)
 	// player_side = true if the sprite is a playership
 
-	static sf::Vector2f getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position);
+	static sf::Vector2f getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position, float sprite_sizeY);
 
 	static sf::Vector2i getDirectionMultiplier(Directions direction);
 	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);

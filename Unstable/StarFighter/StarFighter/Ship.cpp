@@ -381,20 +381,17 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	CleanGarbagedEquipments();
 
 	//Resetting flags
-	if (m_isCollidingWithInteractiveObject != PortalInteraction && !m_is_asking_scene_transition)
-	{
+	if (m_isCollidingWithInteractiveObject != PortalInteraction && m_is_asking_scene_transition == false)
 		m_targetPortal = NULL;
-	}
+	
 	if (m_isCollidingWithInteractiveObject != ShopInteraction)
-	{
 		m_targetShop = NULL;
-	}
+	
 	m_isCollidingWithInteractiveObject = No_Interaction;
 	m_movingX = false;
 	m_movingY = false;
 	m_moving = false;
 	m_is_asking_SFPanel = SFPanel_None;
-	m_is_asking_scene_transition = false;
 
 	//Update feedback timers
 	if (m_damage_feedbackTimer > 0)
@@ -1661,34 +1658,9 @@ void Ship::RotateShip(float angle)
 
 void Ship::ScreenBorderConstraints()
 {
-	//screen borders contraints	correction
-	if (getPosition().x < m_size.x / 2)
-	{
-		setPosition(m_size.x / 2, getPosition().y);
-		m_speed.x = 0;
-	}
-
-	if (getPosition().x > SCENE_SIZE_X - (m_size.x / 2))
-	{
-		setPosition(SCENE_SIZE_X - (m_size.x / 2), getPosition().y);
-		m_speed.x = 0;
-	}
-
-	if (getPosition().y < m_size.y / 2)
-	{
-		setPosition(getPosition().x, m_size.y / 2);
-		m_speed.y = 0;
-	}
-
-	if (getPosition().y > SCENE_SIZE_Y - (m_size.y / 2))
-	{
-		setPosition(getPosition().x, SCENE_SIZE_Y - (m_size.y / 2));
-		m_speed.y = 0;
-	}
-
-	/*
-	sf::Vector2i offset = sf::Vector2i(SCREEN_BORDER_OFFSET_CONSTRAINT_X, SCREEN_BORDER_OFFSET_CONSTRAINT_Y);
-	GameObject::getSize_for_Direction((*CurrentGame).m_direction, offset);
+	sf::Vector2i offset = sf::Vector2i(0, 0);
+	if (m_is_asking_scene_transition == false)
+		offset = GameObject::getSize_for_Direction((*CurrentGame).m_direction, sf::Vector2i(SCREEN_BORDER_OFFSET_CONSTRAINT_X, SCREEN_BORDER_OFFSET_CONSTRAINT_Y));
 
 	//screen borders contraints	correction
 	if (getPosition().x < m_size.x / 2 + offset.x)
@@ -1714,8 +1686,6 @@ void Ship::ScreenBorderConstraints()
 		setPosition(getPosition().x, SCENE_SIZE_Y - (m_size.y / 2) - offset.y);
 		m_speed.y = 0;
 	}
-	*/
-	
 }
 
 void Ship::IdleDecelleration(sf::Time deltaTime)

@@ -549,15 +549,13 @@ sf::Vector2f GameObject::getSpeed_for_Scrolling(Directions direction, float vspe
 	return speed;
 }
 
-sf::Vector2f GameObject::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position)
+sf::Vector2f GameObject::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position, float sprite_sizeY)
 {
 	sf::Vector2f speed = sf::Vector2f(0, 0);
 
-	sf::Vector2f future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_Y_RATIO)));
+	sf::Vector2f future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y - sprite_sizeY / 2 - SCREEN_BORDER_OFFSET_CONSTRAINT_Y));
 	if (future_direction == NO_DIRECTION)
-	{
-		future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_X_RATIO)));
-	}
+		future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_X_RATIO));
 
 	if (current_direction == DIRECTION_UP || current_direction == DIRECTION_DOWN
 		|| future_direction == DIRECTION_UP || future_direction == DIRECTION_DOWN)

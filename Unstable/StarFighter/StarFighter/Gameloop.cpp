@@ -372,15 +372,13 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 	{
 		case SCROLLING:
 		{
-			if (m_currentScene->m_generating_enemies)
-			{
+			if (m_currentScene->m_generating_enemies == true)
 				m_currentScene->GenerateEnemiesv2(deltaTime);
-			}
+			
 			//Scrolling until the background reaches its end
 			if ((*CurrentGame).m_direction == NO_DIRECTION)
-			{
 				m_IG_State = LAST_SCREEN;
-			}
+			
 			else
 			{
 				//when last screen is reached
@@ -397,10 +395,8 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 
 					//Stop spawning enemies
 					m_currentScene->m_generating_enemies = false;
-					if (m_currentScene->m_generating_boss)
-					{
+					if (m_currentScene->m_generating_boss == true)
 						m_bossSpawnCountdown.restart();
-					}
 					
 					m_hasDisplayedDestructionRatio = false;
 					m_IG_State = LAST_SCREEN;
@@ -416,9 +412,9 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 		case LAST_SCREEN:
 		{	
 			//Optional script to skip boss procedures, for scripted missions
-			if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss])
+			if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss] == true)
 			{
-				if (m_currentScene->m_generating_boss)
+				if (m_currentScene->m_generating_boss == true)
 				{
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
@@ -428,21 +424,19 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 					}
 				}
 				
-				if ((*CurrentGame).isLastEnemyDead())
+				if ((*CurrentGame).isLastEnemyDead() == true)
 				{
 					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
 				}
 
 				//player takes exit?
-				if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition)
-				{
+				if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition == true)
 					PlayerTakesExit();
-				}
 			}
 
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
-			else if ((*CurrentGame).isLastEnemyDead())
+			else if ((*CurrentGame).isLastEnemyDead() == true)
 			{
 				//scene generates boss? (or boss is dead, eitherway)
 				if (m_currentScene->m_generating_boss)
@@ -460,21 +454,19 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
 
-					if (!m_hasDisplayedDestructionRatio)
+					if (m_hasDisplayedDestructionRatio == false)
 					{
 						//is the scene capable of hazard break? (= last scene before hub)
-						if (m_currentScene->m_canHazardBreak)
+						if (m_currentScene->m_canHazardBreak == true)
 						{
 							//what is our destruction ratio? (displaying score). 100% = Hazard break
-							if (m_currentScene->CheckHazardBreakConditions() && m_currentScene->getSceneHazardLevelUnlockedValue() == m_currentScene->getSceneHazardLevelValue())
+							if (m_currentScene->CheckHazardBreakConditions() == true && m_currentScene->getSceneHazardLevelUnlockedValue() == m_currentScene->getSceneHazardLevelValue())
 							{
 								m_currentScene->DisplayScore(true);
 								m_currentScene->HazardBreak();
 							}
 							else
-							{
 								m_currentScene->DisplayScore();
-							}
 						}
 
 						m_currentScene->m_bg->SetPortalsState(PortalOpen);
@@ -484,18 +476,15 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//player takes exit?
-				if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition)
-				{
+				if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition == true)
 					PlayerTakesExit();
-				}
 			}
 			//clearing enemies that have spawned out of the scene size
 			else
 			{
-				if (m_currentScene->m_generating_boss)
-				{
+				if (m_currentScene->m_generating_boss == true)
 					m_bossSpawnCountdown.restart();
-				}
+
 				m_currentScene->m_bg->SetPortalsState(PortalClose);
 			}
 
@@ -505,7 +494,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 		case BOSS_FIGHT:
 		{
 			//is boss dead?
-			if ((*CurrentGame).isLastEnemyDead())
+			if ((*CurrentGame).isLastEnemyDead() == true)
 			{
 				m_currentScene->m_generating_boss = false;
 				m_IG_State = LAST_SCREEN;
@@ -523,8 +512,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				//Correction of playership position
 				(*CurrentGame).m_playerShip->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2));
 
-				(*CurrentGame).m_playerShip->m_speed = GameObject::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).m_direction, m_nextScene->m_direction, ENDSCENE_TRANSITION_SPEED_DOWN,
-					(*CurrentGame).m_playerShip->getPosition());
+				(*CurrentGame).m_playerShip->m_speed = GameObject::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).m_direction, m_nextScene->m_direction, ENDSCENE_TRANSITION_SPEED_DOWN, (*CurrentGame).m_playerShip->getPosition(), w_);
 
 				m_currentScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).m_vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
@@ -534,10 +522,8 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).garbageLayer(FeedbacksLayer);
 
 				//Optional script to skip boss procedures, for scripted missions, so they may still be alive at this point
-				if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss])
-				{
+				if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss] == true)
 					(*CurrentGame).SetLayerSpeed(EnemyObjectLayer, m_nextScene->m_bg->m_speed);
-				}
 
 				m_IG_State = TRANSITION_PHASE2_2;
 			}
@@ -590,13 +576,12 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//Saving the hazard level change
-				if (m_currentScene->m_canHazardBreak)
+				if (m_currentScene->m_canHazardBreak == true)
 				{
 					SaveSceneHazardLevelUnlocked(m_currentScene->m_name, m_currentScene->getSceneHazardLevelUnlockedValue());
 					for (vector <string>::iterator it = m_currentScene->m_scenesLinkedToUpdate.begin(); it != m_currentScene->m_scenesLinkedToUpdate.end(); it++)
-					{
 						SaveSceneHazardLevelUnlocked((*it), m_currentScene->getSceneHazardLevelUnlockedValue());
-					}
+
 					m_currentScene->m_scenesLinkedToUpdate.clear();
 					//transmitting the info to the next scene so it can update its portals
 					UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
@@ -605,9 +590,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					//if the next scene is not a hub, then we want to remember the past scenes so we can update them later in case of hazard break
 					for (vector <string>::iterator it = m_currentScene->m_scenesLinkedToUpdate.begin(); it != m_currentScene->m_scenesLinkedToUpdate.end(); it++)
-					{
 						m_nextScene->m_scenesLinkedToUpdate.push_back((*it));
-					}
 				}
 
 				//Wiping the previous background and swapping with the new one
@@ -628,15 +611,11 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 					SavePlayer();
 				}
 				else
-				{
 					SavePlayer();
-				}
 
 				//Resetting counting of hits taken for scene score
 				if (m_currentScene->m_direction == NO_DIRECTION)
-				{
 					(*CurrentGame).m_playerShip->m_hits_taken = 0;
-				}
 
 				//Giving control back to the player
 				(*CurrentGame).m_playerShip->m_disable_inputs = false;
@@ -644,27 +623,22 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 
 				(*CurrentGame).m_waiting_for_scene_transition = false;
 				(*CurrentGame).m_playerShip->m_immune = false;
+				(*CurrentGame).m_playerShip->m_is_asking_scene_transition = false;
 
 				//Play scene title feedback if we come from a hub + music changes
 				if (previous_direction == NO_DIRECTION || (*CurrentGame).m_curMusic_type == Music_Hub)
 				{
 					m_currentScene->PlayTitleFeedback();
 
-					if (!m_currentScene->m_scene_music.empty())
-					{
+					if (m_currentScene->m_scene_music.empty() == false)
 						(*CurrentGame).PlayMusic(Music_Scene, m_currentScene->m_scene_music);
-					}
 					else
-					{
 						(*CurrentGame).PlayMusic(Music_Scene);
-					}
 				}
-				if (m_currentScene->m_direction == NO_DIRECTION)
-				{
-					(*CurrentGame).PlayMusic(Music_Hub);
-				}
-			}
 
+				if (m_currentScene->m_direction == NO_DIRECTION)
+					(*CurrentGame).PlayMusic(Music_Hub);
+			}
 			break;
 		}
 
@@ -675,7 +649,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 			(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
 
 			//player takes exit?
-			if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition)
+			if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition == true)
 			{
 				m_currentScene->m_bg->SetPortalsState(PortalGhost);
 
@@ -683,9 +657,8 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 
 				bool reverse = false;
 				if ((*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
-				{
 					reverse = true;
-				}
+				
 				string nextScene_filename = (*CurrentGame).m_playerShip->m_targetPortal->m_destination_name;
 
 				(*CurrentGame).m_direction = (*CurrentGame).m_playerShip->m_targetPortal->m_direction;
@@ -712,14 +685,10 @@ void Gameloop::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShi
 	//getting the max hazard value for the upcoming scene
 	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene->m_name);
 	if (it != playerShip->m_knownScenes.end())
-	{
 		scene->setSceneHazardLevelUnlockedValue(playerShip->m_knownScenes[scene->m_name]);
-	}
-	else
-	{
-		//destination is not know yet -> default max hazard value
+	else//destination is not know yet -> default max hazard value
 		scene->setSceneHazardLevelUnlockedValue(0);
-	}
+	
 
 	//loading the scene's portals with the info about their respective max hazard values
 	for (int i = 0; i < NO_DIRECTION; i++)
@@ -728,14 +697,9 @@ void Gameloop::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShi
 		{
 			map<string, int>::iterator it = playerShip->m_knownScenes.find(scene->m_bg->m_portals[(Directions)i]->m_destination_name);
 			if (it != playerShip->m_knownScenes.end())
-			{
 				scene->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = playerShip->m_knownScenes[scene->m_bg->m_portals[(Directions)i]->m_destination_name];
-			}
-			else
-			{
-				//destination is not know yet -> default max hazard value
+			else//destination is not know yet -> default max hazard value
 				scene->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = 0;
-			}
 		}
 	}
 }
@@ -872,14 +836,10 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).resetHazard();
 			(*CurrentGame).m_playerShip->m_hits_taken = 0;
 
-			if (!m_currentScene->m_scene_music.empty())
-			{
+			if (m_currentScene->m_scene_music.empty() == false)
 				(*CurrentGame).PlayMusic(Music_Hub, m_currentScene->m_scene_music);
-			}
 			else
-			{
 				(*CurrentGame).PlayMusic(Music_Hub);
-			}
 		}
 
 		m_playerShip->setPosition(ship_pos);
@@ -901,17 +861,11 @@ void Gameloop::LoadAllScenes(string scenes_file)
 	vector<vector<string> > generalScenesConfig = *(FileLoaderUtils::FileLoader(scenes_file));
 	size_t allScenesVectorSize = generalScenesConfig.size();
 	for (size_t i = 0; i < allScenesVectorSize; i++)
-	{
 		(*CurrentGame).m_generalScenesConfig.insert(std::map<string, vector<string> >::value_type(generalScenesConfig[i][SCENE_NAME], generalScenesConfig[i]));
-	}
 
 	for (size_t j = 0; j < allScenesVectorSize; j++)
-	{
 		if (!generalScenesConfig[j][SCENE_FILENAME].empty() && generalScenesConfig[j][SCENE_FILENAME].compare("0") != 0)
-		{
 			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> > >::value_type(generalScenesConfig[j][SCENE_NAME], *(FileLoaderUtils::FileLoader(generalScenesConfig[j][SCENE_FILENAME]))));
-		}
-	}
 
 	generalScenesConfig.clear();
 
@@ -925,9 +879,7 @@ void Gameloop::LoadAllEnemies(string enemies_file)
 	vector<vector<string> > enemiesConfig = *(FileLoaderUtils::FileLoader(enemies_file));
 	size_t allEnemiesVectorSize = enemiesConfig.size();
 	for (size_t i = 0; i < allEnemiesVectorSize; i++)
-	{
 		(*CurrentGame).m_enemiesConfig.insert(std::map<string, vector<string> >::value_type(enemiesConfig[i][ENEMY_NAME], enemiesConfig[i]));
-	}
 
 	enemiesConfig.clear();
 
@@ -941,9 +893,7 @@ void Gameloop::LoadAllFX(string FX_file)
 	vector<vector<string> > FXConfig = *(FileLoaderUtils::FileLoader(FX_file));
 	size_t allFXVectorSize = FXConfig.size();
 	for (size_t i = 0; i < allFXVectorSize; i++)
-	{
 		(*CurrentGame).m_FXConfig.insert(std::map<string, vector<string> >::value_type(FXConfig[i][FX_NAME], FXConfig[i]));
-	}
 
 	FXConfig.clear();
 
@@ -958,18 +908,15 @@ void Gameloop::PlayerTakesExit()
 
 	bool reverse = false;
 	if ((*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
-	{
 		reverse = true;
-	}
 
 	string nextScene_filename = (*CurrentGame).m_playerShip->m_targetPortal->m_destination_name;
 	m_nextScene = new Scene(nextScene_filename, m_currentScene->getSceneHazardLevelValue(), reverse, false);
 
 	//remembering linked scenes to hazard break later
-	if (!m_currentScene->m_canHazardBreak)
-	{
+	if (m_currentScene->m_canHazardBreak == false)
 		m_nextScene->m_scenesLinkedToUpdate.push_back(m_currentScene->m_name);
-	}
+
 	UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 
 	m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
@@ -994,9 +941,7 @@ void Gameloop::CheckScriptedDialogs()
 		{
 			size_t chainedDialogsVectorSize = m_currentScene->m_dialogs[i].second.size();
 			for (size_t j = 0; j < chainedDialogsVectorSize; j++)
-			{
 				(*CurrentGame).m_playerShip->m_targetDialogs.push_back(m_currentScene->m_dialogs[i].second[j]->Clone());
-			}
 
 			m_currentScene->m_dialogs[i].first = -1;//flag it as read
 			break;
