@@ -5,6 +5,10 @@ phase03,150,0,0,0,0,0,0,0,0,0,0,0,0,0,,,0,,,0,0,0,1,0,0,0,0,0,0,0,,phaseClock,gr
 phase04,-200,laser_fast,0,0,0,0,0,0,0,0,0,0,0,0,,,0,,,0,0,0,1,0,0,0,0,0,0,0,,positionV,lesser,100,phase02,life,lesser,0,phase05,0
 phase05,200,0,0,0,laser_arc,0,0,0,0,0,0,0,0,0,,,0,,,0,,,1,0,0,0,0,0,0,laser_360,fireball,0,,,,0,,,,0
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+V_AlphaGold_Test1,0,0,,,0,,,0,,,0,,,0,,,0,,,0,0,0,0,0,0,0,0,0,0,0,,phaseClock,greater,2,V_AlphaGold_Test2,0,,,,0
+V_AlphaGold_Test2,0,0,,,0,,,0,,,0,,,0,,,0,,,line,30,0,0,0,0,0,0,0,0,0,,life,lesser,100,V_AlphaGold_Test3,0,,,,0
+V_AlphaGold_Test3,0,0,,,0,,,0,,,0,,,0,,,0,,,0,0,0,0,0,0,0,0,0,0,0,,phaseClock,greater,2,V_AlphaGold_Test4,0,,,,0
+V_AlphaGold_Test4,0,0,,,0,,,0,,,0,,,0,,,0,,,oscillator,20,100,1,1,0,0,0,0,0,0,,life,lesser,75,V_AlphaGold_Test1,0,,,,0
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 KatyushaIntro,120,0,0,0,0,0,0,0,0,0,0,0,0,0,,,0,,,0,,,,,0,ghost,0,0,0,0,,positionV,greater,100,KatyushaIntro_Wait,0,,,,0
 KatyushaIntro_Wait,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,0,,,0,,,,,0,ghost,0,0,0,0,,wakeUp,0,0,Katyusha_Phase1_Kickoff,0,,,,0
@@ -17,7 +21,7 @@ R_HatsukiIntro_DeployRight,30,0,0,0,0,0,0,0,0,0,0,0,0,0,,,0,,,line,40,0,1,,0,gho
 R_Hatsuki_Phase1_Kickoff,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,0,,,0,,,,,0,ghost,0,0,Katyusha,0,,wakeUp,0,0,R_Hatsuki_Phase1,0,,,,0
 Katyusha_Phase1,0,V_Katyusha_dragonball_support,0,2,0,0,0,0,0,0,0,0,0,0,,,0,,,oscillator,30,200,0,1,0,ghost,0,0,Itsukoi,0,,wakeUp,0,0,Katyusha_Phase1_Wait1,0,,,,0
 L_Itsukoi_Phase1,0,V_Itsukoi_triple_shot,0,0,V_Itsukoi_laserXL_ascending,0,4,0,0,0,0,0,0,0,,,0,,,oscillator,10,100,1,1,200,0,face_target,0,Hatsuki,0,,life,lesser,50,L_Itsukoi_Phase1_Exit_Left,0,,,,0
-R_Hatsuki_Phase1,0,V_Itsukoi_triple_shot,0,0,V_Itsukoi_laserXL_ascending,0,4.5,0,0,0,0,0,0,0,,,0,,,oscillator,10,100,-1,1,200,0,face_target,0,0,0,,life,lesser,50,R_Hatsuki_Phase1_Exit_Right,0,,,,0
+R_Hatsuki_Phase1,0,V_Itsukoi_triple_shot,0,0,V_Itsukoi_laserXL_ascending,0,4.5,0,0,0,0,0,0,0,,,0,,,oscillator,-10,100,1,1,200,0,face_target,0,0,0,,life,lesser,50,R_Hatsuki_Phase1_Exit_Right,0,,,,0
 L_Itsukoi_Phase1_Exit_Left,0,0,,,0,,,0,0,0,0,0,0,0,,,0,,,line,-200,0,1,0,200,ghost,reset_facing,0,0,0,,positionH,lesser,-100,L_Itsukoi_Phase1_Exit_Turn,0,,,,0
 L_Itsukoi_Phase1_Exit_Turn,70,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,-30,ghost,0,0,0,0,,phaseClock,greater,3,L_Itsukoi_Phase2_Run1,0,,,,0
 L_Itsukoi_Phase2_Run1,0,V_Itsukoi_carpet_bombing_right,-75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,line,700,0,1,0,0,0,0,0,0,0,,positionH,greater,1200,L_Itsukoi_Phase2_Turn,0,,,,0

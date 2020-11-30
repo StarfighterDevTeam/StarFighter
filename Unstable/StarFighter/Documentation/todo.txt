@@ -1,0 +1,23 @@
+[Refactor avec évolution]
+- sprite packaging dans des spritesheet (enemis d'une même classe sur une même image, en utilisant les animations)
+- pattern "keep" pour garder le même pattern (en modifiant certains paramètres ?)
+- refonte Geometry pattern pour avoir plus de paramètres et obtenir des résultats plus fiables. Transition d'un pattern à un pattern identique à assurer.
+
+[Refactor sans évolution]
+- Refactor weapon* en tant qu'equipment, qui possède un m_weapon.
+Equipment et weapon deviennent des dérivées de GameObject (armor, shield etc.. sont des variables en commun) ce qui évite de les encapsuler dans des GameObjet, refonte inventaire.
+Le Loot possède 1 equipment.
+- ship updates classés par HUD state dans des fonctions séparées
+- ship et enemy dérivés d'une même classe "Ship" (ship devenant PlayerShip)
+- fire et beam update à commoniser entre bot, player et enemy
+
+[Evolution cosmétique]
+- white bar quand on perd des pv, pour feedback la barre qui descend
+
+[Game rules breakthrough]
+- Jeu en direction UP uniquement et occupant tout l'écran plutôt que 1080x1080
+- Points de vie remplacés par X vies (2 au début, puis +1, +1 ...). Les dégats subits valent tous 1 vie, avec immune pendant 2 secondes.
+
+[Content]
+- Vanguard boss 3 et 4
+- Royal bestiaire (basé sur les laser beam)

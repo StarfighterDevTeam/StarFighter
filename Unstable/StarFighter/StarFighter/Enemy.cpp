@@ -2,6 +2,39 @@
 
 extern Game* CurrentGame;
 
+
+
+
+//DEBUG PATTERN
+void Enemy::Draw(sf::RenderTexture& screen)
+{
+	/*DEBUG*/
+	Text text;
+	text.setFont(*m_font);
+	text.setCharacterSize(12);
+	text.setColor(sf::Color::White);
+	text.setPosition(sf::Vector2f(getPosition().x - 30, getPosition().y - 100));
+	ostringstream ss;
+
+	//hack
+	//if (m_pattern.m_patternParams.empty() == false)
+	//	m_pattern.m_patternParams[0] = 0;//param 0 = clockwise inutile car on a déjà le signe de speed.  Remplacer par un booléen "randomize speed sign".
+	//m_pattern.m_patternSpeed = -100;
+
+	//display
+	ss << "spd: " << to_string(int(m_pattern.m_patternSpeed)) << " / ";
+	for (float f : m_pattern.m_patternParams)
+		ss << to_string(int(f)) << " / ";
+
+	text.setString(ss.str());
+	screen.draw(text);
+	GameObject::Draw(screen);
+	/**/
+
+	
+}
+
+
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), frameNumber, animationNumber)
 {
 	m_collider_type = EnemyObject;
@@ -194,7 +227,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-	//call bobbyPattern
+	//update pattern
 	if (hyperspeedMultiplier < 1.0f)
 		offset = m_pattern.getOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
 	else
@@ -370,8 +403,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			for (Ammo* beam : weapon->m_beams)
 			{
 				//update beam positions
-				//float beam_offset_x = beam->m_offset_x * cos(weapon->m_shot_angle) + (- beam->m_size.y / 2 * sin(weapon->m_shot_angle));
-				//float beam_offset_y = beam->m_offset_x * sin(weapon->m_shot_angle) - (- beam->m_size.y / 2 * cos(weapon->m_shot_angle));
+				beam->setRotation(weapon->m_shot_angle * 180 / M_PI);
 
 				float beam_offset_x = beam->m_offset_x * cos(weapon->m_shot_angle) - beam->m_size.y / 2 * sin(weapon->m_shot_angle);
 				float beam_offset_y = beam->m_offset_x * sin(weapon->m_shot_angle) + beam->m_size.y / 2 * cos(weapon->m_shot_angle);
@@ -379,9 +411,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				beam->setPosition(weapon->getPosition().x + beam_offset_x, weapon->getPosition().y + beam_offset_y);
 				beam->setRotation(weapon->m_shot_angle * 180 / M_PI);
 			}
-
-			if (!m_weapons_list.front()->m_beams.empty())
-				printf("eny pos: %f; wp pos: %f, beam pos: %f, rotation: %f\n", getPosition().y, m_weapons_list.front()->getPosition().y, m_weapons_list.front()->m_beams.front()->getPosition().y, getRotation() / 180 * M_PI);
 
 			if (m_disable_fire == true)
 			{

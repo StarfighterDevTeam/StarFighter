@@ -3,6 +3,7 @@
 GeometryPattern::GeometryPattern()
 {
 	m_pattern_type = NoMovePattern;
+	m_patternSpeed = 0;
 }
 
 GeometryPattern* GeometryPattern::PatternLoader(vector<string> line_data, int index)

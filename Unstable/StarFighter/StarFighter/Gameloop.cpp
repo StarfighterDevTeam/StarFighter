@@ -90,7 +90,7 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, false);
 
 	//DEBUG
-	//SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+	SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
 }
 
 void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
@@ -439,7 +439,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 			else if ((*CurrentGame).isLastEnemyDead() == true)
 			{
 				//scene generates boss? (or boss is dead, eitherway)
-				if (m_currentScene->m_generating_boss)
+				if (m_currentScene->m_generating_boss == true)
 				{
 					m_currentScene->m_bg->SetPortalsState(PortalInvisible);
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
