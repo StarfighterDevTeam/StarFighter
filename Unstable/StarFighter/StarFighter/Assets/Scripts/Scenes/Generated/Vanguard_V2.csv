@@ -1,5 +1,5 @@
 #,filename,width,height,vspeed,Vertical/Horizontal,Size Stellarmap,
-bg,2D/Backgrounds/BGVertical_1.png,1080,5400,75,V,1,
+bg,2D/Backgrounds/BGVertical_1.jpg,1080,5400,75,V,1,
 #,enemies_name,proba,enemy_class,Level,spawnCost,repeatChance,MissChance
 enemy,V_Alpha1,1,1,2,4,0.30f,0.10f
 enemy,V_Sigma1,1,2,2,10,0.2,0.5

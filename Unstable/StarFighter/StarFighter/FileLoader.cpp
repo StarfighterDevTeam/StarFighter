@@ -82,7 +82,8 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 	}
 
 	EnemyBase* base = new EnemyBase;
-	base->m_enemy = new Enemy(sf::Vector2f(0, 0), sf::Vector2f(0, stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_SPEED])), (*CurrentGame).m_enemiesConfig[name][ENEMY_IMAGE_NAME], sf::Vector2f(stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_WIDTH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_HEIGHT])), LoadFX((*CurrentGame).m_enemiesConfig[name][ENEMY_FX_DEATH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_FRAMES]));
+	base->m_enemy = new Enemy(sf::Vector2f(0, 0), sf::Vector2f(0, stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_SPEED])), (*CurrentGame).m_enemiesConfig[name][ENEMY_IMAGE_NAME], sf::Vector2f(stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_WIDTH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_HEIGHT])), LoadFX((*CurrentGame).m_enemiesConfig[name][ENEMY_FX_DEATH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_FRAMES]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_NB_SKINS]));
+	base->m_enemy->setAnimationLine(stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_SKIN]) - 1);//the skin counts starts at 1
 	base->m_probability = probability;
 	base->m_enemyclass = enemyClass;
 	base->m_enemy->m_enemy_class = (EnemyClass)enemyClass;

@@ -530,6 +530,7 @@ Enemy* Enemy::Clone()
 	enemy->m_weapon_loot = getWeaponLoot();
 	enemy->m_display_name = m_display_name;
 	enemy->m_enemy_class = m_enemy_class;
+	enemy->setAnimationLine(m_currentAnimationIndex);
 
 	enemy->m_pattern = m_pattern;
 	enemy->m_angspeed = m_angspeed;

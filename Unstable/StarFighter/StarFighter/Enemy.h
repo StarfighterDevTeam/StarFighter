@@ -4,12 +4,12 @@
 #include "Background.h"
 
 #define	ENEMYX_DAMAGE			5
-#define	ENEMYX_ARMOR			100
+#define	ENEMYX_ARMOR				100
 #define	ENEMYX_SHIELD			100
 #define	ENEMYX_SHIELD_REGEN		1
 
 #define	ENEMYY_DAMAGE			5
-#define	ENEMYY_ARMOR			200
+#define	ENEMYY_ARMOR				200
 #define	ENEMYY_SHIELD			200
 #define	ENEMYY_SHIELD_REGEN		1
 
