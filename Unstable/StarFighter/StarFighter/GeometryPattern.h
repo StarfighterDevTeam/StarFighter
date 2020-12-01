@@ -12,9 +12,8 @@ using namespace std;
 enum PatternType 
 {
 	NoMovePattern,
-	Circle_,
-	Oscillator,
 	Line_,
+	Circle_,
 	Rectangle_,
 	NBVAL_PatternType
 };
@@ -23,35 +22,35 @@ enum GeometryPatternData
 {
 	GEOMETRY_PATTERN_TYPE,//0
 	GEOMETRY_PATTERN_SPEED,//1
-	GEOMETRY_PATTERN_ARG1,//2
-	GEOMETRY_PATTERN_ARG2,//3
-	GEOMETRY_PATTERN_ARG3,//4
+	GEOMETRY_PATTERN_CLOCKWISE,//2
+	GEOMETRY_PATTERN_STARTING_POINT,//3
+	GEOMETRY_PATTERN_WIDTH,//4
+	GEOMETRY_PATTERN_HEIGHT,//5
 };
 
 class GeometryPattern
 {
 public:
 	GeometryPattern();
-	void setPattern(PatternType pt, float patternSpeed, vector<float> args);
-	void startPattern();
-	sf::Vector2f getOffset(float seconds, bool absolute_coordinate = false);
-	static GeometryPattern* PatternLoader(vector<string> line_data, int index);
+
+	static GeometryPattern* LoadPattern(vector<string> line_data, int index);
+	void setPattern_v2(GeometryPattern* pattern);
+	void setPattern_v2(PatternType pattern_type, int speed, int clockwise, int width, int height, int starting_point);
+	void resetPattern();
+	sf::Vector2f getOffset_v2(sf::Time deltaTime, bool global_offset = false);
 
 	PatternType m_pattern_type;
-	vector<float> m_patternParams;
-	float m_patternSpeed;
-	float m_patternSpeedInRadian;
+	int m_speed;
+	int m_clockwise;
+	int m_width;
+	int m_height;
+	int m_starting_point;
 
 private:
-	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
-	void ToCartesianCoords(sf::Vector2f* polarCoords);
-
 	sf::Vector2i m_direction;
-	sf::Vector2f m_curSandboxPosition_cartesian;
-	sf::Vector2f m_curSandboxPosition_polar;
-
 	float m_distance_left;
-	float m_currTheta;
+	float m_theta;
+	sf::Vector2f m_offset;
 };
 
 

@@ -3,350 +3,262 @@
 GeometryPattern::GeometryPattern()
 {
 	m_pattern_type = NoMovePattern;
-	m_patternSpeed = 0;
+	m_speed = 0;
+	m_clockwise = 0;
+	m_width = 0;
+	m_height = 0;
+	m_starting_point = 0;
+	m_offset = sf::Vector2f(0, 0);
 }
 
-GeometryPattern* GeometryPattern::PatternLoader(vector<string> line_data, int index)
+GeometryPattern* GeometryPattern::LoadPattern(vector<string> line_data, int index)
 {
 	GeometryPattern* pattern = new GeometryPattern();
-
-	PatternType pattern_type = NoMovePattern;
+		//return pattern;//DEBUG
 
 	if (line_data[index].compare("0") != 0)
 	{
-		pattern->m_patternSpeed = stoi(line_data[index + GEOMETRY_PATTERN_SPEED]);//angular speed, horizontal speed
+		pattern->m_speed = stoi(line_data[index + GEOMETRY_PATTERN_SPEED]);
+		pattern->m_clockwise = stoi(line_data[index + GEOMETRY_PATTERN_CLOCKWISE]);
 
 		if (line_data[index].compare("line") == 0)
 		{
-			pattern_type = Line_;
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2])); // opposite sign of speed (-1), random sign (0), normal (1)
+			pattern->m_pattern_type = Line_;
 		}
 		else if (line_data[index].compare("circle") == 0)
 		{
-			pattern_type = Circle_;
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG1])); // radius
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
-		}
-		else if (line_data[index].compare("oscillator") == 0)
-		{
-			pattern_type = Oscillator;
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG1])); // radius
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG3]));  // counterclockwise (-1), random (0), clockwise (1)
+			pattern->m_pattern_type = Circle_;
+
+			pattern->m_width = stoi(line_data[index + GEOMETRY_PATTERN_WIDTH]);
+			pattern->m_height = stoi(line_data[index + GEOMETRY_PATTERN_HEIGHT]);
+			pattern->m_starting_point = stoi(line_data[index + GEOMETRY_PATTERN_STARTING_POINT]);
 		}
 		else if (line_data[index].compare("rectangle") == 0)
 		{
-			pattern_type = Rectangle_;
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG1])); // width
-			pattern->m_patternParams.push_back(stoi(line_data[index + GEOMETRY_PATTERN_ARG2]));  // height
+			pattern->m_pattern_type = Rectangle_;
+
+			pattern->m_width = stoi(line_data[index + GEOMETRY_PATTERN_WIDTH]);
+			pattern->m_height = stoi(line_data[index + GEOMETRY_PATTERN_HEIGHT]);
+			pattern->m_starting_point = stoi(line_data[index + GEOMETRY_PATTERN_STARTING_POINT]);
 		}
 	}
-
-	pattern->m_pattern_type = pattern_type;
 
 	return pattern;
 }
 
-void GeometryPattern::startPattern()
+void GeometryPattern::resetPattern()
 {
-	setPattern(m_pattern_type, m_patternSpeed, m_patternParams);
+	setPattern_v2(m_pattern_type, m_speed, m_clockwise, m_width, m_height, m_starting_point);
 }
 
-void GeometryPattern::setPattern(PatternType pt, float patternSpeed, vector<float> args)
+void GeometryPattern::setPattern_v2(GeometryPattern* pattern)
 {
-	//Note that patternSpeed is 
-	// - px/sec on the canvas for Rectangle
-	// - time to do 360° for the circle
+	setPattern_v2(pattern->m_pattern_type, pattern->m_speed, pattern->m_clockwise, pattern->m_width, pattern->m_height, pattern->m_starting_point);
+}
 
-	switch (pt)
+void GeometryPattern::setPattern_v2(PatternType pattern_type, int speed, int clockwise, int width, int height, int starting_point)
+{
+	if (pattern_type == m_pattern_type && speed == m_speed && clockwise == m_clockwise && width == m_width && height == m_height && starting_point == m_starting_point)
+		return;//identical pattern asked => ignored.
+
+	if (clockwise == 0)//randomized "clockwise" variable
 	{
-		case Line_:
+		if (m_clockwise == 0)//else, keep the current clockwise value
 		{
-			//ARGS 
-			// 0 = opposite speed ?
-			// v = speed in px/sec
-			if (args.size() < 1)
-				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
-
-			if (args[0] == 0)
-			{
-				srand(time(NULL));
-				//random between 1 and -1
-				args[0] = ((rand() % 2) * 2) - 1;
-			}
-
-			break;
-		}
-
-		case Rectangle_:
-		{
-			//ARGS 
-			// 0 = width
-			// 1 = height
-			// v = speed in px/sec
-			if (args.size() < 2)
-				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
-
-			m_distance_left = args[0];
-			m_direction = sf::Vector2i(1,0);
-
-			break;
-		}
-
-		case Circle_:
-		{
-			//ARGS 
-			// 0 = rayon
-			// 1 = counterclockwise (-1), random (0), clockwise (1)
-			// v = vitesse angulaire (degres/s)
-			if (args.size() < 2)
-				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
-
-			if (args[1] == 0)
-			{
-				if (m_pattern_type == pt)//if previous pattern is alreay this type, keep the same direction
-					args[1] = m_patternParams[1];
-				else
-				{
-					//random between 1 and -1
-					srand(time(NULL));
-					args[1] = ((rand() % 2) * 2) - 1;
-				}
-			}
-
-			m_patternSpeedInRadian = patternSpeed*M_PI / 180; //converting speed to radians
-			m_curSandboxPosition_polar = sf::Vector2f(args[0], -M_PI_2 * args[1]); //starts on top of the circle (-pi/2)
-			m_curSandboxPosition_cartesian = ToCartesianCoords(m_curSandboxPosition_polar);
-
-			break;
-		}
-
-		case Oscillator:
-		{
-			//ARGS 
-			// 0 = amplitude
-			// 1 = counterclockwise (-1), random (0), clockwise (1)
-			// 2 = centered(1), not centered (0)
-			// v = speed of oscillation
-			if (args.size() < 3)
-				throw invalid_argument(TextUtils::format("GeometryPattern error: Invalid # or arges for pattern '%d' (received %d, expected %d)", pt, args.size(), 1));
-
-			if (args[1] == 0)//asking for random
-			{
-				if (m_pattern_type == pt)//if previous pattern is alreay this type, keep the same direction
-					args[1] = m_patternParams[1];
-				else
-				{
-					//random between 1 and -1
-					srand(time(NULL));
-					args[1] = ((rand() % 2) * 2) - 1;
-				}
-			}
-
-			m_patternSpeedInRadian = patternSpeed * 2 * M_PI / args[0]; //converting speed to radians (2pi = 1 amplitude)
-			m_curSandboxPosition_polar = sf::Vector2f(args[0] / 2, args[1] * M_PI / 180); // r = ampl/2 + converting angle to radians
-			m_curSandboxPosition_cartesian = args[2] == 1 ? sf::Vector2f(0, 0) : ToCartesianCoords(m_curSandboxPosition_polar);
-			m_currTheta = M_PI/2; //starting @the middle.
-
-			break;
+			srand(time(NULL));
+			clockwise = ((rand() % 2) * 2) - 1;
 		}
 	}
+	else
+		m_clockwise = clockwise;
+	
+	m_speed = speed;
+	m_width = width;
+	m_height = height;
+	m_pattern_type = pattern_type;
 
-	m_pattern_type = pt;
-	m_patternParams = args;
-	m_patternSpeed = patternSpeed;
+	//starting point
+	if (pattern_type >= 0)//-1 = don't apply starting point (continue with current offset)
+	{
+		m_starting_point = starting_point;
+		int cc = m_clockwise * m_speed;
 
+		switch (m_pattern_type)
+		{
+			case Rectangle_:
+			{
+				//0-----1----2
+				//|          |
+				//7          3
+				//|          |
+				//6-----5----4
+
+				//case 0 + default value
+				m_direction.x = cc >= 0 ? 1 : 0;
+				m_direction.y = cc >= 0 ? 0 : 1;
+				m_distance_left = cc >= 0 ? m_width : m_height;
+	
+				if (m_starting_point == 1)
+				{
+					m_direction.x = cc >= 0 ? 1 : -1;
+					m_direction.y = 0;
+					m_distance_left = m_width * 0.5;
+				}
+				else if (m_starting_point == 2)
+				{
+					m_direction.x = cc >= 0 ? 0 : -1;
+					m_direction.y = cc >= 0 ? 1 : 0;
+					m_distance_left = cc >= 0 ? m_height : m_width;
+				}
+				else if (m_starting_point == 3)
+				{
+					m_direction.x = 0;
+					m_direction.y = cc >= 0 ? 1 : -1;
+					m_distance_left = m_height * 0.5;
+				}
+				else if (m_starting_point == 4)
+				{
+					m_direction.x = cc >= 0 ? -1 : 0;
+					m_direction.y = cc >= 0 ? 0 : -1;
+					m_distance_left = cc >= 0 ? m_width : m_height;
+				}
+				else if (m_starting_point == 5)
+				{
+					m_direction.x = cc >= 0 ? -1 : 1;
+					m_direction.y = 0;
+					m_distance_left = m_width * 0.5;
+				}
+				else if (m_starting_point == 6)
+				{
+					m_direction.x = cc >= 0 ? 0 : -1;
+					m_direction.y = cc >= 0 ? -1 : 0;
+					m_distance_left = cc >= 0 ? m_height : m_width;
+				}
+				else if (m_starting_point == 7)
+				{
+					m_direction.x = 0;
+					m_direction.y = cc >= 0 ? -1 : 1;
+					m_distance_left = m_height * 0.5;
+				}
+
+				break;
+			}
+			case Circle_:
+			{
+				//      0
+				//   11    1
+				// 10       2
+				// 9         3
+				//  8       4
+				//    7   5
+				//      6
+				m_theta = M_PI * m_starting_point / 6;
+
+				break;
+			}
+			default:
+				break;
+		}
+	}
 }
 
-sf::Vector2f  GeometryPattern::getOffset(float seconds, bool absolute_coordinate)
+sf::Vector2f GeometryPattern::getOffset_v2(sf::Time deltaTime, bool global_offset)
 {
-	static sf::Vector2f offset;
+	int cc = m_clockwise * m_speed;
 
-	switch(m_pattern_type)
+	if (global_offset == false)//if false, we want the offset relative to the previous frame only
+	{
+		m_offset.x = 0;
+		m_offset.y = 0;
+	}
+
+	switch (m_pattern_type)
 	{
 		case NoMovePattern:
 		{
-			offset.x=0;
-			offset.y=0;
+			m_offset.x = 0;
+			m_offset.y = 0;
 			break;
 		}
-	
 		case Line_:
 		{
-			//ARGS 
-			// 0 = xspeed
-			offset.x = m_patternSpeed * m_patternParams[0]*seconds;
-			offset.y = 0;
-			break;							
-		}
-
-		case Rectangle_:
-		{
-			//ARGS 
-			// 0 = longueur
-			// 1 = largeur
-
-			//just move on the line
-			offset.x = m_direction.x * m_patternSpeed*seconds;
-			offset.y = m_direction.y * m_patternSpeed*seconds;
-			static float moved= abs(offset.x) + abs(offset.y);
-
-			if(m_distance_left > moved)
-			{
-				//Moving on the edge
-				m_distance_left -= moved;
-			}
-			else
-			{
-				offset.x = m_direction.x*m_distance_left;
-				offset.y = m_direction.y*m_distance_left;
-
-				//Changing direction
-				if(abs(m_direction.x) == 1)
-				{
-					m_direction.y = m_direction.x;
-					m_direction.x = 0;
-				}
-				else
-				{
-					m_direction.x = -m_direction.y;
-					m_direction.y = 0;
-				}
-
-				if(m_distance_left < moved)
-				{
-					offset.x += m_direction.x*abs(m_distance_left-moved);
-					offset.y += m_direction.y*abs(m_distance_left-moved);
-
-					m_distance_left = (abs(m_direction.x) == 1 ? m_patternParams[0] : m_patternParams[1]) - abs(m_distance_left-moved);
-				}
-				else
-				{
-					//longueur ou largeur ?
-					m_distance_left = abs(m_direction.x) == 1 ? m_patternParams[0] : m_patternParams[1];
-				}				
-			}
-
-			if (absolute_coordinate)
-			{
-				if (m_direction.x == 1)
-				{
-					offset.x = m_patternParams[0] / 2 - m_distance_left;
-					offset.y = - m_patternParams[1] / 2;
-				}
-				else if (m_direction.x == -1)
-				{
-					offset.x = - (m_patternParams[0] / 2 - m_distance_left);
-					offset.y = m_patternParams[1] / 2;
-				}
-				else if (m_direction.y == 1)
-				{
-					offset.x = m_patternParams[0] / 2;
-					offset.y = m_patternParams[1] / 2 - m_distance_left;
-				}
-				else if (m_direction.y == -1)
-				{
-					offset.x = -(m_patternParams[0] / 2);
-					offset.y = -(m_patternParams[1] / 2 - m_distance_left);
-				}	
-			}
-
+			m_offset.x += deltaTime.asSeconds() * m_speed * m_clockwise;
+			m_offset.y = 0;
 			break;
 		}
-
 		case Circle_:
 		{
-			//ARGS 
-			// 0 = rayon
-			// v = vitesse angulaire (degres/s)
+			float old_theta = m_theta;
+			m_theta += deltaTime.asSeconds() * M_PI * m_speed * m_clockwise / 180;
 
-			static float new_angle;
-			static sf::Vector2f next;
+			if (m_theta > 2 * M_PI)
+				m_theta -= 2 * M_PI;
+			else if (m_theta < 0)
+				m_theta += 2 * M_PI;
 
-			//Updating our current theta [modulo 2PI]
-			new_angle = m_curSandboxPosition_polar.y + (m_patternParams[1] >= 0 ? seconds*m_patternSpeedInRadian : -seconds*m_patternSpeedInRadian);
-			m_curSandboxPosition_polar.y = fmod(new_angle, 2*M_PI);
-
-			//Our next position:
-			next = ToCartesianCoords(m_curSandboxPosition_polar);
-
-			//return offset = diff between new and old position
-			if (!absolute_coordinate)
-			{
-				offset.x = m_patternParams[1] * (next.x - m_curSandboxPosition_cartesian.x);
-				offset.y = m_patternParams[1] * (next.y - m_curSandboxPosition_cartesian.y);
-			}
-			//or the new position only:
-			else
-			{
-				offset.x = m_patternParams[1] * next.x;
-				offset.y = m_patternParams[1] * next.y;
-			}
-
-			m_curSandboxPosition_cartesian.x = next.x;
-			m_curSandboxPosition_cartesian.y = next.y;
+			m_offset.x += -(sin(old_theta) - sin(m_theta)) * m_width;
+			m_offset.y += (cos(old_theta) - cos(m_theta)) * m_height;;
 
 			break;
 		}
-
-		case Oscillator:
+		case Rectangle_:
 		{
-			//ARGS 
-			// 0 = rayon
-			// v = vitesse angulaire (degres/s)
-			static sf::Vector2f next;
+			float move_x = deltaTime.asSeconds() * m_speed * m_direction.x;
+			float move_y = deltaTime.asSeconds() * m_speed * m_direction.y;
+			float moved = abs(move_x) + abs(move_y);
 
-			//Updating our current theta [modulo 2PI]
-			m_currTheta = fmod(m_currTheta + seconds*m_patternSpeedInRadian, 2 * M_PI);
+			sf::Vector2f offset_tmp = sf::Vector2f(0, 0);
 
-			//Our next position (r is updated according to cos(theta))
-			next.x = m_curSandboxPosition_polar.x*cos(m_currTheta);
-			next.y = m_curSandboxPosition_polar.y;
-			ToCartesianCoords(&next);
-
-			//printf("theta : %f, next: %f\n", m_currTheta, next.x);
-			//first oscillation of a "centered" oscillator pattern is twice smaller. here we detect that this first oscillation is over and we switch back to full amplitude oscillations
-			
-			//return offset = diff between new and old position
-			if (!absolute_coordinate)
+			if (moved <= m_distance_left)//didn't cross a corner, moving in line
 			{
-				offset.x = m_patternParams[1] * (next.x - m_curSandboxPosition_cartesian.x);
-				offset.y = m_patternParams[1] * (next.y - m_curSandboxPosition_cartesian.y);
-			}
-			//or the new position only:
-			else
+				offset_tmp.x += move_x;
+				offset_tmp.y += move_y;
+				m_distance_left -= moved;
+			}	
+			else//crossed a corner, changing direction
 			{
-				offset.x = m_patternParams[1] * next.x;
-				offset.y = m_patternParams[1] * next.y;
+				//move up to the corner
+				if (move_x > 0)
+					offset_tmp.x = m_distance_left;
+				else if (move_x < 0)
+					offset_tmp.x = -m_distance_left;
+				else if (move_y > 0)
+					offset_tmp.y = m_distance_left;
+				else
+					offset_tmp.y = -m_distance_left;
+
+				//changing direction
+				if (m_direction.x == 0)//from y to x
+				{
+					m_distance_left = m_width - (abs(move_y) - abs(offset_tmp.y));//width/height of rectangle minus distance already used
+					m_direction.y = 0;
+					if ((cc > 0 && offset_tmp.y > 0) || (cc < 0 && offset_tmp.y < 0))
+						m_direction.x = -1;
+					else if ((cc > 0 && offset_tmp.y < 0) || (cc < 0 && offset_tmp.y > 0))
+						m_direction.x = 1;
+				}
+				else//from x to y
+				{
+					m_distance_left = m_height - (abs(move_x) - abs(offset_tmp.x));//width/height of rectangle minus distance already used
+					m_direction.x = 0;
+					if ((cc > 0 && offset_tmp.x > 0) || (cc < 0 && offset_tmp.x < 0))
+						m_direction.y = 1;
+					else if ((cc > 0 && offset_tmp.x < 0) || (cc < 0 && offset_tmp.x > 0))
+						m_direction.y = -1;
+				}
+
+				//move the remaining distance in the new direction
+				offset_tmp.x += m_direction.x != 0 ? (abs(move_y) - abs(offset_tmp.y)) * m_direction.x : 0;
+				offset_tmp.y += m_direction.y != 0 ? (abs(move_x) - abs(offset_tmp.x)) * m_direction.y : 0;
 			}
 
-			m_curSandboxPosition_cartesian.x = next.x;
-			m_curSandboxPosition_cartesian.y = next.y;
+			//add new delta offset to global offset
+			m_offset.x += offset_tmp.x;
+			m_offset.y += offset_tmp.y;
 
 			break;
-		}
-
-		default:
-		{
-			throw invalid_argument(TextUtils::format("Game error: Unknow pattern # '%d'", m_pattern_type));
 		}
 	}
-	
- 	return offset;
-}
 
-sf::Vector2f GeometryPattern::ToCartesianCoords(sf::Vector2f polarCoords)
-{
-	sf::Vector2f v;
-	v.x = polarCoords.x*cos(polarCoords.y);
-	v.y = polarCoords.x*sin(polarCoords.y);
-	return v;
-}
-
-void GeometryPattern::ToCartesianCoords(sf::Vector2f* polarCoords)
-{
-	static float r;
-	r = polarCoords->x;
-	polarCoords->x = polarCoords->x*cos(polarCoords->y);
-	polarCoords->y = r*sin(polarCoords->y);
+	return m_offset;
 }

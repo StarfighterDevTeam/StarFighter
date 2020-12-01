@@ -8,12 +8,12 @@ extern Game* CurrentGame;
 //DEBUG PATTERN
 void Enemy::Draw(sf::RenderTexture& screen)
 {
-	/*DEBUG*/
+	/*DEBUG
 	Text text;
 	text.setFont(*m_font);
 	text.setCharacterSize(12);
 	text.setColor(sf::Color::White);
-	text.setPosition(sf::Vector2f(getPosition().x - 30, getPosition().y - 100));
+	text.setPosition(sf::Vector2f(getPosition().x - 100, getPosition().y - 100));
 	ostringstream ss;
 
 	//hack
@@ -22,18 +22,18 @@ void Enemy::Draw(sf::RenderTexture& screen)
 	//m_pattern.m_patternSpeed = -100;
 
 	//display
-	ss << "spd: " << to_string(int(m_pattern.m_patternSpeed)) << " / ";
-	for (float f : m_pattern.m_patternParams)
-		ss << to_string(int(f)) << " / ";
+	//ss << "type: " << to_string(int(m_pattern.m_pattern_type)) << " / w: " << to_string(int(m_pattern.m_width)) << " / h: " << to_string(int(m_pattern.m_height));
+	//ss << "\noffx: " << to_string(m_pattern.m_offset.x) << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+	ss << "\nphase: " << m_currentPhase->m_display_name.c_str();
+	//for (float f : m_pattern.m_patternParams)
+	//	ss << to_string(int(f)) << " / ";
 
 	text.setString(ss.str());
 	screen.draw(text);
+	*/
+
 	GameObject::Draw(screen);
-	/**/
-
-	
 }
-
 
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), frameNumber, animationNumber)
 {
@@ -229,9 +229,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//update pattern
 	if (hyperspeedMultiplier < 1.0f)
-		offset = m_pattern.getOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
+		offset = m_pattern.getOffset_v2(deltaTime * hyperspeedMultiplier);
 	else
-		offset = m_pattern.getOffset(deltaTime.asSeconds());
+		offset = m_pattern.getOffset_v2(deltaTime);
 
 	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 
@@ -250,7 +250,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (newposition.x < size.x / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_pattern.m_patternSpeed *= -1;
+					m_pattern.m_speed *= -1;
 				else
 					m_speed.x *= -1;
 				
@@ -260,7 +260,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			else if (newposition.x > SCENE_SIZE_X - size.x / 2)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_pattern.m_patternSpeed *= -1;
+					m_pattern.m_speed *= -1;
 				else
 					m_speed.x *= -1;
 				
@@ -276,7 +276,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 					m_speed.y *= -1;
 				else
-					m_pattern.m_patternSpeed *= -1;
+					m_pattern.m_speed *= -1;
 				
 				setPosition(newposition.x, size.y / 2);
 			}
@@ -286,7 +286,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 					m_speed.y *= -1;
 				else
-					m_pattern.m_patternSpeed *= -1;
+					m_pattern.m_speed *= -1;
 				
 				setPosition(newposition.x, SCENE_SIZE_Y - size.y / 2);
 			}
@@ -747,9 +747,7 @@ void Enemy::setPhase(Phase* phase)
 				break;
 			}
 			default:
-			{
-
-			}
+				break;
 		}
 	}
 
@@ -781,37 +779,8 @@ void Enemy::setPhase(Phase* phase)
 			m_weapons_list.push_back(weapon->Clone());
 	}
 
-	//movement
-	//check if identical patterns
-	bool identical_patterns = false;
-	if (m_currentPhase && m_currentPhase->m_pattern->m_pattern_type == phase->m_pattern->m_pattern_type)
-	{
-		if (m_currentPhase->m_pattern->m_pattern_type == NoMovePattern)
-			identical_patterns = true;
-		else if (m_currentPhase->m_pattern->m_patternSpeed == phase->m_pattern->m_patternSpeed)
-		{
-			size_t paramsVectorSize = m_currentPhase->m_pattern->m_patternParams.size();
-			if (paramsVectorSize == phase->m_pattern->m_patternParams.size())
-			{
-				if (paramsVectorSize == 0)
-					identical_patterns = true;
-				else
-				{
-					for (size_t i = 0; i < paramsVectorSize; i++)
-					{
-						if (m_currentPhase->m_pattern->m_patternParams[i] != phase->m_pattern->m_patternParams[i])
-							break;
-
-						if (i == paramsVectorSize - 1)
-							identical_patterns = true;
-					}
-				}
-			}
-		}
-	}
-
-	if (identical_patterns == false)
-		m_pattern.setPattern(phase->m_pattern->m_pattern_type, phase->m_pattern->m_patternSpeed, phase->m_pattern->m_patternParams); //vitesse angulaire (degres/s)
+	//movement pattern
+	m_pattern.setPattern_v2(phase->m_pattern); //vitesse angulaire (degres/s)
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
 	if (phase->m_welcomeWeapon != NULL)
@@ -919,8 +888,8 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//loading phases
-			GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*it), PHASE_PATTERN);
-			phase->m_pattern = m_bobby;
+			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), PHASE_PATTERN);
+			phase->m_pattern = pattern;
 
 			//loading rotation speed
 			phase->m_rotation_speed = stoi((*it)[PHASE_ROTATION_SPEED]);
@@ -1207,8 +1176,8 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 			weapon->m_ammunition->m_speed = sf::Vector2f(0, weapon->m_ammunition->m_ref_speed);
 			weapon->m_ammunition->m_range = stoi((*it)[WEAPON_RANGE]);
 
-			GeometryPattern* pattern = GeometryPattern::PatternLoader((*it), WEAPON_PATTERN);
-			weapon->m_ammunition->m_pattern.setPattern(pattern->m_pattern_type, pattern->m_patternSpeed, pattern->m_patternParams);
+			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), WEAPON_PATTERN);
+			weapon->m_ammunition->m_pattern.setPattern_v2(pattern);
 			delete pattern;
 
 			weapon->m_multishot = stoi((*it)[WEAPON_MULTISHOT]);
@@ -1328,8 +1297,9 @@ Bot* Enemy::LoadBot(string name)
 			((GameObject*)bot)->m_damage = stoi((*it)[BOT_DAMAGE]);
 			bot->m_spread = Vector2f(stoi((*it)[BOT_XSPREAD]), stoi((*it)[BOT_YSPREAD]));
 
-			GeometryPattern* m_bobby = GeometryPattern::PatternLoader((*it), BOT_PATTERN);
-			bot->m_pattern.setPattern(m_bobby->m_pattern_type, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
+			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), BOT_PATTERN);
+			bot->m_pattern.setPattern_v2(pattern);
+			delete pattern;
 
 			bot->m_rotation_speed = stoi((*it)[BOT_ROTATION_SPEED]);
 
@@ -1360,9 +1330,7 @@ Equipment* Enemy::LoadEquipment(string name)
 				stoi((*it)[EQUIPMENT_FRAMES]), (*it)[EQUIPMENT_NAME]);
 
 			if ((*it)[EQUIPMENT_BOT].compare("0") != 0)
-			{
 				i->m_bots.push_back(LoadBot((*it)[EQUIPMENT_BOT]));
-			}
 
 			if (!(*it)[EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_WIDTH].compare("0") == 0
 				&& !(*it)[EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
@@ -1543,7 +1511,7 @@ Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 			}
 			case 1:
 			{
-				weapon->m_ammunition->m_pattern.setPattern(Oscillator, 200, { 70, 0, 1 });
+				weapon->m_ammunition->m_pattern.setPattern_v2(Circle_, 200, 0, 70, 0, 0);
 				weapon->m_ammunition->m_speed.y *= 0.5;
 				break;
 			}
@@ -1773,19 +1741,16 @@ Equipment* Enemy::CreateRandomModule(int level, float beastScore)
 		Bot* bot = equipment->m_bots.front();
 
 		//Randomize pattern
-		int pattern_type = RandomizeIntBetweenValues(NoMovePattern, Oscillator);
 		int clockwise = ((rand() % 2) * 2) - 1;
-		
-		vector<float> patternParams;
-		patternParams.push_back(bot->m_pattern.m_patternParams[0]);
-		patternParams.push_back(clockwise);
-		if (pattern_type == Oscillator)
+		bot->m_pattern.m_clockwise = clockwise;
+
+		if (RandomizeIntBetweenValues(0, 1) == 0)//chance of "oscillator" pattern
 		{
-			patternParams.push_back(1);
-			bot->m_pattern.m_patternSpeed *= 0.5;
+			bot->m_pattern.m_speed *= 2;
+			bot->m_pattern.m_height = 0;
 		}
-			
-		bot->m_pattern.setPattern((PatternType)pattern_type, bot->m_pattern.m_patternSpeed, patternParams);
+
+		bot->m_pattern.resetPattern();
 
 		//Randomize weapon
 		Weapon* weapon = Enemy::CreateRandomWeapon(level, true, beastScore);
@@ -1802,6 +1767,19 @@ Equipment* Enemy::CreateRandomModule(int level, float beastScore)
 			int x = i / 2;
 			new_bot->m_spread.x *= s * (1 + x);
 
+			//movement pattern spreading
+			//if (bot->m_pattern.m_pattern_type == Circle_)
+			//{
+			//	if (number_of_bots % 2 + 1 == 2)
+			//		new_bot->m_pattern.m_starting_point = 6 + bot->m_pattern.m_starting_point;
+			//	else if (number_of_bots % 2 + 1 == 3)
+			//		new_bot->m_pattern.m_starting_point = 4 * (i % 2 + 1) + bot->m_pattern.m_starting_point;
+			//	else if (number_of_bots % 2 + 1 == 4)
+			//		new_bot->m_pattern.m_starting_point = 3 * (i % 2 + 1) + bot->m_pattern.m_starting_point;
+			//		
+			//	new_bot->m_pattern.resetPattern();
+			//}
+			
 			equipment->m_bots.push_back(new_bot);
 		}
 	}

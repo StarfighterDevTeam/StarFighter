@@ -20,11 +20,8 @@ public:
 	Weapon* m_weapon;
 	GameObject* m_target;
 	Bot* Clone();
-	float m_radius;
-	float m_angspeed;
 	float m_vspeed;
 	void setTarget (GameObject* target);
-	void setRadius (float radius, float clockwise);
 	sf::Vector2f m_spread;
 	bool m_automatic_fire;
 	bool m_key_repeat;

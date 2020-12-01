@@ -322,11 +322,10 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					if (obj->m_bots.front()->m_weapon->m_rafale > 0)
 						ss_stats << "\nRafale: " << obj->m_bots.front()->m_weapon->m_rafale << " (cooldown: " << obj->m_bots.front()->m_weapon->m_rafale_cooldown << " sec";
 
-					if (obj->m_bots.front()->m_pattern.m_pattern_type == Oscillator)
-						ss_stats << "\nPattern: Oscillator";
-					else if (obj->m_bots.front()->m_pattern.m_pattern_type == Circle_)
+					if (obj->m_bots.front()->m_pattern.m_pattern_type == Circle_ && obj->m_bots.front()->m_pattern.m_width > 0 && obj->m_bots.front()->m_pattern.m_height > 0)
 						ss_stats << "\nPattern: Circle";
-
+					else
+						ss_stats << "\nPattern: Oscillator";
 					//ss_stats << "\nFiring style: ";
 					//switch (obj->m_bots.front()->m_weapon->m_shot_mode)
 					//{
@@ -369,7 +368,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						}
 					}
 
-					if (obj->m_bots.front()->m_weapon->m_ammunition->m_pattern.m_pattern_type == Oscillator)
+					if (obj->m_bots.front()->m_weapon->m_ammunition->m_pattern.m_pattern_type == Circle_)
 						ss_stats << "\nEpic ability: waving trajectory";
 				}
 				else
@@ -445,7 +444,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				//	}
 				//}
 
-				if (obj->m_ammunition->m_pattern.m_pattern_type == Oscillator)
+				if (obj->m_ammunition->m_pattern.m_pattern_type == Circle_)
 				{
 					ss_stats << "\nEpic ability: waving trajectory";
 				}

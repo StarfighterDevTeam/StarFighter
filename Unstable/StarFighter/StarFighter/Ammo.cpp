@@ -10,7 +10,6 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_shield = 0;
 	m_shield_max = 0;
 	m_shield_regen = 0;
-	m_startPattern = false;
 	m_ref_speed = sqrt((speed.x*speed.x) + (speed.y*speed.y));
 	m_explosion = explosion;
 	m_radius = 0;
@@ -84,8 +83,8 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-		//call bobbyPattern
-		pattern_offset = m_pattern.getOffset(deltaTime.asSeconds());
+		//call movement pattern
+		pattern_offset = m_pattern.getOffset_v2(deltaTime);
 		offset.x = pattern_offset.x * cos(m_shot_angle) + pattern_offset.y * sin(m_shot_angle);
 		offset.y = pattern_offset.x * sin(m_shot_angle) + pattern_offset.y * cos(m_shot_angle);
 		//offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);

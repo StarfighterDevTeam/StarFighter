@@ -9,8 +9,6 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	m_visible = false;
 	m_isOnScene = true;
 	m_DontGarbageMe = true;
-	m_radius = 0;
-	m_angspeed = 0;
 	m_vspeed = 0;
 	m_spread = sf::Vector2f(0,0);
 	m_damage = 0;
@@ -72,9 +70,9 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 		//pattern
 		if (hyperspeedMultiplier < 1.0f)
-			offset = m_pattern.getOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
+			offset = m_pattern.getOffset_v2(deltaTime * hyperspeedMultiplier, m_target != NULL);
 		else
-			offset = m_pattern.getOffset(deltaTime.asSeconds(), true);
+			offset = m_pattern.getOffset_v2(deltaTime, m_target != NULL);
 
 		offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 		newposition.x += offset.x;
@@ -174,10 +172,7 @@ Bot* Bot::Clone()
 {
 	Bot* bot = new Bot(this->getPosition(), this->m_speed, this->m_textureName, this->m_size);
 	bot->m_display_name = this->m_display_name;
-	bot->m_radius = this->m_radius;
-	bot->m_angspeed = this->m_angspeed;
 	bot->m_vspeed = this->m_vspeed;
-	bot->m_pattern = this->m_pattern;
 	bot->m_spread = this->m_spread;
 	bot->m_weapon = this->m_weapon->Clone();
 	bot->m_damage = this->m_damage;
@@ -188,13 +183,7 @@ Bot* Bot::Clone()
 	bot->m_shield_regen = this->m_shield_regen;
 	bot->m_rotation_speed = this->m_rotation_speed;
 
-	return bot;
-}
+	bot->m_pattern.setPattern_v2(&this->m_pattern);
 
-void Bot::setRadius(float m_radius, float clockwise)
-{
-	vector<float> patternParams;
-	patternParams.push_back(m_radius);
-	patternParams.push_back(clockwise);  // clockwise (>)
-	m_pattern.setPattern(m_pattern.m_pattern_type, m_vspeed, patternParams); //vitesse angulaire (degres/s)in
+	return bot;
 }

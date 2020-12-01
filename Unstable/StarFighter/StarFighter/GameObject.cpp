@@ -168,7 +168,6 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_visible = true;
 	m_isOnScene = /*false*/getPosition().x + (m_size.x / 2) >= 0 && getPosition().x - (m_size.x / 2) <= SCENE_SIZE_X && getPosition().y + (m_size.y / 2) >= 0 && getPosition().y - (m_size.y / 2) <= SCENE_SIZE_Y;
 	m_immune = false;
-	m_startPattern = false;
 	m_garbageMe = false;
 	m_DontGarbageMe = false;
 	m_money = 0;
