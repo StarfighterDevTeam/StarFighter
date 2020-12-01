@@ -1490,8 +1490,8 @@ Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 			}
 			case 1:
 			{
-				weapon->m_ammunition->m_pattern.setPattern_v2(Circle_, 200, 0, 70, 0, 0);
-				weapon->m_ammunition->m_speed.y *= 0.5;
+				weapon->m_ammunition->m_pattern.setPattern_v2(Circle_, 1200, 0, 30, 0, 0);
+				weapon->m_ammunition->m_speed.y *= 0.8;
 				break;
 			}
 		}

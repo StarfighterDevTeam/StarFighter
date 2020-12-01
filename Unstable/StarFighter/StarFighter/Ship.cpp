@@ -2469,8 +2469,6 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 
 int Ship::SaveItems(Ship* ship)
 {
-	return 0;
-
 	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 
@@ -2699,21 +2697,23 @@ Equipment* Ship::LoadSavedEquipmentFromLine(string line)
 		bot->m_spread = sf::Vector2f(bot_spread_x, bot_spread_y);
 		bot->m_rotation_speed = bot_rotation_speed;
 
-		bot->m_pattern.m_pattern_type = (PatternType)bot_pattern_type;
+		GeometryPattern* bot_pattern = new GeometryPattern();
+		bot_pattern->m_pattern_type = (PatternType)bot_pattern_type;
 
-
-		if (bot->m_pattern.m_pattern_type != NoMovePattern)
+		if (bot_pattern->m_pattern_type != NoMovePattern)
 		{
-			bot->m_pattern.m_speed = bot_pattern_speed;
-			bot->m_pattern.m_clockwise = bot_pattern_clockwise;
+			bot_pattern->m_speed = bot_pattern_speed;
+			bot_pattern->m_clockwise = bot_pattern_clockwise;
 
-			if (bot->m_pattern.m_pattern_type == Circle_ || bot->m_pattern.m_pattern_type == Rectangle_)
+			if (bot_pattern->m_pattern_type == Circle_ || bot_pattern->m_pattern_type == Rectangle_)
 			{
-				bot->m_pattern.m_width = bot_pattern_width;
-				bot->m_pattern.m_height = bot_pattern_height;
-				bot->m_pattern.m_starting_point = bot_pattern_starting_point;
+				bot_pattern->m_width = bot_pattern_width;
+				bot_pattern->m_height = bot_pattern_height;
+				bot_pattern->m_starting_point = bot_pattern_starting_point;
 			}
 		}
+		bot->m_pattern.setPattern_v2(bot_pattern);
+		delete bot_pattern;
 
 		if (bot_weapon_name.compare("0") == 0)
 		{
@@ -2725,22 +2725,24 @@ Equipment* Ship::LoadSavedEquipmentFromLine(string line)
 			ammo->m_display_name = bot_ammo_name;
 			ammo->m_range = bot_ammo_range;
 			ammo->m_isBeam = bot_weapon_rafale < 0;
-			ammo->m_pattern.m_pattern_type = (PatternType)bot_ammo_pattern_type;
 
-			if (ammo->m_pattern.m_pattern_type != NoMovePattern)
+			GeometryPattern* ammo_pattern = new GeometryPattern();
+			ammo_pattern->m_pattern_type = (PatternType)bot_ammo_pattern_type;
+
+			if (ammo_pattern->m_pattern_type != NoMovePattern)
 			{
-				ammo->m_pattern.m_speed = bot_ammo_pattern_speed;
-				ammo->m_pattern.m_clockwise = bot_ammo_pattern_clockwise;
+				ammo_pattern->m_speed = bot_ammo_pattern_speed;
+				ammo_pattern->m_clockwise = bot_ammo_pattern_clockwise;
 
-				if (ammo->m_pattern.m_pattern_type == Circle_ || ammo->m_pattern.m_pattern_type == Rectangle_)
+				if (ammo_pattern->m_pattern_type == Circle_ || ammo_pattern->m_pattern_type == Rectangle_)
 				{
-					ammo->m_pattern.m_width = bot_ammo_pattern_width;
-					ammo->m_pattern.m_height = bot_ammo_pattern_height;
-					ammo->m_pattern.m_starting_point = bot_ammo_pattern_starting_point;
+					ammo_pattern->m_width = bot_ammo_pattern_width;
+					ammo_pattern->m_height = bot_ammo_pattern_height;
+					ammo_pattern->m_starting_point = bot_ammo_pattern_starting_point;
 				}
 			}
-
-			//ammo->m_pattern.startPattern();
+			ammo->m_pattern.setPattern_v2(ammo_pattern);
+			delete ammo_pattern;
 
 			Weapon* weapon = new Weapon(ammo);
 			weapon->m_display_name = bot_weapon_name;
@@ -2844,20 +2846,24 @@ Weapon* Ship::LoadSavedWeaponFromLine(string line)
 	ammo->m_display_name = ammo_name;
 	ammo->m_range = ammo_range;
 	ammo->m_isBeam = weapon_rafale < 0;
-	ammo->m_pattern.m_pattern_type = (PatternType)ammo_pattern_type;
 
-	if (ammo->m_pattern.m_pattern_type != NoMovePattern)
+	GeometryPattern* ammo_pattern = new GeometryPattern();
+
+	ammo_pattern->m_pattern_type = (PatternType)ammo_pattern_type;
+	if (ammo_pattern->m_pattern_type != NoMovePattern)
 	{
-		ammo->m_pattern.m_speed = ammo_pattern_speed;
-		ammo->m_pattern.m_clockwise = ammo_pattern_clockwise;
+		ammo_pattern->m_speed = ammo_pattern_speed;
+		ammo_pattern->m_clockwise = ammo_pattern_clockwise;
 
-		if (ammo->m_pattern.m_pattern_type == Circle_ || ammo->m_pattern.m_pattern_type == Rectangle_)
+		if (ammo_pattern->m_pattern_type == Circle_ || ammo_pattern->m_pattern_type == Rectangle_)
 		{
-			ammo->m_pattern.m_width = ammo_pattern_width;
-			ammo->m_pattern.m_height = ammo_pattern_height;
-			ammo->m_pattern.m_starting_point = ammo_pattern_starting_point;
+			ammo_pattern->m_width = ammo_pattern_width;
+			ammo_pattern->m_height = ammo_pattern_height;
+			ammo_pattern->m_starting_point = ammo_pattern_starting_point;
 		}
 	}
+	ammo->m_pattern.setPattern_v2(ammo_pattern);
+	delete ammo_pattern;
 
 	Weapon* weapon = new Weapon(ammo);
 	weapon->m_display_name = display_name;
