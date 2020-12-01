@@ -7,7 +7,7 @@ GeometryPattern::GeometryPattern()
 	m_clockwise = 0;
 	m_width = 0;
 	m_height = 0;
-	m_starting_point = 0;
+	m_starting_point = -1;
 	m_offset = sf::Vector2f(0, 0);
 }
 
@@ -63,22 +63,23 @@ void GeometryPattern::setPattern_v2(PatternType pattern_type, int speed, int clo
 
 	if (clockwise == 0)//randomized "clockwise" variable
 	{
-		if (m_clockwise == 0)//else, keep the current clockwise value
+		if (m_clockwise == 0)
 		{
 			srand(time(NULL));
 			clockwise = ((rand() % 2) * 2) - 1;
 		}
+		else
+			clockwise = m_clockwise;//keep current value
 	}
-	else
-		m_clockwise = clockwise;
 	
 	m_speed = speed;
+	m_clockwise = clockwise;
 	m_width = width;
 	m_height = height;
 	m_pattern_type = pattern_type;
 
 	//starting point
-	if (pattern_type >= 0)//-1 = don't apply starting point (continue with current offset)
+	if (pattern_type >= 0 && (pattern_type != m_pattern_type || starting_point != m_starting_point))
 	{
 		m_starting_point = starting_point;
 		int cc = m_clockwise * m_speed;

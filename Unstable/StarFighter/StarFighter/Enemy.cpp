@@ -2,18 +2,15 @@
 
 extern Game* CurrentGame;
 
-
-
-
 //DEBUG PATTERN
 void Enemy::Draw(sf::RenderTexture& screen)
 {
-	/*DEBUG
-	Text text;
+	/*DEBUG*/
+	/*Text text;
 	text.setFont(*m_font);
 	text.setCharacterSize(12);
 	text.setColor(sf::Color::White);
-	text.setPosition(sf::Vector2f(getPosition().x - 100, getPosition().y - 100));
+	text.setPosition(sf::Vector2f(getPosition().x - 100, getPosition().y - 130));
 	ostringstream ss;
 
 	//hack
@@ -23,7 +20,8 @@ void Enemy::Draw(sf::RenderTexture& screen)
 
 	//display
 	//ss << "type: " << to_string(int(m_pattern.m_pattern_type)) << " / w: " << to_string(int(m_pattern.m_width)) << " / h: " << to_string(int(m_pattern.m_height));
-	//ss << "\noffx: " << to_string(m_pattern.m_offset.x) << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+	ss << "\ncw: " << to_string(m_pattern.m_clockwise);// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+	ss << "\nspd: " << to_string(m_pattern.m_speed);
 	ss << "\nphase: " << m_currentPhase->m_display_name.c_str();
 	//for (float f : m_pattern.m_patternParams)
 	//	ss << to_string(int(f)) << " / ";
@@ -31,7 +29,7 @@ void Enemy::Draw(sf::RenderTexture& screen)
 	text.setString(ss.str());
 	screen.draw(text);
 	*/
-
+	
 	GameObject::Draw(screen);
 }
 
@@ -400,26 +398,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 
 			//UPDATE BEAMS
-			for (Ammo* beam : weapon->m_beams)
-			{
-				//update beam positions
-				beam->setRotation(weapon->m_shot_angle * 180 / M_PI);
-
-				float beam_offset_x = beam->m_offset_x * cos(weapon->m_shot_angle) - beam->m_size.y / 2 * sin(weapon->m_shot_angle);
-				float beam_offset_y = beam->m_offset_x * sin(weapon->m_shot_angle) + beam->m_size.y / 2 * cos(weapon->m_shot_angle);
-
-				beam->setPosition(weapon->getPosition().x + beam_offset_x, weapon->getPosition().y + beam_offset_y);
-				beam->setRotation(weapon->m_shot_angle * 180 / M_PI);
-			}
-
-			if (m_disable_fire == true)
-			{
-				for (Ammo* beam : weapon->m_beams)
-					beam->Death();
-
-				weapon->m_beams.clear();
-				weapon->m_readyFireTimer = 0;
-			}
+			weapon->UpdateBeams(m_disable_fire == false);
 		}
 	}
 

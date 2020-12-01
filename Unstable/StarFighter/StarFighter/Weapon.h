@@ -30,6 +30,7 @@ public:
 	void FireAlternateShot(GameObjectType collider_type);
 	void FireAscendingShot(GameObjectType collider_type);
 	void FireDescendingShot(GameObjectType collider_type);
+	void UpdateBeams(bool firing);
 
 	sf::Vector2i m_fire_direction;
 	float m_rate_of_fire;

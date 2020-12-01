@@ -81,9 +81,7 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 	(*CurrentGame).addToScene(bullet, true);
 
 	if (m_rafale < 0)//continuous beam created, we need to keep track of it
-	{
 		m_beams.push_back(bullet);
-	}
 }
 
 bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -119,20 +117,14 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	if (m_readyFireTimer > m_rate_of_fire && rafale_ready == true)
-	{
 		m_firing_ready = true;
-	}
 	else if (m_rafale > 0)
 	{
 		if (m_readyFireTimer > m_rate_of_fire && m_rafale_index <= m_rafale - 1)
-		{
 			m_firing_ready = true;
-		}
 	}
 	else if (m_rafale < 0)
-	{
 		m_firing_ready = (m_beams.empty() == true && m_readyFireTimer > m_rate_of_fire);
-	}
 
 	return m_firing_ready;
 }
@@ -226,39 +218,23 @@ void Weapon::FireAlternateShot(GameObjectType m_collider_type)
 	if (m_multishot % 2 != 0) //case of an odd number of bullets
 	{
 		if (m_shot_index % 2 != 0)
-		{
-			//CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread);
 			CreateBullet(m_collider_type, -(((m_shot_index - 1) / 2) + 1)*m_xspread, -(((m_shot_index - 1) / 2) + 1)*m_dispersion / 2 / ((m_multishot - 1) / 2));
-		}
 		else
-		{
-			//CreateBullet(m_collider_type, (shot_index/2)*xspread);
 			CreateBullet(m_collider_type, (m_shot_index / 2)*m_xspread, (m_shot_index / 2)*m_dispersion / 2 / ((m_multishot - 1) / 2));
-		}
 	}
 
 	if (m_multishot % 2 == 0) //case of an even number of bullets
 	{
 		if (m_shot_index % 2 != 0)
-		{
-			//CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2));
 			CreateBullet(m_collider_type, -(((m_shot_index / 2) + 1)*m_xspread) + (m_xspread / 2), -((m_shot_index / 2) + 1)*m_dispersion / (m_multishot - 1) + m_dispersion / (m_multishot - 1) / 2);
-		}
 		else
-		{
-			//CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2));
 			CreateBullet(m_collider_type, (((m_shot_index / 2) + 1)*m_xspread) - (m_xspread / 2), ((m_shot_index / 2) + 1)*m_dispersion / (m_multishot - 1) - (m_dispersion / (m_multishot - 1) / 2));
-		}
 	}
 
 	if (m_shot_index < m_multishot - 1)
-	{
 		m_shot_index++;
-	}
 	else
-	{
 		m_shot_index = 0;
-	}
 }
 
 //left to right order
@@ -268,38 +244,24 @@ void Weapon::FireAscendingShot(GameObjectType collider_type)
 	{
 		//left and center bullets (from left to right)
 		if (m_shot_index < (((m_multishot - 1) / 2) + 1))
-		{
 			CreateBullet(collider_type, (-((m_multishot - 1) / 2) + m_shot_index)*m_xspread, (-((m_multishot - 1) / 2) + m_shot_index)*(m_dispersion / (m_multishot - 1)));
-		}
-		//right
-		else
-		{
+		else//right
 			CreateBullet(collider_type, (m_shot_index - ((m_multishot - 1) / 2))*m_xspread, (m_shot_index - ((m_multishot - 1) / 2))*(m_dispersion / (m_multishot - 1)));
-		}
 	}
 
 	if (m_multishot % 2 == 0) //case of an odd number of bullets
 	{
 		//left and center bullets (from left to right)
 		if (m_shot_index < (m_multishot / 2))
-		{
 			CreateBullet(collider_type, (-((m_multishot / 2) + m_shot_index)*m_xspread) + (m_xspread / 2), -((m_multishot / 2) - m_shot_index + (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-		}
-		//right
-		else
-		{
+		else//right
 			CreateBullet(collider_type, (m_shot_index - (m_multishot / 2))*m_xspread + (m_xspread / 2), (m_shot_index - (m_multishot / 2) + (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-		}
 	}
 
 	if (m_shot_index < m_multishot - 1)
-	{
 		m_shot_index++;
-	}
 	else
-	{
 		m_shot_index = 0;
-	}
 }
 
 //right to left order
@@ -309,37 +271,47 @@ void Weapon::FireDescendingShot(GameObjectType collider_type)
 	{
 		//right and center bullets (from right to left)
 		if (m_shot_index < (((m_multishot - 1) / 2) + 1))
-		{
 			CreateBullet(collider_type, (((m_multishot - 1) / 2) - m_shot_index)*m_xspread, (((m_multishot - 1) / 2) - m_shot_index)*(m_dispersion / (m_multishot - 1)));
-		}
-		//left
-		else
-		{
+		else//left
 			CreateBullet(collider_type, (-m_shot_index + ((m_multishot - 1) / 2))*m_xspread, (-m_shot_index + ((m_multishot - 1) / 2))*(m_dispersion / (m_multishot - 1)));
-		}
 	}
 
 	if (m_multishot % 2 == 0) //case of an odd number of bullets
 	{
 		//right and center bullets (from right to left)
 		if (m_shot_index < (m_multishot / 2))
-		{
 			CreateBullet(collider_type, (((m_multishot / 2) - m_shot_index)*m_xspread) + (m_xspread / 2), ((m_multishot / 2) - m_shot_index - (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-		}
-		//left
-		else
-		{
+		else//left
 			CreateBullet(collider_type, (-m_shot_index + (m_multishot / 2))*m_xspread - (m_xspread / 2), (-m_shot_index + (m_multishot / 2) - (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-		}
 	}
 
 	if (m_shot_index < m_multishot - 1)
-	{
 		m_shot_index++;
-	}
 	else
-	{
 		m_shot_index = 0;
+}
+
+void Weapon::UpdateBeams(bool firing)
+{
+	for (Ammo* beam : m_beams)
+	{
+		//update beam positions
+		float beam_offset_x = beam->m_offset_x * cos(m_shot_angle) + beam->m_size.y / 2 * sin(m_shot_angle);
+		float beam_offset_y = beam->m_offset_x * sin(m_shot_angle) - beam->m_size.y / 2 * cos(m_shot_angle);
+
+		beam->setPosition(getPosition().x + beam_offset_x, getPosition().y + beam_offset_y);
+	}
+
+	if (m_beams.empty() == false)//end of beam because no valid fire input
+	{
+		if (firing == false)
+		{
+			for (Ammo* beam : m_beams)
+				beam->Death();
+
+			m_beams.clear();
+			m_readyFireTimer = 0;
+		}
 	}
 }
 

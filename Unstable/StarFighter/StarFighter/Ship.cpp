@@ -578,28 +578,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 
 		//UPDATE BEAMS
-		for (Ammo* beam : m_weapon->m_beams)
-		{
-			beam->setRotation(m_weapon->m_shot_angle * 180 / M_PI);
-
-			//update beam positions
-			float beam_offset_x = beam->m_offset_x * cos(m_weapon->m_shot_angle) + beam->m_size.y / 2 * sin(m_weapon->m_shot_angle);
-			float beam_offset_y = beam->m_offset_x * sin(m_weapon->m_shot_angle) - beam->m_size.y / 2 * cos(m_weapon->m_shot_angle);
-
-			beam->setPosition(m_weapon->getPosition().x + beam_offset_x, m_weapon->getPosition().y + beam_offset_y);
-		}
-
-		if (m_weapon->m_beams.empty() == false)//end of beam because no valid fire input
-		{
-			if (firing == false)
-			{
-				for (Ammo* beam : m_weapon->m_beams)
-						beam->Death();
-
-				m_weapon->m_beams.clear();
-				m_weapon->m_readyFireTimer = 0;
-			}
-		}
+		m_weapon->UpdateBeams(firing);
 	}
 
 	//not considered "firing" between rafales
