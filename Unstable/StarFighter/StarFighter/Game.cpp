@@ -38,7 +38,7 @@ void Game::init(RenderWindow* window)
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	//if (!SpaceCowboys.openFromFile("Music/SpaceCowboys.ogg"))

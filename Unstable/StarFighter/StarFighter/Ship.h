@@ -153,6 +153,14 @@ public :
 
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 
+	bool BuyingItem_v2(GridElement* element, bool equip_directly = false);
+	void SellingItem_v2(GridElement* element);
+	bool DesquipItem_v2(GridElement* element);
+	bool EquipItem_v2(GridElement* element);
+	void ThrowingItem_v2(GridElement* element);
+	bool Equip_v2(GameObject* object);
+	void Desequip_v2(GameObject* object);
+
 	void BuyingItem(bool equip_directly = false);
 	void SellingItem();
 	void GarbagingItem();
@@ -214,6 +222,7 @@ public :
 	bool m_is_asking_scene_transition;
 	SFTextPop* m_recall_text;
 	bool m_release_to_fire;
+	bool m_release_to_throw;
 
 	string m_respawnSceneName;
 	int m_last_hazard_level_played;

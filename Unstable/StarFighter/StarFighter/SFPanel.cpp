@@ -229,6 +229,12 @@ ObjectGrid* SFPanel::GetGrid(bool fake_grid, int grid)
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 
+Grid* SFPanel::GetGrid_v2(int grid)
+{
+	return NULL;
+	//see override function in SFInventoryPanel and other types of SF panels
+}
+
 sf::Vector2i SFPanel::GetFocusedIndex()
 {
 	return sf::Vector2i(-1, -1);
@@ -327,4 +333,20 @@ void SFPanel::ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, Ob
 {
 	return;
 	//see override function in SFMenuPanel and other types of SF panels
+}
+
+GridElement* SFPanel::GetHighlightedElement()
+{
+	return NULL;
+	//see override function in SFInventoryPanel
+}
+
+void SFPanel::SetHighlightedElement(GridElement* element)
+{
+	//see override function in SFInventoryPanel
+}
+
+void SFPanel::SetCursorVisible_v2(bool visible)
+{
+	//see override function in SFInventoryPanel
 }

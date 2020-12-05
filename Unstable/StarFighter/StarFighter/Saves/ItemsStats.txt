@@ -1,0 +1,35 @@
+Engine 0
+Armor Armor 1 2 11.6783 2D/Equipment/Armor.png 48 48 1 0 0 0 0 0 153 0 0 0 0 3 0 0 0
+Shield Shield 1 2 11.8269 2D/Equipment/Shield.png 48 48 1 0 0 0 0 0 0 51 5 20 0 0 0 0 0
+Module Module 1 2 13.4856 2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 0 0 0 bot 1 2D/Equipment/bot.png 32 32 1 -50 0 0 2 600 -1 50 0 3 2-shots_laser 2D/Equipment/laser.png 48 48 1 0.1 0 0.8 2 10 0 0 2 laser 5 2200 0 2D/Ammo/P_laser.png 6 32 1 explosion_S_blue 0
+Weapon 2-shots_laser 1 3 18.0627 2D/Equipment/laser.png 48 48 1 0.0970874 0 0.8 2 10 0 0 2 laser 5 2200 0 2D/Ammo/P_laser.png 6 32 1 explosion_S_blue 0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0

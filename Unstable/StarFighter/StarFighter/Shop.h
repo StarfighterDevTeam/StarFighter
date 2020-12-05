@@ -11,6 +11,8 @@ public:
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	int m_level;
 	vector<GameObject*> m_items;
+
+	Grid* m_grid_v2;
 };
 
 #endif // SHOP_H_INCLUDED

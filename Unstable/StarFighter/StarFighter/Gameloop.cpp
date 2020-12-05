@@ -36,18 +36,35 @@ void Gameloop::Initialize(Player player)
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
 	//Update HUD items
+	//for (int i = 0; i < NBVAL_Equipment; i++)
+	//{
+	//	if (m_playerShip->m_equipment[i] != NULL)
+	//	{
+	//		GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
+	//		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(i, capsule);
+	//	}
+	//}
+	//if (m_playerShip->m_weapon)
+	//{
+	//	GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
+	//	m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
+	//}
+
+	//Update HUD items v2
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_playerShip->m_equipment[i] != NULL)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(i, capsule);
+			EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_equipment_loot->m_quality);
+			m_playerShip->m_SFHudPanel->GetGrid_v2((int)Trade_EquippedGrid)->InsertObject(capsule, i, quality, false);
 		}
 	}
 	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
+		EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_weapon_loot->m_quality);
+		m_playerShip->m_SFHudPanel->GetGrid_v2((int)Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
 	}
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 

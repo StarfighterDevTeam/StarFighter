@@ -60,4 +60,45 @@ public:
 	bool m_visible;
 };
 
+class Grid;//forward declaration
+class GridElement : public GameObject
+{
+public:
+	GridElement();
+	~GridElement();
+	void Draw(sf::RenderTexture& offscreen);
+	void SetPosition(sf::Vector2f position);
+	void SetObject(GameObject* object, EquipmentQuality quality);
+
+	//int m_credits;
+	//int m_level;
+	//float m_quality;
+	GameObject* m_object;
+	GameObject* m_quality_overlay;
+	GameObject* m_grey_overlay;
+	
+	int m_index;
+	Grid* m_grid;
+};
+
+class SFPanel;//forward declaration
+class Grid
+{
+public:
+	Grid(sf::Vector2f position, sf::Vector2i nb_squares, SFPanel* panel);
+	~Grid();
+	void Draw(sf::RenderTexture& offscreen);
+	void SetPosition(sf::Vector2f position);
+	GridElement* GetCursorCollision(GameObject& cursor);
+	int InsertObject(GameObject* object, int index, EquipmentQuality quality, bool force_overwrite);
+	void CloneGridContentFrom(Grid* grid);
+
+	sf::Vector2f m_position;
+	sf::Vector2f m_size;
+	sf::Vector2i m_nb_squares;
+	int m_first_empty_slot_index;
+	vector<GridElement*> m_elements;
+	SFPanel* m_panel;
+};
+
 #endif // HUDGRID_H_INCLUDED

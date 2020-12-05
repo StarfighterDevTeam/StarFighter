@@ -58,10 +58,11 @@ public:
 	int m_shield_regen;
 	int m_hyperspeed_fuel;
 	int m_damage;
+
 	int m_level;
 	int m_credits;
-
 	float m_quality;
+
 	float m_shield_recovery_time;
 	float m_hyperspeed;
 	float m_max_speed;

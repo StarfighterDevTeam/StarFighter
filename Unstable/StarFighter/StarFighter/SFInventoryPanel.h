@@ -6,13 +6,13 @@
 class SFItemStatsPanel : public SFPanel
 {
 public:
-	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state, bool comparison);
+	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state, GameObject* comparison_object);
 	~SFItemStatsPanel();
 	void DisplayItemStats(GameObject* object);
 	void Draw(sf::RenderTexture& screen) override;
 
 	int m_selected_option_index;
-	bool m_comparison;
+	GameObject* m_comparison_object;
 	sf::RectangleShape m_overblock;
 	sf::Text m_title_text_comparison;
 };
@@ -27,12 +27,14 @@ public:
 	void DrawItemLevels(sf::RenderTexture& screen);
 	GameObject* GetCursor() override;
 	GameObject* GetFocusedItem() override;
+	void SetCursorVisible_v2(bool visible) override;
 
 	void SetFocusedItem(GameObject* item) override;
 	sf::Vector2i GetFocusedIndex() override;
 	int GetFocusedIntIndex() override;
 	int GetFocusedGrid() override;
 	ObjectGrid* GetGrid(bool fake_grid = false, int grid = 1) override;
+	Grid* GetGrid_v2(int grid) override;
 	bool GetPrioritaryFeedback() override;
 	SFItemStatsPanel* GetItemStatsPanel() override;
 	void SetItemStatsPanel(SFItemStatsPanel* panel) override;
@@ -64,6 +66,14 @@ public:
 	bool m_has_prioritary_feedback;
 
 	Ship* m_playerShip;
+
+	//v2
+	Grid* m_grids_v2[NBVAL_TradeGrids];
+	void Constructor_v2(SFPanel* panel);
+	GridElement* getCursorCollision(GameObject& cursor);
+	GridElement* GetHighlightedElement() override;
+	void SetHighlightedElement(GridElement* element) override;
+	GridElement* m_highlighted_element;
 };
 
 class SFHUDPanel : public SFInventoryPanel

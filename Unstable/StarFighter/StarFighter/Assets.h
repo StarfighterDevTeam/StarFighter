@@ -49,10 +49,10 @@
 //#define MODULE_FILENAME			"2D/Equipment/Module.png"
 //#define BOT_FILENAME			"2D/Equipment/bot.png"
 
-#define QUALITY_BACKGROUND		"2D/Equipment/quality_background.png"
+#define QUALITY_BACKGROUND				"2D/HUD/quality_background.png"
 #define EQUIPMENT_SIZE					48
 #define BOT_SIZE						32
-#define EMPTYSLOT_FILENAME				"2D/HUD/EmptySlot.png"
+#define EMPTYSLOT_FILENAME				"2D/HUD/empty_slot.png"
 #define GRID_SLOT_SIZE					64
 
 #define FX_EXPLOSION_FILENAME				"2D/FX/FX_explosion.png"

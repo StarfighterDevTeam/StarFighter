@@ -9,6 +9,8 @@ Shop::Shop(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 	m_DontGarbageMe = true;
 	m_level = 1;
+
+	m_grid_v2 = new Grid(sf::Vector2f(0, 0), sf::Vector2i(NBVAL_Equipment + 1, SHOP_GRID_NB_LINES), NULL);
 }
 
 Shop::~Shop()
@@ -16,6 +18,8 @@ Shop::~Shop()
 	for (GameObject* item : m_items)
 		if (item != NULL)
 			delete item;
+
+	delete m_grid_v2;
 }
 
 void Shop::update(sf::Time deltaTime, float hyperspeedMultiplier)
