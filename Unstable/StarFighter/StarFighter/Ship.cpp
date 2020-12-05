@@ -658,8 +658,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					ContinueDialog();
 				}
 			}
-			
-				
 		}
 		//Enemy blocking movement?
 		else if (m_input_blocker)
