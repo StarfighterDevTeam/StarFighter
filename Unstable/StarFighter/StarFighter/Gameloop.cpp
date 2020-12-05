@@ -74,7 +74,7 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, false);
 
 	//DEBUG
-	//SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+	SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
 }
 
 void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
