@@ -642,13 +642,24 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		//DIALOG
 		if (m_HUD_state == HUD_Dialog && m_SFHudPanel)
 		{
-			//Continue
-			//if (m_inputs_states[Action_Firing] == Input_Tap)
-			//{
-			//	ContinueDialog();
-			//}
-			if (m_SFTargetPanel && m_SFTargetPanel->GetDuration() == 0 && m_inputs_states[Action_Firing] == Input_Tap)
-				ContinueDialog();
+			//waiting for player input to continue
+			if (m_SFTargetPanel && m_SFTargetPanel->GetDuration() == 0)
+			{
+				//meanwhile, close HUD menu if open and go back to normal hyperspeed
+				if (m_SFHudPanel->GetCursor()->m_visible == true)
+				{
+					(*CurrentGame).m_hyperspeedMultiplier = 1;
+					m_SFHudPanel->SetCursorVisible_v2(false);
+				}
+
+				//press A to continue
+				if  (m_inputs_states[Action_Firing] == Input_Tap)
+				{
+					ContinueDialog();
+				}
+			}
+			
+				
 		}
 		//Enemy blocking movement?
 		else if (m_input_blocker)
@@ -767,7 +778,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_SFTargetPanel->SetCursorVisible_v2(true);
 			}
 		}
-		else
+		else//Idle combat, shop menu, portal menu (where ship can continue to move)
 		{
 			//Opening hud
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
@@ -834,7 +845,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 				else if (!m_actions_states[Action_Recalling])
 				{
-					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
+					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;//resetting hyperspeed
 				}
 
 				//Auto fire option (F key)
@@ -1683,6 +1694,9 @@ bool Ship::GetLoot(GameObject& object)
 
 void Ship::GetPortal(GameObject* object)
 {
+	if (m_HUD_state == HUD_OpeningEquipment)
+		return;
+
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
@@ -1698,6 +1712,9 @@ void Ship::GetPortal(GameObject* object)
 
 void Ship::GetShop(GameObject* object)
 {
+	if (m_HUD_state == HUD_OpeningEquipment)
+		return;
+
 	m_targetShop = (Shop*)(object);
 	m_isCollidingWithInteractiveObject = ShopInteraction;
 
