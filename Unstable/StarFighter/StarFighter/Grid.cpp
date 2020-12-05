@@ -36,8 +36,11 @@ void GridElement::SetPosition(sf::Vector2f position)
 		m_object->setPosition(position);
 }
 
-void GridElement::SetObject(GameObject* object)
+void GridElement::SetObject(GameObject* object, bool delete_current_object)
 {
+	if (m_object != NULL && delete_current_object == true)
+		delete m_object;
+
 	m_object = object;
 	if (m_object != NULL)
 	{
@@ -188,7 +191,7 @@ void Grid::CloneGridContentFrom(Grid* grid)
 void Grid::ClearGrid()
 {
 	for (GridElement* element : m_elements)
-		element->SetObject(NULL);
+		element->SetObject(NULL, true);
 
 	m_first_empty_slot_index = 0;
 }

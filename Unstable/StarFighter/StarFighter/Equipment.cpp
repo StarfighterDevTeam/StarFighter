@@ -29,7 +29,7 @@ ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, fl
 
 ShipModel::~ShipModel()
 {
-	m_bot = NULL;
+	
 }
 
 // ----------------EQUIPMENT ---------------
@@ -59,8 +59,7 @@ Equipment::Equipment()
 
 Equipment::~Equipment()
 {
-	m_level = 1;
-	m_credits = 0;
+	//bots are destroyed with the method DestroyBots()
 }
 
 Equipment* Equipment::Clone()

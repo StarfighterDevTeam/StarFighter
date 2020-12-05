@@ -198,7 +198,7 @@ void SFInventoryPanel::CreateGrids(SFPanel* panel, sf::Vector2f position0, sf::V
 		element->setAnimationLine(Slot_EngineFake + element->m_index);
 
 	//Stash grid
-	m_grids_v2[Trade_StashGrid] = new Grid(position1, sf::Vector2i(NBVAL_Equipment + 1, EQUIPMENT_GRID_NB_LINES), panel);
+	m_grids_v2[Trade_StashGrid] = new Grid(position1, sf::Vector2i(NBVAL_Equipment + 1, STASH_GRID_NB_LINES), panel);
 
 	//Shop grid
 	if (m_panel_type == SFPanel_Trade && m_grids_v2[Trade_ShopGrid] == NULL)//check if not already created

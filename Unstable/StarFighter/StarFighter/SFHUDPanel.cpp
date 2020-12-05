@@ -149,7 +149,6 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_comboBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 		m_combo_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + COMBO_BAR_SIZE_X + m_combo_text.getGlobalBounds().width / 2 + 8, text_height - 4);
 
-		//grids
 		text_height = GRID_POSITION_Y - INTERACTION_INTERBLOCK;
 		m_equipment_title.setPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		text_height += m_equipment_title.getCharacterSize() + INTERACTION_INTERLINE*2;
@@ -160,11 +159,9 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_inventory_title.setPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		text_height += m_inventory_title.getCharacterSize() + INTERACTION_INTERLINE * 2;
 
-		//lower part
 		sf::Vector2f position1 = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		CreateGrids(this, position0, position1, sf::Vector2f(0, 0));
 
-		text_height += m_grids_v2[Trade_StashGrid]->m_nb_squares.y * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK;
+		text_height += STASH_GRID_NB_LINES * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK;
 		m_money_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += m_money_text.getCharacterSize();
@@ -187,6 +184,24 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 
 		text_height += INTERACTION_SHOP_INTERLINE + m_beastscore_text.getCharacterSize();
 		m_framerate_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+
+		//Create grids
+		CreateGrids(this, position0, position1, sf::Vector2f(0, 0));
+
+		//Load items displayed
+		for (int i = 0; i < NBVAL_Equipment; i++)
+		{
+			if (playerShip->m_equipment[i] != NULL)
+			{
+				GameObject* capsule = Ship::CloneEquipmentIntoGameObject(playerShip->m_equipment[i]);
+				m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, i, false);
+			}
+		}
+		if (playerShip->m_weapon)
+		{
+			GameObject* capsule = Ship::CloneWeaponIntoGameObject(playerShip->m_weapon);
+			m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, NBVAL_Equipment, false);
+		}
 	}
 }
 

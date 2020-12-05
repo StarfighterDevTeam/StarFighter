@@ -15,6 +15,7 @@ void Gameloop::Initialize(Player player)
 	LOGGER_WRITE(Logger::DEBUG, "Initializing HUD...");
 	m_playerShip->m_SFHudPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
 	(*CurrentGame).addToPanels(m_playerShip->m_SFHudPanel);
+	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
 	//Load saved items
 	if (!Ship::LoadPlayerItems(m_playerShip))
@@ -35,22 +36,6 @@ void Gameloop::Initialize(Player player)
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
-	//Update HUD items v2
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_playerShip->m_equipment[i] != NULL)
-		{
-			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
-		}
-	}
-	if (m_playerShip->m_weapon)
-	{
-		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
-	}
-	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
-
 	//Load knownScenes, hazard levels and current scene from save file
 	string playerSave = LoadPlayerSave();
 	if (!playerSave.empty())
@@ -63,8 +48,7 @@ void Gameloop::Initialize(Player player)
 		player.m_currentSceneFile = STARTING_SCENE;
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer();
-		//UpdateShipConfig(m_playerShip, "intro");
-		m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->ClearGrid();
+		//UpdateShipConfig(m_playerShip, "intro");//not to use anymore, or do resync HUD equipements
 		Ship::SaveItems(m_playerShip);
 	}
 
@@ -158,13 +142,17 @@ void Gameloop::Update(Time deltaTime)
 {
 	//debug command
 	#ifndef NDEBUG
+		//F6: spawn in Sandbox scene
 		if (InputGuy::spawnInSandbox() && (*CurrentGame).m_waiting_for_dialog_validation == false)
 			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
 
+		//F7: relad saved items and enemy config
 		if (InputGuy::reloadCSVs())
 		{
 			(*CurrentGame).m_enemiesConfig.clear();
 			LoadAllEnemies(ENEMY_FILE);
+
+			Ship::LoadPlayerItems(m_playerShip);
 		}
 	#endif
 

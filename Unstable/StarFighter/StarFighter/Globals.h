@@ -185,14 +185,14 @@ const char* getSavesPath();
 #define STELLARMAP_SHIP_MINIATURE_SCALE					0.75
 
 //EQUIPMENT GRIDS
-#define SHIP_GRID_NB_LINES								1
-#define SHIP_GRID_NB_ROWS								5
+#define EQUIPPED_GRID_NB_LINES							1
+#define EQUIPPED_GRID_NB_ROWS							5
 #define SHIP_GRID_SLOT_SIZE								64
 #define SHIP_GRID_OFFSET_POS_X							20
 #define SHIP_GRID_OFFSET_POS_Y							472
 
-#define EQUIPMENT_GRID_NB_LINES							6
-#define EQUIPMENT_GRID_NB_ROWS							5
+#define STASH_GRID_NB_LINES								6
+#define STASH_GRID_NB_ROWS								5
 #define EQUIPMENT_GRID_SLOT_SIZE						64
 #define EQUIPMENT_GRID_OFFSET_POS_X						20
 #define EQUIPMENT_GRID_OFFSET_POS_Y						578

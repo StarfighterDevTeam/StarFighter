@@ -43,7 +43,6 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 	text_height += INTERACTION_INTERBLOCK;
 	text_height += INTERACTION_INTERBLOCK;
 
-	//grids
 	sf::Vector2f position0 = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 	sf::Vector2f position2 = sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
@@ -51,12 +50,9 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 
 	sf::Vector2f position1 = sf::Vector2f(position0.x, position0.y + INTERACTION_INTERBLOCK + GRID_SLOT_SIZE);
 	
-	CreateGrids(this, position0, position1, position2);
-	
 	//quit button
-	text_height += m_grids_v2[Trade_ShopGrid]->m_nb_squares.x * GRID_SLOT_SIZE;
-	text_height -= INTERACTION_INTERBLOCK;
-	text_height -= INTERACTION_INTERBLOCK;
+	text_height += SHOP_GRID_NB_LINES * GRID_SLOT_SIZE;
+	text_height -= 4 * INTERACTION_INTERBLOCK;
 	m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 	//build separator between shop items and player items
@@ -64,6 +60,9 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 	m_separator.setOrigin(m_separator.getSize().x / 2, m_separator.getSize().y/2);
 	m_separator.setPosition(getPosition());
 	m_separator.setFillColor(getOutlineColor());
+
+	//Create grids
+	CreateGrids(this, position0, position1, position2);
 }
 
 void SFTradePanel::Draw(sf::RenderTexture& screen)

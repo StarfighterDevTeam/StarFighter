@@ -183,14 +183,8 @@ void Ship::Init()
 	{
 		if (m_equipment[i] != NULL)
 		{
-			if (!m_equipment[i]->m_bots.empty())
-			{
-				size_t botsVectorSize = m_equipment[i]->m_bots.size();
-				for (size_t j = 0; j < botsVectorSize; j++)
-				{
-					m_bot_list.push_back(m_equipment[i]->m_bots[j]);
-				}
-			}
+			for (Bot* bot : m_equipment[i]->m_bots)
+				m_bot_list.push_back(bot);
 		}
 	}
 }
@@ -239,7 +233,7 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 
 	m_equipment[equipment->m_equipmentType] = equipment;
 	
-	Init();
+	Ship::Init();
 
 	if (!equipment->m_bots.empty())
 	{
@@ -2673,7 +2667,11 @@ bool Ship::LoadPlayerItems(Ship* ship)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					ship->setShipEquipment(LoadSavedEquipmentFromLine(line), true, true);//Equipped items will be loaded later in HUD
+					Equipment* equipment = LoadSavedEquipmentFromLine(line);
+					ship->setShipEquipment(equipment, true, true);//Equipped items will be loaded later in HUD
+
+					GameObject* capsule = Ship::CloneEquipmentIntoGameObject(equipment);
+					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
 				}
 			}
 			//Loading weapon
@@ -2682,7 +2680,11 @@ bool Ship::LoadPlayerItems(Ship* ship)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					ship->setShipWeapon(Ship::LoadSavedWeaponFromLine(line), true, true);//Equipped items will be loaded later in HUD
+					Weapon* weapon = Ship::LoadSavedWeaponFromLine(line);
+					ship->setShipWeapon(weapon, true, true);//Equipped items will be loaded later in HUD
+
+					GameObject* capsule = Ship::CloneWeaponIntoGameObject(weapon);
+					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
 				}
 			}
 			//Loading stash
@@ -2722,7 +2724,7 @@ bool Ship::LoadPlayerItems(Ship* ship)
 
 		data.close();  // on ferme le fichier
 
-		return i == NBVAL_Equipment + 1 + EQUIPMENT_GRID_NB_LINES*EQUIPMENT_GRID_NB_ROWS;
+		return i == NBVAL_Equipment + 1 + STASH_GRID_NB_LINES*STASH_GRID_NB_ROWS;
 	}
 	else  // si l'ouverture a échoué
 	{

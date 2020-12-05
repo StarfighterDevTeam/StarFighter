@@ -39,7 +39,7 @@ public:
 	~GridElement();
 	void Draw(sf::RenderTexture& offscreen);
 	void SetPosition(sf::Vector2f position);
-	void SetObject(GameObject* object);
+	void SetObject(GameObject* object, bool delete_current_object = false);
 
 	GameObject* m_object;
 	GameObject* m_quality_overlay;
