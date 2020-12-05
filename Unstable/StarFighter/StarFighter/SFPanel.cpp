@@ -223,12 +223,6 @@ void SFPanel::SetFocusedItem(GameObject* item)
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 
-ObjectGrid* SFPanel::GetGrid(bool fake_grid, int grid)
-{
-	return NULL;
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
 Grid* SFPanel::GetGrid_v2(int grid)
 {
 	return NULL;
@@ -308,7 +302,7 @@ int SFPanel::GetTeleportationCost()
 
 void SFPanel::SetMapViewOffset(sf::Vector2f offset)
 {
-
+	//see override function in SFMapPanel
 }
 
 string SFPanel::GetTeleportationDestination()
@@ -321,18 +315,6 @@ Dialog* SFPanel::GetDialog()
 {
 	return NULL;
 	//see override function in SFDialogPanel
-}
-
-void SFPanel::ClearHighlight()
-{
-	return;
-	//see override function in SFMenuPanel and other types of SF panels
-}
-
-void SFPanel::ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid)
-{
-	return;
-	//see override function in SFMenuPanel and other types of SF panels
 }
 
 GridElement* SFPanel::GetHighlightedElement()

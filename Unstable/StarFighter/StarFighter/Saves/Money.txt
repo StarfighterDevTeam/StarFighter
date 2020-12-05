@@ -1,1 +1,1 @@
-Money 36
+Money 1024

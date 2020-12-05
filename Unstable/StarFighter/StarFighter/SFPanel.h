@@ -84,7 +84,7 @@ public:
 	virtual GameObject* GetCursor();
 	virtual GameObject* GetFocusedItem();
 	virtual void SetFocusedItem(GameObject* item);
-	virtual ObjectGrid* GetGrid(bool fake_grid, int grid);
+
 	virtual Grid* GetGrid_v2(int grid);
 	virtual sf::Vector2i GetFocusedIndex();
 	virtual int GetFocusedIntIndex();
@@ -102,9 +102,6 @@ public:
 	virtual void SetItemsStatsPanelIndex(int index);
 	
 	virtual Dialog* GetDialog();
-
-	virtual void ClearHighlight();
-	virtual void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid);
 
 	//v2
 	virtual GridElement* GetHighlightedElement();

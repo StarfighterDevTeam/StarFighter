@@ -35,21 +35,6 @@ void Gameloop::Initialize(Player player)
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
-	//Update HUD items
-	//for (int i = 0; i < NBVAL_Equipment; i++)
-	//{
-	//	if (m_playerShip->m_equipment[i] != NULL)
-	//	{
-	//		GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-	//		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(i, capsule);
-	//	}
-	//}
-	//if (m_playerShip->m_weapon)
-	//{
-	//	GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-	//	m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
-	//}
-
 	//Update HUD items v2
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
@@ -57,14 +42,14 @@ void Gameloop::Initialize(Player player)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
 			EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_equipment_loot->m_quality);
-			m_playerShip->m_SFHudPanel->GetGrid_v2((int)Trade_EquippedGrid)->InsertObject(capsule, i, quality, false);
+			m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, quality, false);
 		}
 	}
 	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
 		EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_weapon_loot->m_quality);
-		m_playerShip->m_SFHudPanel->GetGrid_v2((int)Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
+		m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
 	}
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
@@ -81,7 +66,7 @@ void Gameloop::Initialize(Player player)
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer();
 		//UpdateShipConfig(m_playerShip, "intro");
-		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->ClearGrid();
+		m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->ClearGrid();
 		Ship::SaveItems(m_playerShip);
 	}
 
@@ -125,7 +110,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 			if ((*it)[SHIPCONFIG_NAME].compare(config_name) == 0)
 			{
 				//Clear equipped items
-				ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->ClearGrid();
+				ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->ClearGrid();
 
 				//Loading equipment
 				for (int i = 0; i < NBVAL_Equipment; i++)
@@ -135,7 +120,8 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 						ship->setShipEquipment(FileLoader::LoadEquipment((*it)[i + 1]), true);
 
 						GameObject* capsule = Ship::CloneEquipmentIntoGameObject(ship->m_equipment[i]);
-						ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, i);
+						EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_equipment_loot->m_quality);
+						ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, quality, false);
 					}
 					else if (ship->m_equipment[i])
 					{
@@ -150,7 +136,8 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1), true);
 
 					GameObject* capsule = Ship::CloneWeaponIntoGameObject(ship->m_weapon);
-					ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, NBVAL_Equipment);
+					EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_weapon_loot->m_quality);
+					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
 				}
 				else if (ship->m_weapon)
 				{

@@ -1,7 +1,7 @@
 #ifndef SFDIALOGPANEL_H_INCLUDED
 #define SFDIALOGPANEL_H_INCLUDED
 
-#include "SFInventoryPanel.h"
+#include "SFTradePanel.h"
 
 class SFDialogPanel : public SFPanel
 {

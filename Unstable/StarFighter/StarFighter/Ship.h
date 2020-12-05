@@ -144,7 +144,6 @@ public :
 	void GetShop(GameObject* object) override;
 	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type);
 	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
-	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* grid);
 	sf::Vector2f GetShipSize();
 
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
@@ -161,13 +160,6 @@ public :
 	bool Equip_v2(GameObject* object);
 	void Desequip_v2(GameObject* object);
 
-	void BuyingItem(bool equip_directly = false);
-	void SellingItem();
-	void GarbagingItem();
-	void EquipItem();
-	void EquipItemFromTradePanel();
-	void DesequipItem();
-	void DesequipItemFromTradePanel();
 	void ContinueDialog();
 	void Recalling();
 	void Teleport(string destination_name);

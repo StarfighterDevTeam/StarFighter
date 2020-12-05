@@ -160,7 +160,7 @@ const char* getSavesPath();
 #define BOSS_PHASE_BAR_MARGIN							4
 
 //ITEM STATS DISPLAY
-#define ITEM_STATS_PANEL_SIZE_X							420
+#define ITEM_STATS_PANEL_SIZE_X							400
 #define ITEM_STATS_PANEL_SIZE_Y							380
 #define ITEM_STATS_PANEL_POSITION_X						20
 #define ITEM_STATS_PANEL_POSITION_Y						80
