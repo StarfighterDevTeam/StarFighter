@@ -19,6 +19,7 @@ const char* getSavesPath();
 	#define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 	#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
 	#define MONEY_SAVE_FILE							"Saves/Money.txt"
+	#define SHOP_SAVE_FILE								"Saves/Shop.txt"
 #endif
 
 #define	REF_WINDOW_RESOLUTION_X					1920

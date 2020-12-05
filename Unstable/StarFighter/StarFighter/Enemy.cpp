@@ -1789,3 +1789,522 @@ EnemyBase::~EnemyBase()
 
 	delete m_enemy;
 }
+
+
+void Enemy::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type)
+{
+	if (equipment)
+	{
+		if (!skip_type)
+		{
+			switch (equipment->m_equipmentType)
+			{
+			case Engine:
+			{
+				data << "Engine ";
+				break;
+			}
+			case Armor:
+			{
+				data << "Armor ";
+				break;
+			}
+			case Shield:
+			{
+				data << "Shield ";
+				break;
+			}
+			case Module:
+			{
+				data << "Module ";
+				break;
+			}
+			default:
+			{
+				data << "Unknown ";
+				break;
+			}
+			}
+		}
+
+		data << equipment->m_display_name << " ";
+		data << equipment->m_level << " ";
+		data << equipment->m_credits << " ";
+		data << equipment->m_quality << " ";
+		data << equipment->m_textureName << " ";
+		data << equipment->m_size.x << " ";
+		data << equipment->m_size.y << " ";
+		data << equipment->m_frameNumber << " ";
+		data << equipment->m_max_speed << " ";
+		data << equipment->m_deceleration << " ";
+		data << equipment->m_acceleration << " ";
+		data << equipment->m_hyperspeed << " ";
+		data << equipment->m_hyperspeed_fuel << " ";
+		data << equipment->m_armor << " ";
+		data << equipment->m_shield << " ";
+		data << equipment->m_shield_regen << " ";
+		data << equipment->m_shield_recovery_time << " ";
+		data << equipment->m_damage << " ";
+		data << equipment->m_bombs << " ";
+		data << equipment->m_can_hyperspeed << " ";
+		data << equipment->m_can_jump << " ";
+
+		if (!equipment->m_bots.empty())
+		{
+			data << equipment->m_bots.front()->m_display_name << " ";
+			data << equipment->m_bots.size() << " ";
+			data << equipment->m_bots.front()->m_textureName << " ";
+			data << equipment->m_bots.front()->m_size.x << " ";
+			data << equipment->m_bots.front()->m_size.y << " ";
+			data << equipment->m_bots.front()->m_frameNumber << " ";
+			data << equipment->m_bots.front()->m_spread.x << " ";
+			data << equipment->m_bots.front()->m_spread.y << " ";
+			data << equipment->m_bots.front()->m_rotation_speed << " ";
+			data << equipment->m_bots.front()->m_pattern.m_pattern_type << " ";
+
+			if (equipment->m_bots.front()->m_pattern.m_pattern_type != NoMovePattern)
+			{
+				data << equipment->m_bots.front()->m_pattern.m_speed << " ";
+				data << equipment->m_bots.front()->m_pattern.m_clockwise << " ";
+
+				if (equipment->m_bots.front()->m_pattern.m_pattern_type == Circle_ || equipment->m_bots.front()->m_pattern.m_pattern_type == Rectangle_)
+				{
+					data << equipment->m_bots.front()->m_pattern.m_width << " ";
+					data << equipment->m_bots.front()->m_pattern.m_height << " ";
+					data << equipment->m_bots.front()->m_pattern.m_starting_point << " ";
+				}
+			}
+
+			if (equipment->m_bots.front()->m_weapon)
+			{
+				Enemy::SaveWeaponData(data, equipment->m_bots.front()->m_weapon, true, true);
+				return;
+			}
+			else
+				data << "0";
+		}
+		else
+			data << "0";
+	}
+	else
+		data << "0";
+
+	data << endl;
+}
+
+void Enemy::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level)
+{
+	if (skip_type == false)
+		data << "Weapon ";
+
+	if (weapon != NULL)
+	{
+		data << weapon->m_display_name << " ";
+		if (skip_level == false)
+		{
+			data << weapon->m_level << " ";
+			data << weapon->m_credits << " ";
+			data << weapon->m_quality << " ";
+		}
+		data << weapon->m_textureName << " ";
+		data << weapon->m_size.x << " ";
+		data << weapon->m_size.y << " ";
+		data << weapon->m_frameNumber << " ";
+		data << weapon->m_rate_of_fire << " ";
+		data << weapon->m_rafale << " ";
+		data << weapon->m_rafale_cooldown << " ";
+
+		data << weapon->m_multishot << " ";
+		data << weapon->m_xspread << " ";
+		data << weapon->m_dispersion << " ";
+		data << (int)weapon->m_shot_mode << " ";
+		data << (int)weapon->m_target_homing << " ";
+
+		data << weapon->m_ammunition->m_display_name << " ";
+		data << weapon->m_ammunition->m_damage << " ";
+		data << weapon->m_ammunition->m_speed.y << " ";
+		data << weapon->m_ammunition->m_range << " ";
+		data << weapon->m_ammunition->m_textureName << " ";
+		data << weapon->m_ammunition->m_size.x << " ";
+		data << weapon->m_ammunition->m_size.y << " ";
+		data << weapon->m_ammunition->m_frameNumber << " ";
+		data << weapon->m_ammunition->m_explosion->m_display_name << " ";
+		data << (int)weapon->m_ammunition->m_pattern.m_pattern_type;
+
+		if (weapon->m_ammunition->m_pattern.m_pattern_type != NoMovePattern)
+		{
+			data << weapon->m_ammunition->m_pattern.m_speed << " ";
+			data << weapon->m_ammunition->m_pattern.m_clockwise << " ";
+
+			if (weapon->m_ammunition->m_pattern.m_pattern_type == Circle_ || weapon->m_ammunition->m_pattern.m_pattern_type == Rectangle_)
+			{
+				data << weapon->m_ammunition->m_pattern.m_width << " ";
+				data << weapon->m_ammunition->m_pattern.m_height << " ";
+				data << weapon->m_ammunition->m_pattern.m_starting_point << " ";
+			}
+		}
+	}
+	else
+		data << "0";
+
+	data << endl;
+}
+
+Equipment* Enemy::LoadSavedEquipmentFromLine(string line)
+{
+	string equipment_type;
+	string display_name;
+
+	std::istringstream ss(line);
+	ss >> equipment_type >> display_name;
+	//ss.str(line.substr(ss.tellg()));
+
+	Equipment* equipment = new Equipment();
+
+	string texture_name;
+	int level;
+	int credits;
+	float quality;
+	int width;
+	int height;
+	int frames;
+	float max_speed;
+	float deceleration;
+	float acceleration;
+	float hyperspeed;
+	int hyperspeed_fuel;
+	int armor;
+	int shield;
+	int shield_regen;
+	float shield_recovery;
+	int damage;
+	int bombs;
+	bool can_hyperspeed;
+	bool can_jump;
+
+	string bot_name;
+	int bot_number;
+	string bot_texture_name;
+	int bot_width;
+	int bot_height;
+	int bot_frames;
+	float bot_spread_x;
+	float bot_spread_y;
+	float bot_rotation_speed;
+	int bot_pattern_type;
+	float bot_pattern_speed;
+	int bot_pattern_clockwise;
+	float bot_pattern_width;
+	float bot_pattern_height;
+	int bot_pattern_starting_point;
+
+	string bot_weapon_name;
+	string bot_weapon_texture_name;
+	int bot_weapon_width;
+	int bot_weapon_height;
+	int bot_weapon_frames;
+	float bot_weapon_rate_of_fire;
+	int bot_weapon_rafale;
+	float bot_rafale_cooldown;
+	int bot_weapon_multishot;
+	float bot_weapon_xspread;
+	float bot_weapon_dispersion;
+	int bot_weapon_shot_mode;
+	int bot_weapon_target_homing;
+
+	string bot_ammo_name;
+	int bot_ammo_damage;
+	float bot_ammo_speed;
+	float bot_ammo_range;
+	string bot_ammo_texture_name;
+	int bot_ammo_width;
+	int bot_ammo_height;
+	int bot_ammo_frames;
+	int bot_ammo_pattern_type;
+	float bot_ammo_pattern_speed;
+	int bot_ammo_pattern_clockwise;
+	float bot_ammo_pattern_width;
+	float bot_ammo_pattern_height;
+	int bot_ammo_pattern_starting_point;
+	string bot_ammo_explosion_name;
+
+	if (display_name.compare("0") == 0)
+	{
+		//do nothing
+	}
+	else
+	{
+		ss >> level >> credits >> quality >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel
+			>> armor >> shield >> shield_regen >> shield_recovery >> damage >> bombs >> can_hyperspeed >> can_jump >> bot_name;
+
+		if (bot_name.compare("0") == 0)
+		{
+			//do nothing
+		}
+		else
+		{
+			ss >> bot_number >> bot_texture_name >> bot_width >> bot_height >> bot_frames >> bot_spread_x >> bot_spread_y >> bot_rotation_speed >> bot_pattern_type;
+			if (bot_pattern_type == Line_)
+				ss >> bot_pattern_speed >> bot_pattern_clockwise;
+			else if (bot_pattern_type == Circle_ || bot_pattern_type == Rectangle_)
+				ss >> bot_pattern_speed >> bot_pattern_clockwise >> bot_pattern_width >> bot_pattern_height >> bot_pattern_starting_point;
+
+			ss >> bot_weapon_name;
+			if (bot_weapon_name.compare("0") == 0)
+			{
+				//do nothing
+			}
+			else
+			{
+				ss >> bot_weapon_texture_name >> bot_weapon_width >> bot_weapon_height >> bot_weapon_frames >> bot_weapon_rate_of_fire >>
+					bot_weapon_rafale >> bot_rafale_cooldown >> bot_weapon_multishot >> bot_weapon_xspread >> bot_weapon_dispersion >> bot_weapon_shot_mode
+					>> bot_weapon_target_homing;
+
+				ss >> bot_ammo_name >> bot_ammo_damage >> bot_ammo_speed >> bot_ammo_range >> bot_ammo_texture_name >> bot_ammo_width >> bot_ammo_height >>
+					bot_ammo_frames >> bot_ammo_explosion_name >> bot_ammo_pattern_type;
+
+				if (bot_ammo_pattern_type == Line_)
+					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_clockwise;
+				else if (bot_ammo_pattern_type == Circle_ || bot_ammo_pattern_type == Rectangle_)
+					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_clockwise >> bot_ammo_pattern_width >> bot_ammo_pattern_height >> bot_ammo_pattern_starting_point;
+			}
+		}
+	}
+
+	EquipmentType type = NBVAL_Equipment;
+	if (equipment_type.compare("Shield") == 0)
+		type = Shield;
+	else if (equipment_type.compare("Armor") == 0)
+		type = Armor;
+	else if (equipment_type.compare("Engine") == 0)
+		type = Engine;
+	else if (equipment_type.compare("Module") == 0)
+		type = Module;
+
+	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, hyperspeed_fuel, armor, shield, shield_regen, shield_recovery, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
+	equipment->m_level = level;
+	equipment->m_credits = credits;
+	equipment->m_quality = quality;
+	equipment->m_bombs = bombs;
+	equipment->m_can_hyperspeed = can_hyperspeed;
+	equipment->m_can_jump = can_jump;
+
+	if (bot_name.compare("0") != 0)
+	{
+		Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), bot_texture_name, sf::Vector2f(bot_width, bot_height));
+		bot->m_display_name = bot_name;
+		bot->m_spread = sf::Vector2f(bot_spread_x, bot_spread_y);
+		bot->m_rotation_speed = bot_rotation_speed;
+
+		GeometryPattern* bot_pattern = new GeometryPattern();
+		bot_pattern->m_pattern_type = (PatternType)bot_pattern_type;
+
+		if (bot_pattern->m_pattern_type != NoMovePattern)
+		{
+			bot_pattern->m_speed = bot_pattern_speed;
+			bot_pattern->m_clockwise = bot_pattern_clockwise;
+
+			if (bot_pattern->m_pattern_type == Circle_ || bot_pattern->m_pattern_type == Rectangle_)
+			{
+				bot_pattern->m_width = bot_pattern_width;
+				bot_pattern->m_height = bot_pattern_height;
+				bot_pattern->m_starting_point = bot_pattern_starting_point;
+			}
+		}
+		bot->m_pattern.setPattern_v2(bot_pattern);
+		delete bot_pattern;
+
+		if (bot_weapon_name.compare("0") == 0)
+		{
+			//do nothing
+		}
+		else
+		{
+			Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, bot_ammo_speed), bot_ammo_texture_name, sf::Vector2f(bot_ammo_width, bot_ammo_height), bot_ammo_damage, Enemy::LoadFX(bot_ammo_explosion_name));
+			ammo->m_display_name = bot_ammo_name;
+			ammo->m_range = bot_ammo_range;
+			ammo->m_isBeam = bot_weapon_rafale < 0;
+
+			GeometryPattern* ammo_pattern = new GeometryPattern();
+			ammo_pattern->m_pattern_type = (PatternType)bot_ammo_pattern_type;
+
+			if (ammo_pattern->m_pattern_type != NoMovePattern)
+			{
+				ammo_pattern->m_speed = bot_ammo_pattern_speed;
+				ammo_pattern->m_clockwise = bot_ammo_pattern_clockwise;
+
+				if (ammo_pattern->m_pattern_type == Circle_ || ammo_pattern->m_pattern_type == Rectangle_)
+				{
+					ammo_pattern->m_width = bot_ammo_pattern_width;
+					ammo_pattern->m_height = bot_ammo_pattern_height;
+					ammo_pattern->m_starting_point = bot_ammo_pattern_starting_point;
+				}
+			}
+			ammo->m_pattern.setPattern_v2(ammo_pattern);
+			delete ammo_pattern;
+
+			Weapon* weapon = new Weapon(ammo);
+			weapon->m_display_name = bot_weapon_name;
+			weapon->m_fire_direction = Vector2i(0, -1);
+			weapon->m_rate_of_fire = bot_weapon_rate_of_fire;
+			weapon->m_shot_mode = (ShotMode)bot_weapon_shot_mode;
+
+			weapon->m_multishot = bot_weapon_multishot;
+			weapon->m_xspread = bot_weapon_xspread;
+			weapon->m_dispersion = bot_weapon_dispersion;
+			weapon->m_rafale = bot_weapon_rafale;
+			weapon->m_rafale_cooldown = bot_rafale_cooldown;
+
+			weapon->m_textureName = bot_weapon_texture_name;
+			weapon->m_size = sf::Vector2f(bot_weapon_width, bot_weapon_height);
+			weapon->m_frameNumber = bot_weapon_frames;
+			weapon->m_target_homing = (TargetHoming)bot_weapon_target_homing;
+
+			bot->m_weapon = weapon;
+		}
+
+		for (int i = 0; i < bot_number; i++)
+		{
+			if (i == 0)
+				equipment->m_bots.push_back(bot);
+			else
+			{
+				Bot* new_bot = bot->Clone();
+
+				//bots auto spreading based on number of bots
+				int s = i % 2 == 0 ? 1 : -1;
+				int x = i / 2;
+				new_bot->m_spread.x *= s * (1 + x);
+
+				equipment->m_bots.push_back(new_bot);
+			}
+		}
+	}
+
+	return equipment;
+}
+
+Weapon* Enemy::LoadSavedWeaponFromLine(string line)
+{
+	string equipment_type;
+	string display_name;
+
+	//std::istringstream(line) >> equipment_type >> display_name;
+
+	std::istringstream ss(line);
+	ss >> equipment_type >> display_name;
+
+	Equipment* equipment = new Equipment();
+
+	string weapon_texture_name;
+	int weapon_level;
+	int weapon_credits;
+	float weapon_quality;
+	int weapon_width;
+	int weapon_height;
+	int weapon_frames;
+	float weapon_rate_of_fire;
+	int weapon_rafale;
+	float rafale_cooldown;
+	int weapon_multishot;
+	float weapon_xspread;
+	float weapon_dispersion;
+	int weapon_shot_mode;
+	int weapon_target_homing;
+
+	string ammo_name;
+	int ammo_damage;
+	float ammo_speed;
+	float ammo_range;
+	string ammo_texture_name;
+	int ammo_width;
+	int ammo_height;
+	int ammo_frames;
+	int ammo_pattern_type;
+	float ammo_pattern_speed;
+	int ammo_pattern_clockwise;
+	float ammo_pattern_width;
+	float ammo_pattern_height;
+	int ammo_pattern_starting_point;
+	string ammo_explosion_name;
+
+	ss >> weapon_level >> weapon_credits >> weapon_quality >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
+		weapon_rafale >> rafale_cooldown >> weapon_multishot >> weapon_xspread >> weapon_dispersion >> weapon_shot_mode
+		>> weapon_target_homing >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_texture_name >> ammo_width >> ammo_height >>
+		ammo_frames >> ammo_explosion_name >> ammo_pattern_type;
+
+	if (ammo_pattern_type != NoMovePattern)
+		ss >> ammo_pattern_speed >> ammo_pattern_clockwise;
+
+	if (ammo_pattern_type == Circle_ || ammo_pattern_type == Rectangle_)
+		ss >> ammo_pattern_width >> ammo_pattern_height >> ammo_pattern_starting_point;
+
+	EquipmentType type = NBVAL_Equipment;
+
+	Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, ammo_speed), ammo_texture_name, sf::Vector2f(ammo_width, ammo_height), ammo_damage, Enemy::LoadFX(ammo_explosion_name));
+	ammo->m_display_name = ammo_name;
+	ammo->m_range = ammo_range;
+	ammo->m_isBeam = weapon_rafale < 0;
+
+	GeometryPattern* ammo_pattern = new GeometryPattern();
+
+	ammo_pattern->m_pattern_type = (PatternType)ammo_pattern_type;
+	if (ammo_pattern->m_pattern_type != NoMovePattern)
+	{
+		ammo_pattern->m_speed = ammo_pattern_speed;
+		ammo_pattern->m_clockwise = ammo_pattern_clockwise;
+
+		if (ammo_pattern->m_pattern_type == Circle_ || ammo_pattern->m_pattern_type == Rectangle_)
+		{
+			ammo_pattern->m_width = ammo_pattern_width;
+			ammo_pattern->m_height = ammo_pattern_height;
+			ammo_pattern->m_starting_point = ammo_pattern_starting_point;
+		}
+	}
+	ammo->m_pattern.setPattern_v2(ammo_pattern);
+	delete ammo_pattern;
+
+	Weapon* weapon = new Weapon(ammo);
+	weapon->m_display_name = display_name;
+	weapon->m_level = weapon_level;
+	weapon->m_credits = weapon_credits;
+	weapon->m_quality = weapon_quality;
+	weapon->m_fire_direction = Vector2i(0, -1);
+	weapon->m_rate_of_fire = weapon_rate_of_fire;
+	weapon->m_shot_mode = (ShotMode)weapon_shot_mode;
+
+	weapon->m_multishot = weapon_multishot;
+	weapon->m_xspread = weapon_xspread;
+	weapon->m_dispersion = weapon_dispersion;
+	weapon->m_rafale = weapon_rafale;
+	weapon->m_rafale_cooldown = rafale_cooldown;
+
+	weapon->m_textureName = weapon_texture_name;
+	weapon->m_size = sf::Vector2f(weapon_width, weapon_height);
+	weapon->m_frameNumber = weapon_frames;
+	weapon->m_target_homing = (TargetHoming)weapon_target_homing;
+
+	return weapon;
+}
+
+GameObject* Enemy::CloneEquipmentIntoGameObject(Equipment* new_equipment)
+{
+	assert(new_equipment != NULL);
+
+	GameObject* capsule = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), new_equipment->m_textureName, new_equipment->m_size, sf::Vector2f(new_equipment->m_size.x / 2, new_equipment->m_size.y / 2), new_equipment->m_frameNumber);
+	capsule->setEquipmentLoot(new_equipment->Clone());
+	capsule->m_display_name = new_equipment->m_display_name;
+
+	return capsule;
+}
+
+GameObject* Enemy::CloneWeaponIntoGameObject(Weapon* new_weapon)
+{
+	assert(new_weapon != NULL);
+
+	GameObject* capsule = new GameObject(new_weapon->getPosition(), sf::Vector2f(0, 0), new_weapon->m_textureName, new_weapon->m_size, sf::Vector2f(new_weapon->m_size.x / 2, new_weapon->m_size.y / 2), new_weapon->m_frameNumber);
+	capsule->setWeaponLoot(new_weapon->Clone());
+	capsule->m_display_name = new_weapon->m_display_name;
+
+	return capsule;
+}

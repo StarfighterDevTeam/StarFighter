@@ -1,7 +1,7 @@
 #ifndef SHOP_H_INCLUDED
 #define SHOP_H_INCLUDED
 
-#include "Portal.h"
+#include "EnemyGenerator.h"
 
 class Shop : public GameObject
 {
@@ -11,6 +11,9 @@ public:
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	int m_level;
 	vector<GameObject*> m_items;
+
+	static int SaveShop(Shop* ship);
+	static bool LoadShop(Shop* shop);
 
 	Grid* m_grid_v2;
 };

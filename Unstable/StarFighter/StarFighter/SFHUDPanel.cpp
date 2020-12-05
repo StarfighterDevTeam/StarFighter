@@ -193,13 +193,13 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		{
 			if (playerShip->m_equipment[i] != NULL)
 			{
-				GameObject* capsule = Ship::CloneEquipmentIntoGameObject(playerShip->m_equipment[i]);
+				GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(playerShip->m_equipment[i]);
 				m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, i, false);
 			}
 		}
-		if (playerShip->m_weapon)
+		if (playerShip->m_weapon != NULL)
 		{
-			GameObject* capsule = Ship::CloneWeaponIntoGameObject(playerShip->m_weapon);
+			GameObject* capsule = Enemy::CloneWeaponIntoGameObject(playerShip->m_weapon);
 			m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, NBVAL_Equipment, false);
 		}
 	}

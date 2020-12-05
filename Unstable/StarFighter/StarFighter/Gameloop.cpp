@@ -101,7 +101,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 					{
 						ship->setShipEquipment(FileLoader::LoadEquipment((*it)[i + 1]), true);
 
-						GameObject* capsule = Ship::CloneEquipmentIntoGameObject(ship->m_equipment[i]);
+						GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(ship->m_equipment[i]);
 						ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
 					}
 					else if (ship->m_equipment[i])
@@ -116,7 +116,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 				{
 					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1), true);
 
-					GameObject* capsule = Ship::CloneWeaponIntoGameObject(ship->m_weapon);
+					GameObject* capsule = Enemy::CloneWeaponIntoGameObject(ship->m_weapon);
 					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
 				}
 				else if (ship->m_weapon)
@@ -153,6 +153,7 @@ void Gameloop::Update(Time deltaTime)
 			LoadAllEnemies(ENEMY_FILE);
 
 			Ship::LoadPlayerItems(m_playerShip);
+			Ship::LoadPlayerMoney(m_playerShip);
 		}
 	#endif
 

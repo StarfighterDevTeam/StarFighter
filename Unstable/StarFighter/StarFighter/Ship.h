@@ -1,7 +1,7 @@
 #ifndef SHIP_H_INCLUDED
 #define SHIP_H_INCLUDED
 
-#include "EnemyGenerator.h"
+#include "Background.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -121,8 +121,6 @@ public :
 	void setShipModel(ShipModel* ship_model, bool no_save = false);
 	void cleanEquipment(int equipment_type, bool no_save = false);
 	void cleanWeapon(bool no_save = false);
-	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
-	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
 	bool CanHyperspeed();
 	bool CanJump();
 	int GetNumberOfBombs();
@@ -244,10 +242,6 @@ public :
 	static bool LoadPlayerMoney(Ship* ship);
 	static int SaveItems(Ship* ship);
 	static bool LoadPlayerItems(Ship* ship);
-	static Equipment* LoadSavedEquipmentFromLine(string line);
-	static Weapon* LoadSavedWeaponFromLine(string line);
-	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
-	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
 
 	int m_hyperspeed_fuel_max;
 	float m_hyperspeed_fuel;

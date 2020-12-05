@@ -1,7 +1,7 @@
 #ifndef ENEMY_H_INCLUDED
 #define ENEMY_H_INCLUDED
 
-#include "Background.h"
+#include "Portal.h"
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR				100
@@ -50,6 +50,14 @@ public:
 	static Equipment* CreateRandomShield(int level, float beastScore);
 	static Equipment* CreateRandomEngine(int level, float beastScore);
 	static Equipment* CreateRandomModule(int level, float beastScore);
+
+	static Equipment* LoadSavedEquipmentFromLine(string line);
+	static Weapon* LoadSavedWeaponFromLine(string line);
+	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
+	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
+
+	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
+	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
 
 	//phases
 	void setPhase(Phase* phase);
