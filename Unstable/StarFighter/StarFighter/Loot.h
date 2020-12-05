@@ -1,7 +1,7 @@
 #ifndef LOOT_H_INCLUDED
 #define LOOT_H_INCLUDED
 
-#include "Equipment.h"
+#include "Grid.h"
 
 class Loot : public GameObject
 {

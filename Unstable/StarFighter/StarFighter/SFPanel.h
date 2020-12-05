@@ -60,6 +60,8 @@ public:
 	int m_selected_index;
 };
 
+class GridElement;//forward declaration
+class Grid;//forward declaration
 class SFPanel : public SFRectangle
 {
 public:
@@ -74,21 +76,15 @@ public:
 	sf::Text m_text;
 	bool m_visible;
 	SFPanelTypes m_panel_type;
-
 	SFActionBox* m_actions;
-
 	Ship* m_playerShip;
 
 	virtual void SetSelectedOptionIndex(int index);
 	virtual int GetSelectedOptionIndex();
 	virtual GameObject* GetCursor();
-	virtual GameObject* GetFocusedItem();
-	virtual void SetFocusedItem(GameObject* item);
 
 	virtual Grid* GetGrid_v2(int grid);
-	virtual sf::Vector2i GetFocusedIndex();
-	virtual int GetFocusedIntIndex();
-	virtual int GetFocusedGrid();
+
 	virtual bool GetPrioritaryFeedback();
 	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);
 	virtual string GetTeleportationDestination();
@@ -103,7 +99,6 @@ public:
 	
 	virtual Dialog* GetDialog();
 
-	//v2
 	virtual GridElement* GetHighlightedElement();
 	virtual void SetHighlightedElement(GridElement* element);
 	virtual void SetCursorVisible_v2(bool visible);

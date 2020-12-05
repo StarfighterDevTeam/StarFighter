@@ -1,7 +1,7 @@
-#ifndef HUDGRID_H_INCLUDED
-#define HUDGRID_H_INCLUDED
+#ifndef GRID_H_INCLUDED
+#define GRID_H_INCLUDED
 
-#include "Includes/SimpleCollision.hpp"
+#include "Equipment.h"
 
 enum SlotFeedbackStates
 {
@@ -39,11 +39,8 @@ public:
 	~GridElement();
 	void Draw(sf::RenderTexture& offscreen);
 	void SetPosition(sf::Vector2f position);
-	void SetObject(GameObject* object, EquipmentQuality quality);
+	void SetObject(GameObject* object);
 
-	//int m_credits;
-	//int m_level;
-	//float m_quality;
 	GameObject* m_object;
 	GameObject* m_quality_overlay;
 	GameObject* m_grey_overlay;
@@ -61,9 +58,12 @@ public:
 	void Draw(sf::RenderTexture& offscreen);
 	void SetPosition(sf::Vector2f position);
 	GridElement* GetCursorCollision(GameObject& cursor);
-	int InsertObject(GameObject* object, int index, EquipmentQuality quality, bool force_overwrite);
+	int InsertObject(GameObject* object, int index, bool force_overwrite);
 	void CloneGridContentFrom(Grid* grid);
 	void ClearGrid();
+	void UpdateGreyMaskOnInsufficientCredits(int money);//buggé
+	static int GetPrice(GameObject* capsule);
+	static int GetEquipmentType(GameObject* capsule);
 
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;
@@ -73,4 +73,4 @@ public:
 	SFPanel* m_panel;
 };
 
-#endif // HUDGRID_H_INCLUDED
+#endif // GRID_H_INCLUDED

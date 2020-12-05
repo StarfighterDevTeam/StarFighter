@@ -1,7 +1,7 @@
 #ifndef SFTEXT_H_INCLUDED
 #define SFTEXT_H_INCLUDED
 
-#include "HudGrid.h"
+#include "Includes/SimpleCollision.hpp"
 
 using namespace sf;
 

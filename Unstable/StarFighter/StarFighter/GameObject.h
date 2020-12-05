@@ -312,6 +312,7 @@ public:
 	Weapon* getWeaponLoot();
 	
 	static int GetPrice(int credits, float quality);
+	
 	bool clearLoots();
 	virtual void AddComboCount(int value);
 

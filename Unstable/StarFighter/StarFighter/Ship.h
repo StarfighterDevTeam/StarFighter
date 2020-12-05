@@ -185,7 +185,6 @@ public :
 	string m_is_asking_teleportation;
 
 	sf::Clock m_brakingHoldingClock;
-	GameObject* m_previously_focused_item;
 
 	void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	int getGrazeCount();

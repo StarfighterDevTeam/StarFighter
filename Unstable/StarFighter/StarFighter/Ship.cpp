@@ -85,7 +85,6 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_targetShop = NULL;
 	m_equipment_loot = NULL;
 	m_weapon_loot = NULL;
-	m_previously_focused_item = NULL;
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
@@ -692,7 +691,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				else
 					m_SFHudPanel->SetPrioritaryFeedback(false);
 			}
-			m_previously_focused_item = m_SFHudPanel->GetFocusedItem();
 
 			//Weapon firing
 			bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
@@ -1035,9 +1033,8 @@ void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Ti
 bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 {
 	GameObject* item = element->m_object;
-	int equipment_type = item->m_equipment_loot != NULL ? item->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
-	int price = GameObject::GetPrice(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_credits : item->m_weapon_loot->m_credits, item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
-	EquipmentQuality quality = Game::GetItemQualityClass(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
+	int equipment_type = Grid::GetEquipmentType(item);
+	int price = Grid::GetPrice(item);
 	Grid* equipped_grid = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid);
 	Grid* stash_grid = m_SFHudPanel->GetGrid_v2(Trade_StashGrid);
 	
@@ -1049,20 +1046,20 @@ bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 
 	if (equip_directly == true)//try to equip it in priority
 	{
-		if (equipped_grid->InsertObject(item, equipment_type, quality, false) == equipment_type)//try equip directly in the dedicated slot, success?
+		if (equipped_grid->InsertObject(item, equipment_type, false) == equipment_type)//try equip directly in the dedicated slot, success?
 		{
-			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, quality, false);//clone in copy grid
+			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, false);//clone in copy grid
 			(*CurrentGame).PlaySFX(SFX_Equip);
 			Equip_v2(item);
 
 			success = true;
 		}
-		else if (stash_grid->InsertObject(equipped_grid->m_elements[equipment_type]->m_object, -1, quality, false) >= 0)//try swapping equipped object with stash then equip it, success?
+		else if (stash_grid->InsertObject(equipped_grid->m_elements[equipment_type]->m_object, -1, false) >= 0)//try swapping equipped object with stash then equip it, success?
 		{
-			m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->m_elements[equipment_type]->m_object, -1, quality, false);//replicate in copy grid
+			m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->m_elements[equipment_type]->m_object, -1, false);//replicate in copy grid
 
-			equipped_grid->InsertObject(item, equipment_type, quality, true);
-			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, quality, true);//clone in copy grid
+			equipped_grid->InsertObject(item, equipment_type, true);
+			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, true);//clone in copy grid
 
 			(*CurrentGame).PlaySFX(SFX_Equip);
 			Equip_v2(item);
@@ -1074,14 +1071,14 @@ bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 	}
 	else//try to stash it in priority
 	{
-		if (stash_grid->InsertObject(item, -1, quality, false) >= 0)//try Inserting in the stash, success?)
+		if (stash_grid->InsertObject(item, -1, false) >= 0)//try Inserting in the stash, success?)
 		{
-			m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(item->Clone(), -1, quality, false);//clone in copy grid
+			m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(item->Clone(), -1, false);//clone in copy grid
 			success = true;
 		}
-		else if (equipped_grid->InsertObject(item, equipment_type, quality, false) == equipment_type)//try inserting in equipped slots, success?
+		else if (equipped_grid->InsertObject(item, equipment_type, false) == equipment_type)//try inserting in equipped slots, success?
 		{
-			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, quality, false);//clone in copy grid
+			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, false);//clone in copy grid
 			(*CurrentGame).PlaySFX(SFX_Equip);
 			Equip_v2(item);
 
@@ -1093,10 +1090,12 @@ bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 	if (success == true)
 	{
 		m_money -= price;
+		//m_SFTargetPanel->GetGrid_v2(Trade_ShopGrid)->UpdateGreyMaskOnInsufficientCredits(m_money);//buggé
+		
 		(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
 		//clear item from shop
-		m_targetShop->m_grid_v2->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+		m_targetShop->m_grid_v2->InsertObject(NULL, element->m_index, true);
 
 		Ship::SaveItems(this);
 		Ship::SavePlayerMoney(this);
@@ -1108,23 +1107,24 @@ bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 void Ship::SellingItem_v2(GridElement* element)
 {
 	GameObject* item = element->m_object;
-	int equipment_type = item->m_equipment_loot != NULL ? item->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
-	EquipmentQuality quality = Game::GetItemQualityClass(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
+	int equipment_type = Grid::GetEquipmentType(item);
 	Grid* equipped_grid = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid);
 	Grid* stash_grid = m_SFHudPanel->GetGrid_v2(Trade_StashGrid);
 
-	bool success = m_targetShop->m_grid_v2->InsertObject(item, -1, quality, false) >= 0;//trying to insert in shop grid, success?
+	bool success = m_targetShop->m_grid_v2->InsertObject(item, -1, false) >= 0;//trying to insert in shop grid, success?
 
 	//sell anyway
-	element->m_grid->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+	element->m_grid->InsertObject(NULL, element->m_index, true);
 
 	if (element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid))//replicate in copy grid
-		equipped_grid->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+		equipped_grid->InsertObject(NULL, element->m_index, true);
 	else
-		stash_grid->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+		stash_grid->InsertObject(NULL, element->m_index, true);
 	
-	int price = GameObject::GetPrice(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_credits : item->m_weapon_loot->m_credits, item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
+	int price = Grid::GetPrice(item);
 	m_money += price;
+	//m_SFTargetPanel->GetGrid_v2(Trade_ShopGrid)->UpdateGreyMaskOnInsufficientCredits(m_money);//buggé
+	
 	(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
 	if (success == false)//no space in shop, object has been sold and is lost permanently
@@ -1140,21 +1140,20 @@ void Ship::SellingItem_v2(GridElement* element)
 bool Ship::DesquipItem_v2(GridElement* element)
 {
 	GameObject* item = element->m_object;
-	int equipment_type = item->m_equipment_loot != NULL ? item->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
-	EquipmentQuality quality = Game::GetItemQualityClass(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
+	int equipment_type = Grid::GetEquipmentType(item);
 	Grid* equipped_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid);
 	Grid* stash_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_StashGrid) : m_SFTargetPanel->GetGrid_v2(Trade_StashGrid);
 	Grid* copy_equipped_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)) : NULL;
 	Grid* copy_stash_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_StashGrid) : m_SFHudPanel->GetGrid_v2(Trade_StashGrid)) : NULL;
 	
-	if (stash_grid->InsertObject(item, -1, quality, false) >= 0)
+	if (stash_grid->InsertObject(item, -1, false) >= 0)
 	{
-		equipped_grid->InsertObject(NULL, element->m_index, quality, true);
+		equipped_grid->InsertObject(NULL, element->m_index, true);
 
 		if (copy_equipped_grid != NULL && copy_stash_grid != NULL)//replicate in copy grid if any
 		{
-			copy_stash_grid->InsertObject(copy_equipped_grid->m_elements[element->m_index]->m_object, -1, quality, false);
-			copy_equipped_grid->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+			copy_stash_grid->InsertObject(copy_equipped_grid->m_elements[element->m_index]->m_object, -1, false);
+			copy_equipped_grid->InsertObject(NULL, element->m_index, true);
 		}
 
 		Desequip_v2(item);
@@ -1168,36 +1167,34 @@ bool Ship::DesquipItem_v2(GridElement* element)
 bool Ship::EquipItem_v2(GridElement* element)
 {
 	GameObject* item = element->m_object;
-	int equipment_type = item->m_equipment_loot != NULL ? item->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
-	EquipmentQuality quality = Game::GetItemQualityClass(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
+	int equipment_type = Grid::GetEquipmentType(item);
 	Grid* equipped_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid);
 	Grid* stash_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_StashGrid) : m_SFTargetPanel->GetGrid_v2(Trade_StashGrid);
 	Grid* copy_equipped_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)) : NULL;
 	Grid* copy_stash_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_StashGrid) : m_SFHudPanel->GetGrid_v2(Trade_StashGrid)) : NULL;
 
-	if (equipped_grid->InsertObject(item, equipment_type, quality, false) == equipment_type)//try equipping, success?
+	if (equipped_grid->InsertObject(item, equipment_type, false) == equipment_type)//try equipping, success?
 	{
-		stash_grid->InsertObject(NULL, element->m_index, quality, true);
+		stash_grid->InsertObject(NULL, element->m_index, true);
 		
 		if (copy_equipped_grid != NULL && copy_stash_grid != NULL)//replicate in copy grid if any
 		{
-			copy_equipped_grid->InsertObject(copy_stash_grid->m_elements[element->m_index]->m_object, equipment_type, quality, false);
-			copy_stash_grid->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+			copy_equipped_grid->InsertObject(copy_stash_grid->m_elements[element->m_index]->m_object, equipment_type, false);
+			copy_stash_grid->InsertObject(NULL, element->m_index, true);
 		}
 	}
 	else//swap item with stash
 	{
 		GameObject* item_tmp = equipped_grid->m_elements[equipment_type]->m_object;
-		EquipmentQuality quality_copy = Game::GetItemQualityClass(item_tmp->m_equipment_loot != NULL ? item_tmp->m_equipment_loot->m_quality : item_tmp->m_weapon_loot->m_quality);
 
-		equipped_grid->InsertObject(item, equipment_type, quality, true);
-		stash_grid->InsertObject(item_tmp, element->m_index, quality_copy, true);
+		equipped_grid->InsertObject(item, equipment_type, true);
+		stash_grid->InsertObject(item_tmp, element->m_index, true);
 
 		if (copy_equipped_grid != NULL && copy_stash_grid != NULL)
 		{
 			GameObject* copy_item_tmp = copy_equipped_grid->m_elements[equipment_type]->m_object;//replicate in copy grid
-			copy_equipped_grid->InsertObject(copy_stash_grid->m_elements[element->m_index]->m_object, equipment_type, quality, true);
-			copy_stash_grid->InsertObject(copy_item_tmp, element->m_index, quality_copy, true);
+			copy_equipped_grid->InsertObject(copy_stash_grid->m_elements[element->m_index]->m_object, equipment_type, true);
+			copy_stash_grid->InsertObject(copy_item_tmp, element->m_index, true);
 		}
 
 		stash_grid->m_panel->SetHighlightedElement(NULL);//reset highlighted element in grid
@@ -1237,7 +1234,7 @@ void Ship::ThrowingItem_v2(GridElement* element)
 					Desequip_v2(element->m_object);
 
 				delete element->m_grid->m_elements[element->m_index]->m_object;
-				element->m_grid->InsertObject(NULL, element->m_index, ItemQuality_Poor, true);
+				element->m_grid->InsertObject(NULL, element->m_index, true);
 
 				m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_HighlightState, false);
 				m_release_to_throw = true;
@@ -1475,11 +1472,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 				shop->m_weapon_loot = NULL;
 			}
 
-			//shop->m_items.push_back(capsule);
-
-			//v2
-			EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_quality : capsule->m_weapon_loot->m_quality);
-			shop->m_grid_v2->InsertObject(capsule, -1, quality, false);
+			shop->m_grid_v2->InsertObject(capsule, -1, false);
 		}
 		else
 		{
@@ -1636,18 +1629,17 @@ bool Ship::GetLoot(GameObject& object)
 	{
 		bool success = false;
 		GameObject* capsule = CloneEquipmentIntoGameObject(object.m_equipment_loot);
-		EquipmentQuality quality = Game::GetItemQualityClass(object.m_equipment_loot->m_quality);
 		//stash it
 		if (m_equipment[object.m_equipment_loot->m_equipmentType] != NULL)
 		{
-			success = m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, -1, quality, false) >= 0;
+			success = m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, -1, false) >= 0;
 		}
 		//equip it
 		else
 		{
 			setShipEquipment(object.m_equipment_loot->Clone(), true);
 			//and update HUD
-			success = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, object.m_equipment_loot->m_equipmentType, quality, false);
+			success = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, object.m_equipment_loot->m_equipmentType, false);
 		}
 		
 		if (success)
@@ -1664,19 +1656,18 @@ bool Ship::GetLoot(GameObject& object)
 	else if (object.m_weapon_loot)
 	{
 		bool success = false;
-		EquipmentQuality quality = Game::GetItemQualityClass(object.m_weapon_loot->m_quality);
 		GameObject* capsule = CloneWeaponIntoGameObject(object.m_weapon_loot);
 		//stash it
 		if (m_weapon != NULL)
 		{
-			success = m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, -1, quality, false) >= 0;
+			success = m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, -1, false) >= 0;
 		}
 		//equip it
 		else
 		{
 			setShipWeapon(object.m_weapon_loot->Clone(), true);
 			//and update HUD
-			success = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
+			success = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
 		}
 
 		if (success)
@@ -2712,16 +2703,14 @@ bool Ship::LoadPlayerItems(Ship* ship)
 						{
 							Weapon* weapon = Ship::LoadSavedWeaponFromLine(line);
 							GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
-							EquipmentQuality quality = Game::GetItemQualityClass(weapon->m_quality);
-							ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, index, quality, false);
+							ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, index, false);
 							delete weapon;
 						}
 						else
 						{
 							Equipment* equipment = Ship::LoadSavedEquipmentFromLine(line);
 							GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
-							EquipmentQuality quality = Game::GetItemQualityClass(equipment->m_quality);
-							ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, index, quality, false);
+							ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, index, false);
 							delete equipment;
 						}
 					}

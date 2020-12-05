@@ -49,8 +49,8 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 
 	float text_height2 = text_height += INTERACTION_INTERBLOCK + 2 * GRID_SLOT_SIZE;
 
-	sf::Vector2f position1 = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height2);
-
+	sf::Vector2f position1 = sf::Vector2f(position0.x, position0.y + INTERACTION_INTERBLOCK + GRID_SLOT_SIZE);
+	
 	CreateGrids(this, position0, position1, position2);
 	
 	//quit button
@@ -64,13 +64,6 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 	m_separator.setOrigin(m_separator.getSize().x / 2, m_separator.getSize().y/2);
 	m_separator.setPosition(getPosition());
 	m_separator.setFillColor(getOutlineColor());
-
-	//fill shop
-	//for (GameObject* item : m_playerShip->m_targetShop->m_items)
-	//{
-	//	EquipmentQuality quality = Game::GetItemQualityClass(item->m_equipment_loot != NULL ? item->m_equipment_loot->m_quality : item->m_weapon_loot->m_quality);
-	//	m_grids_v2[Trade_ShopGrid]->InsertObject(item, -1, quality, false);
-	//}
 }
 
 void SFTradePanel::Draw(sf::RenderTexture& screen)

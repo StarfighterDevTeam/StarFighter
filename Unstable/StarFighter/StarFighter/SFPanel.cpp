@@ -212,38 +212,9 @@ GameObject* SFPanel::GetCursor()
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 
-GameObject* SFPanel::GetFocusedItem()
-{
-	return NULL;
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
-void SFPanel::SetFocusedItem(GameObject* item)
-{
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
 Grid* SFPanel::GetGrid_v2(int grid)
 {
 	return NULL;
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
-sf::Vector2i SFPanel::GetFocusedIndex()
-{
-	return sf::Vector2i(-1, -1);
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
-int SFPanel::GetFocusedIntIndex()
-{
-	return -1;
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
-int SFPanel::GetFocusedGrid()
-{
-	return -1;
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 

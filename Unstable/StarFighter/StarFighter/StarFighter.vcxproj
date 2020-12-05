@@ -102,7 +102,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="HudGrid.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
@@ -151,7 +151,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="HudGrid.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />

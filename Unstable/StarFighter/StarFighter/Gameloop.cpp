@@ -41,15 +41,13 @@ void Gameloop::Initialize(Player player)
 		if (m_playerShip->m_equipment[i] != NULL)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_equipment_loot->m_quality);
-			m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, quality, false);
+			m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
 		}
 	}
 	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_weapon_loot->m_quality);
-		m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
+		m_playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
 	}
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
@@ -120,8 +118,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 						ship->setShipEquipment(FileLoader::LoadEquipment((*it)[i + 1]), true);
 
 						GameObject* capsule = Ship::CloneEquipmentIntoGameObject(ship->m_equipment[i]);
-						EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_equipment_loot->m_quality);
-						ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, quality, false);
+						ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
 					}
 					else if (ship->m_equipment[i])
 					{
@@ -136,8 +133,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1), true);
 
 					GameObject* capsule = Ship::CloneWeaponIntoGameObject(ship->m_weapon);
-					EquipmentQuality quality = Game::GetItemQualityClass(capsule->m_weapon_loot->m_quality);
-					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, quality, false);
+					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
 				}
 				else if (ship->m_weapon)
 				{

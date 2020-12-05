@@ -1,4 +1,4 @@
-#include "HudGrid.h"
+#include "Grid.h"
 
 //GRID ELEMENT
 GridElement::GridElement() : GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE), sf::Vector2f(GRID_SLOT_SIZE * 0.5, GRID_SLOT_SIZE * 0.5),
@@ -36,23 +36,28 @@ void GridElement::SetPosition(sf::Vector2f position)
 		m_object->setPosition(position);
 }
 
-void GridElement::SetObject(GameObject* object, EquipmentQuality quality)
+void GridElement::SetObject(GameObject* object)
 {
 	m_object = object;
 	if (m_object != NULL)
+	{
 		m_object->setPosition(getPosition());
-	m_quality_overlay->setAnimationLine((int)quality);
+
+		int quality = (int)Game::GetItemQualityClass(object->m_equipment_loot != NULL ? object->m_equipment_loot->m_quality : object->m_weapon_loot->m_quality);
+		m_quality_overlay->setAnimationLine(quality);
+	}
+		
 	m_quality_overlay->m_visible = m_object != NULL;
 }
 
 void GridElement::Draw(sf::RenderTexture& offscreen)
 {
 	offscreen.draw(*this);
+	m_quality_overlay->Draw(offscreen);
 
 	if (m_object != NULL)
 		m_object->Draw(offscreen);
 
-	m_quality_overlay->Draw(offscreen);
 	m_grey_overlay->Draw(offscreen);
 }
 
@@ -97,7 +102,7 @@ void Grid::Draw(sf::RenderTexture& offscreen)
 		element->Draw(offscreen);
 }
 
-int Grid::InsertObject(GameObject* object, int index, EquipmentQuality quality, bool force_overwrite)
+int Grid::InsertObject(GameObject* object, int index, bool force_overwrite)
 {
 	if (m_first_empty_slot_index < 0 && force_overwrite == false)//grid is full, can't insert new item
 		return -1;//error code
@@ -105,13 +110,13 @@ int Grid::InsertObject(GameObject* object, int index, EquipmentQuality quality, 
 	int index_returned = index;
 	if (index < 0)//look for the first empty slot
 	{
-		m_elements[m_first_empty_slot_index]->SetObject(object, quality);
+		m_elements[m_first_empty_slot_index]->SetObject(object);
 		index_returned = m_first_empty_slot_index;
 	}
 	else if (index < m_nb_squares.x * m_nb_squares.y)
 	{
 		if (m_elements[index]->m_object == NULL || force_overwrite == true)
-			m_elements[index]->SetObject(object, quality);//try inserting at the requested index
+			m_elements[index]->SetObject(object);//try inserting at the requested index
 		else
 			return -1;//slot already occupied
 	}
@@ -183,7 +188,35 @@ void Grid::CloneGridContentFrom(Grid* grid)
 void Grid::ClearGrid()
 {
 	for (GridElement* element : m_elements)
-		element->SetObject(NULL, ItemQuality_Poor);
+		element->SetObject(NULL);
 
 	m_first_empty_slot_index = 0;
+}
+
+void Grid::UpdateGreyMaskOnInsufficientCredits(int money)
+{
+	for (GridElement* element : m_elements)
+	{
+		GameObject* item = element->m_object;
+		element->m_grey_overlay->m_visible = Grid::GetPrice(item) > money || money == 0;
+	}
+}
+
+int Grid::GetPrice(GameObject* capsule)
+{
+	if (capsule == NULL)
+		return 0;
+
+	int credits = capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_credits : capsule->m_weapon_loot->m_credits;
+	float quality = capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_quality : capsule->m_weapon_loot->m_quality;
+
+	return GameObject::GetPrice(credits, quality);
+}
+
+int Grid::GetEquipmentType(GameObject* capsule)
+{
+	if (capsule == NULL)
+		return -1;
+
+	return capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
 }

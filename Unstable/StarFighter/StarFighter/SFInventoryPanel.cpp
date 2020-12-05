@@ -51,7 +51,6 @@ SFInventoryPanel::~SFInventoryPanel()
 
 void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
-	//V2
 	getCursorCollision(m_cursor);
 }
 
@@ -302,7 +301,7 @@ GridElement* SFInventoryPanel::getCursorCollision(GameObject& cursor)
 				m_item_stats_panel = new SFItemStatsPanel(element->m_object, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state, NULL);
 
 				//update compare panel
-				int equip_type = element->m_object->m_equipment_loot != NULL ? element->m_object->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
+				int equip_type = Grid::GetEquipmentType(element->m_object);
 				if (element->m_grid != m_grids_v2[Trade_EquippedGrid] && m_grids_v2[Trade_EquippedGrid]->m_elements[equip_type]->m_object != NULL)//compare only if it's not the equipped grid
 					m_item_stats_panel_compare = new SFItemStatsPanel(element->m_object, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state, m_grids_v2[Trade_EquippedGrid]->m_elements[equip_type]->m_object);
 			}
