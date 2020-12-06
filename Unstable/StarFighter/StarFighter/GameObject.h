@@ -360,9 +360,11 @@ public:
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);
-	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
+	static float GetAngleRadForVector(sf::Vector2f vector);
 	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
 	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
+	static float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
+	static float GetAngleDegToTargetAngleDeg(float ref_rotation_in_deg, float target_rotation_in_deg);
 
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);

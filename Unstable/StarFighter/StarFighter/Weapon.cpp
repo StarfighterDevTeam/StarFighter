@@ -62,8 +62,8 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 
 	bullet->setPosition(getPosition().x + bullet_offset_x, getPosition().y + bullet_offset_y);
 
-	bullet->m_speed.x = bullet->m_ref_speed * sin(m_shot_angle + (l_dispersion *  M_PI / 180)) * (- m_fire_direction.y);
-	bullet->m_speed.y = bullet->m_ref_speed * cos(m_shot_angle + (l_dispersion *  M_PI / 180)) * (m_fire_direction.y);
+	bullet->m_speed.x = bullet->m_ref_speed * sin(m_shot_angle + (l_dispersion *  M_PI / 180)) * (- m_fire_direction);
+	bullet->m_speed.y = bullet->m_ref_speed * cos(m_shot_angle + (l_dispersion *  M_PI / 180)) * m_fire_direction;
 
 	bullet->setRotation((m_shot_angle * 180.0f / M_PI) + l_dispersion);
 
@@ -293,16 +293,20 @@ void Weapon::FireDescendingShot(GameObjectType collider_type)
 
 void Weapon::UpdateBeams(bool firing)
 {
+	//update beam rotation
 	for (Ammo* beam : m_beams)
 	{
-		//update beam positions
-		float beam_offset_x = beam->m_offset_x * cos(m_shot_angle) + beam->m_size.y / 2 * sin(m_shot_angle);
-		float beam_offset_y = beam->m_offset_x * sin(m_shot_angle) - beam->m_size.y / 2 * cos(m_shot_angle);
+		float beam_offset_x = beam->m_offset_x * cos(m_shot_angle) + beam->m_size.y / 2 * sin(m_shot_angle) * (- m_fire_direction);
+		float beam_offset_y = beam->m_offset_x * sin(m_shot_angle) - beam->m_size.y / 2 * cos(m_shot_angle) * (- m_fire_direction);
 
 		beam->setPosition(getPosition().x + beam_offset_x, getPosition().y + beam_offset_y);
+
+		//if (m_target_homing == HOMING)
+			beam->setRotation(m_shot_angle * 180 / M_PI);
 	}
 
-	if (m_beams.empty() == false)//end of beam because no valid fire input
+	//end of beam because no valid fire input
+	if (m_beams.empty() == false)
 	{
 		if (firing == false)
 		{
@@ -313,6 +317,26 @@ void Weapon::UpdateBeams(bool firing)
 			m_readyFireTimer = 0;
 		}
 	}
+}
+
+bool Weapon::HasSemiHomingSalvoInProgress()
+{
+	if (m_target_homing != SEMI_HOMING)
+		return false;
+
+	if (m_rafale > 0)
+	{
+		if (m_rafale_index > 0 && m_rafale_index < m_rafale)
+			return true;
+
+		if (m_multishot > 1 && m_shot_index > 0)
+			return true;
+	}
+
+	if (m_rafale < 0 && m_beams.empty() == false)
+		return true;
+
+	return false;
 }
 
 Weapon* Weapon::Clone()

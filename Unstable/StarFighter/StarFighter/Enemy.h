@@ -98,7 +98,6 @@ public:
 	void RotateFeedbacks(float angle);
 
 	float m_health_feedbackTimer;
-
 	int m_level;
 
 	void ApplyLevelModifiers();

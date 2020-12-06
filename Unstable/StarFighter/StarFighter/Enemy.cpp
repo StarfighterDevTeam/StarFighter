@@ -20,9 +20,14 @@ void Enemy::Draw(sf::RenderTexture& screen)
 
 	//display
 	//ss << "type: " << to_string(int(m_pattern.m_pattern_type)) << " / w: " << to_string(int(m_pattern.m_width)) << " / h: " << to_string(int(m_pattern.m_height));
-	ss << "\ncw: " << to_string(m_pattern.m_clockwise);// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
-	ss << "\nspd: " << to_string(m_pattern.m_speed);
-	ss << "\nphase: " << m_currentPhase->m_display_name.c_str();
+	ss << "\nface_target: " << to_string((int)(m_face_target));// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+	ss << "\nrotation speed: " << to_string(m_rotation_speed);
+	if (m_weapons_list.front()->m_target_homing == NO_HOMING)
+		ss << "\nNO HOMING: ";
+	else if (m_weapons_list.front()->m_target_homing == SEMI_HOMING)
+		ss << "\nSEMI HOMING: ";
+	else if (m_weapons_list.front()->m_target_homing == HOMING)
+		ss << "\nHOMING: ";
 	//for (float f : m_pattern.m_patternParams)
 	//	ss << to_string(int(f)) << " / ";
 
@@ -155,6 +160,8 @@ void Enemy::UpdateHealthBars()
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	GameObject* playership = (GameObject*)(*CurrentGame).m_playerShip;
+
 	//update timers
 	if (m_health_feedbackTimer > 0)
 	{
@@ -293,55 +300,51 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (m_isOnScene == true)
 	{
-		//UPDATE TARGETS AND COOLDOWNS
-		//calculating the angle we want to face, if any
-		float target_angle = getRotation();
-		bool isNearestTargetIsKnown = false;
-		if (m_reset_facing)
-			target_angle = GameObject::getRotation_for_Direction((*CurrentGame).m_direction);
-		else if (m_face_target)
-		{
-			target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, this->getPosition()), 360);
-			isNearestTargetIsKnown = true;
-		}
-
-		bool isDoneFiringOnLockedTarget = true;
+		//TURNING TOWARDS DESIRED ANGLE
+		bool hasSemiHomingInProgress = false;
 		for (Weapon* weapon : m_weapons_list)
+			if (weapon->HasSemiHomingSalvoInProgress() == true)
+			{
+				hasSemiHomingInProgress = true;
+				break;
+			}
+
+		if (hasSemiHomingInProgress == false)//if semi-homing salvo in progress, just keep current angle
 		{
-			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
-				//now acquire target if the weapons needs it
-				if (!isNearestTargetIsKnown)//maybe we know it already?
-					if (weapon->m_target_homing == HOMING || (weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale_index == 0))
-						target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, getPosition()), 360);
+			if (m_face_target == false && m_reset_facing == false)//no facing instruction: just apply the rotation speed
+			{
+				rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+			}	
+			else//facing instructions: compute target angle and apply rotation towards that angle
+			{
+				//desired angle?
+				float target_angle = getRotation();
 
-			//semi-HOMING and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_HOMING"
-			if (m_face_target == true && weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale > 0 && ((weapon->m_rafale_index > 0 && weapon->m_rafale_index < weapon->m_rafale) || (weapon->m_multishot > 1 && weapon->m_shot_index > 0)))
-				isDoneFiringOnLockedTarget = false;
-		}
+				if (m_reset_facing == true)
+					target_angle = GameObject::getRotation_for_Direction((*CurrentGame).m_direction);
+				else if (m_face_target == true && hasSemiHomingInProgress == false)
+					target_angle = fmod(getRotation() + 180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 360);
 
-		float current_angle = this->getRotation();
-		float delta = current_angle - target_angle;
-		if (delta > 180)
-			delta -= 360;
-		else if (delta < -180)
-			delta += 360;
+				float delta = GameObject::GetAngleDegToTargetAngleDeg(getRotation(), target_angle);
 
-		if (!m_face_target && !m_reset_facing)
-			rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-		else
-			if (isDoneFiringOnLockedTarget)
-				//now let's rotate toward the target (the player)
+				//rotate towards desired angle
 				if (delta >= 0)
+				{
 					if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
 						rotate(-abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 					else
 						setRotation(target_angle);
+				}
 				else
+				{
 					if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
 						rotate(abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 					else
 						setRotation(target_angle);
-
+				}
+			}
+		}
+		
 		//transition blocking firing and phase transitioning?
 		if ((*CurrentGame).m_waiting_for_scene_transition == true)
 		{
@@ -357,44 +360,45 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				//do nothing: this weapon is settled to start firing later (delay)
 			}
 			else
-			{
-				/*
-				if (m_face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget == false)
+			{	//calcule weapon angle offset
+				float theta = getRotation() + weapon->m_angle_offset;
+				
+				//angle offset to target
+				float delta = GameObject::GetAngleDegToTargetAngleDeg(180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 0);
+
+				if (hasSemiHomingInProgress == false)
 				{
-					//do nothing
+					//we turn the weapon towards the target if :
+					//- we have some kind of Homing (!=NO_HOMING)
+					//AND we must not be a laserbeam, because that is to strong on the enemy
+					//however if not required to face target, we allow it for specific scenarios, but it is not recommended to use in general gameplay
+					if (weapon->m_target_homing != NO_HOMING && (weapon->m_rafale >= 0 || m_face_target == false))
+						theta += delta;
+
+					//calcule weapon offset
+					theta *= M_PI / 180;//switching to radians
+					weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (-weapon->m_fire_direction);
+					weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (-weapon->m_fire_direction);
+
+					//transmitting the angle to the weapon, which will pass it to the bullets
+					weapon->m_shot_angle = theta;
 				}
-				else
-				{
-				*/
-					//UPDATE WEAPON POSITION
-					if (weapon->m_target_homing == SEMI_HOMING && weapon->m_rafale > 0 && ((weapon->m_rafale_index > 0 && weapon->m_rafale_index < weapon->m_rafale) || (weapon->m_multishot > 1 && weapon->m_shot_index > 0)))
+
+				weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);
+				weapon->m_face_target = m_face_target;
+
+				//FIRE: Weapon can fire if:
+				//- not required to face the enemy
+				//- has Homing ability (not necessarily aligned with target)
+				//- has Semi-homing ability and started salvo
+				//- is aligned with target
+				float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_BEAM : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_OTHER;
+				if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
+					if (m_face_target == false || weapon->m_target_homing == HOMING || hasSemiHomingInProgress == true || abs(delta) < angle_tolerance_for_alignment)
 					{
-						//semi-HOMING and rafale not ended or alternated multishot not ended = no update of target or weapon position
-					}
-					else
-					{
-						//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
-						float theta = (getRotation() + weapon->m_angle_offset) / 180 * M_PI;
-						if (weapon->m_target_homing != NO_HOMING && abs(delta) > 1)//let's take delta>1 as an epsilon 
-							theta -= delta / 180 * M_PI;
-
-						//weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) - m_size.y / 2 * sin(theta);
-						//weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) + m_size.x / 2 * cos(theta);
-						weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) - m_size.y / 2 * sin(theta);
-						weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) + m_size.y / 2 * cos(theta);
-
-						//transmitting the angle to the weapon, which will pass it to the bullets
-						weapon->m_shot_angle = theta;
-					}
-
-					weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);
-					weapon->m_face_target = m_face_target;
-				/*}*/
-
-				//FIRE
-				if (m_disable_fire == false && weapon->m_firing_ready == true)
-					weapon->Fire(EnemyFire, deltaTime);
+						weapon->Fire(EnemyFire, deltaTime);
 						m_shots_fired++;
+					}
 			}
 
 			//UPDATE BEAMS
@@ -409,7 +413,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		if (m_currentPhase->m_transitions_list.empty() == false)
 			CheckCondition();
 }
-
 void Enemy::RotateFeedbacks(float angle)
 {
 	m_armorBar.setRotation(angle);
@@ -1146,7 +1149,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 		{
 			Weapon* weapon = new Weapon(Enemy::LoadAmmo((*it)[WEAPON_AMMO]));
 			weapon->m_display_name = (*it)[WEAPON_DISPLAY_NAME];
-			weapon->m_fire_direction = Vector2i(0, fire_direction);
+			weapon->m_fire_direction = fire_direction;
 			weapon->m_rate_of_fire = atof((*it)[WEAPON_RATE_OF_FIRE].c_str());
 			weapon->m_shot_mode = NoShotMode;
 
@@ -2145,7 +2148,7 @@ Equipment* Enemy::LoadSavedEquipmentFromLine(string line)
 
 			Weapon* weapon = new Weapon(ammo);
 			weapon->m_display_name = bot_weapon_name;
-			weapon->m_fire_direction = Vector2i(0, -1);
+			weapon->m_fire_direction = -1;
 			weapon->m_rate_of_fire = bot_weapon_rate_of_fire;
 			weapon->m_shot_mode = (ShotMode)bot_weapon_shot_mode;
 
@@ -2269,7 +2272,7 @@ Weapon* Enemy::LoadSavedWeaponFromLine(string line)
 	weapon->m_level = weapon_level;
 	weapon->m_credits = weapon_credits;
 	weapon->m_quality = weapon_quality;
-	weapon->m_fire_direction = Vector2i(0, -1);
+	weapon->m_fire_direction = -1;
 	weapon->m_rate_of_fire = weapon_rate_of_fire;
 	weapon->m_shot_mode = (ShotMode)weapon_shot_mode;
 

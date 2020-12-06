@@ -31,8 +31,9 @@ public:
 	void FireAscendingShot(GameObjectType collider_type);
 	void FireDescendingShot(GameObjectType collider_type);
 	void UpdateBeams(bool firing);
+	bool HasSemiHomingSalvoInProgress();
 
-	sf::Vector2i m_fire_direction;
+	int m_fire_direction;
 	float m_rate_of_fire;
 	float m_readyFireTimer;
 	Ammo* m_ammunition;

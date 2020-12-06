@@ -705,10 +705,10 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 	return s;
 }
 
-float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
+float GameObject::GetAngleRadForVector(sf::Vector2f vector)
 {
-	const float a = curSpeed.x;
-	const float b = curSpeed.y;
+	const float a = vector.x;
+	const float b = vector.y;
 
 	if (a == 0 && b == 0)
 		return 0.f;
@@ -725,7 +725,6 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 	}
 
 	angle += M_PI_2;
-	//angle = (fmod(angle, 2 * M_PI));
 
 	return angle;
 }
@@ -741,7 +740,7 @@ float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* 
 float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
 {
 	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
-	float target_angle = GetAngleRadForSpeed(diff);
+	float target_angle = GetAngleRadForVector(diff);
 
 	const float a = diff.x;
 	const float b = diff.y;
@@ -760,6 +759,24 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	angle += M_PI_2;
 
 	return angle;
+}
+
+float GameObject::GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
+{
+	float angle = GameObject::GetAngleRadForVector(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI;
+	
+	return GameObject::GetAngleDegToTargetAngleDeg(ref_rotation_in_deg, angle);
+}
+
+float GameObject::GetAngleDegToTargetAngleDeg(float ref_rotation_in_deg, float target_rotation_in_deg)
+{
+	float delta_angle = ref_rotation_in_deg - target_rotation_in_deg;
+	if (delta_angle > 180)
+		delta_angle -= 360;
+	else if (delta_angle < - 180)
+		delta_angle += 360;
+
+	return delta_angle;
 }
 
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)

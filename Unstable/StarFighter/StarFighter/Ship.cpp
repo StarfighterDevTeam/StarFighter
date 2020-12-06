@@ -546,14 +546,14 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		if (m_weapon->m_target_homing != NO_HOMING)
 			theta -= delta / 180 * M_PI;
 
-		if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
+		if (m_weapon->HasSemiHomingSalvoInProgress() == true)
 		{
 			//semi-HOMING and rafale not ended => no update of target or weapon position
 		}
 		else
 		{
-			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta);
-			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta);
+			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (- m_weapon->m_fire_direction);
+			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (- m_weapon->m_fire_direction);
 
 			//transmitting the angle to the weapon, which will pass it to the bullets
 			m_weapon->m_shot_angle = theta;
@@ -575,8 +575,12 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		m_weapon->UpdateBeams(firing);
 	}
 
+	//Bots firing
+	for (Bot* bot : m_bot_list)
+		bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
+
 	//not considered "firing" between rafales
-	if (firing == true)
+	if (firing == true && m_weapon != NULL)
 	{
 		if (m_weapon->m_rafale < 0 && m_weapon->m_beams.empty() == true)
 			firing = false;
@@ -584,9 +588,9 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 			firing = false;
 	}
 
-	//Bots firing
-	for (Bot* bot : m_bot_list)
-		bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
+	//not considered firing if no weapon and no bot to fire
+	if (m_weapon == NULL && m_bot_list.empty() == true)
+		firing = false;
 
 	return firing;
 }
