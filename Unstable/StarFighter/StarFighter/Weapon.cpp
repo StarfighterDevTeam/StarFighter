@@ -339,6 +339,17 @@ bool Weapon::HasSemiHomingSalvoInProgress()
 	return false;
 }
 
+float Weapon::GetAngleToleranceForBeam(GameObject* target)
+{
+	float Z = PIXELS_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_BEAM;
+	float X = m_ammunition->m_size.x * 0.5;
+	float D = GameObject::GetDistanceBetweenPositions(getPosition(), target->getPosition());
+
+	float ratio = D == 0 ? 0 : (Z + X) / D;
+
+	return asin(ratio) * 180 / M_PI;
+}
+
 Weapon* Weapon::Clone()
 {
 	Weapon* weapon = new Weapon(this->m_ammunition->Clone());

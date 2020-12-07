@@ -392,7 +392,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				//- has Homing ability (not necessarily aligned with target)
 				//- has Semi-homing ability and started salvo
 				//- is aligned with target
-				float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_BEAM : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_OTHER;
+				float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? weapon->GetAngleToleranceForBeam(playership) : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT;
 				if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
 					if (m_face_target == false || weapon->m_target_homing == HOMING || hasSemiHomingInProgress == true || abs(delta) < angle_tolerance_for_alignment)
 					{

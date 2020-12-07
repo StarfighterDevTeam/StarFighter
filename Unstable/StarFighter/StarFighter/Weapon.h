@@ -32,6 +32,7 @@ public:
 	void FireDescendingShot(GameObjectType collider_type);
 	void UpdateBeams(bool firing);
 	bool HasSemiHomingSalvoInProgress();
+	float GetAngleToleranceForBeam(GameObject* target);
 
 	int m_fire_direction;
 	float m_rate_of_fire;
