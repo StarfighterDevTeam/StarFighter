@@ -555,7 +555,7 @@ void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 	if (!inside_rect.contains(cursor.getPosition()))
 	{
 		sf::Vector2f speed = sf::Vector2f(cursor.getPosition().x - this->getPosition().x, cursor.getPosition().y - this->getPosition().y);
-		GameObject::NormalizeSpeed(&speed, STELLARMAP_SCROLLING_SPEED);
+		GameObject::NormalizeVector(&speed, STELLARMAP_SCROLLING_SPEED);
 		if (abs(speed.x) > STELLARMAP_SCROLLING_MIN_SPEED)
 		{
 			m_scroll_offset.x -= speed.x * deltaTime.asSeconds();

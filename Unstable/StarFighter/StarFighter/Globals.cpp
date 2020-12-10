@@ -90,11 +90,11 @@ int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 	return random_value;
 }
 
-float RandomizeFloatBetweenValues(sf::Vector2f min_max_values)
+float RandomizeFloatBetweenValues(float value_min, float value_max)
 {
 	float random_value = (float) ((double) rand() / RAND_MAX);
-	random_value *= (min_max_values.y - min_max_values.x);
-	random_value += min_max_values.x;
+	random_value *= (value_max - value_min);
+	random_value += value_min;
 
 	return random_value;
 }
@@ -117,4 +117,20 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
 	}
 	return str;
+}
+
+void BoundToValues(float& input, float min, float max)
+{
+	if (min > max)
+	{
+		float _min = min;
+		min = max;
+		max = _min;
+	}
+
+	if (input < min)
+		input = min;
+
+	if (input > max)
+		input = max;
 }

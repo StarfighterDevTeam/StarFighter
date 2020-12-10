@@ -2,6 +2,43 @@
 
 extern Game* CurrentGame;
 
+
+//DEBUG
+void Ammo::Draw(sf::RenderTexture& screen)
+{
+	/*DEBUG*/
+	//Text text;
+	//text.setFont(*(*CurrentGame).m_font[0]);
+	//text.setCharacterSize(14);
+	//text.setColor(sf::Color::White);
+	//text.setPosition(sf::Vector2f(getPosition().x - 50, getPosition().y - 70));
+	//ostringstream ss;
+	
+	//ss << "\nspeed: " << to_string((int)GameObject::GetVectorLength(m_speed));// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+
+	//missile locking position feedback
+	if (m_is_missile_model == true)
+	{
+		sf::RectangleShape rect;
+		rect.setSize(sf::Vector2f(20, 20));
+		rect.setOrigin(sf::Vector2f(10, 10));
+		rect.setFillColor(sf::Color(0, 0, 0, 0));
+
+		rect.setOutlineColor(sf::Color::Red);
+
+		rect.setOutlineThickness(2);
+		rect.setPosition(m_missile_target_position);
+
+		if (m_missile_phase > Missile_SlowDown)
+			screen.draw(rect);
+	}
+	
+	//text.setString(ss.str());
+	//screen.draw(text);
+
+	GameObject::Draw(screen);
+}
+
 Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int damage, FX* explosion) : GameObject(position, speed,  textureName, size)
 {
 	m_damage = damage;
@@ -20,6 +57,18 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_current_range = 0;
 	m_shot_angle = 0;
 	m_display_name = "Ammo";
+	m_is_missile_model = false;
+	
+
+	//missile motion model
+	m_missile_acceleration = RandomizeFloatBetweenValues(900, 1000);
+	m_missile_deceleration = RandomizeFloatBetweenValues(340, 360);
+	m_missile_speed_max = 2000;
+	m_missile_speed_min = RandomizeFloatBetweenValues(180, 220);
+	m_missile_turn_speed = RandomizeFloatBetweenValues(160, 240);;
+	m_missile_turn_speed_track = 100;
+	m_missile_speed_locking = 1000;
+	m_missile_phase =  Missile_SlowDown;
 }
 
 Ammo* Ammo::Clone()
@@ -36,12 +85,59 @@ Ammo* Ammo::Clone()
 	ammo->m_offset_x = this->m_offset_x;
 	ammo->m_isBeam = this->m_isBeam;
 	ammo->m_DontGarbageMe = this->m_isBeam;
+	ammo->m_is_missile_model = this->m_is_missile_model;
 
 	return ammo;
 }
 
 void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	//missile motion model
+	if (m_is_missile_model == true)
+	{
+		float speed = GameObject::GetVectorLength(m_speed);
+		float heading = getRotation();
+
+		//speed change
+		const float turn_speed = m_missile_phase == Missile_SlowDown ? m_missile_turn_speed : m_missile_turn_speed_track;
+		if (m_missile_phase == Missile_SlowDown)
+		{
+			speed -= m_missile_deceleration * deltaTime.asSeconds() * hyperspeedMultiplier;
+			if (speed <= m_missile_speed_min)
+				m_missile_phase = Missile_TrackTarget;
+		}
+		else
+		{
+			speed += m_missile_acceleration * deltaTime.asSeconds() * hyperspeedMultiplier;
+			if (speed > m_missile_speed_locking)
+				m_missile_phase = Missile_FinalHeading;
+		}
+			
+		//turn to target position
+		if (m_missile_phase != Missile_FinalHeading)
+		{
+			GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+			const float delta_angle = GameObject::GetAngleDegToTargetPosition(getPosition(), heading + 180, playerShip->getPosition());
+			m_missile_target_position = playerShip->getPosition();//for feedback purpose
+
+			if (delta_angle != 0 && m_missile_phase != Missile_FinalHeading)
+			{
+				if (abs(delta_angle) <= turn_speed * deltaTime.asSeconds() * hyperspeedMultiplier)
+					heading -= delta_angle;
+				else if (delta_angle > 0)
+					heading -= turn_speed * deltaTime.asSeconds() * hyperspeedMultiplier;
+				else
+					heading += turn_speed * deltaTime.asSeconds() * hyperspeedMultiplier;
+			}
+		}
+		
+		//set heading and speed
+		setRotation(heading);
+		BoundToValues(speed, m_missile_speed_min, m_missile_speed_max);
+		m_speed = GameObject::GetVectorFromLengthAndAngle(speed, (heading + 180) * M_PI / 180);
+	}
+
+	//apply speed
 	sf::Vector2f newspeed = m_speed;
 	float new_ref_speed = m_ref_speed;
 	if (hyperspeedMultiplier > 1)

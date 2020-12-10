@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-//DEBUG PATTERN
+//DEBUG
 void Enemy::Draw(sf::RenderTexture& screen)
 {
 	/*DEBUG*/
@@ -325,23 +325,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				else if (m_face_target == true && hasSemiHomingInProgress == false)
 					target_angle = fmod(getRotation() + 180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 360);
 
-				float delta = GameObject::GetAngleDegToTargetAngleDeg(getRotation(), target_angle);
-
-				//rotate towards desired angle
-				if (delta >= 0)
-				{
-					if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
-						rotate(-abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-					else
-						setRotation(target_angle);
-				}
-				else
-				{
-					if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
-						rotate(abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-					else
-						setRotation(target_angle);
-				}
+				//rotate towards target angle
+				TurnToTargetAngle(target_angle, m_rotation_speed, deltaTime, l_hyperspeedMultiplier);
 			}
 		}
 		
@@ -364,7 +349,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				float theta = getRotation() + weapon->m_angle_offset;
 				
 				//angle offset to target
-				float delta = GameObject::GetAngleDegToTargetAngleDeg(180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 0);
+				float delta = GameObject::GetDeltaAngleToTargetAngle(180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 0);
 
 				if (hasSemiHomingInProgress == false)
 				{
@@ -490,7 +475,11 @@ void Enemy::GetDamage(int damage)
 		m_shield -= damage;
 
 	if (m_armor <= 0)
+	{
+		m_armor == 0;
 		Death();
+	}
+		
 }
 
 Enemy* Enemy::Clone()
@@ -1082,7 +1071,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 		if (random_number < LootTable_DropIsEquipment[loot_class] * LootTable_DroppingSomething[loot_class])
 		{
 			//Beast Scale Score randomized here within the min and max
-			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class]);
+			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class].x, LootTable_BeastScale[loot_class].y);
 
 			//Calculation of the bonus "credits" for the loot
 			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(m_level + 1));
@@ -1231,6 +1220,7 @@ Ammo* Enemy::LoadAmmo(string name)
 				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
 
 			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);
+			new_ammo->m_is_missile_model = (bool)stoi((*it)[AMMO_MISSILE_MODEL]);
 			return new_ammo;
 		}
 	}
@@ -1366,7 +1356,7 @@ void Enemy::ApplyLevelModifiers()
 Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 {
 	//beam weapon?
-	bool beam_weapon = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WEAPON_CHANCE_OF_BEAM;
+	bool beam_weapon = RandomizeFloatBetweenValues(0, 1) < WEAPON_CHANCE_OF_BEAM;
 
 	//Creating the item with base stats
 	Weapon* weapon = beam_weapon == false ? Enemy::LoadWeapon("laser", -1) : Enemy::LoadWeapon("laserbeam", -1);
@@ -1435,7 +1425,7 @@ Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 		//dispersion weapon?
 		int min_multishots_for_dispersion = is_bot ? MIN_MULTISHOTS_FOR_DISPERSION_FOR_BOT - MIN_VALUE_OF_MULTISHOT : MIN_MULTISHOTS_FOR_DISPERSION - MIN_VALUE_OF_MULTISHOT;
 		if (bonus_multishot == min_multishots_for_dispersion && dispersion == 0)
-			dispersion = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WEAPON_CHANCE_OF_DISPERSION ? 1 : -1;
+			dispersion = RandomizeFloatBetweenValues(0, 1) < WEAPON_CHANCE_OF_DISPERSION ? 1 : -1;
 	}
 
 	//allocating bonuses to the weapon
@@ -1452,7 +1442,7 @@ Weapon* Enemy::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 
 		if (dispersion > 0)
 		{
-			weapon->m_dispersion = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_DISPERSION, is_bot ? WEAPON_MAX_DISPERSION_FOR_BOT : WEAPON_MAX_DISPERSION));
+			weapon->m_dispersion = RandomizeFloatBetweenValues(WEAPON_MIN_DISPERSION, is_bot ? WEAPON_MAX_DISPERSION_FOR_BOT : WEAPON_MAX_DISPERSION);
 			weapon->m_ammunition->m_damage *= (1 + WEAPON_DISPERSION_DAMAGE_MALUS);
 
 			weapon->m_display_name = to_string(weapon->m_multishot) + "-shots_wide_laser";

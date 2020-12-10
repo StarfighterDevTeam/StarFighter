@@ -605,11 +605,11 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 		if ((*it)->m_spawnResource > (*it)->m_spawnCost)
 		{
 			//Randomization of the event
-			float p = RandomizeFloatBetweenValues(sf::Vector2f(0, 1));
+			float p = RandomizeFloatBetweenValues(0, 1);
 			if (p < (*it)->m_spawnRepeatProbability)
 			{
 				//Critical event: spawn enemy, pay discount cost
-				float r = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_REPEAT_MINIMUM_RESOURCE, SPAWN_REPEAT_MAXIMUM_RESOURCE));
+				float r = RandomizeFloatBetweenValues(SPAWN_REPEAT_MINIMUM_RESOURCE, SPAWN_REPEAT_MAXIMUM_RESOURCE);
 				(*it)->m_spawnResource *= r;
 				SpawnEnemy((*it)->m_enemyClass);
 				CollateralSpawnCost((*it)->m_spawnCost, (*it)->m_spawnCostCollateralMultiplier, (*it)->m_enemyClass);
@@ -618,7 +618,7 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 			else if (p > 1 - (*it)->m_spawnMissProbability)
 			{
 				//Critical event: don't spawn enemy, but still pay a (discount) cost
-				float m = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_MISS_MINIMUM_RESOURCE, SPAWN_MISS_MAXIMUM_RESOURCE));
+				float m = RandomizeFloatBetweenValues(SPAWN_MISS_MINIMUM_RESOURCE, SPAWN_MISS_MAXIMUM_RESOURCE);
 				(*it)->m_spawnResource *= m;
 				//printf("CRITICAL MISS class %d\n", (*it)->enemyClass);
 			}
@@ -626,7 +626,7 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 			{
 				//Normal event: spawn enemy, pay total cost
 				SpawnEnemy((*it)->m_enemyClass);
-				float n = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_NORMAL_MINIMUM_RESOURCE, SPAWN_NORMAL_MAXIMUM_RESOURCE));
+				float n = RandomizeFloatBetweenValues(SPAWN_NORMAL_MINIMUM_RESOURCE, SPAWN_NORMAL_MAXIMUM_RESOURCE);
 				(*it)->m_spawnResource = 0 + (n*(*it)->m_spawnCost);
 				CollateralSpawnCost((*it)->m_spawnCost, (*it)->m_spawnCostCollateralMultiplier, (*it)->m_enemyClass);
 			}

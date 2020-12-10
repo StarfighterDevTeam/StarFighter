@@ -126,6 +126,7 @@ enum AmmoData
 	AMMO_FX,//5
 	AMMO_SOUND,//6
 	AMMO_ROTATION_SPEED,//7
+	AMMO_MISSILE_MODEL,//8
 };
 
 enum FXData
@@ -320,7 +321,6 @@ public:
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
 	virtual void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier);
-	void GetPolarMovement(sf::Vector2f* np);
 
 	int m_damage;
 	int m_armor;
@@ -360,12 +360,14 @@ public:
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
-	static float GetLengthOfVector(sf::Vector2f vector);
+	static float GetVectorLength(sf::Vector2f vector);
 	static float GetAngleRadForVector(sf::Vector2f vector);
 	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
 	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 	static float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
-	static float GetAngleDegToTargetAngleDeg(float ref_rotation_in_deg, float target_rotation_in_deg);
+	static float GetDeltaAngleToTargetAngle(float ref_rotation_in_deg, float target_rotation_in_deg);
+	sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle);
+	bool TurnToTargetAngle(float target_angle, float rotation_speed, sf::Time deltaTime, float hyperspeedMultiplier);//in degress
 
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
@@ -376,8 +378,8 @@ public:
 	static sf::Vector2f ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size);
 
 	//utilitary methods
-	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
-	static void ScaleSpeed(sf::Vector2f* vector, float target_value);
+	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
+	static void ScaleVector(sf::Vector2f* vector, float target_value);
 
 	int m_money;
 	Equipment* m_equipment_loot;

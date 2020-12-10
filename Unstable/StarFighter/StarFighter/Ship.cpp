@@ -960,7 +960,7 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 	m_speed.y += inputs_direction.y*getFighterFloatStatValue(Fighter_Acceleration);
 
 	//max speed constraints
-	GameObject::NormalizeSpeed(&m_speed, getFighterFloatStatValue(Fighter_MaxSpeed));
+	GameObject::NormalizeVector(&m_speed, getFighterFloatStatValue(Fighter_MaxSpeed));
 }
 
 void Ship::ManageGhost(sf::Time deltaTime)
@@ -1327,7 +1327,7 @@ void Ship::Bomb()
 
 void Ship::Jump()
 {
-	ScaleSpeed(&m_speed, SHIP_JUMPING_SPEED);
+	ScaleVector(&m_speed, SHIP_JUMPING_SPEED);
 	m_is_jumping = true;
 
 	//ghost
@@ -1463,7 +1463,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 	for (size_t i = 0; i < num_spawned_objects; i++)
 	{
 		//double random_number = (double)rand() / (RAND_MAX);
-		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class]);
+		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class].x, LootTable_BeastScale_Base[loot_class].y);
 
 		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, shop->m_level, shop, random_beast_scale))
 		{

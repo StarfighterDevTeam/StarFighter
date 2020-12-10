@@ -230,7 +230,7 @@ void GameObject::updateAnimation(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 }
 
-bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
+bool GameObject::NormalizeVector(sf::Vector2f* vector, float max_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return true;
@@ -247,7 +247,7 @@ bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
-void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
+void GameObject::ScaleVector(sf::Vector2f* vector, float target_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return;
@@ -315,6 +315,7 @@ void GameObject::GetDamage(int damage)
 
 	if (m_armor <= 0)
 	{
+		m_armor = 0;
 		Death();
 	}
 }
@@ -698,10 +699,10 @@ float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
 
-	return GetLengthOfVector(current_diff);
+	return GetVectorLength(current_diff);
 }
 
-float GameObject::GetLengthOfVector(sf::Vector2f vector)
+float GameObject::GetVectorLength(sf::Vector2f vector)
 {
 	const float a = vector.x;
 	const float b = vector.y;
@@ -709,6 +710,35 @@ float GameObject::GetLengthOfVector(sf::Vector2f vector)
 	s = sqrt(s);
 	s = floor(s);
 	return s;
+}
+
+sf::Vector2f GameObject::GetVectorFromLengthAndAngle(const float length, const float angle)
+{
+	sf::Vector2f vector;
+	vector.x = length * sin(angle);
+	vector.y = -length * cos(angle);
+	return vector;
+}
+
+bool GameObject::TurnToTargetAngle(float target_angle, float rotation_speed, sf::Time deltaTime, float hyperspeedMultiplier)
+{
+	float delta = GameObject::GetDeltaAngleToTargetAngle(getRotation(), target_angle);
+
+	if (delta >= 0 && (abs(delta) > abs(rotation_speed) * deltaTime.asSeconds() * hyperspeedMultiplier))
+	{
+		rotate(-abs(rotation_speed) * deltaTime.asSeconds() * hyperspeedMultiplier);
+		return false;
+	}
+	else if (delta < 0 && (abs(delta) > abs(rotation_speed) * deltaTime.asSeconds() * hyperspeedMultiplier))
+	{
+		rotate(abs(rotation_speed) * deltaTime.asSeconds() * hyperspeedMultiplier);
+		return false;
+	}
+	else
+	{
+		setRotation(target_angle);
+		return true;
+	}
 }
 
 float GameObject::GetAngleRadForVector(sf::Vector2f vector)
@@ -771,10 +801,10 @@ float GameObject::GetAngleDegToTargetPosition(sf::Vector2f ref_position, float r
 {
 	float angle = GameObject::GetAngleRadForVector(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI;
 	
-	return GameObject::GetAngleDegToTargetAngleDeg(ref_rotation_in_deg, angle);
+	return GameObject::GetDeltaAngleToTargetAngle(ref_rotation_in_deg, angle);
 }
 
-float GameObject::GetAngleDegToTargetAngleDeg(float ref_rotation_in_deg, float target_rotation_in_deg)
+float GameObject::GetDeltaAngleToTargetAngle(float ref_rotation_in_deg, float target_rotation_in_deg)
 {
 	float delta_angle = ref_rotation_in_deg - target_rotation_in_deg;
 	if (delta_angle > 180)
@@ -937,7 +967,7 @@ sf::Vector2f GameObject::getRandomXSpawnPosition(Directions direction, sf::Vecto
 	}
 
 	//random value inside the allowed spread
-	float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(0, allowed_spread));
+	float random_posX = RandomizeFloatBetweenValues(0, allowed_spread);
 
 	//getting position coordinates (min + random value)
 	float pos_x = GameObject::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;

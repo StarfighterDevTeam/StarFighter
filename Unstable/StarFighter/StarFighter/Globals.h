@@ -312,8 +312,9 @@ float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
 int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
-float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
+float RandomizeFloatBetweenValues(float value_min, float value_max);
 float MaxBetweenValues(sf::Vector2f values);
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+void BoundToValues(float& input, float min, float max);
 
 #endif // GLOBALS_H_INCLUDED
