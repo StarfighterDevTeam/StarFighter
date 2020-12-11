@@ -46,11 +46,7 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 {
 	Ammo* bullet = m_ammunition->Clone();
 
-	float l_dispersion = dispersion;
-	if (m_collider_type == EnemyFire)
-	{
-		l_dispersion = -l_dispersion;
-	}
+	float l_dispersion = m_collider_type == EnemyFire ? - dispersion : dispersion;
 
 	//transmitting the value to the bullet
 	bullet->m_shot_angle = m_shot_angle;
@@ -62,7 +58,7 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 
 	bullet->setPosition(getPosition().x + bullet_offset_x, getPosition().y + bullet_offset_y);
 
-	bullet->m_speed.x = bullet->m_ref_speed * sin(m_shot_angle + (l_dispersion *  M_PI / 180)) * (- m_fire_direction);
+	bullet->m_speed.x = bullet->m_ref_speed * sin(m_shot_angle + (l_dispersion *  M_PI / 180)) * (-m_fire_direction);
 	bullet->m_speed.y = bullet->m_ref_speed * cos(m_shot_angle + (l_dispersion *  M_PI / 180)) * m_fire_direction;
 
 	bullet->setRotation((m_shot_angle * 180.0f / M_PI) + l_dispersion);
@@ -70,13 +66,25 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 	bullet->m_visible = true;
 	bullet->m_collider_type = m_collider_type;
 	bullet->m_isOnScene = true;
-
-	bullet->m_collider_type = m_collider_type;
 	
+	//beam layer
 	if (bullet->m_isBeam == false)
 		bullet->m_layer = m_collider_type == EnemyFire ? EnemyFireLayer : FriendlyFireLayer;
 	else
 		bullet->m_layer = m_collider_type == EnemyFire ? EnemyBeamLayer : FriendlyBeamLayer;
+
+	//missile default target position
+	if (bullet->m_is_missile_model == true)
+	{
+		if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == NO_DIRECTION)
+			bullet->m_missile_target_position = sf::Vector2f(getPosition().x, ((m_fire_direction + 1) / 2) * SCENE_SIZE_Y);//0 if player, SCENE_SIZE_Y if enemy
+		else if ((*CurrentGame).m_direction == DIRECTION_DOWN)
+			bullet->m_missile_target_position = sf::Vector2f(getPosition().x, ((- m_fire_direction + 1) / 2) * SCENE_SIZE_Y);//SCENE_SIZE_Y if player, 0 if enemy
+		else if ((*CurrentGame).m_direction == DIRECTION_RIGHT)
+			bullet->m_missile_target_position = sf::Vector2f(((- m_fire_direction + 1) / 2) * SCENE_SIZE_X, getPosition().y);//SCENE_SIZE_X if player, 0 if enemy
+		else if ((*CurrentGame).m_direction == DIRECTION_LEFT)
+			bullet->m_missile_target_position = sf::Vector2f(((m_fire_direction + 1) / 2) * SCENE_SIZE_X, getPosition().y);//0 if player, SCENE_SIZE_X if enemy
+	}
 
 	(*CurrentGame).addToScene(bullet, true);
 

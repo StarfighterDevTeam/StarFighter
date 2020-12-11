@@ -34,9 +34,6 @@ void GameObject::Draw(sf::RenderTexture& screen)
 		#ifndef NDEBUG
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8))//display hitbox on holding key
 		{
-			bool transparent = m_transparent;
-			m_transparent = false;
-		
 			float x = getLocalBounds().width * cos(getRotation() * M_PI / 180) + getLocalBounds().height * sin(getRotation() * M_PI / 180);
 			float y = getLocalBounds().height * cos(getRotation() * M_PI / 180) + getLocalBounds().width * sin(getRotation() * M_PI / 180);
 			
@@ -51,8 +48,6 @@ void GameObject::Draw(sf::RenderTexture& screen)
 			screen.draw(rect);
 
 			screen.draw(*this);
-
-			m_transparent = transparent;
 			return;
 		}
 		#endif

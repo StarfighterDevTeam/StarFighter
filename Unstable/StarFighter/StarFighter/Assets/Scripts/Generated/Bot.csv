@@ -3,3 +3,4 @@ bot,0,0,0,0,laserbeam,2D/Equipment/bot.png,32,32,1,death_explosion,circle,300,1,
 bot_blue,0,0,0,0,laser,2D/Equipment/bot_blue.png,32,32,1,death_explosion,circle,300,1,3,50,50,0,0,0
 bot_red,0,0,0,0,laser,2D/Equipment/bot_red.png,32,32,1,death_explosion,rectangle,150,1,1,50,50,0,50,0
 bot_green,0,0,0,0,laser,2D/Equipment/bot_green.png,32,32,1,death_explosion,0,,,,,,0,50,0
+bot_rocket,0,0,0,0,minirocket,2D/Equipment/bot.png,32,32,1,death_explosion,circle,300,1,3,50,50,0,-50,0

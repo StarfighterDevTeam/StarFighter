@@ -769,12 +769,12 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 	if (playerShip != NULL)
 	{
 		//cleaning layers
-		(*CurrentGame).garbageLayer(FriendlyFireLayer);
+		(*CurrentGame).garbageLayer(FriendlyFireLayer, false, true);
 		(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
 		(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
-		(*CurrentGame).garbageLayer(ExplosionLayer);
-		(*CurrentGame).garbageLayer(LootLayer);
-		(*CurrentGame).garbageLayer(FeedbacksLayer);
+		(*CurrentGame).garbageLayer(ExplosionLayer, false, true);
+		(*CurrentGame).garbageLayer(LootLayer, false, true);
+		(*CurrentGame).garbageLayer(FeedbacksLayer, false, true);
 
 		//delete current scene <!> to do after cleaning layers, otherwise Enemy class will be left with their vector<Phase*> m_phases and FX* m_FX_Death pointing to destroyed elemnts
 		delete m_currentScene;

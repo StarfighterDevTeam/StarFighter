@@ -542,9 +542,10 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		else if (delta < -180)
 			delta += 360;
 
-		float theta = getRotation() / 180 * M_PI;
+		float theta = getRotation() + m_weapon->m_angle_offset;
+
 		if (m_weapon->m_target_homing != NO_HOMING)
-			theta -= delta / 180 * M_PI;
+			theta -= delta;
 
 		if (m_weapon->HasSemiHomingSalvoInProgress() == true)
 		{
@@ -552,6 +553,8 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 		else
 		{
+			//calcule weapon offset
+			theta *= M_PI / 180;//switching to radians
 			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (- m_weapon->m_fire_direction);
 			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (- m_weapon->m_fire_direction);
 

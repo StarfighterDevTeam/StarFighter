@@ -42,9 +42,9 @@ R_Alpha1,40,100,20,100,0,0,0,2D/Royale/R_Alpha.png,69,78,1,1,4,50,death_explosio
 R_Alpha2,40,100,20,100,0,0,0,2D/Royale/R_Alpha.png,69,78,1,2,4,50,death_explosion,10,0,R_Alpha2_Entry
 R_Alpha3,40,100,20,100,0,0,0,2D/Royale/R_Alpha.png,69,78,1,3,4,50,death_explosion,10,0,R_Alpha3_Entry
 R_AlphaGold,1000,100,20,1000,0,0,0,2D/Royale/R_Alpha.png,69,78,1,4,4,50,death_explosion,10,0,R_AlphaGold_Entry
-R_Sigma1,50,150,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,1,4,50,death_explosion,10,0,R_Sigma1_Entry
-R_Sigma2,50,150,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,2,4,50,death_explosion,10,0,R_Sigma2_Entry
-R_Sigma3,50,150,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,3,4,50,death_explosion,10,0,R_Sigma3_Entry
+R_Sigma1,50,100,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,1,4,50,death_explosion,10,0,R_Sigma1_Entry
+R_Sigma2,50,100,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,2,4,50,death_explosion,10,0,R_Sigma2_Entry
+R_Sigma3,50,100,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,3,4,50,death_explosion,10,0,R_Sigma3_Entry
 R_SigmaGold,300,500,20,100,0,0,0,2D/Royale/R_Sigma.png,51,66,5,3,4,50,death_explosion,10,0,R_SigmaGold_Entry
 R_Beta1,500,0,0,300,0,0,0,2D/Royale/R_Beta.png,207,81,1,1,4,50,death_explosion,20,0,R_Beta1_Entry
 R_Beta2,500,0,0,300,0,0,0,2D/Royale/R_Beta.png,207,81,1,2,4,50,death_explosion,20,0,R_Beta2_Entry

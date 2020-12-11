@@ -101,11 +101,10 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 	if (m_weapon != NULL)
 	{
 		//UPDATE WEAPON POSITION
-		//calculating the angle we want to face, if any
-		float target_angle = getRotation();
+		float target_angle = getRotation();//calculating the angle we want to face, if any
 		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
 			target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
-		
+
 		float current_angle = getRotation();
 		float delta = current_angle - target_angle;
 		if (delta > 180)
@@ -113,21 +112,21 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 		else if (delta < -180)
 			delta += 360;
 
-		float theta = getRotation() / 180 * M_PI;
+		float theta = getRotation() + m_weapon->m_angle_offset;
+
 		if (m_weapon->m_target_homing != NO_HOMING)
-			theta -= delta / 180 * M_PI;
+			theta -= delta;
 
 		if (m_weapon->HasSemiHomingSalvoInProgress() == true)
 		{
-			//semi-HOMING and rafale not ended = no update of target or weapon position
+			//semi-HOMING and rafale not ended => no update of target or weapon position
 		}
 		else
 		{
-			//m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.y / 2 * sin(theta);
-			//m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x - m_size.y / 2 * cos(theta);
-
-			m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (-m_weapon->m_fire_direction);
-			m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (-m_weapon->m_fire_direction);
+			//calcule weapon offset
+			theta *= M_PI / 180;//switching to radians
+			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (-m_weapon->m_fire_direction);
+			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (-m_weapon->m_fire_direction);
 
 			//transmitting the angle to the weapon, which will pass it to the bullets
 			m_weapon->m_shot_angle = theta;

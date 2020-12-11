@@ -303,8 +303,10 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 
 					ss_stats << "\nDamage: " << obj->m_bots.front()->m_weapon->m_ammunition->m_damage;
 					
-					if (obj->m_bots.front()->m_weapon->m_rafale >= 0)
+					if (obj->m_bots.front()->m_weapon->m_rafale >= 0 && obj->m_bots.front()->m_weapon->m_ammunition->m_is_missile_model == false)
 						ss_stats << "\nAmmo speed: " << obj->m_bots.front()->m_weapon->m_ammunition->m_speed.y;
+					else if (obj->m_bots.front()->m_weapon->m_ammunition->m_is_missile_model == true)
+						ss_stats << "\nGuided missiles";
 					else 
 						ss_stats << "\nContinuous beam";
 
@@ -402,8 +404,10 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				//}
 				ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
 
-				if (obj->m_rafale >= 0)
+				if (obj->m_rafale >= 0 && obj->m_ammunition->m_is_missile_model == false)
 					ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
+				else if (obj->m_ammunition->m_is_missile_model == true)
+					ss_stats << "\nGuided missiles";
 				else
 					ss_stats << "\nContinuous beam";
 				

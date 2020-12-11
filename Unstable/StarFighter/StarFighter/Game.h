@@ -111,7 +111,7 @@ public:
 	float GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore);
 	static EquipmentQuality GetItemQualityClass(float quality);
 
-	TargetScan FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
+	GameObject* GetNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string display_name);
 

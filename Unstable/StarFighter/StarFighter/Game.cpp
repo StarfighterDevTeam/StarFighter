@@ -642,45 +642,32 @@ float Game::GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore
 
 }
 
-TargetScan Game::FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
+GameObject* Game::GetNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
 {
-	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
-	{
-		if (*it == NULL)
-			continue;
 
-		if ((*it)->m_isOnScene && !(*it)->m_ghost)
+	if (type == PlayerShip && m_playerShip != NULL)
+		return (GameObject*)m_playerShip;
+	
+	GameObject* object_found = NULL;
+	for (GameObject* object : m_sceneGameObjectsTyped[type])
+	{
+		if (object->m_isOnScene == true && object->m_ghost == false)
 		{
-			const float a = ref_position.x - (*it)->getPosition().x;
-			const float b = ref_position.y - (*it)->getPosition().y;
+			const float a = ref_position.x - object->getPosition().x;
+			const float b = ref_position.y - object->getPosition().y;
 
 			float distance_to_ref = (a * a) + (b * b);
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
 				shortest_distance = distance_to_ref;
-				pos = (*it)->getPosition();
+				object_found = object;
 			}
 		}
 	}
-	if (shortest_distance > 0)
-	{
-		if (range > 0 && (range * range) <= shortest_distance)
-		{
-			return TargetScan::TARGET_OUT_OF_RANGE;
-		}
-		else
-		{
-			return TargetScan::TARGET_IN_RANGE;
-		}
 
-	}
-	else
-	{
-		return TargetScan::NO_TARGET_FOUND;
-	}
+	return object_found;
 }
 
 float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
