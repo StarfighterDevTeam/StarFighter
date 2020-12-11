@@ -92,6 +92,8 @@ const char* getSavesPath();
 #define SCREEN_BORDER_OFFSET_CONSTRAINT_Y					8
 #define PIXELS_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_BEAM		40
 #define ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT			1
+#define ENEMY_BIG_LASERBEAM_POINTER_DELAY					1.5
+#define ENEMY_SMALL_LASERBEAM_POINTER_DELAY					1
 
 //HUD
 #define ARMOR_BAR_SIZE_X								320
@@ -309,7 +311,7 @@ enum HazardLevels
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
-float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
+float ProrataBetweenThreshold(float value, sf::Vector2f min_max_threshold);
 int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(float value_min, float value_max);

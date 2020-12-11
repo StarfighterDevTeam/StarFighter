@@ -14,6 +14,7 @@ class Weapon : public sf::Sprite
 public:
 	Weapon(Ammo* ammunition);
 	~Weapon();
+	void Draw(sf::RenderTexture& screen);
 
 	std::string m_textureName;
 	sf::Vector2f m_size;

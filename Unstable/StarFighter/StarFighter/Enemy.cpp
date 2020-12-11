@@ -34,6 +34,9 @@ void Enemy::Draw(sf::RenderTexture& screen)
 	text.setString(ss.str());
 	screen.draw(text);
 	*/
+
+	for (Weapon* weapon : m_weapons_list)
+		weapon->Draw(screen);
 	
 	GameObject::Draw(screen);
 }

@@ -37,7 +37,7 @@ public:
 	float m_missile_deceleration;
 	float m_missile_speed_min;
 	float m_missile_speed_max;
-	float m_missile_speed_locking;
+	float m_missile_speed_unlocking_target;
 	MissilePhase m_missile_phase;
 	sf::Vector2f m_missile_target_position;//for feedback only
 	GameObject* m_missile_target_object;

@@ -68,7 +68,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 		m_missile_speed_min = RandomizeFloatBetweenValues(180, 220);
 		m_missile_turn_speed = RandomizeFloatBetweenValues(200, 240);
 		m_missile_turn_speed_track = 100;
-		m_missile_speed_locking = 1100;
+		m_missile_speed_unlocking_target = 1000;
 		m_missile_phase = Missile_SlowDown;
 		m_DontGarbageMe = is_missile_model;
 		m_missile_target_object = NULL;
@@ -123,7 +123,7 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		else
 		{
 			speed += m_missile_acceleration * deltaTime.asSeconds() * l_hyperspeedMultiplier;
-			if (speed > m_missile_speed_locking)
+			if (speed > m_missile_speed_unlocking_target)
 				m_missile_phase = Missile_FinalHeading;
 		}
 		

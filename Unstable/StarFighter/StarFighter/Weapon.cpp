@@ -42,6 +42,31 @@ Weapon::~Weapon()
 		beam->Death();
 }
 
+void Weapon::Draw(sf::RenderTexture& screen)
+{
+	if (m_rafale < 0)
+	{
+		float laser_warning_delay = m_ammunition->m_size.x > 30 ? ENEMY_BIG_LASERBEAM_POINTER_DELAY : ENEMY_SMALL_LASERBEAM_POINTER_DELAY;
+
+		if (m_readyFireTimer > m_rate_of_fire - laser_warning_delay)//laserbeam aiming feedback for enemies
+		{
+			sf::RectangleShape rect;
+			rect.setSize(sf::Vector2f(m_ammunition->m_size.x * 0.1, m_ammunition->m_size.y));
+			rect.setOrigin(sf::Vector2f(0.5 * m_ammunition->m_size.x * 0.1, 0.5 * m_ammunition->m_size.y));
+			float alpha = ProrataBetweenThreshold(m_readyFireTimer, sf::Vector2f(m_rate_of_fire - laser_warning_delay, m_rate_of_fire)) * 120;
+			rect.setFillColor(sf::Color(255, 0, 0, alpha));
+
+			float beam_offset_x = m_ammunition->m_offset_x * cos(m_shot_angle) + m_ammunition->m_size.y / 2 * sin(m_shot_angle) * (-m_fire_direction);
+			float beam_offset_y = m_ammunition->m_offset_x * sin(m_shot_angle) - m_ammunition->m_size.y / 2 * cos(m_shot_angle) * (-m_fire_direction);
+
+			rect.setPosition(getPosition().x + beam_offset_x, getPosition().y + beam_offset_y);
+			rect.setRotation(m_shot_angle * 180 / M_PI);
+
+			screen.draw(rect);
+		}
+	}
+}
+
 void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = m_ammunition->Clone();
@@ -132,7 +157,7 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 			m_firing_ready = true;
 	}
 	else if (m_rafale < 0)
-		m_firing_ready = (m_beams.empty() == true && m_readyFireTimer > m_rate_of_fire);
+		m_firing_ready = m_beams.empty() == true && m_readyFireTimer > m_rate_of_fire;
 
 	return m_firing_ready;
 }
