@@ -683,8 +683,10 @@ void Scene::SpawnEnemy(int enemy_class)
 	//RANDOM POSITION
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).m_direction, enemy->m_size);
 	enemy->setPosition(pos);
+
 	if (enemy->m_phases.empty() == false)
 		enemy->setPhase(enemy->m_phases.front());
+
 	enemy->UpdateHealthBars();//update health bar position
 	(*CurrentGame).addToScene(enemy, false);
 

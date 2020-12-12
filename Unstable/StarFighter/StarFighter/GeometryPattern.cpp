@@ -76,12 +76,12 @@ void GeometryPattern::setPattern_v2(PatternType pattern_type, int speed, int clo
 	m_clockwise = clockwise;
 	m_width = width;
 	m_height = height;
-	m_pattern_type = pattern_type;
 
 	//starting point
 	if (pattern_type >= 0 && (pattern_type != m_pattern_type || starting_point != m_starting_point))
 	{
 		m_starting_point = starting_point;
+		m_pattern_type = pattern_type;
 		int cc = m_clockwise * m_speed;
 
 		switch (m_pattern_type)
@@ -228,8 +228,18 @@ sf::Vector2f GeometryPattern::getOffset_v2(sf::Time deltaTime, bool global_offse
 				else
 					offset_tmp.y = -m_distance_left;
 
-				//changing direction
-				if (m_direction.x == 0)//from y to x
+				if (m_height == 0)//handling specific case of width=0
+				{
+					m_direction.x *= -1;
+					m_distance_left = m_width - (abs(move_x) - abs(offset_tmp.x));
+				}
+				else if (m_width == 0)//handling specific case of height=0
+				{
+					m_direction.y *= -1;
+					m_distance_left = m_height - (abs(move_y) - abs(offset_tmp.y));
+				}
+				//normal rectangle case: changing direction
+				else if (m_direction.x == 0)//from y to x
 				{
 					m_distance_left = m_width - (abs(move_y) - abs(offset_tmp.y));//width/height of rectangle minus distance already used
 					m_direction.y = 0;
