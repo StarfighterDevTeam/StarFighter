@@ -1074,5 +1074,11 @@ GameObject* GameObject::GetInputBlocker()
 
 void GameObject::SetAskingPanel(SFPanelTypes type)
 {
+	//see override in Ship class
+}
 
+bool GameObject::ClearTargetIfGarbage()
+{
+	//see override in class Ammo
+	return false;
 }

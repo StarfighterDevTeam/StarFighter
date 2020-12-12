@@ -394,6 +394,7 @@ public:
 	virtual void SetInputBlocker(GameObject* blocker);
 	virtual GameObject* GetInputBlocker();
 	virtual void SetAskingPanel(SFPanelTypes type);
+	virtual bool ClearTargetIfGarbage();
 
 protected:
 	sf::Vector2f m_initial_position;

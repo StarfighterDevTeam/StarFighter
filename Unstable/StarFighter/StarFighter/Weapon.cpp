@@ -113,6 +113,8 @@ void Weapon::CreateBullet(GameObjectType collider_type, float offsetX, float dis
 		//missile trail fx
 		if (collider_type == EnemyFire && bullet->m_trail != NULL)
 			bullet->m_trail->m_offset.y = -bullet->m_trail->m_offset.y;
+
+		(*CurrentGame).addToGuidedMissiles(bullet);
 	}
 
 	(*CurrentGame).addToScene(bullet, true);

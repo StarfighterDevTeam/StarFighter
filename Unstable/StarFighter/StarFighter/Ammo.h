@@ -18,6 +18,7 @@ public:
 	Ammo* Clone();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void Draw(sf::RenderTexture& screen) override;
+	bool ClearTargetIfGarbage() override;
 
 	FX* m_explosion;
 	float m_radius;

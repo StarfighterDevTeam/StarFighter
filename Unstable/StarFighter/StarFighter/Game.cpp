@@ -250,6 +250,11 @@ void Game::addToTextPops(SFTextPop* textpop)
 	m_sceneSFTextPops.push_back(textpop);
 }
 
+void Game::addToGuidedMissiles(GameObject* missile)
+{
+	m_sceneGuidedMissiles.push_back(missile);
+}
+
 void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
@@ -259,14 +264,28 @@ void Game::updateScene(Time deltaTime)
 	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
 	//Clearing garbage and updating the rest + adding newly created objects
-	vector<GameObject*> sceneGameObjects_tmp;
-
 	for (int i = 0; i < NBVAL_Layer; i++)
 		m_sceneGameObjectsLayered[i].clear();
 	for (int i = 0; i < NBVAL_GameObject; i++)
 		m_sceneGameObjectsTyped[i].clear();
 
+	//handling guided missiles specifically, because we need to clean their target if target is to be "garbaged"
+	vector<GameObject*> sceneGameGuidedMissiles_tmp;
+	for (GameObject* missile : m_sceneGuidedMissiles)
+	{
+		if (missile->m_garbageMe == false)
+		{
+			sceneGameGuidedMissiles_tmp.push_back(missile);
+			missile->ClearTargetIfGarbage();
+		}
+	}
+
+	m_sceneGuidedMissiles.clear();
+	for (GameObject* missile : sceneGameGuidedMissiles_tmp)
+		m_sceneGuidedMissiles.push_back(missile);
+
 	//delete "garbage" objects, keep the rest in a temporary vector
+	vector<GameObject*> sceneGameObjects_tmp;
 	for (GameObject* object : m_sceneGameObjects)
 	{
 		object->GarbageWhenOutOfScreen();

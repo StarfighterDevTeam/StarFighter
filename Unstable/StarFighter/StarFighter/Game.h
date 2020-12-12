@@ -67,9 +67,9 @@ public:
 	void addToScene(GameObject* object, bool during_update);
 	void addToRectangles(SFRectangle& rectangle);
 	void addToTexts(SFText& text);
-
 	void addToPanels(SFPanel* panel);
 	void addToTextPops(SFTextPop* textpop);
+	void addToGuidedMissiles(GameObject* missile);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -144,9 +144,6 @@ public:
 	string m_next_music_name;
 	Music_Bank m_curMusic_type;
 
-
-	
-
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	
@@ -164,6 +161,7 @@ private:
 	vector<GameObject*> m_sceneGameObjectsCreated;
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+	vector<GameObject*> m_sceneGuidedMissiles;
 };
 
 #endif // GAME_H_INCLUDED

@@ -144,7 +144,10 @@ void Gameloop::Update(Time deltaTime)
 	#ifndef NDEBUG
 		//F6: spawn in Sandbox scene
 		if (InputGuy::spawnInSandbox() && (*CurrentGame).m_waiting_for_dialog_validation == false)
+		{
 			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+			(*CurrentGame).m_playerShip->ResplenishHealth();
+		}
 
 		//F7: relad saved items and enemy config
 		if (InputGuy::reloadCSVs())
