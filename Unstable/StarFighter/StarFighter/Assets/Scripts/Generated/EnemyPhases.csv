@@ -42,8 +42,9 @@ R_Alpha1_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Alpha2_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Alpha3_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_AlphaGold_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
-R_Sigma1_Entry,300,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,150,R_Sigma1_Routine,shield,lesser,20,R_Sigma1_Routine,0
-R_Sigma1_Routine,0,R_Sigma1_laserbeam,0,0.5,0,,,0,0,0,0,0,0,0,,,0,,,rectangle,100,0,4,200,100,40,face_target,0,0,0,0,0,,,,0,,,,0
+R_Sigma1_Entry,300,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,50,face_target,0,0,0,0,positionV,greater,150,R_Sigma1_Shoot,shield,lesser,20,R_Sigma1_Shoot,0
+R_Sigma1_Move,0,0,0,0,0,,,0,0,0,0,0,0,0,,,0,,,rectangle,150,0,1,200,100,50,face_target,0,0,0,0,phaseClock,greater,4,R_Sigma1_Shoot,0,,,,0
+R_Sigma1_Shoot,0,R_Sigma1_laserbeam,0,0,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,phaseClock,greater,4,R_Sigma1_Move,0,,,,0
 R_Sigma2_Entry,300,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Sigma3_Entry,300,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_SigmaGold_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0

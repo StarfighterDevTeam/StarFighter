@@ -18,7 +18,7 @@ Weapon::Weapon(Ammo* ammunition)
 	m_target_homing = NO_HOMING;
 	m_shot_mode = NoShotMode;
 	m_angle_offset = 0;
-	m_delay = 0.f;
+	m_delay = 0;
 	m_weaponOffset = sf::Vector2f(0, 0);
 	m_face_target = false;
 	m_fire_pattern_return = false;
@@ -44,10 +44,9 @@ Weapon::~Weapon()
 
 void Weapon::Draw(sf::RenderTexture& screen)
 {
-	if (m_rafale < 0)
+	if (m_rafale < 0 && m_beams.empty() == true)
 	{
 		float laser_warning_delay = m_ammunition->m_size.x > 30 ? ENEMY_BIG_LASERBEAM_POINTER_DELAY : ENEMY_SMALL_LASERBEAM_POINTER_DELAY;
-
 		if (m_readyFireTimer > m_rate_of_fire - laser_warning_delay)//laserbeam aiming feedback for enemies
 		{
 			sf::RectangleShape rect;
@@ -137,7 +136,7 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//enf of beam timer
-	if (m_beams.empty() == false && m_rafale_cooldown > 0 && m_beam_timer > m_rafale_cooldown)
+	if (m_beams.empty() == false && m_rafale_cooldown > 0 && m_beam_timer >= m_rafale_cooldown)
 	{
 		for (Ammo* beam : m_beams)
 			beam->Death();
@@ -155,15 +154,15 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 		rafale_ready = true;
 	}
 
-	if (m_readyFireTimer > m_rate_of_fire && rafale_ready == true)
+	if (m_readyFireTimer >= m_rate_of_fire && rafale_ready == true)
 		m_firing_ready = true;
 	else if (m_rafale > 0)
 	{
-		if (m_readyFireTimer > m_rate_of_fire && m_rafale_index <= m_rafale - 1)
+		if (m_readyFireTimer >= m_rate_of_fire && m_rafale_index <= m_rafale - 1)
 			m_firing_ready = true;
 	}
 	else if (m_rafale < 0)
-		m_firing_ready = m_beams.empty() == true && m_readyFireTimer > m_rate_of_fire;
+		m_firing_ready = m_beams.empty() == true && m_readyFireTimer >= m_rate_of_fire;
 
 	return m_firing_ready;
 }

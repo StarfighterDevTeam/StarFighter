@@ -20,20 +20,14 @@ void Enemy::Draw(sf::RenderTexture& screen)
 
 	//display
 	//ss << "type: " << to_string(int(m_pattern.m_pattern_type)) << " / w: " << to_string(int(m_pattern.m_width)) << " / h: " << to_string(int(m_pattern.m_height));
-	ss << "\nface_target: " << to_string((int)(m_face_target));// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
-	ss << "\nrotation speed: " << to_string(m_rotation_speed);
-	if (m_weapons_list.front()->m_target_homing == NO_HOMING)
-		ss << "\nNO HOMING: ";
-	else if (m_weapons_list.front()->m_target_homing == SEMI_HOMING)
-		ss << "\nSEMI HOMING: ";
-	else if (m_weapons_list.front()->m_target_homing == HOMING)
-		ss << "\nHOMING: ";
+	ss << "\n " << m_currentPhase->m_display_name.c_str();// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+	ss << "\nclock: " << to_string((int)m_phaseTimer.asSeconds());
+	
 	//for (float f : m_pattern.m_patternParams)
 	//	ss << to_string(int(f)) << " / ";
 
 	text.setString(ss.str());
-	screen.draw(text);
-	*/
+	screen.draw(text);*/
 
 	for (Weapon* weapon : m_weapons_list)
 		weapon->Draw(screen);
@@ -344,53 +338,50 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		for (Weapon* weapon : m_weapons_list)
 		{
 			if (m_phaseTimer.asSeconds() < weapon->m_delay)
-			{
-				//do nothing: this weapon is settled to start firing later (delay)
-			}
-			else
-			{	//calcule weapon angle offset
-				float theta = getRotation() + weapon->m_angle_offset;
+				weapon->m_readyFireTimer = 0;
+			
+			//calcule weapon angle offset
+			float theta = getRotation() + weapon->m_angle_offset;
 				
-				//angle offset to target
-				float delta = GameObject::GetDeltaAngleToTargetAngle(180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 0);
+			//angle offset to target
+			float delta = GameObject::GetDeltaAngleToTargetAngle(180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 0);
 
-				if (hasSemiHomingInProgress == false)
-				{
-					//we turn the weapon towards the target if :
-					//- we have some kind of Homing (!=NO_HOMING)
-					//AND we must not be a laserbeam, because that is to strong on the enemy
-					//however if not required to face target, we allow it for specific scenarios, but it is not recommended to use in general gameplay
-					if (weapon->m_target_homing != NO_HOMING && (weapon->m_rafale >= 0 || m_face_target == false))
-						theta += delta;
+			if (hasSemiHomingInProgress == false)
+			{
+				//we turn the weapon towards the target if :
+				//- we have some kind of Homing (!=NO_HOMING)
+				//AND we must not be a laserbeam, because that is to strong on the enemy
+				//however if not required to face target, we allow it for specific scenarios, but it is not recommended to use in general gameplay
+				if (weapon->m_target_homing != NO_HOMING && (weapon->m_rafale >= 0 || m_face_target == false))
+					theta += delta;
 
-					//calcule weapon offset
-					theta *= M_PI / 180;//switching to radians
-					weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (-weapon->m_fire_direction);
-					weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (-weapon->m_fire_direction);
+				//calcule weapon offset
+				theta *= M_PI / 180;//switching to radians
+				weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (-weapon->m_fire_direction);
+				weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (-weapon->m_fire_direction);
 
-					//transmitting the angle to the weapon, which will pass it to the bullets
-					weapon->m_shot_angle = theta;
-				}
-
-				weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);
-				weapon->m_face_target = m_face_target;
-
-				//FIRE: Weapon can fire if:
-				//- not required to face the enemy
-				//- has Homing ability (not necessarily aligned with target)
-				//- has Semi-homing ability and started salvo
-				//- is aligned with target
-				float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? weapon->GetAngleToleranceForBeam(playership) : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT;
-				if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
-					if (m_face_target == false || weapon->m_target_homing == HOMING || hasSemiHomingInProgress == true || abs(delta) < angle_tolerance_for_alignment)
-					{
-						if (m_isOnScene == true)//forbid enemies to shoot from out of screen
-						{
-							weapon->Fire(EnemyFire, deltaTime);
-							m_shots_fired++;
-						}
-					}
+				//transmitting the angle to the weapon, which will pass it to the bullets
+				weapon->m_shot_angle = theta;
 			}
+
+			weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);
+			weapon->m_face_target = m_face_target;
+
+			//FIRE: Weapon can fire if:
+			//- not required to face the enemy
+			//- has Homing ability (not necessarily aligned with target)
+			//- has Semi-homing ability and started salvo
+			//- is aligned with target
+			float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? weapon->GetAngleToleranceForBeam(playership) : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT;
+			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
+				if (m_face_target == false || weapon->m_target_homing == HOMING || hasSemiHomingInProgress == true || abs(delta) < angle_tolerance_for_alignment)
+				{
+					if (m_isOnScene == true)//forbid enemies to shoot from out of screen
+					{
+						weapon->Fire(EnemyFire, deltaTime);
+						m_shots_fired++;
+					}
+				}
 
 			//UPDATE BEAMS
 			weapon->UpdateBeams(m_disable_fire == false);
@@ -1786,7 +1777,6 @@ EnemyBase::~EnemyBase()
 	delete m_enemy;
 }
 
-
 void Enemy::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type)
 {
 	if (equipment)
@@ -1795,31 +1785,31 @@ void Enemy::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_ty
 		{
 			switch (equipment->m_equipmentType)
 			{
-			case Engine:
-			{
-				data << "Engine ";
-				break;
-			}
-			case Armor:
-			{
-				data << "Armor ";
-				break;
-			}
-			case Shield:
-			{
-				data << "Shield ";
-				break;
-			}
-			case Module:
-			{
-				data << "Module ";
-				break;
-			}
-			default:
-			{
-				data << "Unknown ";
-				break;
-			}
+				case Engine:
+				{
+					data << "Engine ";
+					break;
+				}
+				case Armor:
+				{
+					data << "Armor ";
+					break;
+				}
+				case Shield:
+				{
+					data << "Shield ";
+					break;
+				}
+				case Module:
+				{
+					data << "Module ";
+					break;
+				}
+				default:
+				{
+					data << "Unknown ";
+					break;
+				}
 			}
 		}
 
