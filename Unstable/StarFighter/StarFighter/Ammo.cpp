@@ -2,7 +2,6 @@
 
 extern Game* CurrentGame;
 
-
 //DEBUG
 void Ammo::Draw(sf::RenderTexture& screen)
 {
@@ -36,6 +35,9 @@ void Ammo::Draw(sf::RenderTexture& screen)
 	//text.setString(ss.str());
 	//screen.draw(text);
 
+	if (m_trail != NULL)
+		m_trail->Draw(screen);
+
 	GameObject::Draw(screen);
 }
 
@@ -58,6 +60,9 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_shot_angle = 0;
 	m_display_name = "Ammo";
 	m_is_missile_model = is_missile_model;
+	m_trail = NULL;
+	
+	//(*CurrentGame).addToScene(m_trail, false);
 
 	//missile motion model
 	if (is_missile_model == true)
@@ -72,7 +77,17 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 		m_missile_phase = Missile_SlowDown;
 		m_DontGarbageMe = is_missile_model;
 		m_missile_target_object = NULL;
+
+		m_trail = new Aura(this, "2D/FX/FX_rocket_smoke.png", sf::Vector2f(8, 20), 3, 1);
+		m_trail->m_DontGarbageMe = true;
+		m_trail->m_offset = sf::Vector2f(0, (m_size.y / 2) + (m_trail->m_size.y / 2));
 	}
+}
+
+Ammo::~Ammo()
+{
+	if (m_trail != NULL)
+		delete m_trail;
 }
 
 Ammo* Ammo::Clone()
@@ -208,4 +223,15 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	rotate(m_rotation_speed * deltaTime.asSeconds() * l_hyperspeedMultiplier);
 
 	AnimatedSprite::update(deltaTime);
+
+	//FX
+	if (m_trail != NULL)
+	{
+		m_trail->update(deltaTime, l_hyperspeedMultiplier);
+		
+		if (m_collider_type == EnemyFire)
+			m_trail->setRotation(getRotation() + 180);
+		else
+			m_trail->setRotation(getRotation());
+	}
 }

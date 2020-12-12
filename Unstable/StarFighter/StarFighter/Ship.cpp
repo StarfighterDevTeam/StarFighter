@@ -60,10 +60,8 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 
 	m_fake_ship = NULL;
 	if (!ship_model->m_fake_textureName.empty())
-	{
 		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, false);
-	}
+		//(*CurrentGame).addToScene(m_fake_ship, false);
 
 	m_combo_aura = new Aura(this, "2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
 	//(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
@@ -72,7 +70,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_trail->m_DontGarbageMe = true;
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
-	(*CurrentGame).addToScene(m_trail, false);
+	//(*CurrentGame).addToScene(m_trail, false);
 
 	m_graze_radius_feedback.setRadius(GRAZE_DISTANCE);
 	m_graze_radius_feedback.setOrigin(sf::Vector2f(m_graze_radius_feedback.getRadius(), m_graze_radius_feedback.getRadius()));
@@ -127,14 +125,9 @@ Ship::~Ship()
 		delete bot;
 
 	//game objects
-	if (m_combo_aura != NULL)
-		m_combo_aura->Death();
-
-	if (m_fake_ship != NULL)
-		m_fake_ship->Death();
-
-	if (m_trail != NULL)
-		m_trail->Death();
+	delete m_combo_aura;
+	delete m_fake_ship;;
+	delete m_trail;
 
 	if (m_recall_text != NULL)
 		m_recall_text->GarbageMe();
@@ -445,7 +438,16 @@ void Ship::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible == true)
 	{
-		this->GameObject::Draw(screen);
+		if (m_combo_aura != NULL)
+			m_combo_aura->Draw(screen);
+
+		if (m_fake_ship != NULL)
+			m_fake_ship->Draw(screen);
+
+		if (m_trail != NULL)
+			m_trail->Draw(screen);
+
+		GameObject::Draw(screen);
 
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{

@@ -14,6 +14,7 @@ class Ammo : public GameObject
 {
 public:
 	Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int damage, FX* explosion, bool is_missile_model);
+	~Ammo();
 	Ammo* Clone();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void Draw(sf::RenderTexture& screen) override;
@@ -28,6 +29,7 @@ public:
 	float m_offset_x;//offset respect to weapon on firing
 	bool m_isBeam;
 	string m_sound_name;
+	Aura* m_trail;
 	bool m_is_missile_model;
 
 	//missile motion model

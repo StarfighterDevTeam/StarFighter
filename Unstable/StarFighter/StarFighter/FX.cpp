@@ -74,10 +74,14 @@ void Aura::Init(std::string textureName, sf::Vector2f size, int frameNumber)
 
 void Aura::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, newoffset;
-	newoffset = getSpeed_for_Direction((*CurrentGame).m_direction, m_offset);
-	newposition.x = m_target->getPosition().x + newoffset.x;
-	newposition.y = m_target->getPosition().y + newoffset.y;
+	static sf::Vector2f newposition;
+
+	float angle = m_target->getRotation() / 180 * M_PI;
+	float offset_x = m_offset.x * cos(angle) - m_offset.y * sin(angle);
+	float offset_y = m_offset.x * sin(angle) + m_offset.y * cos(angle);
+
+	newposition.x = m_target->getPosition().x + offset_x;
+	newposition.y = m_target->getPosition().y + offset_y;
 	setPosition(newposition.x,newposition.y);
 
 	AnimatedSprite::update(deltaTime);

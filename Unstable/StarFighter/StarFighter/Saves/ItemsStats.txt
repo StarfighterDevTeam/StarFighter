@@ -1,9 +1,9 @@
-Engine 0
+Engine Engine 2 9 16.2643 2D/Equipment/Thruster.png 48 48 1 0 0 0 1.05 104 0 0 0 0 0 0 1 0 0
 Armor 0
 Shield 0
 Module Module 1 0 0 2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 0 0 0 bot_rocket 1 2D/Equipment/bot.png 32 32 1 -50 0 0 2 300 1 50 50 3 Mini-rockets 2D/Equipment/laser.png 48 48 1 1 0 0.8 2 30 40 0 0 180 minirocket 5 500 0 2D/Ammo/P_minirocket.png 16 34 1 explosion_S_blue 0 1 
 Weapon Laser_beam 1 0 0 2D/Equipment/laser.png 48 48 1 0.5 -1 0 1 0 0 0 2 0 laserbeam 5 0 0 2D/Ammo/P_laserbeam.png 66 2715 1 explosion_S_blue 0 0 
-0
+Engine Engine 2 9 16.2643 2D/Equipment/Thruster.png 48 48 1 0 0 0 1.05 104 0 0 0 0 0 0 0 0 0
 0
 0
 0

@@ -67,11 +67,11 @@ void Weapon::Draw(sf::RenderTexture& screen)
 	}
 }
 
-void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)
+void Weapon::CreateBullet(GameObjectType collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = m_ammunition->Clone();
 
-	float l_dispersion = m_collider_type == EnemyFire ? - dispersion : dispersion;
+	float l_dispersion = collider_type == EnemyFire ? -dispersion : dispersion;
 
 	//transmitting the value to the bullet
 	bullet->m_shot_angle = m_shot_angle;
@@ -89,14 +89,14 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 	bullet->setRotation((m_shot_angle * 180.0f / M_PI) + l_dispersion);
 
 	bullet->m_visible = true;
-	bullet->m_collider_type = m_collider_type;
+	bullet->m_collider_type = collider_type;
 	bullet->m_isOnScene = true;
 	
 	//beam layer
 	if (bullet->m_isBeam == false)
-		bullet->m_layer = m_collider_type == EnemyFire ? EnemyFireLayer : FriendlyFireLayer;
+		bullet->m_layer = collider_type == EnemyFire ? EnemyFireLayer : FriendlyFireLayer;
 	else
-		bullet->m_layer = m_collider_type == EnemyFire ? EnemyBeamLayer : FriendlyBeamLayer;
+		bullet->m_layer = collider_type == EnemyFire ? EnemyBeamLayer : FriendlyBeamLayer;
 
 	//missile default target position
 	if (bullet->m_is_missile_model == true)
@@ -109,6 +109,10 @@ void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float d
 			bullet->m_missile_target_position = sf::Vector2f(((- m_fire_direction + 1) / 2) * SCENE_SIZE_X, getPosition().y);//SCENE_SIZE_X if player, 0 if enemy
 		else if ((*CurrentGame).m_direction == DIRECTION_LEFT)
 			bullet->m_missile_target_position = sf::Vector2f(((m_fire_direction + 1) / 2) * SCENE_SIZE_X, getPosition().y);//0 if player, SCENE_SIZE_X if enemy
+
+		//missile trail fx
+		if (collider_type == EnemyFire && bullet->m_trail != NULL)
+			bullet->m_trail->m_offset.y = -bullet->m_trail->m_offset.y;
 	}
 
 	(*CurrentGame).addToScene(bullet, true);
