@@ -81,6 +81,7 @@ public:
 	
 	bool m_face_target;
 	bool m_reset_facing;
+	bool m_shoot_when_aligned;
 	BouncingType m_bouncing;
 	int m_shots_fired;
 	bool m_input_blocker;

@@ -34,7 +34,7 @@ public:
 	void FireDescendingShot(GameObjectType collider_type, int multishot, int shot_index);
 	void FireDescending2Shot(GameObjectType collider_type);
 	void UpdateBeams(bool firing);
-	bool HasSemiHomingSalvoInProgress();
+	bool hasLockingSalvoInProgress();
 	float GetAngleToleranceForBeam(GameObject* target);
 
 	int m_fire_direction;
@@ -52,12 +52,12 @@ public:
 	int m_rafale;
 	int m_rafale_index;
 	float m_rafale_cooldown;
+	bool m_rafale_locking;
 	float m_angle_offset;
 	float m_delay;
 	sf::Vector2f m_weaponOffset;
 	sf::Vector2f m_weapon_current_offset;
 	float m_shot_angle;
-	bool m_face_target;
 	vector<Ammo*> m_beams;
 	float m_beam_timer;
 

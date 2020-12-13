@@ -1,1 +1,30 @@
--1
+Engine Engine 1 3 18.121 2D/Equipment/Thruster.png 48 48 1 0 0 0 1 103 0 0 0 0 0 0 0 0 0
+Armor Armor 1 2 15.1629 2D/Equipment/Armor.png 48 48 1 0 0 0 0 0 150 0 0 0 0 3 0 0 0
+Shield Shield 1 3 19.0827 2D/Equipment/Shield.png 48 48 1 0 0 0 0 0 0 51 5 19.802 0 0 0 0 0
+Module Module 1 3 20.5714 2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 0 0 0 bot_rocket 1 2D/Equipment/bot.png 32 32 1 -50 0 0 2 600 1 50 0 3 2-shots_wide_laser 2D/Equipment/laser.png 48 48 1 0.0990099 0 0.8 2 10 33.6576 0 2 0 laser 6 2200 0 0 0 0 
+Weapon 2-shots_laser 1 3 18.8053 2D/Equipment/laser.png 48 48 1 0.0970874 0 0.8 2 10 0 0 2 0 laser 5 2200 0 0 0 0 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0

@@ -88,6 +88,7 @@ enum Modifier
 	GhostModifier,//no collision + alpha mask
 	DeathModifier,//suicide
 	FaceTarget,//rotate to always face player
+	ShootWhenAligned,//only shoots when aligned with target
 	ResetFacing,//rotate to default direction
 	Bouncing,//bounces on scene borders
 	BouncingH,//bounces on horizontal scene borders only

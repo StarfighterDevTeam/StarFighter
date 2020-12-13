@@ -549,7 +549,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		if (m_weapon->m_target_homing != NO_HOMING)
 			theta -= delta;
 
-		if (m_weapon->HasSemiHomingSalvoInProgress() == true)
+		if (m_weapon->hasLockingSalvoInProgress() == true)
 		{
 			//semi-HOMING and rafale not ended => no update of target or weapon position
 		}

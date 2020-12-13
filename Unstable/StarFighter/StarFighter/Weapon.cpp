@@ -14,12 +14,12 @@ Weapon::Weapon(Ammo* ammunition)
 	m_rafale_cooldown = 0.8f;
 	m_rafale = 0;
 	m_rafale_index = 0;
+	m_rafale_locking = false;
 	m_target_homing = NO_HOMING;
 	m_shot_mode = NoShotMode;
 	m_angle_offset = 0;
 	m_delay = 0;
 	m_weaponOffset = sf::Vector2f(0, 0);
-	m_face_target = false;
 	m_display_name = "Laser";
 	m_level = 1;
 	m_credits = 0;
@@ -333,9 +333,9 @@ void Weapon::UpdateBeams(bool firing)
 	}
 }
 
-bool Weapon::HasSemiHomingSalvoInProgress()
+bool Weapon::hasLockingSalvoInProgress()
 {
-	if (m_target_homing != SEMI_HOMING)
+	if (m_rafale_locking == false)
 		return false;
 
 	if (m_rafale > 0)
@@ -376,6 +376,7 @@ Weapon* Weapon::Clone()
 	weapon->m_dispersion = this->m_dispersion;
 	weapon->m_rafale = this->m_rafale;
 	weapon->m_rafale_cooldown = this->m_rafale_cooldown;
+	weapon->m_rafale_locking = this->m_rafale_locking;
 	weapon->m_target_homing = this->m_target_homing;
 	weapon->m_angle_offset = this->m_angle_offset;
 	weapon->m_delay = this->m_delay;

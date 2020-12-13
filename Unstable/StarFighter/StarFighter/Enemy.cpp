@@ -47,6 +47,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_rotation_speed = 0;
 	m_face_target = false;
 	m_reset_facing = false;
+	m_shoot_when_aligned = false;
 	m_bouncing = NoBouncing;
 	m_enemyTimer = sf::seconds(0);
 	m_level = 1;
@@ -298,15 +299,15 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (m_isOnScene == true)
 	{
 		//TURNING TOWARDS DESIRED ANGLE
-		bool hasSemiHomingInProgress = false;
+		bool hasLockingSalvoInProgress = false;
 		for (Weapon* weapon : m_weapons_list)
-			if (weapon->HasSemiHomingSalvoInProgress() == true)
+			if (weapon->hasLockingSalvoInProgress() == true)
 			{
-				hasSemiHomingInProgress = true;
+				hasLockingSalvoInProgress = true;
 				break;
 			}
 
-		if (hasSemiHomingInProgress == false)//if semi-homing salvo in progress, just keep current angle
+		if (hasLockingSalvoInProgress == false)//"locking rafale" modifier prevents for rotating during a rafale salvo in progress
 		{
 			if (m_face_target == false && m_reset_facing == false)//no facing instruction: just apply the rotation speed
 			{
@@ -319,7 +320,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 				if (m_reset_facing == true)
 					target_angle = GameObject::getRotation_for_Direction((*CurrentGame).m_direction);
-				else if (m_face_target == true && hasSemiHomingInProgress == false)
+				else if (m_face_target == true)
 					target_angle = fmod(getRotation() + 180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 360);
 
 				//rotate towards target angle
@@ -346,13 +347,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//angle offset to target
 			float delta = GameObject::GetDeltaAngleToTargetAngle(180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 0);
 
-			if (hasSemiHomingInProgress == false)
+			if (hasLockingSalvoInProgress == false)
 			{
 				//we turn the weapon towards the target if :
 				//- we have some kind of Homing (!=NO_HOMING)
 				//AND we must not be a laserbeam, because that is to strong on the enemy
-				//however if not required to face target, we allow it for specific scenarios, but it is not recommended to use in general gameplay
-				if (weapon->m_target_homing != NO_HOMING && (weapon->m_rafale >= 0 || m_face_target == false))
+				if (weapon->m_target_homing != NO_HOMING && weapon->m_rafale >= 0)
 					theta += delta;
 
 				//calcule weapon offset
@@ -365,7 +365,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 
 			weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);
-			weapon->m_face_target = m_face_target;
 
 			//FIRE: Weapon can fire if:
 			//- not required to face the enemy
@@ -374,7 +373,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//- is aligned with target
 			float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? weapon->GetAngleToleranceForBeam(playership) : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT;
 			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
-				if (m_face_target == false || weapon->m_target_homing == HOMING || hasSemiHomingInProgress == true || abs(delta) < angle_tolerance_for_alignment)
+				if (m_shoot_when_aligned == false || weapon->m_target_homing == HOMING || hasLockingSalvoInProgress == true || abs(delta) < angle_tolerance_for_alignment)
 				{
 					if (m_isOnScene == true)//forbid enemies to shoot from out of screen
 					{
@@ -648,6 +647,7 @@ void Enemy::setPhase(Phase* phase)
 	m_immune = false;
 	m_face_target = false;
 	m_reset_facing = false;
+	m_shoot_when_aligned = false;
 	m_bouncing = NoBouncing;
 
 	setGhost(false);
@@ -685,6 +685,11 @@ void Enemy::setPhase(Phase* phase)
 			case ResetFacing:
 			{
 				m_reset_facing = true;
+				break;
+			}
+			case ShootWhenAligned:
+			{
+				m_shoot_when_aligned = true;
 				break;
 			}
 			case Bouncing:
@@ -874,6 +879,10 @@ Phase* Enemy::LoadPhase(string name)
 						l_new_modifier = DeathModifier;
 					else if ((*it)[PHASE_MODIFIER + i].compare("face_target") == 0)
 						l_new_modifier = FaceTarget;
+					else if ((*it)[PHASE_MODIFIER + i].compare("reset_facing") == 0)
+						l_new_modifier = ResetFacing;
+					else if ((*it)[PHASE_MODIFIER + i].compare("shoot_when_aligned") == 0)
+						l_new_modifier = ShootWhenAligned;
 					else if ((*it)[PHASE_MODIFIER + i].compare("reset_facing") == 0)
 						l_new_modifier = ResetFacing;
 					else if ((*it)[PHASE_MODIFIER + i].compare("bouncing") == 0)
@@ -1170,11 +1179,10 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 			if (weapon->m_rafale != 0)
 			{
 				weapon->m_rafale_cooldown = atof((*it)[WEAPON_RAFALE_COOLDOWN].c_str());
+				weapon->m_rafale_locking = (bool)(stoi((*it)[WEAPON_RAFALE_LOCKING]));
 
 				if (weapon->m_rafale < 0)
-				{
 					weapon->m_ammunition->m_isBeam = true;
-				}
 			}
 				
 			weapon->m_textureName = (*it)[WEAPON_IMAGE_NAME];

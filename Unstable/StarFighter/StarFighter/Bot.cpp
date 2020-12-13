@@ -117,7 +117,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 		if (m_weapon->m_target_homing != NO_HOMING)
 			theta -= delta;
 
-		if (m_weapon->HasSemiHomingSalvoInProgress() == true)
+		if (m_weapon->hasLockingSalvoInProgress() == true)
 		{
 			//semi-HOMING and rafale not ended => no update of target or weapon position
 		}
