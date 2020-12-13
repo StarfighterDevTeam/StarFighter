@@ -950,6 +950,7 @@ sf::Vector2f GameObject::getRandomXSpawnPosition(Directions direction, sf::Vecto
 	//now calculating the starting coordinate (left)
 	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
 	rand_coordinates_min.x += 200;//marging for movement patterns
+	cluster_size.x += 200;//marging for movement patterns
 	rand_coordinates_min = GameObject::getPosition_for_Direction(direction, rand_coordinates_min, false);
 
 	//length of the allowed spread

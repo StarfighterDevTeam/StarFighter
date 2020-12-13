@@ -11,7 +11,6 @@ Weapon::Weapon(Ammo* ammunition)
 	m_rate_of_fire = 0.4f;
 	m_shot_index = 0;
 	m_dispersion = 0.f;
-	m_firing_ready = true;
 	m_rafale_cooldown = 0.8f;
 	m_rafale = 0;
 	m_rafale_index = 0;
@@ -21,7 +20,6 @@ Weapon::Weapon(Ammo* ammunition)
 	m_delay = 0;
 	m_weaponOffset = sf::Vector2f(0, 0);
 	m_face_target = false;
-	m_fire_pattern_return = false;
 	m_display_name = "Laser";
 	m_level = 1;
 	m_credits = 0;
@@ -46,13 +44,12 @@ void Weapon::Draw(sf::RenderTexture& screen)
 {
 	if (m_rafale < 0 && m_beams.empty() == true)
 	{
-		float laser_warning_delay = m_ammunition->m_size.x > 30 ? ENEMY_BIG_LASERBEAM_POINTER_DELAY : ENEMY_SMALL_LASERBEAM_POINTER_DELAY;
-		if (m_readyFireTimer > m_rate_of_fire - laser_warning_delay)//laserbeam aiming feedback for enemies
+		if (m_readyFireTimer > m_rate_of_fire - ENEMY_LASERBEAM_WARNING_DELAY)//laserbeam aiming feedback for enemies
 		{
 			sf::RectangleShape rect;
 			rect.setSize(sf::Vector2f(m_ammunition->m_size.x * 0.1, m_ammunition->m_size.y));
 			rect.setOrigin(sf::Vector2f(0.5 * m_ammunition->m_size.x * 0.1, 0.5 * m_ammunition->m_size.y));
-			float alpha = ProrataBetweenThreshold(m_readyFireTimer, sf::Vector2f(m_rate_of_fire - laser_warning_delay, m_rate_of_fire)) * 120;
+			float alpha = ProrataBetweenThreshold(m_readyFireTimer, sf::Vector2f(m_rate_of_fire - ENEMY_LASERBEAM_WARNING_DELAY, m_rate_of_fire)) * 120;
 			rect.setFillColor(sf::Color(255, 0, 0, alpha));
 
 			float beam_offset_x = m_ammunition->m_offset_x * cos(m_shot_angle) + m_ammunition->m_size.y / 2 * sin(m_shot_angle) * (-m_fire_direction);
@@ -124,6 +121,8 @@ void Weapon::CreateBullet(GameObjectType collider_type, float offsetX, float dis
 
 bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	m_firing_ready = false;
+
 	if (hyperspeedMultiplier < 1.0f)
 	{
 		m_readyFireTimer += deltaTime.asSeconds() * hyperspeedMultiplier;
@@ -179,32 +178,24 @@ void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime)
 		else if (m_shot_mode == AlternateShotMode)
 			FireAlternateShot(collider_type);
 		else if (m_shot_mode == AscendingShotMode)
-			FireAscendingShot(collider_type);
+			FireAscendingShot(collider_type, m_multishot, m_shot_index);
 		else if (m_shot_mode == DescendingShotMode)
-			FireDescendingShot(collider_type);
+			FireDescendingShot(collider_type, m_multishot, m_shot_index);
 		else if (m_shot_mode == Ascending2ShotMode)
-		{
-			if (!m_fire_pattern_return)
-				FireAscendingShot(collider_type);
-			else
-				FireDescendingShot(collider_type);
-
-			if (m_shot_index == 0)
-				m_fire_pattern_return = !m_fire_pattern_return;
-		}
+			FireAscending2Shot(collider_type);
 		else if (m_shot_mode == Descending2ShotMode)
-		{
-			if (!m_fire_pattern_return)
-				FireDescendingShot(collider_type);
-			else
-				FireAscendingShot(collider_type);
-
-			if (m_shot_index == 0)
-				m_fire_pattern_return = !m_fire_pattern_return;
-		}
+			FireDescending2Shot(collider_type);
 	}
 	else//single shot
 		CreateBullet(collider_type);
+
+	if (m_multishot > 0 && m_shot_mode != NoShotMode)
+	{
+		if (m_shot_index < m_multishot - 1)
+			m_shot_index++;
+		else
+			m_shot_index = 0;
+	}
 
 	m_readyFireTimer = 0;
 	m_firing_ready = false;
@@ -268,65 +259,50 @@ void Weapon::FireAlternateShot(GameObjectType m_collider_type)
 		else
 			CreateBullet(m_collider_type, (((m_shot_index / 2) + 1)*m_xspread) - (m_xspread / 2), ((m_shot_index / 2) + 1)*m_dispersion / (m_multishot - 1) - (m_dispersion / (m_multishot - 1) / 2));
 	}
-
-	if (m_shot_index < m_multishot - 1)
-		m_shot_index++;
-	else
-		m_shot_index = 0;
 }
 
 //left to right order
-void Weapon::FireAscendingShot(GameObjectType collider_type)
+void Weapon::FireAscendingShot(GameObjectType collider_type, int multishot, int shot_index)
 {
-	if (m_multishot % 2 != 0) //case of an even number of bullets
-	{
-		//left and center bullets (from left to right)
-		if (m_shot_index < (((m_multishot - 1) / 2) + 1))
-			CreateBullet(collider_type, (-((m_multishot - 1) / 2) + m_shot_index)*m_xspread, (-((m_multishot - 1) / 2) + m_shot_index)*(m_dispersion / (m_multishot - 1)));
-		else//right
-			CreateBullet(collider_type, (m_shot_index - ((m_multishot - 1) / 2))*m_xspread, (m_shot_index - ((m_multishot - 1) / 2))*(m_dispersion / (m_multishot - 1)));
-	}
+	if (multishot % 2 != 0) //case of an odd number of bullets
+		CreateBullet(collider_type, (-((multishot - 1) / 2) + shot_index) * m_xspread, (-((multishot - 1) / 2) + shot_index) * (m_dispersion / (multishot - 1)));
 
-	if (m_multishot % 2 == 0) //case of an odd number of bullets
-	{
-		//left and center bullets (from left to right)
-		if (m_shot_index < (m_multishot / 2))
-			CreateBullet(collider_type, (-((m_multishot / 2) + m_shot_index)*m_xspread) + (m_xspread / 2), -((m_multishot / 2) - m_shot_index + (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-		else//right
-			CreateBullet(collider_type, (m_shot_index - (m_multishot / 2))*m_xspread + (m_xspread / 2), (m_shot_index - (m_multishot / 2) + (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-	}
-
-	if (m_shot_index < m_multishot - 1)
-		m_shot_index++;
-	else
-		m_shot_index = 0;
+	if (multishot % 2 == 0) //case of an even number of bullets
+		CreateBullet(collider_type, (0.5 - (multishot / 2) + shot_index) * m_xspread, (0.5 - (multishot / 2) + shot_index) * (m_dispersion / (multishot - 1)));
 }
 
 //right to left order
-void Weapon::FireDescendingShot(GameObjectType collider_type)
+void Weapon::FireDescendingShot(GameObjectType collider_type, int multishot, int shot_index)
 {
-	if (m_multishot % 2 != 0) //case of an even number of bullets
-	{
-		//right and center bullets (from right to left)
-		if (m_shot_index < (((m_multishot - 1) / 2) + 1))
-			CreateBullet(collider_type, (((m_multishot - 1) / 2) - m_shot_index)*m_xspread, (((m_multishot - 1) / 2) - m_shot_index)*(m_dispersion / (m_multishot - 1)));
-		else//left
-			CreateBullet(collider_type, (-m_shot_index + ((m_multishot - 1) / 2))*m_xspread, (-m_shot_index + ((m_multishot - 1) / 2))*(m_dispersion / (m_multishot - 1)));
-	}
+	if (multishot % 2 != 0) //case of an odd number of bullets
+		CreateBullet(collider_type, (((multishot - 1) / 2) - shot_index) * m_xspread, (((multishot - 1) / 2) - shot_index) * (m_dispersion / (multishot - 1)));
 
-	if (m_multishot % 2 == 0) //case of an odd number of bullets
-	{
-		//right and center bullets (from right to left)
-		if (m_shot_index < (m_multishot / 2))
-			CreateBullet(collider_type, (((m_multishot / 2) - m_shot_index)*m_xspread) + (m_xspread / 2), ((m_multishot / 2) - m_shot_index - (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-		else//left
-			CreateBullet(collider_type, (-m_shot_index + (m_multishot / 2))*m_xspread - (m_xspread / 2), (-m_shot_index + (m_multishot / 2) - (m_xspread / 2))*(m_dispersion / (m_multishot - 1)));
-	}
+	if (multishot % 2 == 0) //case of an even number of bullets
+		CreateBullet(collider_type, (0.5 + (multishot / 2) - shot_index) * m_xspread, (- 0.5 + (multishot / 2) - shot_index) * (m_dispersion / (multishot - 1)));
+}
 
-	if (m_shot_index < m_multishot - 1)
-		m_shot_index++;
+void Weapon::FireAscending2Shot(GameObjectType collider_type)
+{
+	int multishot = (m_multishot / 2) + 1;
+	if (m_shot_index < multishot)
+		FireAscendingShot(collider_type, multishot, m_shot_index);
 	else
-		m_shot_index = 0;
+	{
+		int index = (multishot - 1) - (m_shot_index - (multishot - 1));
+		FireAscendingShot(collider_type, multishot, index);
+	}
+}
+
+void Weapon::FireDescending2Shot(GameObjectType collider_type)
+{
+	int multishot = (m_multishot / 2) + 1;
+	if (m_shot_index < multishot)
+		FireDescendingShot(collider_type, multishot, m_shot_index);
+	else
+	{
+		int index = (multishot - 1) - (m_shot_index - (multishot - 1));
+		FireDescendingShot(collider_type, multishot, index);
+	}
 }
 
 void Weapon::UpdateBeams(bool firing)

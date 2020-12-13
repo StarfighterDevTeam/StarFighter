@@ -29,8 +29,10 @@ public:
 
 	void FireMultiShot(GameObjectType collider_type);
 	void FireAlternateShot(GameObjectType collider_type);
-	void FireAscendingShot(GameObjectType collider_type);
-	void FireDescendingShot(GameObjectType collider_type);
+	void FireAscendingShot(GameObjectType collider_type, int multishot, int shot_index);
+	void FireAscending2Shot(GameObjectType collider_type);
+	void FireDescendingShot(GameObjectType collider_type, int multishot, int shot_index);
+	void FireDescending2Shot(GameObjectType collider_type);
 	void UpdateBeams(bool firing);
 	bool HasSemiHomingSalvoInProgress();
 	float GetAngleToleranceForBeam(GameObject* target);
@@ -64,9 +66,6 @@ public:
 	float m_quality;
 	
 	Weapon* Clone();
-
-private:
-	bool m_fire_pattern_return;
 };
 
 #endif // WEAPON_H_INCLUDED
