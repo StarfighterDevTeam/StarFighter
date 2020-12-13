@@ -1206,8 +1206,9 @@ Ammo* Enemy::LoadAmmo(string name)
 		if ((*it)[0].compare(name) == 0)
 		{
 			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), (*it)[AMMO_IMAGE_NAME],
-				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), 0, LoadFX((*it)[AMMO_FX]), (bool)stoi((*it)[AMMO_MISSILE_MODEL]));
+				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_FRAMES]), stoi((*it)[AMMO_NB_SKINS]), 0, LoadFX((*it)[AMMO_FX]), (bool)stoi((*it)[AMMO_MISSILE_MODEL]));
 
+			new_ammo->setAnimationLine(stoi((*it)[AMMO_SKIN]) - 1);
 			new_ammo->m_display_name = (*it)[AMMO_NAME];
 			new_ammo->m_sound_name = (*it)[AMMO_SOUND];
 
@@ -1911,11 +1912,7 @@ void Enemy::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool 
 		data << weapon->m_ammunition->m_damage << " ";
 		data << weapon->m_ammunition->m_speed.y << " ";
 		data << weapon->m_ammunition->m_range << " ";
-		data << weapon->m_ammunition->m_textureName << " ";
-		data << weapon->m_ammunition->m_size.x << " ";
-		data << weapon->m_ammunition->m_size.y << " ";
-		data << weapon->m_ammunition->m_frameNumber << " ";
-		data << weapon->m_ammunition->m_explosion->m_display_name << " ";
+		data << weapon->m_ammunition->m_currentAnimationIndex << " ";
 		data << (int)weapon->m_ammunition->m_pattern.m_pattern_type << " ";
 
 		if (weapon->m_ammunition->m_pattern.m_pattern_type != NoMovePattern)
@@ -2006,18 +2003,13 @@ Equipment* Enemy::LoadSavedEquipmentFromLine(string line)
 	int bot_ammo_damage;
 	float bot_ammo_speed;
 	float bot_ammo_range;
-	string bot_ammo_texture_name;
-	int bot_ammo_width;
-	int bot_ammo_height;
-	int bot_ammo_frames;
+	int bot_ammo_skin;
 	int bot_ammo_pattern_type;
 	float bot_ammo_pattern_speed;
 	int bot_ammo_pattern_clockwise;
 	float bot_ammo_pattern_width;
 	float bot_ammo_pattern_height;
 	int bot_ammo_pattern_starting_point;
-	string bot_ammo_explosion_name;
-	bool bot_ammo_is_missile_guided;
 
 	if (display_name.compare("0") == 0)
 	{
@@ -2028,11 +2020,7 @@ Equipment* Enemy::LoadSavedEquipmentFromLine(string line)
 		ss >> level >> credits >> quality >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel
 			>> armor >> shield >> shield_regen >> shield_recovery >> damage >> bombs >> can_hyperspeed >> can_jump >> bot_name;
 
-		if (bot_name.compare("0") == 0)
-		{
-			//do nothing
-		}
-		else
+		if (bot_name.compare("0") != 0)
 		{
 			ss >> bot_number >> bot_texture_name >> bot_width >> bot_height >> bot_frames >> bot_spread_x >> bot_spread_y >> bot_rotation_speed >> bot_pattern_type;
 			if (bot_pattern_type == Line_)
@@ -2041,25 +2029,18 @@ Equipment* Enemy::LoadSavedEquipmentFromLine(string line)
 				ss >> bot_pattern_speed >> bot_pattern_clockwise >> bot_pattern_width >> bot_pattern_height >> bot_pattern_starting_point;
 
 			ss >> bot_weapon_name;
-			if (bot_weapon_name.compare("0") == 0)
-			{
-				//do nothing
-			}
-			else
+			if (bot_weapon_name.compare("0") != 0)
 			{
 				ss >> bot_weapon_texture_name >> bot_weapon_width >> bot_weapon_height >> bot_weapon_frames >> bot_weapon_rate_of_fire >>
 					bot_weapon_rafale >> bot_rafale_cooldown >> bot_weapon_multishot >> bot_weapon_xspread >> bot_weapon_dispersion >> bot_weapon_shot_mode
 					>> bot_weapon_target_homing >> bot_weapon_angle_offset;
 
-				ss >> bot_ammo_name >> bot_ammo_damage >> bot_ammo_speed >> bot_ammo_range >> bot_ammo_texture_name >> bot_ammo_width >> bot_ammo_height >>
-					bot_ammo_frames >> bot_ammo_explosion_name >> bot_ammo_pattern_type;
+				ss >> bot_ammo_name >> bot_ammo_damage >> bot_ammo_speed >> bot_ammo_range >> bot_ammo_skin >> bot_ammo_pattern_type;
 
 				if (bot_ammo_pattern_type == Line_)
 					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_clockwise;
 				else if (bot_ammo_pattern_type == Circle_ || bot_ammo_pattern_type == Rectangle_)
 					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_clockwise >> bot_ammo_pattern_width >> bot_ammo_pattern_height >> bot_ammo_pattern_starting_point;
-
-				ss >> bot_ammo_is_missile_guided;
 			}
 		}
 	}
@@ -2113,9 +2094,12 @@ Equipment* Enemy::LoadSavedEquipmentFromLine(string line)
 		}
 		else
 		{
-			Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, bot_ammo_speed), bot_ammo_texture_name, sf::Vector2f(bot_ammo_width, bot_ammo_height), bot_ammo_damage, Enemy::LoadFX(bot_ammo_explosion_name), bot_ammo_is_missile_guided);
+			Ammo* ammo = Enemy::LoadAmmo(bot_ammo_name);
 			ammo->m_display_name = bot_ammo_name;
+			ammo->m_speed.y = bot_ammo_speed;
+			ammo->m_damage = bot_ammo_damage;
 			ammo->m_range = bot_ammo_range;
+			ammo->setAnimationLine(bot_ammo_skin);
 			ammo->m_isBeam = bot_weapon_rafale < 0;
 
 			GeometryPattern* ammo_pattern = new GeometryPattern();
@@ -2211,23 +2195,17 @@ Weapon* Enemy::LoadSavedWeaponFromLine(string line)
 	int ammo_damage;
 	float ammo_speed;
 	float ammo_range;
-	string ammo_texture_name;
-	int ammo_width;
-	int ammo_height;
-	int ammo_frames;
+	int ammo_skin;
 	int ammo_pattern_type;
 	float ammo_pattern_speed;
 	int ammo_pattern_clockwise;
 	float ammo_pattern_width;
 	float ammo_pattern_height;
 	int ammo_pattern_starting_point;
-	string ammo_explosion_name;
-	bool ammo_is_missile_model;
 
 	ss >> weapon_level >> weapon_credits >> weapon_quality >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
 		weapon_rafale >> rafale_cooldown >> weapon_multishot >> weapon_xspread >> weapon_dispersion >> weapon_shot_mode
-		>> weapon_target_homing >> weapon_angle_offset >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_texture_name >> ammo_width >> ammo_height >>
-		ammo_frames >> ammo_explosion_name >> ammo_pattern_type >> ammo_is_missile_model;
+		>> weapon_target_homing >> weapon_angle_offset >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_skin >> ammo_pattern_type;
 
 	if (ammo_pattern_type != NoMovePattern)
 		ss >> ammo_pattern_speed >> ammo_pattern_clockwise;
@@ -2237,9 +2215,12 @@ Weapon* Enemy::LoadSavedWeaponFromLine(string line)
 
 	EquipmentType type = NBVAL_Equipment;
 
-	Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, ammo_speed), ammo_texture_name, sf::Vector2f(ammo_width, ammo_height), ammo_damage, Enemy::LoadFX(ammo_explosion_name), ammo_is_missile_model);
+	Ammo* ammo = Enemy::LoadAmmo(ammo_name);
 	ammo->m_display_name = ammo_name;
+	ammo->m_speed.y = ammo_speed;
+	ammo->m_damage = ammo_damage;
 	ammo->m_range = ammo_range;
+	ammo->setAnimationLine(ammo_skin);
 	ammo->m_isBeam = weapon_rafale < 0;
 
 	GeometryPattern* ammo_pattern = new GeometryPattern();

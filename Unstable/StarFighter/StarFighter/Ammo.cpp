@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int damage, FX* explosion, bool is_missile_model) : GameObject(position, speed, textureName, size)
+Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, int damage, FX* explosion, bool is_missile_model) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x * 0.5, size.y * 0.5), frameNumber, animationNumber)
 {
 	m_damage = damage;
 	m_armor = 1;
@@ -54,7 +54,7 @@ Ammo::~Ammo()
 
 Ammo* Ammo::Clone()
 {
-	Ammo* ammo = new Ammo(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_damage, this->m_explosion, this->m_is_missile_model);
+	Ammo* ammo = new Ammo(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_frameNumber, this->m_animationNumber, this->m_damage, this->m_explosion, this->m_is_missile_model);
 	ammo->m_display_name = this->m_display_name;
 	ammo->m_sound_name = this->m_sound_name;
 
@@ -67,6 +67,7 @@ Ammo* Ammo::Clone()
 	ammo->m_isBeam = this->m_isBeam;
 	ammo->m_DontGarbageMe = this->m_isBeam || this->m_is_missile_model;
 	ammo->m_is_missile_model = this->m_is_missile_model;
+	ammo->setAnimationLine(m_currentAnimationIndex);
 
 	return ammo;
 }
@@ -78,7 +79,6 @@ bool Ammo::ClearTargetIfGarbage()
 		if (m_missile_target_object->m_garbageMe == true)
 		{
 			m_missile_target_object = NULL;
-			m_missile_phase = Missile_FinalHeading;
 			return true;
 		}
 	}
@@ -120,7 +120,7 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 		
 		//acquiring target
-		if (m_missile_target_object == NULL && m_missile_phase != Missile_FinalHeading)
+		if (m_missile_target_object == NULL)
 		{
 			GameObjectType target_type = m_collider_type == FriendlyFire ? EnemyObject : PlayerShip;
 			m_missile_target_object = (*CurrentGame).GetNearestGameObject(target_type, getPosition(), m_range);

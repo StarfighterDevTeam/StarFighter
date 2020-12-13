@@ -13,7 +13,7 @@ enum MissilePhase
 class Ammo : public GameObject
 {
 public:
-	Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int damage, FX* explosion, bool is_missile_model);
+	Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, int damage, FX* explosion, bool is_missile_model);
 	~Ammo();
 	Ammo* Clone();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;

@@ -83,3 +83,5 @@ V_Katyusha_break_dragonball,Vanguard_Katyusha_Break_Dragonballs,2D/Equipment/las
 R_Sigma1_laserbeam,Royale_Sigma_Laserbeam,2D/Equipment/laser.png,48,48,1,R_laserbeamS,5,0,0,1,-1,3,1,0,0,0,0,0,0,,,,,
 R_Gamma1_minirocket,Royale_Gamma_Minirocket,2D/Equipment/laser.png,48,48,1,R_minirocket,20,500,0,0.3,3,4,4,20,100,0,180,homing,0,,,,,
 R_Gamma1_laserbeam,Royale_Gamma_Laserbeam,2D/Equipment/laser.png,48,48,1,R_laserbeamL,10,0,0,3,-1,3,1,0,0,0,0,semi_homing,0,,,,,
+R_Alpha1_laserM,Royale_Alpha1_LaserM,2D/Equipment/laser.png,48,48,1,R_laserM,20,500,0,0.6,0,0,2,20,0,0,0,homing,0,,,,,
+R_Beta1_laserS_machinegun,Royale_Beta1_LaserS_Machinegun,2D/Equipment/laser.png,48,48,1,R_laserS,20,700,0,0.3,30,5,3,40,0,ascending2,0,0,0,,,,,
