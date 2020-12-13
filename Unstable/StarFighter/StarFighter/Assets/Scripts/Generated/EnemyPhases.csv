@@ -48,8 +48,8 @@ R_Sigma1_Shoot,0,R_Sigma1_laserbeam,0,0,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0
 R_Sigma2_Entry,300,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Sigma3_Entry,300,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_SigmaGold_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
-R_Beta1_Entry,50,R_Beta1_laserS_machinegun,100,0,R_Beta1_laserS_machinegun,-100,,R_Beta1_laserM,30,1.5,R_Beta1_laserM,-30,1.8,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,400,R_Beta1_Exit,0,,,,0
-R_Beta1_Exit,50,R_Beta1_laserS_machinegun,100,0,R_Beta1_laserS_machinegun,-100,,R_Beta1_laserM,30,0,R_Beta1_laserM,-30,0,0,,,0,,,rectangle,130,0,1,2000,0,0,0,0,0,0,0,0,,,,0,,,,0
+R_Beta1_Entry,50,R_Beta1_laserS_machinegun,100,0,R_Beta1_laserS_machinegun,-100,,R_Beta1_laserM,30,0,R_Beta1_laserM,-30,0.4,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,350,R_Beta1_Exit,0,,,,0
+R_Beta1_Exit,50,R_Beta1_laserS_machinegun,100,0,R_Beta1_laserS_machinegun,-100,,R_Beta1_laserM,30,0,R_Beta1_laserM,-30,0,0,,,0,,,rectangle,80,0,1,2000,0,0,0,0,0,0,0,0,,,,0,,,,0
 R_Beta2_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Beta3_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_BetaGold_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
@@ -57,8 +57,8 @@ R_Delta1_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Delta2_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Delta3_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_DeltaGold_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
-R_Gamma1_Entry,100,0,0,0,R_Gamma1_minirocket,0,1.5,0,0,0,0,0,0,0,,,0,,,0,,,,,,20,face_target,0,0,0,0,positionV,greater,200,R_Gamma1_Routine,0,,,,0
-R_Gamma1_Routine,0,R_Gamma1_laserbeam,0,0,R_Gamma1_minirocket,0,0,0,0,0,0,0,0,0,,,0,,,rectangle,30,1,1,150,0,20,face_target,locking_rafale,0,0,0,0,,,,0,,,,0
+R_Gamma1_Entry,100,0,0,0,R_Gamma1_minirocket,0,1,0,0,0,0,0,0,0,,,0,,,0,,,,,,20,face_target,0,0,0,0,positionV,greater,200,R_Gamma1_Routine,0,,,,0
+R_Gamma1_Routine,0,R_Gamma1_laserbeam,0,0.5,R_Gamma1_minirocket,0,0,0,0,0,0,0,0,0,,,0,,,rectangle,30,1,1,150,0,20,face_target,locking_rafale,0,0,0,0,,,,0,,,,0
 R_Gamma2_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_Gamma3_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 R_GammaGold_Entry,50,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0

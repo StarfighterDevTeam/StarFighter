@@ -724,33 +724,62 @@ void Enemy::setPhase(Phase* phase)
 
 	m_rotation_speed = phase->m_rotation_speed;
 
-	//weapons
-	//check if identical weapons
-	bool identical_weapons = false;
-	size_t weaponsVectorSize = m_weapons_list.size();
-	if (weaponsVectorSize > 0 && weaponsVectorSize == phase->m_weapons_list.size())
+	//WEAPONS
+	//loading phase weapons, keeping existing weapons when they are the same and delay is 0 (which avoids resetting their readyFireTimer)
+	vector<Weapon*> new_weapons_list;
+	for (Weapon* weapon_phase : phase->m_weapons_list)
 	{
-		for (size_t i = 0; i < weaponsVectorSize; i++)
-		{
-			if (m_weapons_list[i]->m_display_name != phase->m_weapons_list[i]->m_display_name)
-				break;
-
-			if (i == weaponsVectorSize - 1)
-				identical_weapons = true;
-		}
-	}
-	//clearing old weapons and setting new ones
-	if (identical_weapons == false)
-	{
+		bool kept = false;
 		for (Weapon* weapon : m_weapons_list)
-			delete weapon;
-		m_weapons_list.clear();
+		{
+			bool found = false;
+			if (weapon_phase->m_display_name.compare(weapon->m_display_name) == 0 && weapon_phase->m_delay == 0)//same kind of weapon?
+			{
+				for (Weapon* weapon_kept : new_weapons_list)//not already saved?
+				{
+					if (weapon_kept == weapon)
+					{
+						found = true;
+						break;
+					}
+				}
 
-		for (Weapon* weapon : phase->m_weapons_list)
-			m_weapons_list.push_back(weapon->Clone());
+				if (found == false)
+				{
+					new_weapons_list.push_back(weapon);//save it
+					kept = true;
+					break;
+				}
+			}
+		}
+		
+		if (kept == false)
+			new_weapons_list.push_back(weapon_phase->Clone());
 	}
 
-	//movement pattern
+	//clearing old weapons not kept
+	for (Weapon* weapon : m_weapons_list)
+	{
+		bool found = false;
+		for (Weapon* new_weapon : new_weapons_list)
+		{
+			if (weapon == new_weapon)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (found == false)
+			delete weapon;
+	}
+
+	//clear list and loading new list
+	m_weapons_list.clear();
+	for (Weapon* weapon : new_weapons_list)
+		m_weapons_list.push_back(weapon);
+
+	//MOVEMENT PATTERN
 	m_pattern.setPattern_v2(phase->m_pattern); //vitesse angulaire (degres/s)
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
