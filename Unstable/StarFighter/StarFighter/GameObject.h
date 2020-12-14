@@ -324,6 +324,7 @@ public:
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
 	virtual void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier);
+	virtual GameObject* GetFakeShip();
 
 	int m_damage;
 	int m_armor;

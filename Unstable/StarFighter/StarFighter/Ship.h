@@ -140,6 +140,7 @@ public :
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
+	GameObject* GetFakeShip() override;
 	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type);
 	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
 	sf::Vector2f GetShipSize();

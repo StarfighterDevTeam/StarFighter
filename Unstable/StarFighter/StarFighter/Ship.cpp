@@ -1742,6 +1742,14 @@ void Ship::GetShop(GameObject* object)
 	}
 }
 
+GameObject* Ship::GetFakeShip()
+{
+	if (m_fake_ship != NULL)
+		return m_fake_ship;
+	else
+		return this;
+}
+
 static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 500, 1500, 3000 };
 static float GrazeLevelsBeastBonus[NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 

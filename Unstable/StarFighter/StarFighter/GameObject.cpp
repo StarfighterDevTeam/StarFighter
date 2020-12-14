@@ -515,6 +515,12 @@ void GameObject::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 	//see overide function in class Ship
 }
 
+GameObject* GameObject::GetFakeShip()
+{
+	return NULL;
+	//see overide function in class Ship
+}
+
 int GameObject::GetPrice(int credits, float quality)
 {
 	return credits * MONEY_COST_OF_LOOT_CREDITS * quality * 0.01 * 2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES;

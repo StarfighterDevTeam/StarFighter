@@ -508,7 +508,8 @@ void Game::colisionChecksV2(Time deltaTime)
 		//Loot
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LootObject].begin(); it2 != m_sceneGameObjectsTyped[LootObject].end(); it2++)
 		{
-			if (SimpleCollision::AreColliding((*it1), (*it2), false))
+			GameObject* fake_ship = (*it1)->GetFakeShip();
+			if (SimpleCollision::AreColliding(fake_ship, *it2, false))
 			{
 				//Do something (like, take the loot)
 				if ((*it1)->GetLoot((*(*it2))))
