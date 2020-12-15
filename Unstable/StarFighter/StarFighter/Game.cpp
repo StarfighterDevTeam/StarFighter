@@ -383,22 +383,20 @@ void Game::updateScene(Time deltaTime)
 
 void Game::killGameObjectType(GameObjectType type)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
+	for (GameObject* object : m_sceneGameObjectsTyped[type])
 	{
-		if ((*it) != NULL)
+		if (object->m_isOnScene == true)
 		{
-			if ((*it)->m_isOnScene)
-			{
-				(*it)->Death();
+			object->Death();
 
-				//Combo
-				if (type == EnemyFire)
-				{
-					GameObject* obj = (GameObject*)m_playerShip;
-					obj->AddComboCount(10);
-				}
+			//Combo
+			if (type == EnemyFire)
+			{
+				GameObject* obj = (GameObject*)m_playerShip;
+				obj->AddComboCount(10);
 			}
 		}
+		
 	}
 }
 

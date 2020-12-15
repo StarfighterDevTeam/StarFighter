@@ -181,7 +181,7 @@ Vector2f InputGuy::getDirections()
 		if (fabs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
 			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0;
 		else if (fabs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
-			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0;
+			y = - sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0;
 	}
 
 	//diagonal movement?

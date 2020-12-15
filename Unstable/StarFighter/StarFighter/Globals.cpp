@@ -45,7 +45,7 @@ const char* getSavesPath()
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values)
 {
-	double random_rate = ((double) rand() / RAND_MAX);
+	double random_rate = 1.f * rand() / RAND_MAX;
 	random_rate *= (min_max_values.y - min_max_values.x);
 	random_rate += min_max_values.x;
 	int i = (int) ((random_rate*value) + 0.5);
@@ -55,7 +55,7 @@ int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values)
 
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios)
 {
-	double random_rate = ((double) rand() / RAND_MAX);
+	double random_rate = 1.f * rand() / RAND_MAX;
 	random_rate *= (min_max_ratios.y - min_max_ratios.x);
 	random_rate += min_max_ratios.x;
 	float f = (float) (random_rate*value);
@@ -94,7 +94,7 @@ int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 
 float RandomizeFloatBetweenValues(float value_min, float value_max)
 {
-	float random_value = (float) ((double) rand() / RAND_MAX);
+	float random_value = 1.f * rand() / RAND_MAX;
 	random_value *= (value_max - value_min);
 	random_value += value_min;
 

@@ -33,9 +33,10 @@ int main()
 	//Title
 	renderWindow.setTitle("StarFighter Beta");
 
-	CurrentGame = new Game();
 	srand(time(NULL));
 
+	CurrentGame = new Game();
+	
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
