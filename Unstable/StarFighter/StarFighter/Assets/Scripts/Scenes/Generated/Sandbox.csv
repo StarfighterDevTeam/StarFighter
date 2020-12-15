@@ -2,11 +2,11 @@
 #,2D/Backgrounds/BGIntro.jpg,1080,1080,50,V,1,
 bg,2D/Backgrounds/BGVertical_1.jpg,1080,5400,10,V,1,
 #,enemies_name,proba,enemy_class,level,spawnCost,repeatChance,missChance
-enemy,R_Alpha1,20,1,1,3,0.3,0.3
-enemy,R_Sigma1,10,1,1,3,0.3,0.3
-enemy,R_Beta1,2,2,1,6,0.05,0.3
-#,R_Delta1,1,3,1,10,0,0
-enemy,R_Gamma1,1,4,1,17,0,0.4
+enemy,R_Alpha2,0,1,1,4,0.3,0.3
+enemy,R_Sigma1,10,1,1,4,0.3,0.3
+enemy,R_Beta2,2,2,1,6,0.05,0.3
+enemy,R_Delta1,1,3,1,16,0,0
+#,R_Gamma1,1,4,1,17,0,0.4
 #,name,enemy_class,spawnX,spawnY,rotation,,
 #,V_BetaGold,7,0.5,-0.2,0,,
 #,V_AlphaGold4,0,0.6,-0.1,0,,
@@ -18,5 +18,5 @@ enemy,R_Gamma1,1,4,1,17,0,0.4
 #,Itsukoi,0,0.4,-0.05,0,,
 #,Hatsuki,0,0.6,-0.05,0,,
 #,V_AlphaGold_Test,7,0.5,0.35,0,,
-boss,R_Beta1,3,0.5,0.35,0,,
+#,R_Delta1,3,0.5,0.25,0,,
 #,R_Gamma1,3,0.5,0.25,0,,

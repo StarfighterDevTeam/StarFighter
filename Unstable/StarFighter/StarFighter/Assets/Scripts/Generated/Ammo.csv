@@ -10,7 +10,7 @@ V_laserXL,2D/Ammo/V_laserXL.png,20,70,1,1,1,explosion_S,Sounds/laser.ogg,0,0
 V_laserXXL,2D/Ammo/V_laserXXL.png,36,126,1,1,1,explosion_S,Sounds/laser.ogg,0,0
 V_ballS,2D/Ammo/V_ballS.png,15,15,1,1,1,explosion_S,Sounds/laser.ogg,0,0
 V_ballM,2D/Ammo/V_ballM.png,33,33,1,1,1,explosion_S,Sounds/laser.ogg,0,0
-V_fireball,2D/Ammo/V_fireball.png,30,42,1,1,1,explosion_S,Sounds/laser.ogg,0,0
+V_fireball,2D/Ammo/V_fireball.png,30,42,1,1,2,explosion_S,Sounds/laser.ogg,0,0
 V_missile,2D/Ammo/V_missile.png,24,42,1,1,1,explosion_S,Sounds/laser.ogg,0,0
 #,,,,,,,,,,
 R_minirocket,2D/Ammo/R_minirocket.png,16,34,1,1,1,explosion_S,0,0,1
@@ -18,3 +18,4 @@ R_laserbeamS,2D/Ammo/R_laserbeamS.png,20,2715,1,1,1,explosion_S,0,0,0
 R_laserbeamL,2D/Ammo/R_laserbeamL.png,100,2715,1,1,1,explosion_S,0,0,0
 R_laserS,2D/Ammo/V_laserS.png,12,33,1,2,2,explosion_S,Sounds/laser.ogg,0,0
 R_laserM,2D/Ammo/V_laserM.png,15,33,1,2,2,explosion_S,Sounds/laser.ogg,0,0
+R_fireball,2D/Ammo/V_fireball.png,30,42,1,2,2,explosion_S,Sounds/laser.ogg,0,0

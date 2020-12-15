@@ -578,7 +578,6 @@ void Game::garbageLayer(LayerType layer, bool only_offscene, bool delete_DontGar
 		return;
 	}
 
-	int clear_count = 0;
 	for (GameObject* object : m_sceneGameObjectsLayered[layer])
 	{
 		if (only_offscene == true && object->m_isOnScene == true)
@@ -589,7 +588,6 @@ void Game::garbageLayer(LayerType layer, bool only_offscene, bool delete_DontGar
 
 		object->m_visible = false;
 		object->m_garbageMe = true;
-		clear_count++;
 
 		//don't count them as "spawned" enemies if we cut them off this way
 		if (layer == EnemyObjectLayer)
@@ -609,7 +607,6 @@ void Game::garbageLayer(LayerType layer, bool only_offscene, bool delete_DontGar
 
 		object->m_visible = false;
 		object->m_garbageMe = true;
-		clear_count++;
 
 		//don't count them as "spawned" enemies if we cut them off this way
 		if (layer == EnemyObjectLayer)

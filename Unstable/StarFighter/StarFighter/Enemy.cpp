@@ -49,7 +49,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_reset_facing = false;
 	m_shoot_when_aligned = false;
 	m_bouncing = NoBouncing;
-	m_enemyTimer = sf::seconds(0);
+	m_enemyTimer = 0;
 	m_level = 1;
 	m_input_blocker = false;
 	m_currentPhase = NULL;
@@ -185,20 +185,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		AnimatedSprite::update(deltaTime);
 		return;
 	}
-
-	if (hyperspeedMultiplier < 1.0f)
-	{
-		m_phaseTimer += deltaTime * hyperspeedMultiplier;
-		m_enemyTimer += deltaTime * hyperspeedMultiplier;
-	}
-	else
-	{
-		m_phaseTimer += deltaTime;
-		m_enemyTimer += deltaTime;
-	}
-
-	//shield regen if not maximum
-	ShieldRegen(deltaTime, hyperspeedMultiplier);
 
 	//movement
 	static sf::Vector2f newposition, offset, newspeed;
@@ -338,7 +324,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		//UPDATE WEAPONS
 		for (Weapon* weapon : m_weapons_list)
 		{
-			if (m_phaseTimer.asSeconds() < weapon->m_delay)
+			if (m_phaseTimer < weapon->m_delay)//reset rate of fire timer while waiting for the weapon "delay"
 				weapon->m_readyFireTimer = 0;
 			
 			//calcule weapon angle offset
@@ -371,22 +357,48 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//- has Homing ability (not necessarily aligned with target)
 			//- has Semi-homing ability and started salvo
 			//- is aligned with target
+			bool hadBeamsActive = weapon->m_beams.empty() == false;
 			float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? weapon->GetAngleToleranceForBeam(playership) : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT;
 			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
+			{
 				if (m_shoot_when_aligned == false || weapon->m_target_homing == HOMING || hasLockingSalvoInProgress == true || abs(delta) < angle_tolerance_for_alignment)
 				{
 					if (m_isOnScene == true)//forbid enemies to shoot from out of screen
 					{
+						if (weapon->m_rafale >= 0)//for enemy ships only (counting the number of shots fired)
+							m_shots_fired++;
+
+						//Fire!
 						weapon->Fire(EnemyFire, deltaTime);
-						m_shots_fired++;
 					}
 				}
+			}
+			else if (weapon->m_rafale < 0 && hadBeamsActive == true && weapon->m_beams.empty() == true)//for enemy ships only (counting the number of laser beam shots fired)
+			{
+				m_shots_fired++;
+			}
 
 			//UPDATE BEAMS
 			weapon->UpdateBeams(m_disable_fire == false);
 		}
 	}
 
+	//update timers
+	if (hyperspeedMultiplier < 1.0f)
+	{
+		m_phaseTimer += deltaTime.asSeconds() * hyperspeedMultiplier;
+		m_enemyTimer += deltaTime.asSeconds() * hyperspeedMultiplier;
+	}
+	else
+	{
+		m_phaseTimer += deltaTime.asSeconds();
+		m_enemyTimer += deltaTime.asSeconds();
+	}
+
+	//shield regen if not maximum
+	ShieldRegen(deltaTime, hyperspeedMultiplier);
+
+	//animate
 	AnimatedSprite::update(deltaTime);
 
 	//phases
@@ -561,18 +573,18 @@ bool Enemy::CheckCondition()
 			}
 			case phaseClock:
 			{
-				if (m_phaseTimer == sf::seconds(cond->m_value))
+				if (m_phaseTimer == cond->m_value)
 					result = EQUAL_TO;
 				else
-					result = m_phaseTimer > sf::seconds(cond->m_value) ? GREATER_THAN : LESSER_THAN;
+					result = m_phaseTimer > cond->m_value ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
 			case enemyClock:
 			{
-				if (m_enemyTimer == sf::seconds(cond->m_value))
+				if (m_enemyTimer == cond->m_value)
 					result = EQUAL_TO;
 				else
-					result = m_enemyTimer > sf::seconds(cond->m_value) ? GREATER_THAN : LESSER_THAN;
+					result = m_enemyTimer > cond->m_value ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
 			case LifePourcentage:
@@ -747,6 +759,7 @@ void Enemy::setPhase(Phase* phase)
 				if (found == false)
 				{
 					new_weapons_list.push_back(weapon);//save it
+					weapon->m_delay = weapon_phase->m_delay;//copy delay (useful when new delay is 0 so there is a continuity with previous weapons)
 					kept = true;
 					break;
 				}
@@ -778,7 +791,7 @@ void Enemy::setPhase(Phase* phase)
 	m_weapons_list.clear();
 	for (Weapon* weapon : new_weapons_list)
 		m_weapons_list.push_back(weapon);
-
+		
 	//MOVEMENT PATTERN
 	m_pattern.setPattern_v2(phase->m_pattern); //vitesse angulaire (degres/s)
 
@@ -821,7 +834,7 @@ void Enemy::setPhase(Phase* phase)
 		if (playerShip->GetInputBlocker() == this)//unlock player
 			playerShip->SetInputBlocker(NULL);
 
-	m_phaseTimer = sf::seconds(0);
+	m_phaseTimer = 0;
 
 	m_currentPhase = phase;
 }

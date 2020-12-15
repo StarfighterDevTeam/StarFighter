@@ -140,26 +140,6 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 
 void Gameloop::Update(Time deltaTime)
 {
-	//debug command
-	#ifndef NDEBUG
-		//F6: spawn in Sandbox scene
-		if (InputGuy::spawnInSandbox() && (*CurrentGame).m_waiting_for_dialog_validation == false)
-		{
-			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
-			(*CurrentGame).m_playerShip->ResplenishHealth();
-		}
-
-		//F7: relad saved items and enemy config
-		if (InputGuy::reloadCSVs())
-		{
-			(*CurrentGame).m_enemiesConfig.clear();
-			LoadAllEnemies(ENEMY_FILE);
-
-			Ship::LoadPlayerItems(m_playerShip);
-			Ship::LoadPlayerMoney(m_playerShip);
-		}
-	#endif
-
 	//automatic respawn if dead
 	if ((*CurrentGame).m_playerShip->m_visible == false)
 	{
@@ -178,15 +158,15 @@ void Gameloop::Update(Time deltaTime)
 		CheckScriptedDialogs();
 	}
 
-	//State machine
-	InGameStateMachineCheck(deltaTime);
-
 	//Get "beast score" bonus
 	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).m_playerShip->m_combo_level * 0.01 * MAX_BEAST_SCALE, m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
 	//(*CurrentGame).GetBeastScoreBonus((*CurrentGame).m_playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
 
 	//Update scene
 	(*CurrentGame).updateScene(deltaTime);
+
+	//State machine
+	InGameStateMachineCheck(deltaTime);
 
 	//Create and destroy HUD panels
 	//case 1: destroying a panel
@@ -208,6 +188,26 @@ void Gameloop::Update(Time deltaTime)
 			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
 		}
 	}
+
+	//debug command
+#ifndef NDEBUG
+	//F6: spawn in Sandbox scene
+	if (InputGuy::spawnInSandbox() && (*CurrentGame).m_waiting_for_dialog_validation == false)
+	{
+		SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+		(*CurrentGame).m_playerShip->ResplenishHealth();
+	}
+
+	//F7: relad saved items and enemy config
+	if (InputGuy::reloadCSVs())
+	{
+		(*CurrentGame).m_enemiesConfig.clear();
+		LoadAllEnemies(ENEMY_FILE);
+
+		Ship::LoadPlayerItems(m_playerShip);
+		Ship::LoadPlayerMoney(m_playerShip);
+	}
+#endif
 	
 	this->mainWindow->clear();
 }
@@ -509,9 +509,9 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).m_vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
-				(*CurrentGame).garbageLayer(FriendlyFireLayer);
-				(*CurrentGame).garbageLayer(LootLayer);
-				(*CurrentGame).garbageLayer(FeedbacksLayer);
+				(*CurrentGame).garbageLayer(FriendlyFireLayer, false, false);
+				(*CurrentGame).garbageLayer(LootLayer, false, false);
+				(*CurrentGame).garbageLayer(FeedbacksLayer, false, false);
 
 				//Optional script to skip boss procedures, for scripted missions, so they may still be alive at this point
 				if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss] == true)

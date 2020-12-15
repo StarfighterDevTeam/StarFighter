@@ -226,7 +226,7 @@ void Ammo::Draw(sf::RenderTexture& screen)
 	//ss << "\nheading: " << to_string((int)getRotation());// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
 
 	//missile locking position feedback
-	if (m_is_missile_model == true && m_missile_target_object != NULL)
+	if (m_is_missile_model == true && m_missile_target_object != NULL && m_missile_phase == Missile_TrackTarget)
 	{
 		sf::RectangleShape rect;
 		rect.setSize(sf::Vector2f(20, 20));
@@ -237,9 +237,8 @@ void Ammo::Draw(sf::RenderTexture& screen)
 
 		rect.setOutlineThickness(2);
 		rect.setPosition(m_missile_target_position);
-
-		if (m_missile_phase > Missile_SlowDown)
-			screen.draw(rect);
+		
+		screen.draw(rect);
 	}
 
 	///*DEBUG*/

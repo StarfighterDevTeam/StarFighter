@@ -68,8 +68,8 @@ public:
 
 	bool CheckCondition() override;
 
-	sf::Time m_phaseTimer;
-	sf::Time m_enemyTimer;
+	float m_phaseTimer;
+	float m_enemyTimer;
 
 	static Phase* LoadPhase(string name);
 	static Dialog* LoadDialog(string name);
