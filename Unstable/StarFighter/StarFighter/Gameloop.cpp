@@ -74,7 +74,7 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, false);
 
 	//DEBUG
-	SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+	//SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
 }
 
 void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
@@ -497,6 +497,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 
 		case TRANSITION_PHASE1_2:
 		{
+			/*
 			//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
 			if ((*CurrentGame).m_playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == LESSER_THAN
 				|| (*CurrentGame).m_playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == EQUAL_TO)
@@ -509,6 +510,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).m_vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
+				*/
 				(*CurrentGame).garbageLayer(FriendlyFireLayer, false, false);
 				(*CurrentGame).garbageLayer(LootLayer, false, false);
 				(*CurrentGame).garbageLayer(FeedbacksLayer, false, false);
@@ -518,13 +520,14 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).SetLayerSpeed(EnemyObjectLayer, m_nextScene->m_bg->m_speed);
 
 				m_IG_State = TRANSITION_PHASE2_2;
-			}
+			//}
 
 			break;
 		}
 
 		case TRANSITION_PHASE2_2:
 		{
+			/*
 			float wn = m_nextScene->m_bg->m_size.x;
 			float hn = m_nextScene->m_bg->m_size.y;
 			//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
@@ -536,8 +539,12 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene->m_bg->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f((w / 2), (h / 2)));
 
 				m_nextScene->m_bg->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2)));
+				*/
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling(m_nextScene->m_direction, m_nextScene->m_vspeed);
 				(*CurrentGame).m_vspeed = m_nextScene->m_vspeed;
+
+				sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, (m_nextScene->m_direction == NO_DIRECTION ? SCENE_SIZE_Y*STARTSCENE_X_RATIO : SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
+				(*CurrentGame).m_playerShip->setPosition(ship_pos);
 
 				if (m_nextScene->m_direction == NO_DIRECTION)
 				{
@@ -630,7 +637,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 
 				if (m_currentScene->m_direction == NO_DIRECTION)
 					(*CurrentGame).PlayMusic(Music_Hub);
-			}
+			//}
 			break;
 		}
 
@@ -796,7 +803,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 
 		//position
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
-		if ((*CurrentGame).m_direction != NO_DIRECTION)
+		if (m_currentScene->m_direction != NO_DIRECTION)
 		{
 			(*CurrentGame).m_playerShip->m_disable_fire = false;
 			(*CurrentGame).m_playerShip->m_disableHyperspeed = false;
@@ -917,9 +924,18 @@ void Gameloop::PlayerTakesExit()
 	(*CurrentGame).m_playerShip->m_disable_inputs = true;
 	(*CurrentGame).m_playerShip->m_disable_fire = true;
 	(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
-	(*CurrentGame).m_playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
+	//(*CurrentGame).m_playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 	
 	(*CurrentGame).m_waiting_for_scene_transition = true;
+	(*CurrentGame).m_playerShip->m_HUD_state = HUD_Idle;
+
+	//cleaning layers
+	(*CurrentGame).garbageLayer(FriendlyFireLayer, false, true);
+	(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
+	(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
+	(*CurrentGame).garbageLayer(ExplosionLayer, false, true);
+	(*CurrentGame).garbageLayer(LootLayer, false, true);
+	(*CurrentGame).garbageLayer(FeedbacksLayer, false, true);
 
 	m_IG_State = TRANSITION_PHASE1_2;
 }

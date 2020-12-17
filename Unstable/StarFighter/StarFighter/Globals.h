@@ -35,6 +35,7 @@ const char* getSavesPath();
 #define STARTSCENE_Y_RATIO						0.85f
 
 #define STARTING_SCENE							"Vanguard_HubIntro"
+#define STARTING_SCENE_STELLAR_MAP				"Vanguard_Hub0"
 #define STARTING_MONEY							150
 
 #define DEFAULT_MUSIC_VOLUME					50

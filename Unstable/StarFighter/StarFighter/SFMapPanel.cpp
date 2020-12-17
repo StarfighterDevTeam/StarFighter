@@ -332,17 +332,29 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	m_scroll_offset = sf::Vector2f(0, 0);
 
 	//CONSTRUCTION OF THE MAP
-	//start with current hub
+	//start with hub 0
 	StellarBranch* mother_branch = new StellarBranch();
-	m_current_hub = new StellarHub();
-	mother_branch->m_hub = m_current_hub;
-	mother_branch->m_hub->m_display_name = m_playerShip->m_currentScene_name;
-	mother_branch->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
+	mother_branch->m_hub = new StellarHub();
+	mother_branch->m_hub->m_display_name = STARTING_SCENE_STELLAR_MAP;
 	m_branches.push_back(mother_branch);
-	//m_checked_hubs.push_back(m_current_hub);
+
+	//StellarBranch* mother_branch = new StellarBranch();
+	//m_current_hub = new StellarHub();
+	//mother_branch->m_hub = m_current_hub;
+	//mother_branch->m_hub->m_display_name = m_playerShip->m_currentScene_name;
+	//mother_branch->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
+	//m_branches.push_back(mother_branch);
 
 	//scan branches around
-	ScanBranches(mother_branch->m_hub->m_display_name, NO_DIRECTION, sf::Vector2f(0,0));
+	ScanBranches(STARTING_SCENE_STELLAR_MAP, NO_DIRECTION, sf::Vector2f(0, 0));
+
+	//Retrive current hub
+	for (StellarBranch* branch : m_branches)
+		if (branch->m_hub != NULL && branch->m_hub->m_display_name.compare(m_playerShip->m_currentScene_name) == 0)
+		{
+			m_current_hub = branch->m_hub;
+			break;
+		}
 
 	//get size of the known area
 	m_map_content_area = GetStellarMapKnownSize();
@@ -591,13 +603,13 @@ void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 }
 
 void SFMapPanel::UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates)
-{
+{ 
 	if (!m_branches.empty())
 	{
 		size_t branchesVectorSize = m_branches.size();
 		for (size_t i = 0; i < branchesVectorSize; i++)
 		{
-			sf::Vector2f pos = sf::Vector2f(this->getPosition().x + m_scroll_offset.x, this->getPosition().y + m_scroll_offset.y);
+			sf::Vector2f pos = sf::Vector2f(this->getPosition().x + m_scroll_offset.x + m_current_hub->m_coordinates.x * STELLARMAP_SCALE, this->getPosition().y + m_scroll_offset.y + m_current_hub->m_coordinates.y * STELLARMAP_SCALE);
 			if (into_real_coordinates)
 			{
 				m_branches[i]->SetPosition(SFStellarInfoPanel::GetRealCoordinates(pos, getPosition(), getSize()));
@@ -769,7 +781,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				}
 				else if (!IsSceneKnownByThePlayer(links[direction]) && !m_branches.back()->m_segments.empty())
 				{
-					//scene is not known by the plauer
+					//scene is not known by the player
 					continue;
 				}
 

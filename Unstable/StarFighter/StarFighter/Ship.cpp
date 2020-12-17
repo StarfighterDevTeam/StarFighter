@@ -526,7 +526,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 
 bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	bool firing = m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_actions_states[Action_Recalling] == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
+	bool firing = m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_recall_text->m_visible == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
 		&& (*CurrentGame).m_waiting_for_dialog_validation == false && hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
 
 	//Fire function
@@ -619,10 +619,6 @@ void Ship::UpdateHUDStates()
 		}
 		else
 			m_HUD_state = HUD_Idle;
-		//else if (m_HUD_state == HUD_PortalInteraction || m_HUD_state == HUD_ShopMainMenu)
-		//{
-		//	m_HUD_state = HUD_Idle;
-		//}
 	}
 }
 
@@ -805,7 +801,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
 			m_movingX = inputs_direction.x != 0;
 			m_movingY = inputs_direction.y != 0;
-			if (!m_actions_states[Action_Recalling])
+			if (m_recall_text->m_visible == false)
 			{
 				ManageAcceleration(inputs_direction);
 			}
@@ -816,7 +812,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Recalling back to last hub
 				UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
 
-				if (m_actions_states[Action_Recalling] == true)
+				if (m_actions_states[Action_Recalling] == true && m_respawnSceneName.empty() == false)
 					Recalling();
 				else
 					m_recall_text->m_visible = false;
@@ -1438,7 +1434,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	}
 
 	//idle deceleration
-	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment || m_actions_states[Action_Recalling])
+	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment || m_recall_text->m_visible == true)
 	{
 		m_speed.x -= (m_speed.x) * deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 
@@ -1446,7 +1442,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	if (!m_movingY || m_HUD_state == HUD_OpeningEquipment || m_actions_states[Action_Recalling])
+	if (!m_movingY || m_HUD_state == HUD_OpeningEquipment || m_recall_text->m_visible == true)
 	{
 		m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 

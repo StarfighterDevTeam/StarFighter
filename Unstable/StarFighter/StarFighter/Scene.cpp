@@ -23,10 +23,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	int enemy_count = 0;
 	
 	//Loading the linked scene names
-	m_links[DIRECTION_UP] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP];
-	m_links[DIRECTION_DOWN] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_DOWN];
-	m_links[DIRECTION_RIGHT] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_RIGHT];
-	m_links[DIRECTION_LEFT] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_LEFT];
+	m_links[DIRECTION_UP] = (*CurrentGame).m_direction != DIRECTION_DOWN ? (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP] : "0";
+	m_links[DIRECTION_DOWN] = (*CurrentGame).m_direction != DIRECTION_UP ? (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_DOWN] : "0";
+	m_links[DIRECTION_RIGHT] = (*CurrentGame).m_direction != DIRECTION_LEFT ? (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_RIGHT] : "0";
+	m_links[DIRECTION_LEFT] = (*CurrentGame).m_direction != DIRECTION_RIGHT ? (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_LEFT] : "0";
 
 	m_canHazardBreak = ((*CurrentGame).m_generalScenesConfig[name][SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
 	m_level = stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_LEVEL]);// +hazard_level;
@@ -47,11 +47,13 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			float h = stoi((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_HEIGHT]);
 
 			//Assigning the right direction for the scene
-			if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("V") == 0)
-				m_direction = reverse_scene == true ? DIRECTION_DOWN : DIRECTION_UP;
-			else if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("H") == 0)
-				m_direction = reverse_scene == true ? DIRECTION_LEFT : DIRECTION_RIGHT;
-			else if (!first_scene)
+			if ((*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("V") == 0 || (*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("H") == 0)
+			{
+				(*CurrentGame).m_direction = DIRECTION_UP;
+				m_direction = (*CurrentGame).m_direction;
+			}
+				
+			else if (/*!first_scene || */(*CurrentGame).m_sceneConfigs[name][i][BACKGROUND_VERTICAL].compare("0") == 0)
 			{
 				hub = true;
 				m_direction = (*CurrentGame).m_direction;
@@ -59,7 +61,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 			//Setting the right initial position and speed
 			float first_screen_offset = 0;
-			if (first_scene)
+			if (1)//HACK
 			{
 				(*CurrentGame).m_direction = m_direction;
 				first_screen_offset = GameObject::getSize_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
@@ -81,10 +83,15 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				{
 					//CREATING THE PORTAL
 					m_bg->m_portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
-					sf::Vector2f bg_size = GameObject::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
+					sf::Vector2f bg_size = sf::Vector2f(w, h);// GameObject::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
 					//applying offset respect to the center of the background, depending on the direction
-					m_bg->m_portals[(Directions)i]->m_offset = GameObject::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
-					m_bg->m_portals[(Directions)i]->setPosition(m_bg->getPosition().x + m_bg->m_portals[(Directions)i]->m_offset.x, m_bg->getPosition().y + m_bg->m_portals[(Directions)i]->m_offset.y);
+					if (hub == true)
+						m_bg->m_portals[(Directions)i]->m_offset = GameObject::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+					else
+						m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+					
+					//m_bg->m_portals[(Directions)i]->setPosition(m_bg->getPosition().x + m_bg->m_portals[(Directions)i]->m_offset.x, m_bg->getPosition().y + m_bg->m_portals[(Directions)i]->m_offset.y);
+					m_bg->m_portals[(Directions)i]->setPosition(m_bg->getPosition().x, m_bg->getPosition().y - 0.5 * bg_size.y + 0.5 * PORTAL_HEIGHT);
 
 					//rotation
 					m_bg->m_portals[(Directions)i]->setRotation(GameObject::getRotation_for_Direction((Directions)i));
