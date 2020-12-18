@@ -31,6 +31,7 @@ void Shop::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 int Shop::SaveShop(Shop* shop)
 {
+	return 0;
 	LOGGER_WRITE(Logger::DEBUG, "Saving shop in profile.\n");
 
 	ofstream data(string(getSavesPath()) + SHOP_SAVE_FILE, ios::in | ios::trunc);

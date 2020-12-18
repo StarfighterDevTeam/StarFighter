@@ -287,15 +287,11 @@ void GameObject::GetDamageFrom(GameObject& object)
 
 void GameObject::GetDamage(int damage)
 {
-	if (m_immune)
-	{
+	if (m_immune == true)
 		return;
-	}
 
 	if (damage == 0)
-	{
 		return;
-	}
 
 	setColor(Color(255, 0, 0, 255), true);
 	if (damage > m_shield)

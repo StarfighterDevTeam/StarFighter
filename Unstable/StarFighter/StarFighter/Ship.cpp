@@ -393,10 +393,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 	}
 
-	if (hyperspeedMultiplier < 1.0f)
-		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() * hyperspeedMultiplier : 0;
-	else
-		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() : 0;
+	float l_hyperspeedMuliplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
 
 	//Update
 	ManageShieldRegen(deltaTime, hyperspeedMultiplier);
@@ -417,8 +414,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	ScreenBorderConstraints();
 	SettingTurnAnimations();
 
-	ManageGhost(deltaTime);
-	ManageImmunity();
+	ManageImmunity(deltaTime * l_hyperspeedMuliplier);
+	ManageGhost(deltaTime * l_hyperspeedMuliplier);
 	ManageJumpFeedbacks();
 
 	//member objects follow
@@ -980,22 +977,31 @@ void Ship::ManageGhost(sf::Time deltaTime)
 	}
 }
 
-void Ship::ManageImmunity()
+void Ship::ManageImmunity(sf::Time deltaTime)
 {
-	//immunity frames after death
-	if (m_immune == true)
+	//immunity after hit taken
+	if (m_collision_timer > 0)
 	{
-		if (m_immunityTimer.getElapsedTime() > sf::seconds(2))
+		m_collision_timer -= deltaTime.asSeconds();
+
+		if (m_collision_timer > 0)
 		{
-			m_immune = false;
+			int alpha = (int)(255 * (sin(m_collision_timer * 10) + 1) / 2);
+			setColor(sf::Color(255, 255, 255, alpha));
+			if (m_fake_ship != NULL)
+				m_fake_ship->setColor(sf::Color(255, 255, 255, alpha));
+			
+			//death
+			if (m_armor <= 0)
+				m_visible = false;
+		}
+		else
+		{
 			setColor(sf::Color(255, 255, 255, 255));
 			if (m_fake_ship != NULL)
 				m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
 		}
 	}
-
-	//CHEAT
-	//this->immune = true;
 }
 
 void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container)
@@ -1561,7 +1567,7 @@ void Ship::Respawn()
 	SetBotsVisibility((*CurrentGame).m_direction != NO_DIRECTION);
 	
 	m_immune = true;
-	m_immunityTimer.restart();
+	m_collision_timer = 0;
 	m_disable_inputs = false;
 }
 
@@ -1860,6 +1866,15 @@ float Ship::getShipBeastScore()
 
 void Ship::GetDamageFrom(GameObject& object)
 {
+	if (m_collision_timer > 0 || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
+		return;
+
+	if (object.m_damage == 0)
+		return;
+
+	if (object.m_collision_timer > 0)
+		return;
+
 	if (object.m_collider_type == EnemyFire)
 	{
 		//display impact FX regardless of damage
@@ -1880,37 +1895,19 @@ void Ship::GetDamageFrom(GameObject& object)
 		}
 	}
 
-	if (m_immune || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
-		return;
-
-	if (object.m_damage == 0)
-		return;
-
-	if (object.m_collision_timer > 0)
-		return;
-	else
+	if (object.m_collider_type != EnemyFire)//ship collision versus ship
 	{
-		GetDamage(object.m_damage);
+		//object.m_collision_timer = TIME_BETWEEN_COLLISION_DAMAGE_TICK;
 
-		if (object.m_collider_type == EnemyFire)//bullet versus ship
+		if (object.m_collider_type == EnemyObject)//FX mutal collision
 		{
-			Ammo& ammo = (Ammo&)object;
-			object.m_collision_timer = ammo.m_isBeam == false ? TIME_BETWEEN_BULLET_DAMAGE_TICK : TIME_BETWEEN_BEAM_DAMAGE_TICK;
-		}
-		else//collision ship versus ship
-		{
-			object.m_collision_timer = TIME_BETWEEN_COLLISION_DAMAGE_TICK;
+			string fx_name = "explosion_S";
+			float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
+			FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
 
-			if (object.m_collider_type == EnemyObject)//FX mutal collision
-			{
-				string fx_name = "explosion_S";
-				float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
-				FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
-
-				float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
-				fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x / 2, getPosition().y + cos(angle)*GetShipSize().y / 2);
-				(*CurrentGame).addToScene(fx, true);
-			}
+			float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
+			fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x / 2, getPosition().y + cos(angle)*GetShipSize().y / 2);
+			(*CurrentGame).addToScene(fx, true);
 		}
 	}
 
@@ -1919,13 +1916,17 @@ void Ship::GetDamageFrom(GameObject& object)
 		m_fake_ship->setColor(Color(255, 0, 0, 255), true);
 	m_damage_feedbackTimer = DAMAGE_FEEDBACK_TIME;
 
-	if (object.m_damage > m_shield)
+	m_collision_timer = IMMUNE_DELAY_AFTER_HIT_TAKEN;
+	(*CurrentGame).killGameObjectType(EnemyFire);
+
+	int damage = 1;//object.m_damage
+	if (damage > m_shield)
 	{
-		m_armor -= (object.m_damage - m_shield);
+		m_armor -= (damage - m_shield);
 		m_shield = 0;
 	}
 	else
-		m_shield -= object.m_damage;
+		m_shield -= damage;
 
 	m_shield_recovery_clock.restart();
 	
@@ -1939,8 +1940,8 @@ void Ship::GetDamageFrom(GameObject& object)
 	if (m_combo_aura != NULL)
 		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
 
-	if (m_armor <= 0)
-		Death();
+	//if (m_armor <= 0)
+	//	Death();
 }
 
 
@@ -2046,6 +2047,7 @@ bool Ship::LoadPlayerMoney(Ship* ship)
 
 int Ship::SaveItems(Ship* ship)
 {
+	return 0;
 	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 

@@ -402,7 +402,6 @@ public:
 
 protected:
 	sf::Vector2f m_initial_position;
-	sf::Clock m_immunityTimer;
 	
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;

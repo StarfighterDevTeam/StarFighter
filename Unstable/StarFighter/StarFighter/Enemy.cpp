@@ -314,8 +314,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 		
-		//transition blocking firing and phase transitioning?
-		if ((*CurrentGame).m_waiting_for_scene_transition == true)
+		//transition blocking firing and phase transitioning? or player in immunity delay after hit taken?
+		if ((*CurrentGame).m_waiting_for_scene_transition == true || playership->m_collision_timer > 0)
 		{
 			AnimatedSprite::update(deltaTime);
 			return;

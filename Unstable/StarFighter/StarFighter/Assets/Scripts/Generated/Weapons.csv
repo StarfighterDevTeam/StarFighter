@@ -1,5 +1,5 @@
 #weapon_name,display_name,image,width,height,frames,ammo_name,damage,vspeed,range,time_between_shots,rafale,rafale_cooldown,rafale_locking,multishot,xspread,dispersion,alternate,angle_offset,target_homing,pattern_type,speed,cw,start,width,height
-laser,Default_laser,2D/Equipment/laser.png,48,48,1,laser,5,2200,0,0.1,0,0,0,2,20,0,0,0,homing,0,,,,,
+laser,Default_laser,2D/Equipment/laser.png,48,48,1,laser,5,2200,0,0.1,0,0,0,2,20,0,0,0,0,0,,,,,
 laserbeam,Laser_beam,2D/Equipment/laser.png,48,48,1,laserbeam,5,0,0,0.5,-1,0,0,1,0,0,0,0,homing,0,,,,,
 minirocket,Mini-rockets,2D/Equipment/laser.png,48,48,1,minirocket,5,500,0,1,0,0,0,4,30,40,0,180,0,0,,,,,
 #,,,,,,,,,,,,,,,,,,,,,,,,,

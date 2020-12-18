@@ -52,6 +52,16 @@ Ammo::~Ammo()
 		delete m_trail;
 }
 
+void Ammo::Death()
+{
+	FX* explosion = m_explosion->Clone();
+	explosion->setPosition(getPosition());
+	(*CurrentGame).addToScene(explosion, true);
+
+
+	GameObject::Death();
+}
+
 Ammo* Ammo::Clone()
 {
 	Ammo* ammo = new Ammo(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_frameNumber, this->m_animationNumber, this->m_damage, this->m_explosion, this->m_is_missile_model);

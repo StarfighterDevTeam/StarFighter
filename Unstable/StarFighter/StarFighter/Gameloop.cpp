@@ -141,7 +141,7 @@ void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
 void Gameloop::Update(Time deltaTime)
 {
 	//automatic respawn if dead
-	if ((*CurrentGame).m_playerShip->m_visible == false)
+	if ((*CurrentGame).m_playerShip->m_visible == false && (*CurrentGame).m_playerShip->m_collision_timer <= 0)
 	{
 		RespawnInLastSafePoint();
 	}

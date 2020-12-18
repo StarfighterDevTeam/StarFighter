@@ -105,7 +105,7 @@ public :
 	void UpdateInputStates();
 	void UpdateHUDStates();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
-	void ManageImmunity();
+	void ManageImmunity(sf::Time deltaTime);
 	void ManageGhost(sf::Time deltaTime);
 	bool ResplenishHealth();
 	void RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel);
