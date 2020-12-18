@@ -855,11 +855,10 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
 				{
 					//Bots automatic fire option
-					m_automatic_fire = m_actions_states[Action_AutomaticFire];
-					for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
-					{
-						(*it)->m_automatic_fire = m_actions_states[Action_AutomaticFire];
-					}
+					if (m_inputs_states[Action_AutomaticFire] == Input_Tap)
+						m_automatic_fire = !m_automatic_fire;
+					for (Bot* bot : m_bot_list)
+						bot->m_automatic_fire = m_automatic_fire;
 				}
 
 				//Firing button

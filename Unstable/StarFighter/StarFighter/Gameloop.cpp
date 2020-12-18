@@ -144,7 +144,6 @@ void Gameloop::Update(Time deltaTime)
 	if ((*CurrentGame).m_playerShip->m_visible == false)
 	{
 		RespawnInLastSafePoint();
-		//SpawnInScene((*CurrentGame).m_playerShip->m_respawnSceneName);
 	}
 	if (!(*CurrentGame).m_playerShip->m_is_asking_teleportation.empty())
 	{
@@ -747,7 +746,7 @@ void Gameloop::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		}
 		case SFPanel_Portal:
 		{
-			playerShip->m_SFTargetPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+ 			playerShip->m_SFTargetPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
 			break;
 		}
 		case SFPanel_Shop:
@@ -795,6 +794,9 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 		playerShip->m_currentScene_name = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
 		
+		//direction
+		(*CurrentGame).m_direction = m_currentScene->m_direction;
+
 		//speed
 		(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
 
@@ -803,7 +805,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 
 		//position
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
-		if (m_currentScene->m_direction != NO_DIRECTION)
+		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
 			(*CurrentGame).m_playerShip->m_disable_fire = false;
 			(*CurrentGame).m_playerShip->m_disableHyperspeed = false;
