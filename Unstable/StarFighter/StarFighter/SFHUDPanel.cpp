@@ -326,10 +326,13 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ss_m << m_playerShip->m_money;
 	m_money_text.setString("$ " + ss_m.str());
 
-	//graze
-	ostringstream ss_g;
-	ss_g << m_playerShip->m_graze_count;
-	m_graze_text.setString("Graze: " + ss_g.str());
+	//graze (shield regen)
+	if (m_playerShip->m_shield_max > 0)
+	{
+		ostringstream ss_g;
+		ss_g << m_playerShip->m_graze_count;
+		m_graze_text.setString("Graze: " + ss_g.str() + " / " + to_string(GRAZING_COUNT_TO_REGEN_SHIELD));
+	}
 
 	//score destruction
 	ostringstream ss_sc;

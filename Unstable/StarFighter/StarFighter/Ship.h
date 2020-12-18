@@ -107,6 +107,7 @@ public :
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageImmunity(sf::Time deltaTime);
 	void ManageGhost(sf::Time deltaTime);
+	void ManageGrazingFeedback();
 	bool ResplenishHealth();
 	void RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel);
 	void IdleDecelleration(sf::Time deltaTime);
@@ -221,7 +222,7 @@ public :
 
 	int m_graze_count;
 	int m_graze_level;
-	sf::CircleShape m_graze_radius_feedback;
+	sf::Vertex m_graze_percent_points[GRAZING_FEEDBACK_CIRCLE_POINTS * 2];
 	sf::Clock m_graze_sinus_clock;
 	int m_hits_taken;
 

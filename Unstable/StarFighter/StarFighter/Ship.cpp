@@ -72,12 +72,12 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
 	//(*CurrentGame).addToScene(m_trail, false);
 
-	m_graze_radius_feedback.setRadius(GRAZE_DISTANCE);
-	m_graze_radius_feedback.setOrigin(sf::Vector2f(m_graze_radius_feedback.getRadius(), m_graze_radius_feedback.getRadius()));
-	m_graze_radius_feedback.setFillColor(sf::Color(0, 0, 0, 0));
-	m_graze_radius_feedback.setOutlineThickness(1);
-	m_graze_radius_feedback.setOutlineColor(sf::Color(255, 255, 255, 30));
-	m_graze_radius_feedback.setPosition(getPosition());
+	for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS; i++)
+	{
+		float angle = 360.f * i / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
+		m_graze_percent_points[i * 2].color = sf::Color(0, 0, 0, 0);
+		m_graze_percent_points[i * 2 + 1].color = m_graze_percent_points[i * 2].color;
+	}
 
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
@@ -362,6 +362,43 @@ bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, 
 	return false;
 }
 
+void Ship::ManageGrazingFeedback()
+{
+	if (m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
+	{
+		float radius = GRAZE_DISTANCE;
+		float angle_to_fill = 360.f * m_graze_count / GRAZING_COUNT_TO_REGEN_SHIELD;
+		float thickness = 2;
+
+		//position
+		for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
+		{
+			float angle = 360.f * (i / 2) / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
+
+			m_graze_percent_points[i].position.x = getPosition().x + (radius + (i % 2) * thickness) * cos(- M_PI_2 + angle * M_PI / 180);
+			m_graze_percent_points[i].position.y = getPosition().y + (radius + (i % 2) * thickness) * sin(- M_PI_2 + angle * M_PI / 180);
+
+			//color
+			if (angle_to_fill > 1.f / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1) && angle <= angle_to_fill)
+			{
+				float s = 0.50 + 3 * abs(sin(m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
+				m_graze_percent_points[i].color = sf::Color(0, 0, 255, 200 * s);
+			}
+				
+			else
+			{
+				float s = 0.25 + 3 * abs(sin(4 * m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
+				m_graze_percent_points[i].color = sf::Color(255, 255, 255, 20 * s);
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
+			m_graze_percent_points[i].color = sf::Color(0, 0, 0, 0);
+	}
+}
+
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//clean the dust
@@ -396,7 +433,10 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	float l_hyperspeedMuliplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
 
 	//Update
-	ManageShieldRegen(deltaTime, hyperspeedMultiplier);
+	//ManageShieldRegen(deltaTime, hyperspeedMultiplier);
+
+	//Graze feedback
+	ManageGrazingFeedback();
 
 	sf::Vector2f directions = InputGuy::getDirections();
 
@@ -427,8 +467,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	
 	if (m_fake_ship != NULL)
 		m_fake_ship->update(deltaTime, hyperspeedMultiplier);
-	
-	m_graze_radius_feedback.setPosition(getPosition());
 }
 
 void Ship::Draw(sf::RenderTexture& screen)
@@ -446,13 +484,13 @@ void Ship::Draw(sf::RenderTexture& screen)
 
 		GameObject::Draw(screen);
 
-		if ((*CurrentGame).m_direction != NO_DIRECTION)
+		if ((*CurrentGame).m_direction != NO_DIRECTION && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
 		{
-			sf::Color color = m_graze_radius_feedback.getOutlineColor();
-			float s = 0.25 + 3*abs(sin(2*m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4 ;
-			m_graze_radius_feedback.setOutlineColor(sf::Color(color.r, color.g, color.b, color.a * s));
-			screen.draw(m_graze_radius_feedback);
-			m_graze_radius_feedback.setOutlineColor(color);
+			//sf::Color color = m_graze_radius_feedback.getOutlineColor();
+			//float s = 0.25 + 3*abs(sin(2*m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4 ;
+			//m_graze_radius_feedback.setOutlineColor(sf::Color(color.r, color.g, color.b, color.a * s));
+			screen.draw(m_graze_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
+			//m_graze_radius_feedback.setOutlineColor(color);
 		}
 	}
 }
@@ -1566,8 +1604,8 @@ void Ship::Respawn()
 	SetVisibility(true);
 	SetBotsVisibility((*CurrentGame).m_direction != NO_DIRECTION);
 	
-	m_immune = true;
 	m_collision_timer = 0;
+	m_graze_count = 0;
 	m_disable_inputs = false;
 }
 
@@ -1756,24 +1794,36 @@ static float GrazeLevelsBeastBonus[NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f }
 
 void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if ((*CurrentGame).m_waiting_for_dialog_validation)
-	{
+	if ((*CurrentGame).m_waiting_for_dialog_validation || m_collision_timer > 0)
 		return;
-	}
 
-	static double graze_count_buffer = 0;
-	graze_count_buffer += GRAZE_PER_SECOND_AND_PER_BULLET * deltaTime.asSeconds() * hyperspeedMultiplier;
-
-	if (graze_count_buffer > 1)
+	//shield regen with grazing
+	if (m_shield_max > 0 && m_shield < m_shield_max)
 	{
-		double intpart;
-		graze_count_buffer = modf(graze_count_buffer, &intpart);
-		m_graze_count += intpart;
+		static double graze_count_buffer = 0;
+		graze_count_buffer += GRAZE_PER_SECOND_AND_PER_BULLET * deltaTime.asSeconds() * hyperspeedMultiplier;
 
-		//Combo
-		AddComboCount(intpart);
+		if (graze_count_buffer > 1)
+		{
+			double intpart;
+			graze_count_buffer = modf(graze_count_buffer, &intpart);
+			m_graze_count += intpart;
+
+			//regen shield
+			if (m_graze_count >= GRAZING_COUNT_TO_REGEN_SHIELD)
+			{
+				m_shield++;
+				m_graze_count = m_shield == m_shield_max ? GRAZING_COUNT_TO_REGEN_SHIELD : 0;
+			}
+
+			//Combo
+			//AddComboCount(intpart);
+		}
 	}
+	else
+		m_graze_count = 0;
 
+	/*
 	if (m_graze_level < NB_GRAZE_LEVELS - 1)
 	{
 		if (m_graze_count >= GrazeLevelsThresholds[m_graze_level + 1])
@@ -1840,6 +1890,7 @@ void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 	}
+	*/
 }
 
 int Ship::getGrazeCount()
@@ -1935,7 +1986,6 @@ void Ship::GetDamageFrom(GameObject& object)
 
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
-	m_graze_radius_feedback.setOutlineColor(sf::Color(255, 255, 0, 20));
 	m_hits_taken++;
 	if (m_combo_aura != NULL)
 		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);

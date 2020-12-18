@@ -442,7 +442,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 				else
 				{
-					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
+					//(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
 
 					if (m_hasDisplayedDestructionRatio == false)
