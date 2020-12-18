@@ -25,6 +25,7 @@ public:
 	void LoadAllScenes(string scenes_file);
 	void LoadAllEnemies(string enemies_file);
 	void LoadAllFX(string FX_file);
+	void LoadAllUpgrades(string upgrades_file);
 	void UpdateShipConfig(Ship* ship, string config_name);
 
 	void InGameStateMachineCheck(sf::Time deltaTime);

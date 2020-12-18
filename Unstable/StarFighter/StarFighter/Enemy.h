@@ -1,7 +1,7 @@
 #ifndef ENEMY_H_INCLUDED
 #define ENEMY_H_INCLUDED
 
-#include "Portal.h"
+#include "Upgrade.h"
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR				100

@@ -135,6 +135,12 @@ public :
 	string m_currentScene_name;
 	int m_currentScene_hazard;
 	map<string, int> m_knownScenes;
+
+	void RandomizeUpgrades();
+	void SetUpgrade(string upgrade_name);
+	vector<string> m_upgrades;
+	vector<string> m_upgrades_short;
+	void SetWeapon(string weapon_name);
 	
 	void SetVisibility(bool visible);
 	void Death() override;

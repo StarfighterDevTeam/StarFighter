@@ -78,6 +78,7 @@ const char* getSavesPath();
 #define SCENES_FILE "Scripts/Generated/Scenes.csv"
 #define PHASES_FILE	"Scripts/Generated/EnemyPhases.csv"
 #define DIALOGS_FILE "Scripts/Generated/Dialogs.csv"
+#define UPGRADES_FILE	"Scripts/Generated/Upgrades.csv"
 
 //GAME RULES
 #define PIXEL_PERFECT_COLLISION								true
@@ -97,6 +98,7 @@ const char* getSavesPath();
 #define ENEMY_LASERBEAM_WARNING_DELAY						1.2
 #define GRAZING_COUNT_TO_REGEN_SHIELD						10
 #define GRAZING_FEEDBACK_CIRCLE_POINTS						64
+#define NB_UPGRADE_CHOICES									3
 
 //HUD
 #define ARMOR_BAR_SIZE_X								320

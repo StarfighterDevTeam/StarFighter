@@ -375,10 +375,11 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ostringstream ss_ship_stats;
 	float DPS = 0;
 	if (m_playerShip->m_weapon != NULL)
-		if (m_playerShip->m_weapon->m_shot_mode != NoShotMode)
-			DPS += (floor)(1.f / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage;
+
+		if (m_playerShip->m_weapon->m_ammunition->m_isBeam == false)
+			DPS += (floor)(1.f / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_multishot * m_playerShip->m_weapon->m_ammunition->m_damage;
 		else
-			DPS += (floor)(1.f / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage * m_playerShip->m_weapon->m_multishot;
+			DPS += (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * m_playerShip->m_weapon->m_multishot * m_playerShip->m_weapon->m_ammunition->m_damage;
 
 	if (m_playerShip->m_bot_list.empty() == false && m_playerShip->m_bot_list.front()->m_weapon != NULL)
 	{

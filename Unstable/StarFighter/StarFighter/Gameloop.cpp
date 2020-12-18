@@ -64,6 +64,15 @@ void Gameloop::Initialize(Player player)
 	//Loading all enemies
 	LoadAllEnemies(ENEMY_FILE);
 
+	//Loading all upgrades
+	LoadAllUpgrades(UPGRADES_FILE);
+
+	(*CurrentGame).m_playerShip->RandomizeUpgrades();
+	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_hp_1");
+	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_shield_1");
+	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_hp_2");
+	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_minirocket_5");
+
 	//Creating current scene
 	m_nextScene = NULL;
 	SpawnInScene(m_playerShip->m_currentScene_name);
@@ -882,8 +891,6 @@ void Gameloop::LoadAllEnemies(string enemies_file)
 	for (size_t i = 0; i < allEnemiesVectorSize; i++)
 		(*CurrentGame).m_enemiesConfig.insert(std::map<string, vector<string> >::value_type(enemiesConfig[i][ENEMY_NAME], enemiesConfig[i]));
 
-	enemiesConfig.clear();
-
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
 
@@ -896,7 +903,17 @@ void Gameloop::LoadAllFX(string FX_file)
 	for (size_t i = 0; i < allFXVectorSize; i++)
 		(*CurrentGame).m_FXConfig.insert(std::map<string, vector<string> >::value_type(FXConfig[i][FX_NAME], FXConfig[i]));
 
-	FXConfig.clear();
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void Gameloop::LoadAllUpgrades(string upgrades_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all upgrades.");
+
+	vector<vector<string> > UpgradesConfig = *(FileLoaderUtils::FileLoader(upgrades_file));
+	size_t allFXVectorSize = UpgradesConfig.size();
+	for (size_t i = 0; i < allFXVectorSize; i++)
+		(*CurrentGame).m_upgradesConfig.insert(std::map<string, vector<string> >::value_type(UpgradesConfig[i][UPGRADE_NAME], UpgradesConfig[i]));
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }

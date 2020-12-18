@@ -129,6 +129,7 @@
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
+    <ClCompile Include="Upgrade.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +181,7 @@
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
+    <ClInclude Include="Upgrade.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>

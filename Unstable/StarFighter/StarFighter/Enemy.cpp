@@ -998,10 +998,12 @@ void Enemy::Death()
 	//(*CurrentGame).m_playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
 
 	//Loot
-	if (CreateRandomLootv2(m_enemy_class, (*CurrentGame).m_BeastScoreBonus))
-	{
-		GenerateLoot();
-	}
+	//if (CreateRandomLootv2(m_enemy_class, (*CurrentGame).m_BeastScoreBonus))
+	//{
+	//	GenerateLoot();
+	//}
+
+	playerShip->addMoney(m_money);
 
 	GameObject::Death();
 

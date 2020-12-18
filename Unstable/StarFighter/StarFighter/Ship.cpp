@@ -473,8 +473,8 @@ void Ship::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible == true)
 	{
-		if (m_combo_aura != NULL)
-			m_combo_aura->Draw(screen);
+		//if (m_combo_aura != NULL)
+		//	m_combo_aura->Draw(screen);
 
 		if (m_fake_ship != NULL)
 			m_fake_ship->Draw(screen);
@@ -2109,31 +2109,31 @@ int Ship::SaveItems(Ship* ship)
 		{
 			switch (i)
 			{
-			case Engine:
-			{
-				data << "Engine ";
-				break;
-			}
-			case Armor:
-			{
-				data << "Armor ";
-				break;
-			}
-			case Shield:
-			{
-				data << "Shield ";
-				break;
-			}
-			case Module:
-			{
-				data << "Module ";
-				break;
-			}
-			default:
-			{
-				data << "Unknown ";
-				break;
-			}
+				case Engine:
+				{
+					data << "Engine ";
+					break;
+				}
+				case Armor:
+				{
+					data << "Armor ";
+					break;
+				}
+				case Shield:
+				{
+					data << "Shield ";
+					break;
+				}
+				case Module:
+				{
+					data << "Module ";
+					break;
+				}
+				default:
+				{
+					data << "Unknown ";
+					break;
+				}
 			}
 
 			Enemy::SaveEquipmentData(data, ship->m_equipment[i], true);
@@ -2718,4 +2718,190 @@ GameObject* Ship::GetInputBlocker()
 void Ship::SetAskingPanel(SFPanelTypes type)
 {
 	m_is_asking_SFPanel = type;
+}
+
+void Ship::SetUpgrade(string upgrade_name)
+{
+	m_upgrades.push_back(upgrade_name);
+
+	//update "short" list of maxed upgrades
+	bool permanent = (bool)(stoi((*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_PERMANENT]));
+	if (permanent == true)
+	{
+		string locked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_LOCKED_BY];
+		if (locked_by.compare("0") != 0)
+		{
+			for (vector<string>::iterator it = m_upgrades_short.begin(); it != m_upgrades_short.end(); it++)
+			{
+				if (it->compare(locked_by) == 0)
+				{
+					*it = upgrade_name;
+					break;
+				}
+			}
+		}
+		else
+			m_upgrades_short.push_back(upgrade_name);
+	}
+	
+	//apply effect
+	if (upgrade_name.compare("Upgrade_hp_1") == 0)
+	{
+		m_armor_max++;
+		m_armor++;
+	}
+	else if (upgrade_name.compare("Upgrade_hp_2") == 0)
+	{
+		m_armor_max++;
+		m_armor++;
+	}
+	else if (upgrade_name.compare("Upgrade_hp_3") == 0)
+	{
+		m_armor_max++;
+		m_armor++;
+	}
+	else if (upgrade_name.compare("Upgrade_hp_4") == 0)
+	{
+		m_armor_max++;
+		m_armor++;
+	}
+	else if (upgrade_name.compare("Upgrade_hp_5") == 0)
+	{
+		m_armor_max++;
+		m_armor++;
+	}
+	else if (upgrade_name.compare("Upgrade_shield_1") == 0)
+		m_shield_max++;
+	else if (upgrade_name.compare("Upgrade_shield_2") == 0)
+		m_shield_max++;
+	else if (upgrade_name.compare("Upgrade_shield_3") == 0)
+		m_shield_max++;
+	else if (upgrade_name.compare("Upgrade_shield_4") == 0)
+		m_shield_max++;
+	else if (upgrade_name.compare("Upgrade_shield_5") == 0)
+		m_shield_max++;
+	else if (upgrade_name.compare("Upgrade_laser_1") == 0)
+		SetWeapon("laser1");
+	else if (upgrade_name.compare("Upgrade_laser_2") == 0)
+		SetWeapon("laser2");
+	else if (upgrade_name.compare("Upgrade_laser_3") == 0)
+		SetWeapon("laser3");
+	else if (upgrade_name.compare("Upgrade_laser_4") == 0)
+		SetWeapon("laser4");
+	else if (upgrade_name.compare("Upgrade_laser_5") == 0)
+		SetWeapon("laser5");
+	else if (upgrade_name.compare("Upgrade_laserbeam_1") == 0)
+		SetWeapon("laserbeam1");
+	else if (upgrade_name.compare("Upgrade_laserbeam_2") == 0)
+		SetWeapon("laserbeam2");
+	else if (upgrade_name.compare("Upgrade_laserbeam_3") == 0)
+		SetWeapon("laserbeam3");
+	else if (upgrade_name.compare("Upgrade_laserbeam_4") == 0)
+		SetWeapon("laserbeam4");
+	else if (upgrade_name.compare("Upgrade_laserbeam_5") == 0)
+		SetWeapon("laserbeam5");
+	else if (upgrade_name.compare("Upgrade_minirocket_1") == 0)
+		SetWeapon("minirocket1");
+	else if (upgrade_name.compare("Upgrade_minirocket_2") == 0)
+		SetWeapon("minirocket2");
+	else if (upgrade_name.compare("Upgrade_minirocket_3") == 0)
+		SetWeapon("minirocket3");
+	else if (upgrade_name.compare("Upgrade_minirocket_4") == 0)
+		SetWeapon("minirocket4");
+	else if (upgrade_name.compare("Upgrade_minirocket_5") == 0)
+		SetWeapon("minirocket5");
+	else if (upgrade_name.compare("Restore_hp_1") == 0)
+		m_armor++;
+}
+
+void Ship::SetWeapon(string weapon_name)
+{
+	delete m_weapon;
+	m_weapon = Enemy::LoadWeapon(weapon_name, -1);
+}
+
+void Ship::RandomizeUpgrades()
+{
+	//short list
+	//select eligible upgrades:
+	//- not already possessed
+	//- unlocked
+	//- condition checked
+	vector<string> random_upgrades;
+	for (map<string, vector<string> >::iterator it = (*CurrentGame).m_upgradesConfig.begin(); it != (*CurrentGame).m_upgradesConfig.end(); it++)
+	{
+		if (stoi(it->second[UPGRADE_PERMANENT]) == 1)
+		{
+			//already possessed?
+			bool found = false;
+			for (vector<string>::iterator it2 = m_upgrades.begin(); it2 != m_upgrades.end(); it2++)
+			{
+				if (it2->compare(it->second[UPGRADE_NAME]) == 0)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (found == true)
+				continue;
+		}
+
+		//locked by
+		bool unlocked = false;
+		if (it->second[UPGRADE_LOCKED_BY].compare("0") != 0)
+		{
+			for (vector<string>::iterator it2 = m_upgrades.begin(); it2 != m_upgrades.end(); it2++)
+			{
+				if (it2->compare(it->second[UPGRADE_LOCKED_BY]) == 0)
+				{
+					unlocked = true;
+					break;
+				}
+			}
+
+			if (unlocked == false)
+				continue;
+		}
+
+		//condition
+		if (it->second[UPGRADE_CONDITION].compare("0") != 0)
+		{
+			FloatCompare result = ERROR_COMPARE;
+
+			//compute results
+			if (it->second[UPGRADE_CONDITION].compare("life") == 0)
+			{
+				if (stoi(it->second[UPGRADE_CONDITION_VALUE]) == m_armor)//case of "death" condition handled in method Death(), when the enemy dies precisely
+					result = EQUAL_TO;
+				else
+					result = 100.0f * m_armor / m_armor_max >= stoi(it->second[UPGRADE_CONDITION_VALUE]) ? GREATER_THAN : LESSER_THAN;
+			}
+			else if (it->second[UPGRADE_CONDITION].compare("shield") == 0)
+			{
+				if (m_shield_max == 0)//careful of the case where shield_max == 0, we don't want to be dividing by 0
+					result = stoi(it->second[UPGRADE_CONDITION_VALUE]) == 0 ? EQUAL_TO : LESSER_THAN;
+				else
+					result = 100.0f * m_shield / m_shield_max >= stoi(it->second[UPGRADE_CONDITION_VALUE]) ? GREATER_THAN : LESSER_THAN;
+			}
+
+			//check results
+			if (result == EQUAL_TO || (it->second[UPGRADE_CONDITION_OP].compare("greater") == 0 && result == GREATER_THAN) || (it->second[UPGRADE_CONDITION_OP].compare("lesser") == 0 && result == LESSER_THAN))
+			{
+				//condition matched
+			}
+			else
+				continue;
+		}
+
+		//add to the short list
+		random_upgrades.push_back(it->second[UPGRADE_NAME]);
+	}
+
+	//randomize among the short list
+	random_shuffle(random_upgrades.begin(), random_upgrades.end());
+
+	string name[NB_UPGRADE_CHOICES];
+	for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
+		name[i] = random_upgrades[i];
 }
