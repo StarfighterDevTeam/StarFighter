@@ -985,14 +985,14 @@ void Enemy::Death()
 	(*CurrentGame).addToScene(myFX, true);
 
 	//Combo
-	playerShip->AddComboCount(m_enemy_class * 100);
+	//playerShip->AddComboCount(m_enemy_class * 100);
 
 	//Score
-	(*CurrentGame).m_hazard += m_money;
-	if (!m_isOnScene)
-	{
-		(*CurrentGame).m_hazardSpawned -= m_money;//can only happen when using debugs or scripts to wipe all enemies even offscreen
-	}
+	//(*CurrentGame).m_hazard += m_money;
+	//if (!m_isOnScene)
+	//{
+	//	(*CurrentGame).m_hazardSpawned -= m_money;//can only happen when using debugs or scripts to wipe all enemies even offscreen
+	//}
 
 	//Player XP
 	//(*CurrentGame).m_playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);

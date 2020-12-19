@@ -405,12 +405,12 @@ bool GameObject::GetLoot(GameObject& object)
 
 void GameObject::GetPortal(GameObject* object)
 {
-
+	//see override function in class Ship
 }
 
 void GameObject::GetShop(GameObject* object)
 {
-
+	//see override function in class Ship
 }
 
 bool GameObject::get_equipment_from(GameObject& object)

@@ -251,8 +251,10 @@ public :
 	//void LevelUp();
 	int UpdateShipLevel();
 
-	static int SavePlayerMoney(Ship* ship);
-	static bool LoadPlayerMoney(Ship* ship);
+	static int SavePlayerScenes(Ship* ship);
+	static string LoadPlayerScenes(Ship* ship);
+	static int SavePlayerMoneyAndHealth(Ship* ship);
+	static bool LoadPlayerMoneyAndHealth(Ship* ship);
 	static int SaveItems(Ship* ship);
 	static bool LoadPlayerItems(Ship* ship);
 	static int SavePlayerUpgrades(Ship* ship);

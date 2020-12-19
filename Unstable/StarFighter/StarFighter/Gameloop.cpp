@@ -32,19 +32,11 @@ void Gameloop::Initialize(Player player)
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
 	//Load saved items
-	if (!Ship::LoadPlayerItems(m_playerShip))
-	{
-		//or create a new save file
-		Ship::SaveItems(m_playerShip);
-	}
-
-	//Load money
-	if (!Ship::LoadPlayerMoney(m_playerShip))
-	{
-		//or create a new save file
-		m_playerShip->m_money = STARTING_MONEY;
-		Ship::SavePlayerMoney(m_playerShip);
-	}
+	//if (!Ship::LoadPlayerItems(m_playerShip))
+	//{
+	//	//or create a new save file
+	//	Ship::SaveItems(m_playerShip);
+	//}
 
 	//Load upgrades
 	if (!Ship::LoadPlayerUpgrades(m_playerShip))
@@ -53,8 +45,16 @@ void Gameloop::Initialize(Player player)
 		Ship::SavePlayerUpgrades(m_playerShip);
 	}
 
+	//Load money
+	if (!Ship::LoadPlayerMoneyAndHealth(m_playerShip))
+	{
+		//or create a new save file
+		//m_playerShip->m_money = STARTING_MONEY;
+		Ship::SavePlayerMoneyAndHealth(m_playerShip);
+	}
+
 	//Load knownScenes, hazard levels and current scene from save file
-	string playerSave = LoadPlayerSave();
+	string playerSave = Ship::LoadPlayerScenes(m_playerShip);
 	if (!playerSave.empty())
 	{
 		player.m_currentSceneFile = playerSave;
@@ -64,7 +64,7 @@ void Gameloop::Initialize(Player player)
 		//New game save
 		player.m_currentSceneFile = STARTING_SCENE;
 		AddToKnownScenes(player.m_currentSceneFile);
-		SavePlayer();
+		Ship::SavePlayerScenes(m_playerShip);
 		//UpdateShipConfig(m_playerShip, "intro");//not to use anymore, or do resync HUD equipements
 		//Ship::SaveItems(m_playerShip);
 	}
@@ -212,7 +212,7 @@ void Gameloop::Update(Time deltaTime)
 		LoadAllEnemies(ENEMY_FILE);
 
 		Ship::LoadPlayerItems(m_playerShip);
-		Ship::LoadPlayerMoney(m_playerShip);
+		Ship::LoadPlayerMoneyAndHealth(m_playerShip);
 	}
 #endif
 	
@@ -285,79 +285,6 @@ int Gameloop::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip)
 	}
 	//else
 	return 0;
-}
-
-int Gameloop::SavePlayer(Ship* playerShip)
-{
-	if (!playerShip)
-	{
-		return -1;
-	}
-
-	LOGGER_WRITE(Logger::DEBUG, "Saving known scenes and current scene in profile.\n");
-
-	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
-	{
-		// instructions
-		for (map<string, int>::iterator it = playerShip->m_knownScenes.begin(); it != playerShip->m_knownScenes.end(); it++)
-		{
-			data << it->first.c_str() << " " << it->second;
-			if (it->first.c_str() == playerShip->m_respawnSceneName)
-			{
-				data << " " << "!";
-			}
-			data << endl;
-		}
-
-		data.close();  // on ferme le fichier
-	}
-	else  // si l'ouverture a échoué
-	{
-		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
-	}
-
-	return 0;
-}
-
-string Gameloop::LoadPlayerSave(Ship* playerShip)
-{
-	if (!playerShip)
-	{
-		return "";
-	}
-
-	string return_current_scene;
-
-	std::ifstream  data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
-
-	if (data) // si ouverture du fichier réussie
-	{
-		std::string line;
-		while (std::getline(data, line))
-		{
-			string scene;
-			int level;
-			std::istringstream(line) >> scene >> level;
-			string current_scene;
-				
-			std::istringstream(line) >> scene >> level >> current_scene;
-
-			playerShip->m_knownScenes.insert(std::pair<string, int>(scene, level));
-			if (current_scene.compare("!") == 0)
-			{
-				return_current_scene = scene;
-			}
-		}
-
-		data.close();  // on ferme le fichier
-	}
-	else  // si l'ouverture a échoué
-	{
-		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
-	}
-
-	return return_current_scene;
 }
 
 void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
@@ -609,15 +536,13 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				m_playerShip->m_currentScene_name = m_currentScene->m_name;
 				m_playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
 
-				//Save scenes
+				//Saving
 				AddToKnownScenes(m_currentScene->m_name);
 				if (m_currentScene->m_direction == NO_DIRECTION)
-				{
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
-					SavePlayer();
-				}
-				else
-					SavePlayer();
+				
+				Ship::SavePlayerScenes(m_playerShip);
+				Ship::SavePlayerMoneyAndHealth(m_playerShip);
 
 				//Resetting counting of hits taken for scene score
 				if (m_currentScene->m_direction == NO_DIRECTION)
@@ -652,7 +577,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 		{
 			m_currentScene->m_bg->SetPortalsState(PortalOpen);
 			
-			(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
+			//(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
 
 			//player takes exit?
 			if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition == true)
@@ -864,7 +789,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playerShip)
 			delete dialog;
 		m_playerShip->m_targetDialogs.clear();
 
-		SavePlayer();
+		Ship::SavePlayerScenes(m_playerShip);
 	}
 }
 

@@ -15,7 +15,9 @@ Shop::Shop(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Shop::~Shop()
 {
-	Shop::SaveShop(NULL);//refresh shop content by saving an empty shop
+	//Shop::SaveShop(NULL);//refresh shop content by saving an empty shop
+
+	Shop::SaveShopUpgrades(NULL);
 
 	delete m_grid_v2;
 }
@@ -180,6 +182,10 @@ bool Shop::LoadShopUpgrades(Shop* shop)
 			string upgrade_name;
 			bool sold_out;
 			std::istringstream(line) >> upgrade_name >> (bool)sold_out;
+
+			if (upgrade_name.compare("-1") == 0)
+				return false;
+
 			shop->m_upgrades[i] = upgrade_name;
 			shop->m_sold_out[i] = sold_out;
 

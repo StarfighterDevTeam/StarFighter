@@ -390,11 +390,11 @@ void Game::killGameObjectType(GameObjectType type)
 			object->Death();
 
 			//Combo
-			if (type == EnemyFire)
-			{
-				GameObject* obj = (GameObject*)m_playerShip;
-				obj->AddComboCount(10);
-			}
+			//if (type == EnemyFire)
+			//{
+			//	GameObject* obj = (GameObject*)m_playerShip;
+			//	obj->AddComboCount(10);
+			//}
 		}
 		
 	}

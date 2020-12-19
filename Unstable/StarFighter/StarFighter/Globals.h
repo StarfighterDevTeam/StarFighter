@@ -14,11 +14,11 @@ const char* getSavesPath();
 #ifdef __APPLE__
 	#define PLAYER_SAVE_FILE						"KnownScenes.txt"
 	#define ITEMS_SAVE_FILE							"ItemsStats.txt"
-	#define MONEY_SAVE_FILE							"Money.txt"
+	#define MONEY_AND_HEALTH_SAVE_FILE							"Money.txt"
 #else
-	#define PLAYER_SAVE_FILE							"Saves/KnownScenes.txt"
+	#define SCENES_SAVE_FILE							"Saves/KnownScenes.txt"
 	#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
-	#define MONEY_SAVE_FILE							"Saves/Money.txt"
+	#define MONEY_AND_HEALTH_SAVE_FILE				"Saves/MoneyAndHealth.txt"
 	#define SHOP_SAVE_FILE							"Saves/Shop.txt"
 	#define SHOP_UPGRADES_SAVE_FILE					"Saves/ShopUpgrades.txt"
 	#define PLAYER_UPGRADES_SAVE_FILE				"Saves/Upgrades.txt"

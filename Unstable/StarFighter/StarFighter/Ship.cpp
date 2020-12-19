@@ -802,7 +802,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					Teleport(m_SFTargetPanel->GetTeleportationDestination());
 					m_money -= m_SFTargetPanel->GetTeleportationCost();
-					SavePlayerMoney(this);
+					SavePlayerMoneyAndHealth(this);
 					m_HUD_state = HUD_Idle;
 				}
 			}
@@ -1170,7 +1170,7 @@ bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 		m_targetShop->m_grid_v2->InsertObject(NULL, element->m_index, true);
 
 		Ship::SaveItems(this);
-		Ship::SavePlayerMoney(this);
+		Ship::SavePlayerMoneyAndHealth(this);
 		Shop::SaveShop(m_targetShop);
 	}
 
@@ -1207,7 +1207,7 @@ void Ship::SellingItem_v2(GridElement* element)
 		Desequip_v2(item);
 
 	Ship::SaveItems(this);
-	Ship::SavePlayerMoney(this);
+	Ship::SavePlayerMoneyAndHealth(this);
 	Shop::SaveShop(m_targetShop);
 }
 
@@ -1752,7 +1752,7 @@ bool Ship::GetLoot(GameObject& object)
 
 		(*CurrentGame).PlaySFX(SFX_MoneyLoot);
 
-		Ship::SavePlayerMoney(this);
+		Ship::SavePlayerMoneyAndHealth(this);
 		return true;
 	}
 
@@ -2007,7 +2007,7 @@ void Ship::GetDamageFrom(GameObject& object)
 	m_shield_recovery_clock.restart();
 	
 	//Combo
-	(*CurrentGame).m_playerShip->AddComboCount(-(*CurrentGame).m_playerShip->m_combo_count_max / 2);
+	//(*CurrentGame).m_playerShip->AddComboCount(-(*CurrentGame).m_playerShip->m_combo_count_max / 2);
 
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
@@ -2069,16 +2069,87 @@ int Ship::UpdateShipLevel()
 	return level_;
 }
 
-//SAVING AND LOADING ITEMS AND MONEY
-int Ship::SavePlayerMoney(Ship* ship)
+//SAVING AND LOADING 
+
+int Ship::SavePlayerScenes(Ship* ship)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Saving scenes in profile.\n");
+	assert(ship != NULL);
+
+	ofstream data(string(getSavesPath()) + SCENES_SAVE_FILE, ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		// instructions
+		for (map<string, int>::iterator it = ship->m_knownScenes.begin(); it != ship->m_knownScenes.end(); it++)
+		{
+			data << it->first.c_str() << " " << it->second;
+			if (it->first.c_str() == ship->m_respawnSceneName)
+			{
+				data << " " << "!";
+			}
+			data << endl;
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "Failed to open SCENES SAVE FILE !" << endl;
+	}
+
+	return 0;
+}
+
+string Ship::LoadPlayerScenes(Ship* ship)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading scenes from profile.\n");
+	assert(ship != NULL);
+
+	string return_current_scene;
+
+	std::ifstream  data(string(getSavesPath()) + SCENES_SAVE_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+		while (std::getline(data, line))
+		{
+			string scene;
+			int level;
+			std::istringstream(line) >> scene >> level;
+			string current_scene;
+
+			std::istringstream(line) >> scene >> level >> current_scene;
+
+			ship->m_knownScenes.insert(std::pair<string, int>(scene, level));
+			if (current_scene.compare("!") == 0)
+			{
+				return_current_scene = scene;
+			}
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
+	}
+
+	return return_current_scene;
+}
+
+int Ship::SavePlayerMoneyAndHealth(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Saving money in profile.\n");
 	assert(ship != NULL);
 
-	ofstream data(string(getSavesPath()) + MONEY_SAVE_FILE, ios::in | ios::trunc);
+	ofstream data(string(getSavesPath()) + MONEY_AND_HEALTH_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
 		data << "Money " << ship->m_money << endl;
+		data << "Health " << ship->m_armor << endl;
+		data << "Shield " << ship->m_shield << endl;
+		data << "Graze " << ship->m_graze_count << endl;
 
 		data.close();  // on ferme le fichier
 	}
@@ -2090,23 +2161,33 @@ int Ship::SavePlayerMoney(Ship* ship)
 	return 0;
 }
 
-bool Ship::LoadPlayerMoney(Ship* ship)
+bool Ship::LoadPlayerMoneyAndHealth(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
 	assert(ship != NULL);
 
-	std::ifstream  data(string(getSavesPath()) + MONEY_SAVE_FILE, ios::in);
+	std::ifstream  data(string(getSavesPath()) + MONEY_AND_HEALTH_SAVE_FILE, ios::in);
 
 	if (data) // si ouverture du fichier réussie
 	{
 		std::string line;
+		int i = 0;
 		while (std::getline(data, line))
 		{
-			string equipment_type;
+			string ss;
+			string value;
+			std::istringstream(line) >> ss >> value;
 
-			//Loading money
-
-			std::istringstream(line) >> equipment_type >> ship->m_money;
+			if (i == 0)
+				ship->m_money = stoi(value);
+			else if (i == 1)
+				ship->m_armor = stoi(value);
+			else if (i == 2)
+				ship->m_shield = stoi(value);
+			else if (i == 3)
+				ship->m_graze_count = stoi(value);
+		
+			i++;
 		}
 		
 		data.close();  // on ferme le fichier
@@ -2802,12 +2883,12 @@ void Ship::SetAskingPanel(SFPanelTypes type)
 
 void Ship::SetUpgrade(string upgrade_name)
 {
-	m_upgrades.push_back(upgrade_name);
-
 	//update "short" list of maxed upgrades
 	bool permanent = (bool)(stoi((*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_PERMANENT]));
 	if (permanent == true)
 	{
+		m_upgrades.push_back(upgrade_name);
+
 		string locked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_LOCKED_BY];
 		if (locked_by.compare("0") != 0)
 		{
@@ -2890,7 +2971,7 @@ void Ship::SetUpgrade(string upgrade_name)
 		SetWeapon("minirocket4");
 	else if (upgrade_name.compare("Upgrade_minirocket_5") == 0)
 		SetWeapon("minirocket5");
-	else if (upgrade_name.compare("Restore_hp_1") == 0)
+	else if (upgrade_name.compare("Restores_hp_1") == 0)
 		m_armor++;
 }
 

@@ -198,10 +198,9 @@ bool SFUpgradesPanel::BuyUpgrade()
 
 	(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
-	Ship::SavePlayerMoney(m_playerShip);
+	Ship::SavePlayerMoneyAndHealth(m_playerShip);
 	Ship::SavePlayerUpgrades(m_playerShip);
 	Shop::SaveShopUpgrades(m_playerShip->m_targetShop);
-
 
 	return true;
 }
