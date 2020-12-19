@@ -17,10 +17,6 @@ Shop::~Shop()
 {
 	Shop::SaveShop(NULL);//refresh shop content by saving an empty shop
 
-	for (GameObject* item : m_items)
-		if (item != NULL)
-			delete item;
-
 	delete m_grid_v2;
 }
 
@@ -62,12 +58,11 @@ int Shop::SaveShop(Shop* shop)
 	}
 	else  // si l'ouverture a échoué
 	{
-		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
+		cerr << "ERROR: No save file found for shop items. A new file is going to be created.\n" << endl;
 	}
 
 	return 0;
 }
-
 
 bool Shop::LoadShop(Shop* shop)
 {
@@ -124,7 +119,80 @@ bool Shop::LoadShop(Shop* shop)
 	}
 	else  // si l'ouverture a échoué
 	{
-		cerr << "DEBUG: No ITEMS SAVE FILE found. A new file is going to be created.\n" << endl;
+		cerr << "No SHOP SAVE FILE found.\n" << endl;
+		return false;
+	}
+}
+
+int Shop::SaveShopUpgrades(Shop* shop)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Saving shop upgrades in profile.\n");
+
+	ofstream data(string(getSavesPath()) + SHOP_UPGRADES_SAVE_FILE, ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		if (shop == NULL)
+		{
+			data << "-1";
+			data << endl;
+		}
+		else
+		{
+			for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
+			{
+				data << shop->m_upgrades[i] << " " << (int)shop->m_sold_out[i];
+				data << endl;
+			}
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "ERROR: No save file found for shop upgrades. A new file is going to be created.\n" << endl;
+	}
+
+	return 0;
+}
+
+bool Shop::LoadShopUpgrades(Shop* shop)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading shop from profile.\n");
+
+	if (shop == NULL)
+		return false;
+
+	std::ifstream data(string(getSavesPath()) + SHOP_UPGRADES_SAVE_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		//load save
+		std::string line;
+		int i = 0;
+		while (std::getline(data, line))
+		{
+			if (i == NB_UPGRADE_CHOICES)
+			{
+				printf("ERROR: loading more Shop upgrades from saved file that authorized (%d). Check the save file.\n", i);
+				break;
+			}
+
+			string upgrade_name;
+			bool sold_out;
+			std::istringstream(line) >> upgrade_name >> (bool)sold_out;
+			shop->m_upgrades[i] = upgrade_name;
+			shop->m_sold_out[i] = sold_out;
+
+			i++;
+		}
+
+		data.close();  // on ferme le fichier
+
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "No SHOP UPGRADES SAVE FILE found.\n" << endl;
 		return false;
 	}
 }

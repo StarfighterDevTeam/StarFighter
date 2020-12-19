@@ -243,7 +243,8 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 		m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
 
 		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
-		m_actions->SetString("Buy/Sell", ActionButton_A);
+		//m_actions->SetString("Buy/Sell", ActionButton_A);
+		m_actions->SetString("Buy upgrades", ActionButton_A);
 		m_actions->SetString("Stellar map", ActionButton_X);
 
 		//size and position

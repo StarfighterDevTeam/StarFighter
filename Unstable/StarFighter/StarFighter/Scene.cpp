@@ -129,15 +129,19 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			(*CurrentGame).addToScene(m_bg->m_shop, false);
 
 			//creating shop content
-			if (Shop::LoadShop(m_bg->m_shop) == false)
+			//if (Shop::LoadShop(m_bg->m_shop) == false)
+			if (Shop::LoadShopUpgrades(m_bg->m_shop) == false)
 			{
-				Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Engine);
-				Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Armor);
-				Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Shield);
-				Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Module);
-				Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)NBVAL_Equipment);
+				//Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Engine);
+				//Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Armor);
+				//Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Shield);
+				//Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Module);
+				//Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)NBVAL_Equipment);
 
-				Shop::SaveShop(m_bg->m_shop);
+				(*CurrentGame).m_playerShip->RandomizeUpgrades(m_bg->m_shop);
+
+				Shop::SaveShopUpgrades(m_bg->m_shop);
+				//Shop::SaveShop(m_bg->m_shop);
 			}
 		}
 		//Loading enemies

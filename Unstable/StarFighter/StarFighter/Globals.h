@@ -16,10 +16,12 @@ const char* getSavesPath();
 	#define ITEMS_SAVE_FILE							"ItemsStats.txt"
 	#define MONEY_SAVE_FILE							"Money.txt"
 #else
-	#define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
+	#define PLAYER_SAVE_FILE							"Saves/KnownScenes.txt"
 	#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
 	#define MONEY_SAVE_FILE							"Saves/Money.txt"
-	#define SHOP_SAVE_FILE								"Saves/Shop.txt"
+	#define SHOP_SAVE_FILE							"Saves/Shop.txt"
+	#define SHOP_UPGRADES_SAVE_FILE					"Saves/ShopUpgrades.txt"
+	#define PLAYER_UPGRADES_SAVE_FILE				"Saves/Upgrades.txt"
 #endif
 
 #define	REF_WINDOW_RESOLUTION_X					1920
@@ -103,13 +105,20 @@ const char* getSavesPath();
 //HUD
 #define ARMOR_BAR_SIZE_X								320
 #define ARMOR_BAR_SIZE_Y								20
-#define SHIELD_BAR_SIZE_Y								20
-#define FUEL_BAR_SIZE_Y									14
-#define XP_BAR_SIZE_X									320
-#define XP_BAR_SIZE_Y									16
+#define SHIELD_BAR_SIZE_Y							20
+#define FUEL_BAR_SIZE_Y								14
+#define XP_BAR_SIZE_X								320
+#define XP_BAR_SIZE_Y								16
 #define COMBO_BAR_SIZE_X								160
 #define COMBO_BAR_SIZE_Y								16
-#define GRID_POSITION_Y									350
+#define GRID_POSITION_Y								350
+
+//COLORS
+#define COLOR_DARKBLUE					sf::Color::Color(6, 87, 94, 255)//dark blue-green
+#define COLOR_YELLOW						sf::Color::Color(255, 209, 53, 255)//yellow
+#define COLOR_DARKGREY					sf::Color(10, 10, 10, 230)//dark grey
+#define COLOR_LIGHTGREY					sf::Color(238, 238, 225, 30)//dark grey
+#define COLOR_BLACKMASK					sf::Color(0, 0, 0, 150)//black mask
 
 //INTERACTION PANEL
 #define INTERACTION_PANEL_OFFSET_Y				20
@@ -175,6 +184,14 @@ const char* getSavesPath();
 #define ITEM_STATS_PANEL_POSITION_X						20
 #define ITEM_STATS_PANEL_POSITION_Y						80
 #define ITEM_STATS_COMPARE_OFFSET_X						10
+
+//UPGRADES PANEL
+#define UPGRADES_PANEL_WIDTH								800
+#define UPGRADES_PANEL_HEIGHT							600
+#define UPGRADES_CONTAINER_WIDTH							256
+#define UPGRADES_CONTAINER_HEIGHT						400
+#define UPGRADES_PICTURE_WIDTH							48
+#define UPGRADES_PICTURE_HEIGHT							48
 
 //STELLAR MAP
 #define STELLARMAP_PANEL_WIDTH							1080
@@ -322,6 +339,8 @@ int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(float value_min, float value_max);
 float MaxBetweenValues(sf::Vector2f values);
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+std::string StringCut(std::string str, const size_t length);
+std::string SFReplaceTexts(std::string str, const size_t length);
 void BoundToValues(float& input, float min, float max);
 
 #endif // GLOBALS_H_INCLUDED

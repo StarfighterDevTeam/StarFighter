@@ -123,6 +123,7 @@
     <ClCompile Include="SFText.cpp" />
     <ClCompile Include="SFTextPop.cpp" />
     <ClCompile Include="SFTradePanel.cpp" />
+    <ClCompile Include="SFUpgradesPanel.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Shop.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="SFText.h" />
     <ClInclude Include="SFTextPop.h" />
     <ClInclude Include="SFTradePanel.h" />
+    <ClInclude Include="SFUpgradesPanel.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />

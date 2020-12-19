@@ -102,6 +102,8 @@ public:
 	virtual GridElement* GetHighlightedElement();
 	virtual void SetHighlightedElement(GridElement* element);
 	virtual void SetCursorVisible_v2(bool visible);
+
+	virtual bool BuyUpgrade();
 };
 
 #endif // SFPANEL_H_INCLUDED

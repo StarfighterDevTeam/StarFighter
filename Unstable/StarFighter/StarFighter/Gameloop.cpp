@@ -7,6 +7,15 @@ void Gameloop::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 
+	//Loading all scenes
+	LoadAllScenes(SCENES_FILE);
+	//Loading all FX
+	LoadAllFX(FX_FILE);
+	//Loading all enemies
+	LoadAllEnemies(ENEMY_FILE);
+	//Loading all upgrades
+	LoadAllUpgrades(UPGRADES_FILE);
+
 	//creating new ship
 	m_playerShip = FileLoader::LoadShipConfig("default");
 	(*CurrentGame).SetPlayerShip(m_playerShip);
@@ -17,6 +26,11 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).addToPanels(m_playerShip->m_SFHudPanel);
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
+	//Initialisation of player ship
+	m_playerShip->Init();
+	m_playerShip->ResplenishHealth();
+	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
+
 	//Load saved items
 	if (!Ship::LoadPlayerItems(m_playerShip))
 	{
@@ -24,7 +38,7 @@ void Gameloop::Initialize(Player player)
 		Ship::SaveItems(m_playerShip);
 	}
 
-	//load money
+	//Load money
 	if (!Ship::LoadPlayerMoney(m_playerShip))
 	{
 		//or create a new save file
@@ -32,9 +46,12 @@ void Gameloop::Initialize(Player player)
 		Ship::SavePlayerMoney(m_playerShip);
 	}
 
-	m_playerShip->Init();
-	m_playerShip->ResplenishHealth();
-	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
+	//Load upgrades
+	if (!Ship::LoadPlayerUpgrades(m_playerShip))
+	{
+		//or create a new save file
+		Ship::SavePlayerUpgrades(m_playerShip);
+	}
 
 	//Load knownScenes, hazard levels and current scene from save file
 	string playerSave = LoadPlayerSave();
@@ -49,29 +66,11 @@ void Gameloop::Initialize(Player player)
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer();
 		//UpdateShipConfig(m_playerShip, "intro");//not to use anymore, or do resync HUD equipements
-		Ship::SaveItems(m_playerShip);
+		//Ship::SaveItems(m_playerShip);
 	}
 
 	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
 	m_currentScene = NULL;
-
-	//Loading all scenes
-	LoadAllScenes(SCENES_FILE);
-
-	//Loading all FX
-	LoadAllFX(FX_FILE);
-
-	//Loading all enemies
-	LoadAllEnemies(ENEMY_FILE);
-
-	//Loading all upgrades
-	LoadAllUpgrades(UPGRADES_FILE);
-
-	(*CurrentGame).m_playerShip->RandomizeUpgrades();
-	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_hp_1");
-	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_shield_1");
-	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_hp_2");
-	(*CurrentGame).m_playerShip->SetUpgrade("Upgrade_minirocket_5");
 
 	//Creating current scene
 	m_nextScene = NULL;
@@ -775,6 +774,11 @@ void Gameloop::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		case SFPanel_Map:
 		{
 			playerShip->m_SFTargetPanel = new SFMapPanel(sf::Vector2f(STELLARMAP_PANEL_WIDTH, STELLARMAP_PANEL_HEIGHT), playerShip);
+			break;
+		}
+		case SFPanel_Upgrades:
+		{
+			playerShip->m_SFTargetPanel = new SFUpgradesPanel(sf::Vector2f(UPGRADES_PANEL_WIDTH, UPGRADES_PANEL_HEIGHT), playerShip);
 			break;
 		}
 	}

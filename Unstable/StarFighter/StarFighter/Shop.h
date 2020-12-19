@@ -10,12 +10,17 @@ public:
 	~Shop();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	int m_level;
-	vector<GameObject*> m_items;
 
 	static int SaveShop(Shop* ship);
 	static bool LoadShop(Shop* shop);
 
+	static int SaveShopUpgrades(Shop* ship);
+	static bool LoadShopUpgrades(Shop* shop);
+
 	Grid* m_grid_v2;
+
+	string m_upgrades[NB_UPGRADE_CHOICES];
+	bool m_sold_out[NB_UPGRADE_CHOICES];
 };
 
 #endif // SHOP_H_INCLUDED

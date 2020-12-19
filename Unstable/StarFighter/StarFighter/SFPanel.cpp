@@ -140,23 +140,19 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	m_playerShip = NULL;
 	m_actions = NULL;
 
-	sf::Color _darkblue = sf::Color::Color(6, 87, 94, 255);//dark blue-green
-	sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
-	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
-
 	setSize(size);
 	setOrigin(sf::Vector2f(size.x / 2, size.y / 2));
-	setFillColor(sf::Color(10, 10, 10, 230));//dark grey
+	setFillColor(COLOR_DARKGREY);
 	setOutlineThickness(2);
-	setOutlineColor(_darkblue);//dark blue-green
+	setOutlineColor(COLOR_DARKBLUE);
 
 	//title text
 	m_title_text.setCharacterSize(20);
-	m_title_text.setColor(_yellow);
+	m_title_text.setColor(COLOR_YELLOW);
 
 	//body text
 	m_text.setCharacterSize(18);
-	m_text.setColor(_white);
+	m_text.setColor(sf::Color::White);
 }
 
 SFPanel::~SFPanel()
@@ -185,11 +181,6 @@ void SFPanel::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible == true)
 	{
-		//if (!m_title_text.getString().isEmpty())
-		//	m_title_text.draw(screen);
-		//sf::Text m_text;
-		//sf::Text m_actions_text;
-
 		screen.draw(*this);
 	}
 	//see override function in SFMenuPanel and other types of SF panels
@@ -302,4 +293,10 @@ void SFPanel::SetHighlightedElement(GridElement* element)
 void SFPanel::SetCursorVisible_v2(bool visible)
 {
 	//see override function in SFInventoryPanel
+}
+
+bool SFPanel::BuyUpgrade()
+{
+	//see override function in SFUpgradesPanel
+	return false;
 }

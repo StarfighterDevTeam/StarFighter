@@ -62,6 +62,10 @@ enum PlayerActions
 	Action_DebugCommand,
 	Action_Muting,
 	Action_Pausing,
+	Action_Left,
+	Action_Right,
+	Action_Up,
+	Action_Down,
 	NBVAL_PlayerActions,
 };
 
@@ -76,6 +80,7 @@ enum HUDStates
 	HUD_ShopStellarMap,
 	HUD_Dialog,
 	HUD_Trade,
+	HUD_Upgrades,
 };
 
 enum ShopOptions
@@ -136,7 +141,7 @@ public :
 	int m_currentScene_hazard;
 	map<string, int> m_knownScenes;
 
-	void RandomizeUpgrades();
+	void RandomizeUpgrades(Shop* target_shop);
 	void SetUpgrade(string upgrade_name);
 	vector<string> m_upgrades;
 	vector<string> m_upgrades_short;
@@ -250,6 +255,8 @@ public :
 	static bool LoadPlayerMoney(Ship* ship);
 	static int SaveItems(Ship* ship);
 	static bool LoadPlayerItems(Ship* ship);
+	static int SavePlayerUpgrades(Ship* ship);
+	static bool LoadPlayerUpgrades(Ship* ship);
 
 	int m_hyperspeed_fuel_max;
 	float m_hyperspeed_fuel;

@@ -341,6 +341,10 @@ void Ship::UpdateInputStates()
 	GetInputState(InputGuy::isChangingResolution(), Action_ChangingResolution);
 	GetInputState(InputGuy::setAutomaticFire(), Action_AutomaticFire);
 	GetInputState(InputGuy::isUsingDebugCommand(), Action_DebugCommand);
+	GetInputState(InputGuy::getDirections().x < - 1.f * JOYSTICK_MIN_AXIS_VALUE / 100, Action_Left);
+	GetInputState(InputGuy::getDirections().x > 1.f * JOYSTICK_MIN_AXIS_VALUE / 100, Action_Right);
+	GetInputState(InputGuy::getDirections().y < - 1.f * JOYSTICK_MIN_AXIS_VALUE / 100, Action_Up);
+	GetInputState(InputGuy::getDirections().y > 1.f * JOYSTICK_MIN_AXIS_VALUE / 100, Action_Down);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
@@ -649,7 +653,7 @@ void Ship::UpdateHUDStates()
 			m_HUD_state = HUD_PortalInteraction;
 		else if (m_targetShop != NULL)
 		{
-			if (m_HUD_state != HUD_ShopStellarMap && m_HUD_state != HUD_Trade)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
+			if (m_HUD_state != HUD_ShopStellarMap && m_HUD_state != HUD_Trade && m_HUD_state != HUD_Upgrades)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
 				m_HUD_state = HUD_ShopMainMenu;
 		}
 		else
@@ -816,6 +820,22 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_SFTargetPanel->SetCursorVisible_v2(true);
 			}
 		}
+		//UPGRADES PANEL
+		else if (m_HUD_state == HUD_Upgrades && m_SFTargetPanel)
+		{	
+			//A: buy upgrade
+			if (m_inputs_states[Action_Firing] == Input_Tap)
+			{
+				m_SFTargetPanel->BuyUpgrade();
+			}
+			
+			//exit
+			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
+			{
+				m_HUD_state = HUD_ShopMainMenu;
+				m_SFTargetPanel->SetCursorVisible_v2(false);
+			}
+		}
 		else//Idle combat, shop menu, portal menu (where ship can continue to move)
 		{
 			//Opening hud
@@ -962,7 +982,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//A: Enter shop
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					m_HUD_state = HUD_Trade;
+					//m_HUD_state = HUD_Trade;
+					m_HUD_state = HUD_Upgrades;
 				}
 				//X: Enter stellar map
 				else if (m_inputs_states[Action_Braking] == Input_Tap)
@@ -1774,6 +1795,10 @@ void Ship::GetShop(GameObject* object)
 		{
 			m_is_asking_SFPanel = SFPanel_Map;
 		}
+		else if (m_HUD_state == HUD_Upgrades)
+		{
+			m_is_asking_SFPanel = SFPanel_Upgrades;
+		}
 		else
 		{
 			m_is_asking_SFPanel = SFPanel_Shop;
@@ -2094,7 +2119,6 @@ bool Ship::LoadPlayerMoney(Ship* ship)
 	}
 }
 
-
 int Ship::SaveItems(Ship* ship)
 {
 	return 0;
@@ -2254,6 +2278,62 @@ bool Ship::LoadPlayerItems(Ship* ship)
 		data.close();  // on ferme le fichier
 
 		return i == NBVAL_Equipment + 1 + STASH_GRID_NB_LINES*STASH_GRID_NB_ROWS;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No ITEMS SAVE FILE found. A new file is going to be created.\n" << endl;
+		return false;
+	}
+}
+
+int Ship::SavePlayerUpgrades(Ship* ship)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Saving upgrades in profile.\n");
+	assert(ship != NULL);
+
+	ofstream data(string(getSavesPath()) + PLAYER_UPGRADES_SAVE_FILE, ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		for (vector<string>::iterator it = ship->m_upgrades.begin(); it != ship->m_upgrades.end(); it++)
+		{
+			data << *it;
+			data << endl;
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No save file found for player upgrades. A new file is going to be created.\n" << endl;
+	}
+
+	return 0;
+}
+
+bool Ship::LoadPlayerUpgrades(Ship* ship)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading upgrades from profile.\n");
+	assert(ship != NULL);
+
+	std::ifstream  data(string(getSavesPath()) + PLAYER_UPGRADES_SAVE_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		ship->m_upgrades.clear();
+
+		//load save
+		std::string line;
+		while (std::getline(data, line))
+		{
+			string upgrade_name;
+			std::istringstream(line) >> upgrade_name;
+
+			ship->SetUpgrade(upgrade_name);
+		}
+		
+		data.close();  // on ferme le fichier
+
+		return true;
 	}
 	else  // si l'ouverture a échoué
 	{
@@ -2820,7 +2900,7 @@ void Ship::SetWeapon(string weapon_name)
 	m_weapon = Enemy::LoadWeapon(weapon_name, -1);
 }
 
-void Ship::RandomizeUpgrades()
+void Ship::RandomizeUpgrades(Shop* target_shop)
 {
 	//short list
 	//select eligible upgrades:
@@ -2901,7 +2981,9 @@ void Ship::RandomizeUpgrades()
 	//randomize among the short list
 	random_shuffle(random_upgrades.begin(), random_upgrades.end());
 
-	string name[NB_UPGRADE_CHOICES];
 	for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
-		name[i] = random_upgrades[i];
+	{
+		target_shop->m_upgrades[i] = random_upgrades[i];
+		target_shop->m_sold_out[i] = false;
+	}
 }

@@ -1,5 +1,7 @@
-Vanguard_Hub0 0 !
+Vanguard_Hub0 0
+Vanguard_Hub1 0 !
 Vanguard_HubIntro 0
-Vanguard_V1 0
-Vanguard_V2 0
+Vanguard_V1 1
+Vanguard_V2 1
+Vanguard_V3 0
 Vanguard_VIntro 0
