@@ -1,4 +1,0 @@
-Money 130
-Health 2
-Shield 0
-Graze 0

@@ -362,10 +362,10 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	{
 		ostringstream ss_bg;
 		ss_bg << m_playerShip->m_currentScene_name;
-		if ((*CurrentGame).m_direction != NO_DIRECTION)
-			ss_bg << " (" << m_playerShip->m_currentScene_hazard + 1 << ")";
+		//if ((*CurrentGame).m_direction != NO_DIRECTION)
+		//	ss_bg << " (" << m_playerShip->m_currentScene_hazard + 1 << ")";
 
-		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " "));
+		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " ") + " (lvl " + to_string(m_playerShip->m_level) + ")");
 	}
 
 	//framerate

@@ -405,6 +405,12 @@ void Ship::ManageGrazingFeedback()
 
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	float l_hyperspeedMuliplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+	ManageImmunity(deltaTime * l_hyperspeedMuliplier);
+
+	if (m_visible == false)
+		return;
+
 	//clean the dust
 	CleanGarbagedEquipments();
 
@@ -434,8 +440,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 	}
 
-	float l_hyperspeedMuliplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
-
 	//Update
 	//ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
@@ -458,7 +462,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	ScreenBorderConstraints();
 	SettingTurnAnimations();
 
-	ManageImmunity(deltaTime * l_hyperspeedMuliplier);
 	ManageGhost(deltaTime * l_hyperspeedMuliplier);
 	ManageJumpFeedbacks();
 
@@ -1619,24 +1622,42 @@ void Ship::setGhost(bool ghost)
 
 void Ship::Respawn()
 {
-	Init();
-	//GenerateBots(this);
-	ResplenishHealth();
+	//Init();
+	////GenerateBots(this);
+	////ResplenishHealth();
 	SetVisibility(true);
-	SetBotsVisibility((*CurrentGame).m_direction != NO_DIRECTION);
 	
 	m_collision_timer = 0;
 	m_graze_count = 0;
 	m_disable_inputs = false;
+
+	m_upgrades.clear();
+	m_upgrades_short.clear();
+	m_armor_max = 2;
+	m_armor = m_armor_max;
+	m_shield_max = 0;
+	m_shield = 0;
+	delete m_weapon;
+	m_weapon = Enemy::LoadWeapon("laser", -1);
+	for (Bot* bot : m_bot_list)
+		delete bot;
+	m_bot_list.clear();
+
+	m_level = 1;
+	m_money = 0;
+	m_knownScenes.clear();
+
+	Ship::SavePlayerMoneyAndHealth(this);
+	Ship::SavePlayerUpgrades(this);
+	Ship::SavePlayerScenes(this);
+	Shop::SaveShopUpgrades(NULL);
 }
 
 void Ship::SetVisibility(bool visible)
 {
 	m_visible = visible;
-	if (m_fake_ship)
-	{
+	if (m_fake_ship != NULL)
 		m_fake_ship->m_visible = visible;
-	}
 
 	SetBotsVisibility(visible);
 }
@@ -2150,6 +2171,7 @@ int Ship::SavePlayerMoneyAndHealth(Ship* ship)
 		data << "Health " << ship->m_armor << endl;
 		data << "Shield " << ship->m_shield << endl;
 		data << "Graze " << ship->m_graze_count << endl;
+		data << "Level " << ship->m_level << endl;
 
 		data.close();  // on ferme le fichier
 	}
@@ -2186,6 +2208,8 @@ bool Ship::LoadPlayerMoneyAndHealth(Ship* ship)
 				ship->m_shield = stoi(value);
 			else if (i == 3)
 				ship->m_graze_count = stoi(value);
+			else if (i == 4)
+				ship->m_level = stoi(value);
 		
 			i++;
 		}

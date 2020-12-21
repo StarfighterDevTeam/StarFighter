@@ -645,10 +645,10 @@ void Gameloop::RespawnInLastSafePoint()
 	//(*CurrentGame).garbageLayer(LootLayer);
 
 	//loading last visited hub
-	if ((*CurrentGame).m_playerShip->m_respawnSceneName.empty())
-		(*CurrentGame).m_playerShip->m_respawnSceneName = STARTING_SCENE;
+	//if ((*CurrentGame).m_playerShip->m_respawnSceneName.empty())
+	//	(*CurrentGame).m_playerShip->m_respawnSceneName = STARTING_SCENE;
 	
-	SpawnInScene((*CurrentGame).m_playerShip->m_respawnSceneName);
+	SpawnInScene(STARTING_SCENE);// (*CurrentGame).m_playerShip->m_respawnSceneName);
 
 	//resetting ship
 	(*CurrentGame).m_playerShip->Respawn();
@@ -853,10 +853,25 @@ void Gameloop::PlayerTakesExit()
 
 	(*CurrentGame).PlaySFX(SFX_EnteringPortal);
 
+	
+
 	bool reverse = false;
 	if ((*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 		reverse = true;
 
+	//level up if next scene is a Hub
+	size_t sceneVectorSize = (*CurrentGame).m_sceneConfigs[(*CurrentGame).m_playerShip->m_targetPortal->m_destination_name].size();
+	for (size_t i = 0; i < sceneVectorSize; i++)
+	{
+		if ((*CurrentGame).m_sceneConfigs[(*CurrentGame).m_playerShip->m_targetPortal->m_destination_name][i][0].compare("bg") == 0)
+			if ((*CurrentGame).m_sceneConfigs[(*CurrentGame).m_playerShip->m_targetPortal->m_destination_name][i][BACKGROUND_VERTICAL].compare("0") == 0)
+			{
+				m_playerShip->m_level++;
+				break;
+			}
+	}
+
+	//load next scene
 	string nextScene_filename = (*CurrentGame).m_playerShip->m_targetPortal->m_destination_name;
 	m_nextScene = new Scene(nextScene_filename, m_currentScene->getSceneHazardLevelValue(), reverse, false);
 

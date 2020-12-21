@@ -29,7 +29,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	m_links[DIRECTION_LEFT] = (*CurrentGame).m_direction != DIRECTION_RIGHT ? (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_LEFT] : "0";
 
 	m_canHazardBreak = ((*CurrentGame).m_generalScenesConfig[name][SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
-	m_level = stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_LEVEL]);// +hazard_level;
+	m_level = (*CurrentGame).m_playerShip->m_level;//stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_LEVEL]);// +hazard_level;
 
 	std::string scene_name = (*CurrentGame).m_generalScenesConfig[name][SCENE_DISPLAYNAME];
 
