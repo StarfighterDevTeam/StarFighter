@@ -3,9 +3,9 @@
 extern Game* CurrentGame;
 
 //UPGRADES PANEL
-SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Upgrades)
+SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPanel_Upgrades)
 {
-	m_playerShip = playerShip;
+	m_playership = playership;
 	m_selected_index = 0;
 
 	m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
@@ -35,7 +35,7 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(
 	float container_pos_y = text_height;
 	for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
 	{
-		m_sold_out[i] = m_playerShip->m_targetShop->m_sold_out[i];
+		m_sold_out[i] = m_playership->m_targetShop->m_sold_out[i];
 
 		//container
 		m_upgrade_container[i].setSize(sf::Vector2f(UPGRADES_CONTAINER_WIDTH, UPGRADES_CONTAINER_HEIGHT));
@@ -54,7 +54,7 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(
 		m_upgrades[i].setCharacterSize(20);
 		m_upgrades[i].setColor(COLOR_YELLOW);
 		m_upgrades[i].setPosition(sf::Vector2f(pos_x, text_height));
-		m_upgrades[i].setString(SFReplaceTexts((*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[i]][UPGRADE_DISPLAY_NAME], 0));
+		m_upgrades[i].setString(SFReplaceTexts((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[i]][UPGRADE_DISPLAY_NAME], 0));
 
 		//picture
 		text_height += m_upgrades[i].getGlobalBounds().height;
@@ -67,7 +67,7 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(
 		m_upgrade_picture_container[i].setOutlineColor(COLOR_DARKBLUE);
 		m_upgrade_picture_container[i].setPosition(sf::Vector2f(pos_x + UPGRADES_PICTURE_WIDTH * 0.5, text_height));
 
-		m_upgrade_picture[i] = new GameObject(m_upgrade_picture_container[i].getPosition(), sf::Vector2f(0, 0), (*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[i]][UPGRADE_IMAGE], sf::Vector2f(UPGRADES_PICTURE_WIDTH, UPGRADES_PICTURE_HEIGHT));
+		m_upgrade_picture[i] = new GameObject(m_upgrade_picture_container[i].getPosition(), sf::Vector2f(0, 0), (*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[i]][UPGRADE_IMAGE], sf::Vector2f(UPGRADES_PICTURE_WIDTH, UPGRADES_PICTURE_HEIGHT));
 
 		//price
 		text_height += UPGRADES_PICTURE_HEIGHT * 0.5;
@@ -76,7 +76,7 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(
 		m_upgrade_price[i].setCharacterSize(14);
 		m_upgrade_price[i].setColor(sf::Color::White);
 		m_upgrade_price[i].setPosition(sf::Vector2f(pos_x, text_height));
-		m_upgrade_price[i].setString("$ " + (*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[i]][UPGRADE_PRICE]);
+		m_upgrade_price[i].setString("$ " + (*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[i]][UPGRADE_PRICE]);
 
 		//description
 		text_height += m_upgrade_price[i].getGlobalBounds().height;
@@ -85,7 +85,7 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(
 		m_upgrade_description[i].setCharacterSize(16);
 		m_upgrade_description[i].setColor(sf::Color::White);
 		m_upgrade_description[i].setPosition(sf::Vector2f(pos_x, text_height));
-		m_upgrade_description[i].setString(SFReplaceTexts((*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[i]][UPGRADE_DESCRIPTION], 32));
+		m_upgrade_description[i].setString(SFReplaceTexts((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[i]][UPGRADE_DESCRIPTION], 32));
 
 		//unavailable feedback mask
 		m_unavailable_mask[i].setSize(m_upgrade_container[i].getSize());
@@ -113,23 +113,23 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(
 	m_money_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 	m_money_text.setCharacterSize(16);
 	m_money_text.setColor(sf::Color::White);
-	m_money_text.setString("$ " + to_string(m_playerShip->m_money));
+	m_money_text.setString("$ " + to_string(m_playership->m_money));
 	m_money_text.setPosition(sf::Vector2f(getPosition().x + getSize().x / 2 - INTERACTION_PANEL_MARGIN_SIDES - 150, getPosition().y - getSize().y / 2 + text_height));
 }
 
 void SFUpgradesPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//select upgrade
-	if (m_playerShip->m_inputs_states[Action_Left] == Input_Tap)
+	if (m_playership->m_inputs_states[Action_Left] == Input_Tap)
 		m_selected_index = m_selected_index == 0 ? 0 : m_selected_index - 1;
 
-	if (m_playerShip->m_inputs_states[Action_Right] == Input_Tap)
+	if (m_playership->m_inputs_states[Action_Right] == Input_Tap)
 		m_selected_index = m_selected_index == NB_UPGRADE_CHOICES - 1 ? NB_UPGRADE_CHOICES - 1 : m_selected_index + 1;
 
 	for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
 	{
 		//sold out?
-		m_sold_out[i] = m_playerShip->m_targetShop->m_sold_out[i];
+		m_sold_out[i] = m_playership->m_targetShop->m_sold_out[i];
 
 		//selection feedback
 		if (m_selected_index == i)
@@ -138,19 +138,19 @@ void SFUpgradesPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 			m_upgrade_container[i].setFillColor(COLOR_DARKGREY);
 
 		//sold out or insufficient money?
-		m_unavailable_mask[i].m_visible = i != m_selected_index && (m_sold_out[i] == true || m_playerShip->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]));
+		m_unavailable_mask[i].m_visible = i != m_selected_index && (m_sold_out[i] == true || m_playership->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]));
 		m_sold_out_text[i].m_visible = m_sold_out[i];
 
 		if (m_sold_out[i] == true)
 			m_upgrade_price[i].setColor(sf::Color(128, 128, 128, 255));
-		else if (m_playerShip->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[i]][UPGRADE_PRICE]))
+		else if (m_playership->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[i]][UPGRADE_PRICE]))
 			m_upgrade_price[i].setColor(sf::Color::Red);
 		else
 			m_upgrade_price[i].setColor(sf::Color::White);
 	}
 
 	//money
-	m_money_text.setString("$ " + to_string(m_playerShip->m_money));
+	m_money_text.setString("$ " + to_string(m_playership->m_money));
 }
 
 void SFUpgradesPanel::Draw(sf::RenderTexture& screen)
@@ -186,21 +186,21 @@ void SFUpgradesPanel::Draw(sf::RenderTexture& screen)
 
 bool SFUpgradesPanel::BuyUpgrade()
 {
-	if (m_playerShip->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]))
+	if (m_playership->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]))
 		return false;
 
 	if (m_sold_out[m_selected_index] == true)
 		return false;
 
-	m_playerShip->SetUpgrade(m_playerShip->m_targetShop->m_upgrades[m_selected_index]);
-	m_playerShip->m_money -= stoi((*CurrentGame).m_upgradesConfig[m_playerShip->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]);
-	m_playerShip->m_targetShop->m_sold_out[m_selected_index] = true;
+	m_playership->SetUpgrade(m_playership->m_targetShop->m_upgrades[m_selected_index]);
+	m_playership->m_money -= stoi((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]);
+	m_playership->m_targetShop->m_sold_out[m_selected_index] = true;
 
 	(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
-	Ship::SavePlayerMoneyAndHealth(m_playerShip);
-	Ship::SavePlayerUpgrades(m_playerShip);
-	Shop::SaveShopUpgrades(m_playerShip->m_targetShop);
+	Ship::SavePlayerMoneyAndHealth(m_playership);
+	Ship::SavePlayerUpgrades(m_playership);
+	Shop::SaveShopUpgrades(m_playership->m_targetShop);
 
 	return true;
 }

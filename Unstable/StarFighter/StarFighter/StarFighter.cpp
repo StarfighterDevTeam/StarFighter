@@ -45,7 +45,6 @@ int main()
 	LOGGER_WRITE(Logger::DEBUG, "Initializing player");
 	Player player;
 	player.Init(&renderWindow);
-	player.m_currentSceneFile = "Vanguard_Hub0";
 
 	//Loading InGame state
 	LOGGER_WRITE(Logger::DEBUG, "Starting game");
@@ -122,21 +121,21 @@ int main()
 				}
 			}
 
-			if ((*CurrentGame).m_playerShip != NULL)
+			if ((*CurrentGame).m_playership != NULL)
 			{
 				//Muting
-				(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
-				if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
+				(*CurrentGame).m_playership->GetInputState(InputGuy::isMuting(), Action_Muting);
+				if ((*CurrentGame).m_playership->UpdateAction(Action_Muting, Input_Tap, true))
 				{
-					(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-					(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
+					(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playership->m_actions_states[Action_Muting]);
+					(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playership->m_actions_states[Action_Muting]);
 				}
 
 				//Pausing
-				(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
-				if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
+				(*CurrentGame).m_playership->GetInputState(InputGuy::isPausing(), Action_Pausing);
+				if ((*CurrentGame).m_playership->UpdateAction(Action_Pausing, Input_Tap, true))
 				{
-					(*CurrentGame).m_Pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
+					(*CurrentGame).m_Pause = (*CurrentGame).m_playership->m_actions_states[Action_Pausing];
 
 					if ((*CurrentGame).m_Pause)
 					{

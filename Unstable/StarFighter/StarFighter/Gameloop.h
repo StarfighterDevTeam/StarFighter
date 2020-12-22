@@ -8,7 +8,9 @@ extern Game* CurrentGame;
 class Gameloop : public GameState
 {
 public:
-	Ship* m_playerShip;
+	Gameloop();
+	
+	Ship* m_playership;
 	Scene* m_currentScene;
 	Scene* m_nextScene;
 	InGameStateMachine m_IG_State;
@@ -17,9 +19,9 @@ public:
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
-	bool AddToKnownScenes(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
-	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).m_playerShip);
-	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
+	bool AddToKnownScenes(string scene_name, Ship* playership = (*CurrentGame).m_playership);
+	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playership = (*CurrentGame).m_playership);
+	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playership = (*CurrentGame).m_playership);
 	void LoadAllScenes(string scenes_file);
 	void LoadAllEnemies(string enemies_file);
 	void LoadAllFX(string FX_file);
@@ -27,7 +29,7 @@ public:
 	void UpdateShipConfig(Ship* ship, string config_name);
 
 	void InGameStateMachineCheck(sf::Time deltaTime);
-	void SpawnInScene(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
+	void SpawnInScene(string scene_name, Ship* playership, bool display_scene_name);
 
 	void PlayerTakesExit();
 
@@ -35,12 +37,11 @@ public:
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;
 
-	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip = (*CurrentGame).m_playerShip);
-	void RespawnInLastSafePoint();
+	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playership = (*CurrentGame).m_playership);
 	void CheckScriptedDialogs();
 
-	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
-	static void DestroySFPanel(Ship* playerShip);
+	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playership);
+	static void DestroySFPanel(Ship* playership);
 
 private:
 	sf::RenderWindow* mainWindow;

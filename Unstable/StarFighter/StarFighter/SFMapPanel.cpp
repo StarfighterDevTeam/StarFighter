@@ -10,7 +10,7 @@ StellarHub::StellarHub()
 	setFillColor(sf::Color::Red);
 
 	m_distance_to_current_position = 0;
-	m_level = 1;
+	//m_level = 1;
 	m_coordinates = sf::Vector2f(0, 0);
 	m_feedback_state = StellarComponent_NormalState;
 }
@@ -155,9 +155,9 @@ void StellarBranch::DrawSegments(sf::RenderTexture& screen)
 }
 
 //STELLAR INFO PANEL
-SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_MapInfo)
+SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size, Ship* playership) : SFPanel(size, SFPanel_MapInfo)
 {
-	m_playerShip = playerShip;
+	m_playership = playership;
 
 	setSize(size);
 	setOrigin(size.x / 2, size.y / 2);
@@ -172,7 +172,7 @@ SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size,
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 }
 
-SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playerShip) : SFStellarInfoPanel(hub->getPosition(), size, playerShip)
+SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playership) : SFStellarInfoPanel(hub->getPosition(), size, playership)
 {
 	if (hub)
 	{
@@ -188,13 +188,13 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, 
 			m_actions = new SFActionBox ((*CurrentGame).m_font[Font_Arial]);
 
 			ss << "Teleportation: $" << teleportation_cost;
-			if (playerShip->m_money < teleportation_cost)
+			if (playership->m_money < teleportation_cost)
 			{
 				ss << " (insufficient credits)";
 			}
 
 			m_actions->SetString(ss.str(), ActionButton_A);
-			if (playerShip->m_money < teleportation_cost)
+			if (playership->m_money < teleportation_cost)
 			{
 				m_actions->m_texts[ActionButton_A].setColor(sf::Color(255, 50, 50, 255));//red
 			}
@@ -221,7 +221,7 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, 
 	}
 }
 
-SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playerShip) : SFStellarInfoPanel(segment->getPosition(), size, playerShip)
+SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playership) : SFStellarInfoPanel(segment->getPosition(), size, playership)
 {
 	if (segment)
 	{
@@ -277,9 +277,9 @@ sf::Vector2f SFStellarInfoPanel::GetFakeCoordinates(sf::Vector2f rendered_coordi
 }
 
 //MAP PANEL
-SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Map)
+SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPanel_Map)
 {
-	m_playerShip = playerShip;
+	m_playership = playership;
 	m_info_panel = NULL;
 	m_teleportation_cost = 0;
 
@@ -295,10 +295,10 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	m_cursor.setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 
 	//ship miniature
-	sf::Vector2f ship_size = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_size : playerShip->m_size;
-	string ship_texture = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_textureName : playerShip->m_textureName;
-	int frameNumber = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_frameNumber : playerShip->m_frameNumber;
-	int animationNumber = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_animationNumber : playerShip->m_animationNumber;
+	sf::Vector2f ship_size = playership->m_fake_ship ? playership->m_fake_ship->m_size : playership->m_size;
+	string ship_texture = playership->m_fake_ship ? playership->m_fake_ship->m_textureName : playership->m_textureName;
+	int frameNumber = playership->m_fake_ship ? playership->m_fake_ship->m_frameNumber : playership->m_frameNumber;
+	int animationNumber = playership->m_fake_ship ? playership->m_fake_ship->m_animationNumber : playership->m_animationNumber;
 
 	m_ship = GameObject(this->getPosition(), sf::Vector2f(0, 0), ship_texture, ship_size, sf::Vector2f(ship_size.x / 2, ship_size.y / 2), animationNumber, frameNumber);
 	m_ship.setPosition(sf::Vector2f(this->getPosition()));
@@ -320,7 +320,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 
 	text_height += m_title_text.getGlobalBounds().height / 2 + INTERACTION_INTERBLOCK;
 	ostringstream ss_text;
-	ss_text << "Current location: " << playerShip->m_currentScene_name;
+	ss_text << "Current location: " << playership->m_currentScene_name;
 	m_text.setString(ss_text.str());
 	m_text.setPosition(sf::Vector2f(getPosition().x - m_text.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height));
 
@@ -341,7 +341,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	//StellarBranch* mother_branch = new StellarBranch();
 	//m_current_hub = new StellarHub();
 	//mother_branch->m_hub = m_current_hub;
-	//mother_branch->m_hub->m_display_name = m_playerShip->m_currentScene_name;
+	//mother_branch->m_hub->m_display_name = m_playership->m_currentScene_name;
 	//mother_branch->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 	//m_branches.push_back(mother_branch);
 
@@ -350,7 +350,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 
 	//Retrive current hub
 	for (StellarBranch* branch : m_branches)
-		if (branch->m_hub != NULL && branch->m_hub->m_display_name.compare(m_playerShip->m_currentScene_name) == 0)
+		if (branch->m_hub != NULL && branch->m_hub->m_display_name.compare(m_playership->m_currentScene_name) == 0)
 		{
 			m_current_hub = branch->m_hub;
 			break;
@@ -414,7 +414,7 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 								}
 								m_teleportation_cost = ComputeTeleportationCost(m_branches[i]->m_hub);
 								m_targeted_location = m_branches[i]->m_hub->m_display_name;
-								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, m_teleportation_cost, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
+								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, m_teleportation_cost, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playership);
 							}
 						}
 					}
@@ -447,7 +447,7 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 								}
 								m_teleportation_cost = -1;
 								m_targeted_location = "";
-								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
+								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playership);
 							}
 
 							break;
@@ -738,9 +738,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 	}
 	//forced direction
 	else
-	{
 		links[direction] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_UP + direction];
-	}
 
 	//scan linked scenes
 	for (int direction = 0; direction < NO_DIRECTION; direction++)
@@ -834,64 +832,50 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 
 bool SFMapPanel::ScanScene(string scene_name, Directions direction, sf::Vector2f starting_coordinates)
 {
-	//Loading the particular scene that we want to load
-	size_t sceneVectorSize = (*CurrentGame).m_sceneConfigs[scene_name].size();
-	for (size_t i = 0; i < sceneVectorSize; i++)
+	//hub?
+	if ((bool)stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_IS_HUB]) == true)
 	{
-		if ((*CurrentGame).m_sceneConfigs[scene_name][i][0].compare("bg") == 0)
+		//create new hub
+		StellarHub* new_hub = new StellarHub(scene_name);
+		new_hub->m_coordinates = starting_coordinates;
+		new_hub->m_display_name = scene_name;
+		//new_hub->m_level = stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_LEVEL]);
+		m_branches.back()->m_hub = new_hub;
+
+		//printf("Hub created: %s\n", scene.c_str());
+
+		return true;
+	}
+	//case new segment reached
+	else
+	{
+		//if previous scanned scene was a segment too, create a node
+		if (!m_branches.back()->m_segments.empty())
 		{
-			bool hub = (*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_VERTICAL].compare("H") != 0 && (*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_VERTICAL].compare("V") != 0;
-			bool vertical = (*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_VERTICAL].compare("V") == 0;
+			StellarNode* new_node = new StellarNode();
+			m_branches.back()->m_nodes.push_back(new_node);
+			new_node->m_coordinates = starting_coordinates;
 
-			//case hub reached
-			if (hub)
-			{
-				//create new hub
-				StellarHub* new_hub = new StellarHub(scene_name);
-				new_hub->m_coordinates = starting_coordinates;
-				new_hub->m_display_name = scene_name;
-				new_hub->m_level = stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_LEVEL]);
-				m_branches.back()->m_hub = new_hub;
-
-				//printf("Hub created: %s\n", scene.c_str());
-
-				return true;
-			}
-			//case new segment reached
-			else
-			{
-				//if previous scanned scene was a segment too, create a node
-				if (!m_branches.back()->m_segments.empty())
-				{
-					StellarNode* new_node = new StellarNode();
-					m_branches.back()->m_nodes.push_back(new_node);
-					new_node->m_coordinates = starting_coordinates;
-
-					//printf("Node created\n");
-				}
-
-				//create new segment
-				float segment_size = atof((*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_SIZE_ON_STELLARMAP].c_str());
-				StellarSegment* new_segment = new StellarSegment(vertical, segment_size);
-				new_segment->m_display_name = m_branches.back()->m_segments.empty() ? scene_name : m_branches.back()->m_segments.front()->m_display_name;
-				m_branches.back()->m_segments.push_back(new_segment);
-
-				new_segment->m_size_on_stellar_map = segment_size;
-				new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;
-				new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
-
-				new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene_name);
-				//scenes that have not been explored yet, but that has been scouted (player has seen the portal leading to it), should be displayed as the minimal hazard unlocked (instead of the -1 error code)
-				if (new_segment->m_max_hazard_unlocked < 0)
-				{
-					new_segment->m_max_hazard_unlocked = 0;
-				}
-
-				return false;
-			}
-
-			break;
+			//printf("Node created\n");
 		}
+
+		//create new segment
+		float segment_size = atof((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_SIZE_IN_STELLAR_MAP].c_str());
+		bool vertical = direction == DIRECTION_UP || direction == DIRECTION_DOWN;
+		StellarSegment* new_segment = new StellarSegment(vertical, segment_size);
+		new_segment->m_display_name = m_branches.back()->m_segments.empty() ? scene_name : m_branches.back()->m_segments.front()->m_display_name;
+		m_branches.back()->m_segments.push_back(new_segment);
+
+		new_segment->m_size_on_stellar_map = segment_size;
+		new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;
+		new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
+
+		//new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene_name);
+		////scenes that have not been explored yet, but that has been scouted (player has seen the portal leading to it), should be displayed as the minimal hazard unlocked (instead of the -1 error code)
+		//if (new_segment->m_max_hazard_unlocked < 0)
+		//	new_segment->m_max_hazard_unlocked = 0;
+
+		return false;
 	}
 }
 
@@ -917,22 +901,22 @@ bool SFMapPanel::IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked
 
 bool SFMapPanel::IsSceneKnownByThePlayer(string new_scene)
 {
-	size_t knownScenesVectorSize = m_playerShip->m_knownScenes.size();
+	size_t knownScenesVectorSize = m_playership->m_knownScenes.size();
 
-	map<string, int>::iterator it = m_playerShip->m_knownScenes.find(new_scene);
+	map<string, int>::iterator it = m_playership->m_knownScenes.find(new_scene);
 
 	//if scene not already known
-	return it != m_playerShip->m_knownScenes.end();
+	return it != m_playership->m_knownScenes.end();
 }
 
 int SFMapPanel::GetMaxHazardLevelUnlocked(string new_scene)
 {
-	size_t knownScenesVectorSize = m_playerShip->m_knownScenes.size();
+	size_t knownScenesVectorSize = m_playership->m_knownScenes.size();
 
-	map<string, int>::iterator it = m_playerShip->m_knownScenes.find(new_scene);
+	map<string, int>::iterator it = m_playership->m_knownScenes.find(new_scene);
 
 	//if scene not already known
-	if (it != m_playerShip->m_knownScenes.end())
+	if (it != m_playership->m_knownScenes.end())
 	{
 		return it->second;
 	}

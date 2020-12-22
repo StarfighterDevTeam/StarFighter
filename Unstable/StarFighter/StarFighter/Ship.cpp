@@ -371,7 +371,7 @@ void Ship::ManageGrazingFeedback()
 	if (m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
 	{
 		float radius = GRAZE_DISTANCE;
-		float angle_to_fill = 360.f * m_graze_count / GRAZING_COUNT_TO_REGEN_SHIELD;
+		float angle_to_fill = 360.f * m_graze_count / (GRAZING_COUNT_TO_REGEN_SHIELD * (m_shield + 1));
 		float thickness = 2;
 
 		//position
@@ -406,14 +406,28 @@ void Ship::ManageGrazingFeedback()
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	float l_hyperspeedMuliplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	//Update feedback timers
+	if (m_damage_feedbackTimer > 0)
+	{
+		m_damage_feedbackTimer -= deltaTime.asSeconds();
+		if (m_damage_feedbackTimer <= 0)
+		{
+			setColor(Color(255, 255, 255, 255), true);
+	
+			if (m_ship_model->m_fake_textureName.empty() == false)
+				m_fake_ship->setColor(Color(255, 255, 255, 255), true);
+		}
+	}
+
 	ManageImmunity(deltaTime * l_hyperspeedMuliplier);
 
 	if (m_visible == false)
 		return;
-
+	
 	//clean the dust
 	CleanGarbagedEquipments();
-
+	
 	//Resetting flags
 	if (m_isCollidingWithInteractiveObject != PortalInteraction && m_is_asking_scene_transition == false)
 		m_targetPortal = NULL;
@@ -427,27 +441,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	m_moving = false;
 	m_is_asking_SFPanel = SFPanel_None;
 
-	//Update feedback timers
-	if (m_damage_feedbackTimer > 0)
-	{
-		m_damage_feedbackTimer -= deltaTime.asSeconds();
-		if (m_damage_feedbackTimer <= 0)
-		{
-			setColor(Color(255, 255, 255, 255), true);
-
-			if (m_ship_model->m_fake_textureName.empty() == false)
-				m_fake_ship->setColor(Color(255, 255, 255, 255), true);
-		}
-	}
-
-	//Update
-	//ManageShieldRegen(deltaTime, hyperspeedMultiplier);
-
 	//Graze feedback
 	ManageGrazingFeedback();
-
+	
 	sf::Vector2f directions = InputGuy::getDirections();
-
+	
 	//Update dialogs that have a limited lifespam
 	if (m_targetDialogs.empty() == false && m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Dialog && m_SFTargetPanel->GetDuration() > 0 && m_SFTargetPanel->GetDurationTimer() <= 0)
 		ContinueDialog();
@@ -458,17 +456,16 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	m_trail->m_visible = (hyperspeedMultiplier > 1.0f);
 	
 	GameObject::update(deltaTime, hyperspeedMultiplier);
-
 	ScreenBorderConstraints();
 	SettingTurnAnimations();
-
+	
 	ManageGhost(deltaTime * l_hyperspeedMuliplier);
 	ManageJumpFeedbacks();
-
+	
 	//member objects follow
 	if (m_combo_aura != NULL)
 		m_combo_aura->update(deltaTime, hyperspeedMultiplier);
-
+	
 	if (m_trail != NULL)
 		m_trail->update(deltaTime, hyperspeedMultiplier);
 	
@@ -491,51 +488,15 @@ void Ship::Draw(sf::RenderTexture& screen)
 
 		GameObject::Draw(screen);
 
-		if ((*CurrentGame).m_direction != NO_DIRECTION && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
-		{
-			//sf::Color color = m_graze_radius_feedback.getOutlineColor();
-			//float s = 0.25 + 3*abs(sin(2*m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4 ;
-			//m_graze_radius_feedback.setOutlineColor(sf::Color(color.r, color.g, color.b, color.a * s));
+		if ((*CurrentGame).m_is_in_hub == false && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
 			screen.draw(m_graze_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
-			//m_graze_radius_feedback.setOutlineColor(color);
-		}
 	}
 }
 
 void Ship::ManageJumpFeedbacks()
 {
-	if (m_is_jumping)
-	{
+	if (m_is_jumping == true)
 		PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
-	}
-
-	//if (m_jump_clock.getElapsedTime().asSeconds() < SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
-	//{
-	//	if ((*CurrentGame).m_direction == NO_DIRECTION)
-	//	{
-	//		setColor(sf::Color(255, 255, 255, 255));
-	//		if (m_fake_ship)
-	//		{
-	//			m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
-	//		}
-	//	}
-	//	else
-	//	{
-	//		sf::Uint8 alpha = m_jump_clock.getElapsedTime().asSeconds() / (SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED) * (255 - GHOST_ALPHA_VALUE);
-	//
-	//		setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
-	//		if (m_fake_ship)
-	//		{
-	//			m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
-	//		}
-	//
-	//		//"stroboscopic effect"
-	//		if (m_jump_clock.getElapsedTime().asSeconds() < 0.2)
-	//		{
-	//			PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
-	//		}
-	//	}
-	//}
 }
 
 bool Ship::IsVisible()
@@ -568,7 +529,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 
 bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	bool firing = m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_recall_text->m_visible == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
+	bool firing = m_collision_timer <= 0 && m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_recall_text->m_visible == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
 		&& (*CurrentGame).m_waiting_for_dialog_validation == false && hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
 
 	//Fire function
@@ -577,7 +538,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		//UPDATE WEAPON POSITION
 		float target_angle = getRotation();//calculating the angle we want to face, if any
 		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
-			target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
+			target_angle = fmod(- (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 
 		float current_angle = getRotation();
 		float delta = current_angle - target_angle;
@@ -899,7 +860,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//bomb
-				else if ((*CurrentGame).m_direction != NO_DIRECTION && GetNumberOfBombs() > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / GetNumberOfBombs()) && !m_actions_states[Action_Recalling] && !m_immune)
+				else if ((*CurrentGame).m_is_in_hub == false && GetNumberOfBombs() > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / GetNumberOfBombs()) && !m_actions_states[Action_Recalling] && !m_immune)
 				{
 					m_hyperspeed_fuel -= m_hyperspeed_fuel_max / GetNumberOfBombs();
 					Bomb();
@@ -976,7 +937,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
 					m_is_asking_scene_transition = true;//this triggers transition in InGameState update
-					m_immune = true;
+					//m_immune = true;
 				}
 			}
 			//SHOP MAIN
@@ -1028,14 +989,7 @@ void Ship::ManageGhost(sf::Time deltaTime)
 	if (m_ghost_timer > sf::seconds(0))
 	{
 		m_ghost_timer -= deltaTime;
-		if (m_ghost_timer < sf::seconds(0))
-		{
-			setGhost(false);
-		}
-		else
-		{
-			setGhost(true);
-		}
+		setGhost(m_ghost_timer >= sf::seconds(0));
 	}
 }
 
@@ -1049,10 +1003,10 @@ void Ship::ManageImmunity(sf::Time deltaTime)
 		if (m_collision_timer > 0)
 		{
 			int alpha = (int)(255 * (sin(m_collision_timer * 10) + 1) / 2);
-			setColor(sf::Color(255, 255, 255, alpha));
+			setColor(sf::Color(m_color.r, m_color.g, m_color.b, alpha));
 			if (m_fake_ship != NULL)
-				m_fake_ship->setColor(sf::Color(255, 255, 255, alpha));
-			
+				m_fake_ship->setColor(sf::Color(m_color.r, m_color.g, m_color.b, alpha));
+
 			//death
 			if (m_armor <= 0)
 				m_visible = false;
@@ -1174,7 +1128,7 @@ bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
 
 		Ship::SaveItems(this);
 		Ship::SavePlayerMoneyAndHealth(this);
-		Shop::SaveShop(m_targetShop);
+		//Shop::SaveShop(m_targetShop);
 	}
 
 	return success;
@@ -1211,7 +1165,7 @@ void Ship::SellingItem_v2(GridElement* element)
 
 	Ship::SaveItems(this);
 	Ship::SavePlayerMoneyAndHealth(this);
-	Shop::SaveShop(m_targetShop);
+	//Shop::SaveShop(m_targetShop);
 }
 
 bool Ship::DesquipItem_v2(GridElement* element)
@@ -1412,25 +1366,18 @@ void Ship::Jump()
 void Ship::SettingTurnAnimations()
 {
 	//setting animation
-	const sf::Vector2f f = (sf::Vector2f)GameObject::getDirectionMultiplier((*CurrentGame).m_direction);
-	const float x = GameObject::getSize_for_Direction((*CurrentGame).m_direction, sf::Vector2f(m_speed.x * f.x, m_speed.y * f.y)).x;
+	const float x = m_speed.x;
 
 	if (!m_ship_model->m_fake_textureName.empty())
 	{
 		if (x > 0 && m_currentAnimationIndex != ShipTurningRight && !m_disable_inputs)
-		{
 			m_currentAnimationIndex = ShipTurningRight;
-		}
 
 		else if (x < 0 && m_currentAnimationIndex != ShipTurningLeft && !m_disable_inputs)
-		{
 			m_currentAnimationIndex = ShipTurningLeft;
-		}
 
 		else if ((x == 0 && m_currentAnimationIndex != ShipIdle) || m_disable_inputs)
-		{
 			m_currentAnimationIndex = ShipIdle;
-		}
 	}
 }
 
@@ -1453,10 +1400,10 @@ void Ship::RotateShip(float angle)
 	{
 		(*it)->setRotation(angle);
 	}
-	int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -2 : 1;
+
 	if (m_recall_text)
 	{
-		m_recall_text->m_offset.y = s*(-m_size.y/2);
+		m_recall_text->m_offset.y = -m_size.y * 0.5;
 		//m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
 	}
 }
@@ -1465,7 +1412,7 @@ void Ship::ScreenBorderConstraints()
 {
 	sf::Vector2i offset = sf::Vector2i(0, 0);
 	if (m_is_asking_scene_transition == false)
-		offset = GameObject::getSize_for_Direction((*CurrentGame).m_direction, sf::Vector2i(SCREEN_BORDER_OFFSET_CONSTRAINT_X, SCREEN_BORDER_OFFSET_CONSTRAINT_Y));
+		offset = sf::Vector2i(SCREEN_BORDER_OFFSET_CONSTRAINT_X, SCREEN_BORDER_OFFSET_CONSTRAINT_Y);
 
 	//screen borders contraints	correction
 	if (getPosition().x < m_size.x / 2 + offset.x)
@@ -1518,6 +1465,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	}
 }
 
+/*
 void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type)
 {
 	//Specific equipment type requested?
@@ -1555,6 +1503,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 		}
 	}
 }
+*/
 
 bool Ship::ResplenishHealth()
 {
@@ -1620,11 +1569,10 @@ void Ship::setGhost(bool ghost)
 	}
 }
 
-void Ship::Respawn()
+void Ship::Respawn(bool no_save)
 {
 	//Init();
 	////GenerateBots(this);
-	////ResplenishHealth();
 	SetVisibility(true);
 	
 	m_collision_timer = 0;
@@ -1633,7 +1581,7 @@ void Ship::Respawn()
 
 	m_upgrades.clear();
 	m_upgrades_short.clear();
-	m_armor_max = 2;
+	m_armor_max = 3;
 	m_armor = m_armor_max;
 	m_shield_max = 0;
 	m_shield = 0;
@@ -1647,10 +1595,14 @@ void Ship::Respawn()
 	m_money = 0;
 	m_knownScenes.clear();
 
-	Ship::SavePlayerMoneyAndHealth(this);
-	Ship::SavePlayerUpgrades(this);
-	Ship::SavePlayerScenes(this);
-	Shop::SaveShopUpgrades(NULL);
+	//saving
+	if (no_save == false)
+	{
+		Ship::SavePlayerMoneyAndHealth(this);
+		Ship::SavePlayerUpgrades(this);
+		Ship::SavePlayerScenes(this);
+		Shop::SaveShopUpgrades(NULL);
+	}
 }
 
 void Ship::SetVisibility(bool visible)
@@ -1762,8 +1714,7 @@ bool Ship::GetLoot(GameObject& object)
 		text_feedback->setString(ss.str());
 		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
 		text_feedback->setPosition(getPosition());
-		int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
-		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, (- size.y / 2 - TEXT_POP_OFFSET_Y)));
 		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
 		(*CurrentGame).addToTextPops(pop_feedback);
@@ -1788,14 +1739,14 @@ void Ship::GetPortal(GameObject* object)
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
-	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
-	{
-		m_is_asking_SFPanel = SFPanel_Portal;
-	}
-	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
-	{
+	//if ((*CurrentGame).m_is_in_hub == true && (*CurrentGame).m_waiting_for_dialog_validation == false && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
+	//	m_is_asking_SFPanel = SFPanel_Portal;
+	//
+	//else if ((*CurrentGame).m_is_in_hub == false && (*CurrentGame).m_waiting_for_dialog_validation == false && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
+	//	m_is_asking_SFPanel = SFPanel_Action;
+
+	if ( (*CurrentGame).m_waiting_for_dialog_validation == false && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
 		m_is_asking_SFPanel = SFPanel_Action;
-	}
 }
 
 void Ship::GetShop(GameObject* object)
@@ -1809,21 +1760,13 @@ void Ship::GetShop(GameObject* object)
 	if (!(*CurrentGame).m_waiting_for_dialog_validation)
 	{
 		if (m_HUD_state == HUD_Trade)
-		{
 			m_is_asking_SFPanel = SFPanel_Trade;
-		}
 		else if (m_HUD_state == HUD_ShopStellarMap)
-		{
 			m_is_asking_SFPanel = SFPanel_Map;
-		}
 		else if (m_HUD_state == HUD_Upgrades)
-		{
 			m_is_asking_SFPanel = SFPanel_Upgrades;
-		}
 		else
-		{
 			m_is_asking_SFPanel = SFPanel_Shop;
-		}
 	}
 }
 
@@ -1859,7 +1802,7 @@ void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (m_graze_count >= GRAZING_COUNT_TO_REGEN_SHIELD)
 			{
 				m_shield++;
-				m_graze_count = m_shield == m_shield_max ? GRAZING_COUNT_TO_REGEN_SHIELD : 0;
+				m_graze_count = m_shield == m_shield_max ? GRAZING_COUNT_TO_REGEN_SHIELD * (m_shield + 1) : 0;
 			}
 
 			//Combo
@@ -1984,8 +1927,8 @@ void Ship::GetDamageFrom(GameObject& object)
 		{
 			FX* impactFX = ammo.m_explosion->Clone();
 			float angle_impact = ammo.getRotation() * M_PI / 180;
-			float impact_offset_x = -getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * sin(angle_impact);
-			float impact_offset_y = getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * cos(angle_impact);
+			float impact_offset_x = - m_size.y / 2 * sin(angle_impact);
+			float impact_offset_y = m_size.y / 2 * cos(angle_impact);
 			impactFX->setPosition(getPosition().x + impact_offset_x, getPosition().y + impact_offset_y);
 
 			(*CurrentGame).addToScene(impactFX, true);
@@ -2008,10 +1951,14 @@ void Ship::GetDamageFrom(GameObject& object)
 		}
 	}
 
-	setColor(Color(255, 0, 0, 255), true);
-	if (m_ship_model->m_fake_textureName.empty() == false)
-		m_fake_ship->setColor(Color(255, 0, 0, 255), true);
-	m_damage_feedbackTimer = DAMAGE_FEEDBACK_TIME;
+	if (m_immune == true)
+		return;
+
+	//Getting hit
+	//setColor(Color(255, 0, 0, 255), true);
+	//if (m_ship_model->m_fake_textureName.empty() == false)
+	//	m_fake_ship->setColor(Color(255, 0, 0, 255), true);
+	//m_damage_feedbackTimer = DAMAGE_FEEDBACK_TIME;
 
 	m_collision_timer = IMMUNE_DELAY_AFTER_HIT_TAKEN;
 	(*CurrentGame).killGameObjectType(EnemyFire);
@@ -2028,13 +1975,13 @@ void Ship::GetDamageFrom(GameObject& object)
 	m_shield_recovery_clock.restart();
 	
 	//Combo
-	//(*CurrentGame).m_playerShip->AddComboCount(-(*CurrentGame).m_playerShip->m_combo_count_max / 2);
+	//(*CurrentGame).m_playership->AddComboCount(-(*CurrentGame).m_playership->m_combo_count_max / 2);
 
 	m_graze_count = 0;
-	m_graze_level = GRAZE_LEVEL_NONE;
+	//m_graze_level = GRAZE_LEVEL_NONE;
 	m_hits_taken++;
-	if (m_combo_aura != NULL)
-		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
+	//if (m_combo_aura != NULL)
+	//	m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
 
 	//if (m_armor <= 0)
 	//	Death();
@@ -2044,20 +1991,14 @@ void Ship::GetDamageFrom(GameObject& object)
 int Ship::GetFocusedPortalMaxUnlockedHazardLevel()
 {
 	if (m_targetPortal == NULL)
-	{
 		return -1;
-	}
-	else
-	{
-		return m_targetPortal->m_max_unlocked_hazard_level;
-	}
+	
+	return m_targetPortal->m_max_unlocked_hazard_level;
 }
 
 sf::Vector2f Ship::GetShipSize()
 {
-	sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
-	size = GameObject::getSize_for_Direction((*CurrentGame).m_direction, size);
-	return size;
+	return m_fake_ship != NULL ? m_fake_ship->m_size : m_size;
 }
 
 int Ship::UpdateShipLevel()
@@ -2659,7 +2600,6 @@ void Ship::GenerateBots(GameObject* target)
 		bot->m_automatic_fire = m_automatic_fire;
 		//bot->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, (*it)->m_spread);
 		bot->setTarget(target);
-		bot->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 		bot->m_visible = !m_disable_bots;
 
 		(*CurrentGame).addToScene(bot, true);
@@ -2877,8 +2817,7 @@ void Ship::AddComboCount(int value)
 		text_feedback->setString(ss.str());
 		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
 		text_feedback->setPosition(getPosition());
-		int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
-		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, (-size.y / 2 - TEXT_POP_OFFSET_Y)));
 		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
 		(*CurrentGame).addToTextPops(pop_feedback);

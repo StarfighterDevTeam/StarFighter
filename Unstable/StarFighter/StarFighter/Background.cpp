@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
+Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
 	m_collider_type = BackgroundObject;
 	m_layer = BackgroundLayer;
@@ -10,9 +10,6 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 	m_shop = NULL;
 	m_visible = true;
 	m_DontGarbageMe = true;
-	
-	sf::Vector2f size_ = GameObject::getSize_for_Direction(direction, size);
-	this->setPosition_Y_for_Direction(direction, sf::Vector2f(size_.x / 2, (-size_.y / 2) + first_screen_offset), true);
 
 	for (int i = 0; i < NO_DIRECTION; i++)
 		m_portals[i] = NULL;
@@ -33,18 +30,15 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	static sf::Vector2f newposition, newspeed;
 	newspeed = m_speed;
 
-	if (hyperspeedMultiplier > 1)
-	{
-		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
-		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
-	}
-	else if (hyperspeedMultiplier < 1)
-	{
-		newspeed.x = m_speed.x * hyperspeedMultiplier;
-		newspeed.y = m_speed.y * hyperspeedMultiplier;
-	}
+	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
 
-	setGhost(hyperspeedMultiplier > 1.0f);
+	//slowmotion
+	newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
+
+	if (m_ghost == false && l_hyperspeedMultiplier > 1)
+		setGhost(true);
+	else if (m_ghost == true)
+		setGhost(false);
 
 	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
@@ -53,17 +47,11 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//portals follow the background
 	for (int i = 0; i < NO_DIRECTION; i++)
-	{
 		if (m_portals[(Directions)i] != NULL)
-		{
 			m_portals[(Directions)i]->setPosition(newposition.x + m_portals[(Directions)i]->m_offset.x, newposition.y + m_portals[(Directions)i]->m_offset.y);
-		}
-	}
 
-	if (this->m_shop != NULL)
-	{
-		this->m_shop->setPosition(newposition);
-	}
+	if (m_shop != NULL)
+		m_shop->setPosition(newposition);
 
 	AnimatedSprite::update(deltaTime);
 }

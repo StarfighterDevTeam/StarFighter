@@ -82,14 +82,11 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 
 	//move
 	float newspeed = m_speed_y;
-	if (hyperspeedMultiplier > 1)
-	{
-		newspeed += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * newspeed).y;
-	}
-	else if (hyperspeedMultiplier < 1)
-	{
-		newspeed = m_speed_y * hyperspeedMultiplier;
-	}
+
+	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	//slowmotion
+	newspeed += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
 
 	if (m_target)
 	{

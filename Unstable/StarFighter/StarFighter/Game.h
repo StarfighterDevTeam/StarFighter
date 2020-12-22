@@ -86,6 +86,7 @@ public:
 	sf::Vector2i m_screen_size;
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
+	bool m_is_in_hub;
 
 	bool m_waiting_for_dialog_validation;
 	bool m_waiting_for_scene_transition;
@@ -98,17 +99,16 @@ public:
 	void resetHazard(int hazard_overkill = 0);
 
 	sf::Vector2f m_scale_factor;
-	Directions m_direction;
 
 	int m_hazard;
 	int m_hazardSpawned;
 	float m_BeastScoreBonus;
 
-	Ship* m_playerShip;
+	Ship* m_playership;
 	bool m_Pause;
 
-	void SetPlayerShip(Ship* playerShip);
-	float GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore);
+	void SetPlayerShip(Ship* playership);
+	float GetBeastScoreBonus(float playershipBeastScore, float sceneBeastScore);
 	static EquipmentQuality GetItemQualityClass(float quality);
 
 	GameObject* GetNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);

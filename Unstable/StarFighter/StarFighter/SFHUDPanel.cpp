@@ -3,14 +3,14 @@
 extern Game* CurrentGame;
 
 //HUD PANEL
-SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(size, playerShip, SFPanel_HUD)
+SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(size, playership, SFPanel_HUD)
 {
 	setOrigin(0, 0);
 	setFillColor(sf::Color(10, 10, 10, 128));//dark grey
 	setOutlineThickness(0);
 	setPosition(SCENE_SIZE_X, 0);
 
-	if (playerShip)
+	if (playership)
 	{
 		//int gauges and texts (upper part)
 		m_armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
@@ -41,11 +41,11 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_fuelBarContainer.setOutlineColor(sf::Color(255, 255, 255));
 		m_fuelBarContainer.setOrigin(0, 0);
 
-		m_xpBar.setSize(sf::Vector2f((1.0f * playerShip->m_xp / playerShip->m_xp_max) * XP_BAR_SIZE_X, XP_BAR_SIZE_Y));
+		m_xpBar.setSize(sf::Vector2f((1.0f * playership->m_xp / playership->m_xp_max) * XP_BAR_SIZE_X, XP_BAR_SIZE_Y));
 		m_xpBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
 		m_xpBar.setOrigin(0, 0);
 
-		m_comboBar.setSize(sf::Vector2f((1.0f * playerShip->m_combo_count / playerShip->m_combo_count_max) * COMBO_BAR_SIZE_X, COMBO_BAR_SIZE_Y));
+		m_comboBar.setSize(sf::Vector2f((1.0f * playership->m_combo_count / playership->m_combo_count_max) * COMBO_BAR_SIZE_X, COMBO_BAR_SIZE_Y));
 		m_comboBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
 		m_comboBar.setOrigin(0, 0);
 
@@ -191,15 +191,15 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		//Load items displayed
 		//for (int i = 0; i < NBVAL_Equipment; i++)
 		//{
-		//	if (playerShip->m_equipment[i] != NULL)
+		//	if (playership->m_equipment[i] != NULL)
 		//	{
-		//		GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(playerShip->m_equipment[i]);
+		//		GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(playership->m_equipment[i]);
 		//		m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, i, false);
 		//	}
 		//}
-		//if (playerShip->m_weapon != NULL)
+		//if (playership->m_weapon != NULL)
 		//{
-		//	GameObject* capsule = Enemy::CloneWeaponIntoGameObject(playerShip->m_weapon);
+		//	GameObject* capsule = Enemy::CloneWeaponIntoGameObject(playership->m_weapon);
 		//	m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, NBVAL_Equipment, false);
 		//}
 	}
@@ -220,53 +220,53 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		m_inventory_title.setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 	}
 
-	if (!m_playerShip)
+	if (!m_playership)
 	{
 		return;
 	}
 
 	//armor
-	if (m_playerShip->m_armor_max <= 0)
+	if (m_playership->m_armor_max <= 0)
 	{
 		m_armorBar.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 		m_armorBarContainer.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 	}
 	else
 	{
-		if (m_playerShip->m_armor_max < m_playerShip->m_shield_max)
+		if (m_playership->m_armor_max < m_playership->m_shield_max)
 		{
-			m_armorBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_armor / m_playerShip->m_armor_max * ARMOR_BAR_SIZE_X * m_playerShip->m_armor_max / m_playerShip->m_shield_max), ARMOR_BAR_SIZE_Y));
-			m_armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_playerShip->m_armor_max / m_playerShip->m_shield_max, ARMOR_BAR_SIZE_Y));
+			m_armorBar.setSize(sf::Vector2f(1 + (1.0f * m_playership->m_armor / m_playership->m_armor_max * ARMOR_BAR_SIZE_X * m_playership->m_armor_max / m_playership->m_shield_max), ARMOR_BAR_SIZE_Y));
+			m_armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_playership->m_armor_max / m_playership->m_shield_max, ARMOR_BAR_SIZE_Y));
 		}
 		else
 		{
-			m_armorBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_armor / m_playerShip->m_armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
+			m_armorBar.setSize(sf::Vector2f(1 + (1.0f * m_playership->m_armor / m_playership->m_armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
 			m_armorBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, ARMOR_BAR_SIZE_Y));
 		}
 	}
 
 	//shield
-	if (m_playerShip->m_shield_max <= 0)
+	if (m_playership->m_shield_max <= 0)
 	{
 		m_shieldBar.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
 		m_shieldBarContainer.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
 	}
 	else
 	{
-		if (m_playerShip->m_shield_max < m_playerShip->m_armor_max)
+		if (m_playership->m_shield_max < m_playership->m_armor_max)
 		{
-			m_shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_shield / m_playerShip->m_shield_max * ARMOR_BAR_SIZE_X * m_playerShip->m_shield_max / m_playerShip->m_armor_max), SHIELD_BAR_SIZE_Y));
-			m_shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_playerShip->m_shield_max / m_playerShip->m_armor_max, SHIELD_BAR_SIZE_Y));
+			m_shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_playership->m_shield / m_playership->m_shield_max * ARMOR_BAR_SIZE_X * m_playership->m_shield_max / m_playership->m_armor_max), SHIELD_BAR_SIZE_Y));
+			m_shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_playership->m_shield_max / m_playership->m_armor_max, SHIELD_BAR_SIZE_Y));
 		}
 		else
 		{
-			m_shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_shield / m_playerShip->m_shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
+			m_shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_playership->m_shield / m_playership->m_shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
 			m_shieldBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
 		}
 	}
 
 	//fuel
-	//if (m_playerShip->m_hyperspeed_fuel_max <= 0)
+	//if (m_playership->m_hyperspeed_fuel_max <= 0)
 	//{
 	//	m_fuelBar.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
 	//	m_fuelBarContainer.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
@@ -274,11 +274,11 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//}
 	//else
 	//{
-	//	m_fuelBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_hyperspeed_fuel / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X), FUEL_BAR_SIZE_Y));
+	//	m_fuelBar.setSize(sf::Vector2f(1 + (1.0f * m_playership->m_hyperspeed_fuel / m_playership->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X), FUEL_BAR_SIZE_Y));
 	//	m_fuelBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
-	//	if (m_playerShip->GetNumberOfBombs() > 0 && m_playerShip->m_hyperspeed_fuel > m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER)
+	//	if (m_playership->GetNumberOfBombs() > 0 && m_playership->m_hyperspeed_fuel > m_playership->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER)
 	//	{
-	//		m_fuelBarOverblock.setSize(sf::Vector2f(1.0f * m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
+	//		m_fuelBarOverblock.setSize(sf::Vector2f(1.0f * m_playership->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER / m_playership->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
 	//		m_fuelBarOverblock.setPosition(sf::Vector2f(m_fuelBar.getPosition().x + m_fuelBar.getSize().x - m_fuelBarOverblock.getSize().x, m_fuelBar.getPosition().y));
 	//	}
 	//	else
@@ -288,51 +288,51 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//}
 	//
 	////Combo
-	//m_comboBar.setSize(sf::Vector2f((1.0f * m_playerShip->m_combo_count / m_playerShip->m_combo_count_max * COMBO_BAR_SIZE_X), COMBO_BAR_SIZE_Y));
+	//m_comboBar.setSize(sf::Vector2f((1.0f * m_playership->m_combo_count / m_playership->m_combo_count_max * COMBO_BAR_SIZE_X), COMBO_BAR_SIZE_Y));
 	//ostringstream ss_combo;
-	//ss_combo << "x" << m_playerShip->m_combo_level << " Combo"; 
+	//ss_combo << "x" << m_playership->m_combo_level << " Combo"; 
 	//m_combo_text.setString(ss_combo.str());
 	
 	//life
 	ostringstream ss_life;
-	ss_life << m_playerShip->m_armor << "/" << m_playerShip->m_armor_max;
+	ss_life << m_playership->m_armor << "/" << m_playership->m_armor_max;
 	m_life_text.setString(ss_life.str());
 	m_life_text.setPosition(m_armorBarContainer.getPosition().x + m_armorBarContainer.getSize().x / 2 - m_life_text.getGlobalBounds().width / 2, m_armorBarContainer.getPosition().y + m_life_text.getGlobalBounds().height / 2);
 	
 	//shield
 	ostringstream ss_shield;
-	ss_shield << m_playerShip->m_shield << "/" << m_playerShip->m_shield_max;
+	ss_shield << m_playership->m_shield << "/" << m_playership->m_shield_max;
 	m_shield_text.setString(ss_shield.str());
 	m_shield_text.setPosition(m_shieldBarContainer.getPosition().x + m_shieldBarContainer.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBarContainer.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
 	//
 	//ostringstream ss_fuel;
-	//ss_fuel << (int)m_playerShip->m_hyperspeed_fuel << "/" << m_playerShip->m_hyperspeed_fuel_max;
+	//ss_fuel << (int)m_playership->m_hyperspeed_fuel << "/" << m_playership->m_hyperspeed_fuel_max;
 	//m_fuel_text.setString(ss_fuel.str());
 	//m_fuel_text.setPosition(m_fuelBarContainer.getPosition().x + m_fuelBarContainer.getSize().x / 2 - m_fuel_text.getGlobalBounds().width / 2, m_fuelBarContainer.getPosition().y + 1);//because it works :/
 	//
 	////level
 	//ostringstream ss_slash;
-	//ss_slash << "Level " << m_playerShip->m_level;
-	//if (m_playerShip->m_level_max > -1)
+	//ss_slash << "Level " << m_playership->m_level;
+	//if (m_playership->m_level_max > -1)
 	//{
-	//	ss_slash << " / " << m_playerShip->m_level_max;
+	//	ss_slash << " / " << m_playership->m_level_max;
 	//}
-	//ss_slash << " (XP: " << m_playerShip->m_xp << " / " << m_playerShip->m_xp_max << ")";
+	//ss_slash << " (XP: " << m_playership->m_xp << " / " << m_playership->m_xp_max << ")";
 	//m_level_text.setString(ss_slash.str());
 	//
-	//m_xpBar.setSize(sf::Vector2f((1.0f * m_playerShip->m_xp / m_playerShip->m_xp_max) * XP_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
+	//m_xpBar.setSize(sf::Vector2f((1.0f * m_playership->m_xp / m_playership->m_xp_max) * XP_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
 	//m_level_text.setPosition(m_level_text.getPosition().x, m_xpBar.getPosition().y);
 
 	//money
 	ostringstream ss_m;
-	ss_m << m_playerShip->m_money;
+	ss_m << m_playership->m_money;
 	m_money_text.setString("$ " + ss_m.str());
 
 	//graze (shield regen)
-	//if (m_playerShip->m_shield_max > 0)
+	//if (m_playership->m_shield_max > 0)
 	//{
 	//	ostringstream ss_g;
-	//	ss_g << m_playerShip->m_graze_count;
+	//	ss_g << m_playership->m_graze_count;
 	//	m_graze_text.setString("Graze: " + ss_g.str() + " / " + to_string(GRAZING_COUNT_TO_REGEN_SHIELD));
 	//}
 	//
@@ -343,14 +343,14 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//
 	////score hits taken
 	//ostringstream ss_ht;
-	//ss_ht << m_playerShip->m_hits_taken;
+	//ss_ht << m_playership->m_hits_taken;
 	//m_hitstaken_text.setString("Hits taken: " + ss_ht.str());
 
 	//Beast score
 	//ostringstream ss_beast;
-	////float quality_graze = m_playerShip->getShipBeastScore() / MAX_BEAST_SCALE * 100;
-	//float quality_combo = m_playerShip->m_combo_level;
-	//float quality_hazard = Scene::getSceneBeastScore(m_playerShip->m_currentScene_hazard) / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
+	////float quality_graze = m_playership->getShipBeastScore() / MAX_BEAST_SCALE * 100;
+	//float quality_combo = m_playership->m_combo_level;
+	//float quality_hazard = Scene::getSceneBeastScore(m_playership->m_currentScene_hazard) / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
 	//ss_beast.precision(0);
 	//ss_beast << fixed;
 	////ss_beast << "Drop quality: +" << quality_graze + quality_hazard << "%";
@@ -358,14 +358,14 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//m_beastscore_text.setString(ss_beast.str());
 
 	//scene name
-	if (!m_playerShip->m_currentScene_name.empty())
+	if (!m_playership->m_currentScene_name.empty())
 	{
 		ostringstream ss_bg;
-		ss_bg << m_playerShip->m_currentScene_name;
+		ss_bg << m_playership->m_currentScene_name;
 		//if ((*CurrentGame).m_direction != NO_DIRECTION)
-		//	ss_bg << " (" << m_playerShip->m_currentScene_hazard + 1 << ")";
+		//	ss_bg << " (" << m_playership->m_currentScene_hazard + 1 << ")";
 
-		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " ") + " (lvl " + to_string(m_playerShip->m_level) + ")");
+		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " ") + " (lvl " + to_string(m_playership->m_level) + ")");
 	}
 
 	//framerate
@@ -376,25 +376,25 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//ship global stats
 	ostringstream ss_ship_stats;
 	float DPS = 0;
-	if (m_playerShip->m_weapon != NULL)
+	if (m_playership->m_weapon != NULL)
 
-		if (m_playerShip->m_weapon->m_ammunition->m_isBeam == false)
-			DPS += (floor)(1.f / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_multishot * m_playerShip->m_weapon->m_ammunition->m_damage;
+		if (m_playership->m_weapon->m_ammunition->m_isBeam == false)
+			DPS += (floor)(1.f / m_playership->m_weapon->m_rate_of_fire * 100) / 100 * m_playership->m_weapon->m_multishot * m_playership->m_weapon->m_ammunition->m_damage;
 		else
-			DPS += (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * m_playerShip->m_weapon->m_multishot * m_playerShip->m_weapon->m_ammunition->m_damage;
+			DPS += (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * m_playership->m_weapon->m_multishot * m_playership->m_weapon->m_ammunition->m_damage;
 
-	if (m_playerShip->m_bot_list.empty() == false && m_playerShip->m_bot_list.front()->m_weapon != NULL)
+	if (m_playership->m_bot_list.empty() == false && m_playership->m_bot_list.front()->m_weapon != NULL)
 	{
-		Bot* bot = m_playerShip->m_bot_list.front();
+		Bot* bot = m_playership->m_bot_list.front();
 		if (bot->m_weapon->m_ammunition->m_isBeam == false)
-			DPS += (floor)(1.f / bot->m_weapon->m_rate_of_fire * 100) / 100 * bot->m_weapon->m_multishot * bot->m_weapon->m_ammunition->m_damage * m_playerShip->m_bot_list.size();
+			DPS += (floor)(1.f / bot->m_weapon->m_rate_of_fire * 100) / 100 * bot->m_weapon->m_multishot * bot->m_weapon->m_ammunition->m_damage * m_playership->m_bot_list.size();
 		else
-			DPS += (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * bot->m_weapon->m_multishot * bot->m_weapon->m_ammunition->m_damage * m_playerShip->m_bot_list.size();
+			DPS += (floor)(1.f / TIME_BETWEEN_BEAM_DAMAGE_TICK * 100) / 100 * bot->m_weapon->m_multishot * bot->m_weapon->m_ammunition->m_damage * m_playership->m_bot_list.size();
 	}
 
 	ss_ship_stats << "DPS: " << DPS;
-	//ss_ship_stats << "\nContact damage: " << m_playerShip->m_damage << "\nHyperspeed: " << m_playerShip->m_hyperspeed << "\nFuel: " << m_playerShip->m_hyperspeed_fuel_max
-	//	<< "\nShield regen: " << m_playerShip->m_shield_regen << "/sec" << "\nShield recovery: " << m_playerShip->m_shield_recovery_time << "sec";
+	//ss_ship_stats << "\nContact damage: " << m_playership->m_damage << "\nHyperspeed: " << m_playership->m_hyperspeed << "\nFuel: " << m_playership->m_hyperspeed_fuel_max
+	//	<< "\nShield regen: " << m_playership->m_shield_regen << "/sec" << "\nShield recovery: " << m_playership->m_shield_recovery_time << "sec";
 	m_text.setString(ss_ship_stats.str());
 }
 
@@ -415,13 +415,13 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	screen.draw(m_armorBarContainer);
 	screen.draw(m_armorBar);
 	screen.draw(m_life_text);
-	if (m_playerShip && m_playerShip->m_shield_max > 0)
+	if (m_playership && m_playership->m_shield_max > 0)
 	{
 		screen.draw(m_shieldBarContainer);
 		screen.draw(m_shieldBar);
 		screen.draw(m_shield_text);
 	}
-	//if (m_playerShip && m_playerShip->m_hyperspeed_fuel_max > 0)
+	//if (m_playership && m_playership->m_hyperspeed_fuel_max > 0)
 	//{
 	//	screen.draw(m_fuelBarContainer);
 	//	screen.draw(m_fuelBar);

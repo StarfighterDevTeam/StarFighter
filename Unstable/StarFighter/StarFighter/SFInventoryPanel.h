@@ -6,7 +6,7 @@
 class SFInventoryPanel : public SFPanel
 {
 public:
-	SFInventoryPanel(sf::Vector2f size, Ship* playerShip, SFPanelTypes panel_type);
+	SFInventoryPanel(sf::Vector2f size, Ship* playership, SFPanelTypes panel_type);
 	~SFInventoryPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
@@ -24,7 +24,7 @@ public:
 	SFItemStatsPanel* m_item_stats_panel_compare;
 	bool m_has_prioritary_feedback;
 
-	Ship* m_playerShip;
+	Ship* m_playership;
 
 	//v2
 	Grid* m_grids_v2[NBVAL_TradeGrids];

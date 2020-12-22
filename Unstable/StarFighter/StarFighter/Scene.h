@@ -11,8 +11,6 @@ enum InGameStateMachine
 	SCROLLING,
 	LAST_SCREEN,
 	BOSS_FIGHT,
-	TRANSITION_PHASE1_2,
-	TRANSITION_PHASE2_2,
 	HUB_ROAMING,
 };
 
@@ -25,8 +23,13 @@ enum ScenesData
 	SCENE_LINK_DOWN,//4
 	SCENE_LINK_RIGHT,//5
 	SCENE_LINK_LEFT,//6
-	SCENE_HAZARD_BREAK,//7
-	SCENE_LEVEL,//8
+	SCENE_BACKGROUND_FILENAME,//7
+	SCENE_BACKGROUND_WIDTH,//8
+	SCENE_BACKGROUND_HEIGHT,//9
+	SCENE_BACKGROUND_VSPEED,//10
+	SCENE_IS_HUB,//11
+	SCENE_SIZE_IN_STELLAR_MAP,//12
+	SCENE_MUSIC_NAME,//13
 };
 
 enum ScenesDialogData
@@ -46,12 +49,11 @@ class Scene
 {
 public:
 	//Scene(string name, ShipConfig* shipConf);
-	Scene(string name, int hazard_level, bool reverse_scene=false, bool first_scene=false);
-	Scene(string name);
+	Scene(string name);//, int hazard_level, bool reverse_scene=false, bool first_scene=false);
+	//Scene(string name);
 	~Scene();
 	void GenerateEnemies(Time deltaTime);
 	void SpawnBoss();
-	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
 	void PlayTitleFeedback();
 
 	string m_name;
@@ -65,7 +67,6 @@ public:
 	static float getSceneBeastScore(int for_hazard_level);
 
 	Background* m_bg;
-	Directions m_direction;
 	bool m_generating_enemies;
 	bool m_generating_boss;
 	sf::Clock m_spawnClock;
@@ -75,6 +76,7 @@ public:
 	vector<pair<float, vector<Dialog*> > > m_dialogs;
 	sf::Clock m_scene_clock;
 	string m_scene_music;
+	bool m_is_hub;
 
 	int getSceneHazardLevelUnlockedValue();
 	void setSceneHazardLevelUnlockedValue(int hazard_unlocked_value);

@@ -37,7 +37,7 @@ public:
 	void setPattern_v2(GeometryPattern* pattern);
 	void setPattern_v2(PatternType pattern_type, int speed, int clockwise, int width, int height, int starting_point);
 	void resetPattern();
-	sf::Vector2f getOffset_v2(sf::Time deltaTime, bool global_offset = false);
+	sf::Vector2f getOffset_v2(float deltaTime, bool global_offset = false);
 
 	PatternType m_pattern_type;
 	int m_speed;

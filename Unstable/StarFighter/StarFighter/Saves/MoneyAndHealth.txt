@@ -1,0 +1,5 @@
+Money 28
+Health 1
+Shield 0
+Graze 0
+Level 2

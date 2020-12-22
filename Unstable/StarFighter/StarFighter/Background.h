@@ -6,7 +6,7 @@
 struct Background : public GameObject
 {
 public:
-	Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset = 0);
+	Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	~Background();
 
 	Portal* m_portals[NO_DIRECTION];

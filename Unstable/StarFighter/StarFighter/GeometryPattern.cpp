@@ -163,7 +163,7 @@ void GeometryPattern::setPattern_v2(PatternType pattern_type, int speed, int clo
 	}
 }
 
-sf::Vector2f GeometryPattern::getOffset_v2(sf::Time deltaTime, bool global_offset)
+sf::Vector2f GeometryPattern::getOffset_v2(float deltaTime, bool global_offset)
 {
 	int cc = m_clockwise * m_speed;
 
@@ -183,14 +183,14 @@ sf::Vector2f GeometryPattern::getOffset_v2(sf::Time deltaTime, bool global_offse
 		}
 		case Line_:
 		{
-			m_offset.x += deltaTime.asSeconds() * m_speed * m_clockwise;
+			m_offset.x += deltaTime * m_speed * m_clockwise;
 			m_offset.y = 0;
 			break;
 		}
 		case Circle_:
 		{
 			float old_theta = m_theta;
-			m_theta += deltaTime.asSeconds() * M_PI * m_speed * m_clockwise / 180;
+			m_theta += deltaTime * M_PI * m_speed * m_clockwise / 180;
 
 			if (m_theta > 2 * M_PI)
 				m_theta -= 2 * M_PI;
@@ -204,8 +204,8 @@ sf::Vector2f GeometryPattern::getOffset_v2(sf::Time deltaTime, bool global_offse
 		}
 		case Rectangle_:
 		{
-			float move_x = deltaTime.asSeconds() * m_speed * m_direction.x;
-			float move_y = deltaTime.asSeconds() * m_speed * m_direction.y;
+			float move_x = deltaTime * m_speed * m_direction.x;
+			float move_y = deltaTime * m_speed * m_direction.y;
 			float moved = abs(move_x) + abs(move_y);
 
 			sf::Vector2f offset_tmp = sf::Vector2f(0, 0);

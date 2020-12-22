@@ -137,7 +137,7 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	setSize(size);
 	m_visible = true;
 	m_panel_type = panel_type;
-	m_playerShip = NULL;
+	m_playership = NULL;
 	m_actions = NULL;
 
 	setSize(size);

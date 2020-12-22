@@ -6,7 +6,7 @@
 class SFMenuPanel : public SFPanel
 {
 public:
-	SFMenuPanel(sf::Vector2f size, SFPanelTypes panel_type, size_t options, Ship* playerShip);
+	SFMenuPanel(sf::Vector2f size, SFPanelTypes panel_type, size_t options, Ship* playership);
 	~SFMenuPanel();
 	virtual void Update(sf::Time deltaTime, sf::Vector2f inputs_directions);
 	virtual void Draw(sf::RenderTexture& screen);
@@ -18,7 +18,7 @@ public:
 class SFOneActionPanel : public SFMenuPanel
 {
 public:
-	SFOneActionPanel(sf::Vector2f size, Ship* playerShip);
+	SFOneActionPanel(sf::Vector2f size, Ship* playership);
 	~SFOneActionPanel(){};
 
 	Directions m_direction;
@@ -27,7 +27,7 @@ public:
 class SFPortalPanel : public SFMenuPanel
 {
 public:
-	SFPortalPanel(sf::Vector2f size, Ship* playerShip);
+	SFPortalPanel(sf::Vector2f size, Ship* playership);
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 	void SetSelectedOptionIndex(int index) override;
@@ -40,7 +40,7 @@ public:
 class SFShopPanel : public SFMenuPanel
 {
 public:
-	SFShopPanel(sf::Vector2f size, Ship* playerShip);
+	SFShopPanel(sf::Vector2f size, Ship* playership);
 };
 
 #endif // SFMENU_H_INCLUDED

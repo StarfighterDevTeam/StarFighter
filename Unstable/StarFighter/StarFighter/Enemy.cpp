@@ -109,7 +109,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 void Enemy::UpdateHealthBars()
 {
 	//health bars feedbacks
-	float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).m_direction) / 180 * M_PI;
+	float angle_rad = 0;// GameObject::getRotation_for_Direction((*CurrentGame).m_direction) / 180 * M_PI;
 		
 	m_armorBar.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
 	m_armorBarContainer.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
@@ -145,20 +145,15 @@ void Enemy::UpdateHealthBars()
 	}
 
 	//update enemy level display
-	if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_armorBarContainer.getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer.getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
-	else if ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)
-		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y, m_armorBarContainer.getPosition().y - m_armorBarContainer.getGlobalBounds().height / 2 - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X));
+	m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_armorBarContainer.getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer.getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
 
 	if (m_health_feedbackTimer <= 0)
-	{
 		m_enemyLevel.m_visible = false;
-	}
 }
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	GameObject* playership = (GameObject*)(*CurrentGame).m_playerShip;
+	GameObject* playership = (GameObject*)(*CurrentGame).m_playership;
 
 	//update timers
 	if (m_health_feedbackTimer > 0)
@@ -174,10 +169,10 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			setColor(Color(255, 255, 255, 255), true);
 	}
 
-	if (hyperspeedMultiplier < 1.0f)
-		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() * hyperspeedMultiplier : 0;
-	else
-		m_collision_timer -= m_collision_timer > 0 ? deltaTime.asSeconds() : 0;
+	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	if (m_collision_timer > 0)
+		m_collision_timer -= deltaTime.asSeconds() * l_hyperspeedMultiplier;
 
 	//if a dialog awaits validation or has just ended, only update animations then stop the update
 	if ((*CurrentGame).m_waiting_for_dialog_validation == true || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)
@@ -190,19 +185,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = m_speed;
 
-	if (hyperspeedMultiplier > 1)
-	{
-		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
-		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
-	}
-
-	float l_hyperspeedMultiplier = 1.0f;
-	if (hyperspeedMultiplier < 1.0f)
-	{
-		l_hyperspeedMultiplier = hyperspeedMultiplier;
-		newspeed.x *= l_hyperspeedMultiplier;
-		newspeed.y *= l_hyperspeedMultiplier;
-	}
+	//slowmotion
+	newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
 
 	bool l_ghost = false;
 	if (m_currentPhase != NULL)
@@ -217,12 +201,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 	//update pattern
-	if (hyperspeedMultiplier < 1.0f)
-		offset = m_pattern.getOffset_v2(deltaTime * hyperspeedMultiplier);
-	else
-		offset = m_pattern.getOffset_v2(deltaTime);
-
-	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
+	offset = m_pattern.getOffset_v2(deltaTime.asSeconds() * l_hyperspeedMultiplier);
 
 	newposition.x += offset.x;
 	newposition.y += offset.y;
@@ -233,50 +212,31 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	sf::Vector2f size = sf::Vector2f(getGlobalBounds().width, getGlobalBounds().height);
 	if (m_bouncing != NoBouncing)
 	{
-		if ((m_bouncing != BouncingVertical && ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN))
-			|| (m_bouncing != BouncingHorizontal && ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)))
+		if (m_bouncing != BouncingVertical)
 		{
 			if (newposition.x < size.x / 2)
 			{
-				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_pattern.m_speed *= -1;
-				else
-					m_speed.x *= -1;
-				
+				m_pattern.m_speed *= -1;
 				setPosition(size.x / 2, newposition.y);
 			}
-
 			else if (newposition.x > SCENE_SIZE_X - size.x / 2)
 			{
-				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_pattern.m_speed *= -1;
-				else
-					m_speed.x *= -1;
-				
+				m_pattern.m_speed *= -1;
 				setPosition(SCENE_SIZE_X - size.x / 2, newposition.y);
 			}
 		}
 
-		if ((m_bouncing != BouncingHorizontal && ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN))
-			|| (m_bouncing != BouncingVertical && ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)))
+		if (m_bouncing != BouncingHorizontal)
 		{
 			if (newposition.y < size.y / 2)
 			{
-				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_speed.y *= -1;
-				else
-					m_pattern.m_speed *= -1;
-				
+				m_speed.y *= -1;
 				setPosition(newposition.x, size.y / 2);
 			}
 
 			else if (newposition.y > SCENE_SIZE_Y - size.y / 2)
 			{
-				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-					m_speed.y *= -1;
-				else
-					m_pattern.m_speed *= -1;
-				
+				m_speed.y *= -1;
 				setPosition(newposition.x, SCENE_SIZE_Y - size.y / 2);
 			}
 		}
@@ -305,7 +265,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				float target_angle = getRotation();
 
 				if (m_reset_facing == true)
-					target_angle = GameObject::getRotation_for_Direction((*CurrentGame).m_direction);
+					target_angle = 0;
 				else if (m_face_target == true)
 					target_angle = fmod(getRotation() + 180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 360);
 
@@ -315,7 +275,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 		
 		//transition blocking firing and phase transitioning? or player in immunity delay after hit taken?
-		if ((*CurrentGame).m_waiting_for_scene_transition == true || playership->m_collision_timer > 0)
+		if ((*CurrentGame).m_waiting_for_scene_transition == true)
 		{
 			AnimatedSprite::update(deltaTime);
 			return;
@@ -359,7 +319,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//- is aligned with target
 			bool hadBeamsActive = weapon->m_beams.empty() == false;
 			float angle_tolerance_for_alignment = weapon->m_rafale < 0 ? weapon->GetAngleToleranceForBeam(playership) : ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT;
-			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false)
+			if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier) == true && m_disable_fire == false && playership->m_collision_timer <= 0)
 			{
 				if (m_shoot_when_aligned == false || weapon->m_target_homing == HOMING || hasLockingSalvoInProgress == true || abs(delta) < angle_tolerance_for_alignment)
 				{
@@ -384,17 +344,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//update timers
-	if (hyperspeedMultiplier < 1.0f)
+	if (playership->m_collision_timer <= 0)
 	{
-		m_phaseTimer += deltaTime.asSeconds() * hyperspeedMultiplier;
-		m_enemyTimer += deltaTime.asSeconds() * hyperspeedMultiplier;
+		m_phaseTimer += deltaTime.asSeconds() * l_hyperspeedMultiplier;
+		m_enemyTimer += deltaTime.asSeconds() * l_hyperspeedMultiplier;
 	}
-	else
-	{
-		m_phaseTimer += deltaTime.asSeconds();
-		m_enemyTimer += deltaTime.asSeconds();
-	}
-
+	
 	//shield regen if not maximum
 	ShieldRegen(deltaTime, hyperspeedMultiplier);
 
@@ -428,8 +383,8 @@ void Enemy::GetDamageFrom(GameObject& object)
 		{
 			FX* impactFX = ammo.m_explosion->Clone();
 			float angle_impact = ammo.getRotation() * M_PI / 180;
-			float impact_offset_x = -getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * sin(angle_impact);
-			float impact_offset_y = getSize_for_Direction((*CurrentGame).m_direction, m_size).y / 2 * cos(angle_impact);
+			float impact_offset_x = - m_size.y / 2 * sin(angle_impact);
+			float impact_offset_y = m_size.y / 2 * cos(angle_impact);
 			impactFX->setPosition(getPosition().x + impact_offset_x, getPosition().y + impact_offset_y);
 
 			(*CurrentGame).addToScene(impactFX, true);
@@ -542,7 +497,7 @@ Phase* Enemy::getPhase(string phaseName)
 
 bool Enemy::CheckCondition()
 {
-	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+	GameObject* playership = (GameObject*)(*CurrentGame).m_playership;
 
 	for (ConditionTransition* cond : m_currentPhase->m_transitions_list)
 	{
@@ -553,22 +508,22 @@ bool Enemy::CheckCondition()
 		{
 			case VerticalPosition:
 			{
-				result = compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, cond->m_value));
+				result = compare_posY_withTarget_for_Direction(DIRECTION_UP, sf::Vector2f(cond->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, cond->m_value));
 				break;
 			}
 			case HorizontalPosition:
 			{
-				result = compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				result = compare_posX_withTarget_for_Direction(DIRECTION_UP, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				break;
 			}
 			case PlayerVerticalPosition:
 			{
-				result = playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, cond->m_value));
+				result = playership->compare_posY_withTarget_for_Direction(DIRECTION_UP, sf::Vector2f(cond->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, cond->m_value));
 				break;
 			}
 			case PlayerHorizontalPosition:
 			{
-				result = playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				result = playership->compare_posX_withTarget_for_Direction(DIRECTION_UP, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				break;
 			}
 			case phaseClock:
@@ -649,11 +604,11 @@ bool Enemy::CheckCondition()
 
 void Enemy::setPhase(Phase* phase)
 {
-	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+	GameObject* playership = (GameObject*)(*CurrentGame).m_playership;
 
 	m_shots_fired = 0;
 
-	m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, phase->m_vspeed);
+	m_speed = sf::Vector2f(0, phase->m_vspeed);
 
 	//reset old stats
 	m_immune = false;
@@ -820,19 +775,19 @@ void Enemy::setPhase(Phase* phase)
 	{
 		if (!(*CurrentGame).m_waiting_for_dialog_validation)
 		{
-			playerShip->SetAskingPanel(SFPanel_Dialog);
+			playership->SetAskingPanel(SFPanel_Dialog);
 			size_t dialogsVectorSize = phase->m_dialogs.size();
 			for (size_t i = 0; i < dialogsVectorSize; i++)
-				playerShip->AddDialog(phase->m_dialogs[i]->Clone());
+				playership->AddDialog(phase->m_dialogs[i]->Clone());
 		}
 	}
 
 	//freeze player?
 	if (phase->m_freeze_player)
-		playerShip->SetInputBlocker(this);//lock player
+		playership->SetInputBlocker(this);//lock player
 	else
-		if (playerShip->GetInputBlocker() == this)//unlock player
-			playerShip->SetInputBlocker(NULL);
+		if (playership->GetInputBlocker() == this)//unlock player
+			playership->SetInputBlocker(NULL);
 
 	m_phaseTimer = 0;
 
@@ -863,8 +818,7 @@ Dialog* Enemy::LoadDialog(string name)
 			dialog->m_picture_name = (*it)[DIALOG_PICTURE];
 			dialog->m_next_dialog_name = (*it)[DIALOG_NEXT];
 
-			TextureLoader *loader;
-			loader = TextureLoader::getInstance();
+			TextureLoader *loader = TextureLoader::getInstance();
 			loader->loadTexture(dialog->m_picture_name, DIALOG_PANEL_PORTRAIT_SIZE_X, DIALOG_PANEL_PORTRAIT_SIZE_X);
 
 			return dialog;
@@ -978,14 +932,14 @@ Phase* Enemy::LoadPhase(string name)
 
 void Enemy::Death()
 {
-	GameObject* playerShip = (GameObject*)(*CurrentGame).m_playerShip;
+	GameObject* playership = (GameObject*)(*CurrentGame).m_playership;
 
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(getPosition().x, getPosition().y);
 	(*CurrentGame).addToScene(myFX, true);
 
 	//Combo
-	//playerShip->AddComboCount(m_enemy_class * 100);
+	//playership->AddComboCount(m_enemy_class * 100);
 
 	//Score
 	//(*CurrentGame).m_hazard += m_money;
@@ -995,7 +949,7 @@ void Enemy::Death()
 	//}
 
 	//Player XP
-	//(*CurrentGame).m_playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
+	//(*CurrentGame).m_playership->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
 
 	//Loot
 	//if (CreateRandomLootv2(m_enemy_class, (*CurrentGame).m_BeastScoreBonus))
@@ -1003,7 +957,7 @@ void Enemy::Death()
 	//	GenerateLoot();
 	//}
 
-	playerShip->addMoney(m_money);
+	playership->addMoney(m_money);
 
 	GameObject::Death();
 
@@ -1017,9 +971,9 @@ void Enemy::Death()
 	}
 
 	//unlock player if blocked
-	if (playerShip->GetInputBlocker() == this)
+	if (playership->GetInputBlocker() == this)
 	{
-		playerShip->SetInputBlocker(NULL);
+		playership->SetInputBlocker(NULL);
 	}
 
 	//phase transition "Death" (post-mortem phase of 1 frame)
@@ -1052,7 +1006,7 @@ Enemy::~Enemy()
 
 void Enemy::GenerateLoot()
 {
-	sf::Vector2f speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, LOOT_SPEED_Y);
+	sf::Vector2f speed = sf::Vector2f(0, LOOT_SPEED_Y);
 
 	if (m_weapon_loot != NULL)
 	{

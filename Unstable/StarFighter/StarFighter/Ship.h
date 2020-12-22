@@ -121,7 +121,6 @@ public :
 	void RotateShip(float angle);
 	void setGhost(bool ghost) override;
 
-	void Respawn() override;
 	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
 	bool setShipWeapon(Weapon* weapon, bool overwrite = false, bool no_save = false);
 	void setShipModel(ShipModel* ship_model, bool no_save = false);
@@ -153,7 +152,7 @@ public :
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
 	GameObject* GetFakeShip() override;
-	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type);
+	//static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type);
 	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
 	sf::Vector2f GetShipSize();
 
@@ -178,6 +177,7 @@ public :
 	void Bomb();
 	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
 	void Jump();
+	void Respawn(bool no_save);
 
 	sf::Clock m_stroboscopic_effect_clock;
 	sf::Clock m_jump_clock;

@@ -32,16 +32,10 @@ void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = m_speed;
 
-	if (hyperspeedMultiplier > 1)
-	{
-		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
-		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
-	}
-	else if (hyperspeedMultiplier < 1)
-	{
-		newspeed.x = m_speed.x * hyperspeedMultiplier;
-		newspeed.y = m_speed.y * hyperspeedMultiplier;
-	}
+	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	//slowmotion
+	newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
 
 	setGhost(hyperspeedMultiplier > 1.0f);
 

@@ -55,7 +55,6 @@ void GameObject::Draw(sf::RenderTexture& screen)
 		if (m_transparent == false)
 			screen.draw(*this);
 	}
-		
 }
 
 void GameObject::GarbageWhenOutOfScreen()
@@ -203,13 +202,15 @@ void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = m_speed;
 
-	if (hyperspeedMultiplier < 1)
-	{
-		newspeed.x = m_speed.x * hyperspeedMultiplier;
-		newspeed.y = m_speed.y * hyperspeedMultiplier;
-	}
+	const float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	newspeed.x = m_speed.x * l_hyperspeedMultiplier;
+	newspeed.y = m_speed.y * l_hyperspeedMultiplier;
 	
-	setGhost(hyperspeedMultiplier > 1.0f);
+	if (m_ghost == false && l_hyperspeedMultiplier > 1)
+		setGhost(true);
+	else if (m_ghost == true)
+		setGhost(false);
 	
 	//Basic movement (initial vector)
 	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -250,11 +251,6 @@ void GameObject::ScaleVector(sf::Vector2f* vector, float target_value)
 	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
 	vector->x *= p;
 	vector->y *= p;
-}
-
-void GameObject::Respawn()
-{
-	//see override function in class Ship
 }
 
 void GameObject::setGhost(bool ghost)
@@ -941,7 +937,7 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 	}
 }
 
-sf::Vector2f GameObject::getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
+sf::Vector2f GameObject::getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
 {
 	//default argument for cluster size
 	if (cluster_size == sf::Vector2f(0, 0))
@@ -953,24 +949,20 @@ sf::Vector2f GameObject::getRandomXSpawnPosition(Directions direction, sf::Vecto
 	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
 	rand_coordinates_min.x += 200;//marging for movement patterns
 	cluster_size.x += 200;//marging for movement patterns
-	rand_coordinates_min = GameObject::getPosition_for_Direction(direction, rand_coordinates_min, false);
 
 	//length of the allowed spread
-	int i_ = GameObject::getDirectionMultiplier(direction).y;
-	float allowed_spread = GameObject::getSize_for_Direction(direction, sf::Vector2f(i_*(SCENE_SIZE_X - cluster_size.x), i_*(SCENE_SIZE_Y - cluster_size.x))).x;
+	float allowed_spread = (SCENE_SIZE_X - cluster_size.x);
 
 	//cutting clusters bigger than the scene (+ debug message)
-	if ((allowed_spread*GameObject::getDirectionMultiplier(direction).y) < 0)
-	{
+	if (allowed_spread < 0)
 		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
-	}
 
 	//random value inside the allowed spread
 	float random_posX = RandomizeFloatBetweenValues(0, allowed_spread);
 
 	//getting position coordinates (min + random value)
-	float pos_x = GameObject::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
-	float pos_y = GameObject::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
+	float pos_x = rand_coordinates_min.x + random_posX;
+	float pos_y = rand_coordinates_min.y;
 
 	return sf::Vector2f(pos_x, pos_y);
 }

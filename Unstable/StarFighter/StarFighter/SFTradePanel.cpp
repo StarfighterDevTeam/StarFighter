@@ -3,9 +3,9 @@
 extern Game* CurrentGame;
 
 //TRADE PANEL
-SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(size, playerShip, SFPanel_Trade)
+SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(size, playership, SFPanel_Trade)
 {
-	m_playerShip = playerShip;
+	m_playership = playership;
 	m_item_stats_panel = NULL;
 	m_item_stats_panel_compare = NULL;
 
@@ -18,14 +18,14 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 	//texts
-	if (playerShip)
+	if (playership)
 	{
 		//player name and content
-		m_title_text2.setString(m_playerShip->m_display_name);
+		m_title_text2.setString(m_playership->m_display_name);
 
 		//shop name and items
-		if (m_playerShip->m_targetShop != NULL)
-			m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
+		if (m_playership->m_targetShop != NULL)
+			m_title_text.setString(m_playership->m_targetShop->m_display_name);
 	}
 
 	//size and position

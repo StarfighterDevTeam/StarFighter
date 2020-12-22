@@ -2,10 +2,10 @@
 
 extern Game* CurrentGame;
 
-SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Dialog)
+SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPanel_Dialog)
 {
-	m_playerShip = playerShip;
- 	m_dialog = playerShip->m_targetDialogs.front();
+	m_playership = playership;
+ 	m_dialog = playership->m_targetDialogs.front();
 	m_durationTimer = m_dialog->m_duration;
 
 	if (m_dialog->m_duration == 0)
@@ -16,7 +16,7 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 	setOutlineThickness(2);
 
 	//is dialog displayed up or down
-	m_is_downscreen = (*CurrentGame).m_direction == DIRECTION_DOWN ? m_dialog->m_enemy_speaking : !m_dialog->m_enemy_speaking;
+	m_is_downscreen = m_dialog->m_enemy_speaking == false;
 
 	//panel position and color
 	setPosition(sf::Vector2f(DIALOG_PANEL_OFFSET_X + size.x / 2, SCENE_SIZE_Y - DIALOG_PANEL_OFFSET_Y - size.y / 2));

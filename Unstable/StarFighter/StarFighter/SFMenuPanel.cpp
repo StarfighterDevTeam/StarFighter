@@ -2,10 +2,10 @@
 
 extern Game* CurrentGame;
 
-SFMenuPanel::SFMenuPanel(sf::Vector2f size, SFPanelTypes panel_type, size_t options, Ship* playerShip) : SFPanel(size, panel_type)
+SFMenuPanel::SFMenuPanel(sf::Vector2f size, SFPanelTypes panel_type, size_t options, Ship* playership) : SFPanel(size, panel_type)
 {
 	m_options = options;
-	m_playerShip = playerShip;
+	m_playership = playership;
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 }
@@ -35,15 +35,15 @@ void SFMenuPanel::Draw(sf::RenderTexture& screen)
 }
 
 //------------------ONE ACTION MENU------------
-SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size, SFPanel_Action, 1, playerShip)
+SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(size, SFPanel_Action, 1, playership)
 {
-	if (m_playerShip && m_playerShip->m_targetPortal)
+	if (m_playership && m_playership->m_targetPortal)
 	{
 		//direction
-		m_direction = m_playerShip->m_targetPortal->m_direction;
+		m_direction = m_playership->m_targetPortal->m_direction;
 
 		//texts strings
-		m_title_text.setString(m_playerShip->m_targetPortal->m_display_name);
+		m_title_text.setString(m_playership->m_targetPortal->m_display_name);
 
 		//options texts
 		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
@@ -72,18 +72,18 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playerShip) : SFMenu
 }
 
 //-------------------PORTAL MENU----------------
-SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size, SFPanel_Portal, NB_HAZARD_LEVELS, playerShip)
+SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(size, SFPanel_Portal, NB_HAZARD_LEVELS, playership)
 {
-	if (m_playerShip && m_playerShip->m_targetPortal)
+	if (m_playership && m_playership->m_targetPortal)
 	{	
 		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 		//direction
-		m_direction = m_playerShip->m_targetPortal->m_direction;
+		m_direction = m_playership->m_targetPortal->m_direction;
 
 		//texts strings
 		ostringstream ss_title;
-		ss_title << m_playerShip->m_targetPortal->m_display_name << " (Level " << stoi((*CurrentGame).m_generalScenesConfig[m_playerShip->m_targetPortal->m_destination_name][SCENE_LEVEL]) << ")";
+		ss_title << m_playership->m_targetPortal->m_display_name << " (Level " << m_playership->m_targetPortal->m_level;// stoi((*CurrentGame).m_generalScenesConfig[m_playership->m_targetPortal->m_destination_name][SCENE_LEVEL]) << ")";
 		m_title_text.setString(ss_title.str());
 
 		//options texts
@@ -97,28 +97,28 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		{
 			stringstream ss;
 			ss << "Hazard " << i + 1;
-			if (m_playerShip->m_targetPortal->m_max_unlocked_hazard_level == i)
+			if (m_playership->m_targetPortal->m_max_unlocked_hazard_level == i)
 			{
 				//ss << "-> Score 100.0% to unlock next hazard level";
 			}
 			m_actions_with_selection->AddOption(ss.str(), (*CurrentGame).m_font[Font_Arial]);
 			
 			//text color
-			if (i > m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
+			if (i > m_playership->m_targetPortal->m_max_unlocked_hazard_level)
 			{
 				m_actions_with_selection->m_texts[i].setColor(sf::Color(80, 80, 80, 255));//greyed
 			}
 			else
 			{
-				if (m_playerShip->m_targetPortal->m_level + i < m_playerShip->m_level)
+				if (m_playership->m_targetPortal->m_level + i < m_playership->m_level)
 				{
 					m_actions_with_selection->m_texts[i].setColor(sf::Color(40, 255, 40, 255));//green
 				}
-				else if (m_playerShip->m_targetPortal->m_level + i == m_playerShip->m_level +1)
+				else if (m_playership->m_targetPortal->m_level + i == m_playership->m_level +1)
 				{
 					m_actions_with_selection->m_texts[i].setColor(sf::Color(240, 150, 60, 255));//orange
 				}
-				else if (m_playerShip->m_targetPortal->m_level + i > m_playerShip->m_level + 1)
+				else if (m_playership->m_targetPortal->m_level + i > m_playership->m_level + 1)
 				{
 					m_actions_with_selection->m_texts[i].setColor(sf::Color(255, 40, 40, 255));//red
 				}
@@ -157,7 +157,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 		//default selected index
-		m_selected_option_index = (m_playerShip->m_last_hazard_level_played <= m_playerShip->m_targetPortal->m_max_unlocked_hazard_level ? m_playerShip->m_last_hazard_level_played : m_playerShip->m_targetPortal->m_max_unlocked_hazard_level);
+		m_selected_option_index = (m_playership->m_last_hazard_level_played <= m_playership->m_targetPortal->m_max_unlocked_hazard_level ? m_playership->m_last_hazard_level_played : m_playership->m_targetPortal->m_max_unlocked_hazard_level);
 		m_actions_with_selection->SetSelectedAction(m_selected_option_index);
 	}
 }
@@ -180,25 +180,17 @@ void SFPortalPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//updating greyed out options
 	if (m_visible)
 	{
-		if (m_playerShip && m_playerShip->m_targetPortal)
+		if (m_playership && m_playership->m_targetPortal)
 		{
 			if (m_selected_option_index == 0)
-			{
 				m_actions->m_texts[ActionButton_Y].setColor(sf::Color(80, 80, 80, 255));//greyed
-			}
 			else
-			{
 				m_actions->m_texts[ActionButton_Y].setColor(sf::Color(255, 255, 255, 255));//white
-			}
 
-			if (m_selected_option_index == m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
-			{
+			if (m_selected_option_index == m_playership->m_targetPortal->m_max_unlocked_hazard_level)
 				m_actions->m_texts[ActionButton_X].setColor(sf::Color(80, 80, 80, 255));//greyed
-			}
 			else
-			{
 				m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 255, 255, 255));//white
-			}
 		}
 
 		//hint text
@@ -209,9 +201,7 @@ void SFPortalPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 			m_text.setString(ss.str());
 		}
 		else
-		{
 			m_text.setString("");
-		}
 	}
 }
 
@@ -224,23 +214,21 @@ void SFPortalPanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_text);
 		
 		if (m_actions_with_selection)
-		{
 			m_actions_with_selection->Draw(screen);
-		}
+		
+
 		if (m_actions)
-		{
 			m_actions->Draw(screen);
-		}
 	}
 }
 
 //-------------------SHOP MENU----------------
-SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size, SFPanel_Shop, NBVAL_ShopOptions, playerShip)
+SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(size, SFPanel_Shop, NBVAL_ShopOptions, playership)
 {
-	if (m_playerShip && m_playerShip->m_targetShop)
+	if (m_playership && m_playership->m_targetShop)
 	{
 		//texts strings
-		m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
+		m_title_text.setString(m_playership->m_targetShop->m_display_name);
 
 		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
 		//m_actions->SetString("Buy/Sell", ActionButton_A);

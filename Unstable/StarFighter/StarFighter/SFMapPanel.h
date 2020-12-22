@@ -21,7 +21,7 @@ public:
 	string m_display_name;
 	float m_distance_to_current_position;
 	StellarComponentStates m_feedback_state;
-	int m_level;
+	//int m_level;
 
 	bool Update(GameObject& cursor, bool forbid_collision);
 };
@@ -68,9 +68,9 @@ public:
 class SFStellarInfoPanel : public SFPanel
 {
 public:
-	SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size, Ship* playerShip);
-	SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playerShip);
-	SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playerShip);
+	SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size, Ship* playership);
+	SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playership);
+	SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playership);
 	void Draw(sf::RenderTexture& screen) override;
 	static sf::Vector2f GetRealCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
 	static sf::Vector2f GetFakeCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
@@ -81,7 +81,7 @@ public:
 class SFMapPanel : public SFPanel
 {
 public:
-	SFMapPanel(sf::Vector2f size, Ship* playerShip);
+	SFMapPanel(sf::Vector2f size, Ship* playership);
 	~SFMapPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;

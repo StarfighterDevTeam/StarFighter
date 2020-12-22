@@ -42,7 +42,8 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		static sf::Vector2f newposition, offset, newspeed;
 		newspeed = m_speed;
-		float l_hyperspeedMultiplier = 1.0f;
+
+		float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
 
 		if (m_target != NULL)
 		{
@@ -52,36 +53,22 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 		else
 		{
-			if (hyperspeedMultiplier > 1)
-			{
-				newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
-				newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
-			}
-			else if (hyperspeedMultiplier < 1.0f)
-			{
-				l_hyperspeedMultiplier = hyperspeedMultiplier;
-				newspeed.x *= l_hyperspeedMultiplier;
-				newspeed.y *= l_hyperspeedMultiplier;
-			}
+			//slowmotion
+			newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
 
 			newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 			newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 		}
 
 		//pattern
-		if (hyperspeedMultiplier < 1.0f)
-			offset = m_pattern.getOffset_v2(deltaTime * hyperspeedMultiplier, m_target != NULL);
-		else
-			offset = m_pattern.getOffset_v2(deltaTime, m_target != NULL);
+		offset = m_pattern.getOffset_v2(deltaTime.asSeconds() * l_hyperspeedMultiplier, m_target != NULL);
 
-		offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 		newposition.x += offset.x;
 		newposition.y += offset.y;
 
 		//bot spread value
-		sf::Vector2f spread = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, m_spread);
-		newposition.x += spread.x;
-		newposition.y += spread.y;
+		newposition.x += m_spread.x;
+		newposition.y += m_spread.y;
 
 		setPosition(newposition.x, newposition.y);
 		rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
@@ -103,7 +90,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 		//UPDATE WEAPON POSITION
 		float target_angle = getRotation();//calculating the angle we want to face, if any
 		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
-			target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
+			target_angle = fmod(- (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 
 		float current_angle = getRotation();
 		float delta = current_angle - target_angle;

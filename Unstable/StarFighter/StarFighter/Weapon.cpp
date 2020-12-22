@@ -97,14 +97,7 @@ void Weapon::CreateBullet(GameObjectType collider_type, float offsetX, float dis
 	//missile default target position
 	if (bullet->m_is_missile_model == true)
 	{
-		if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == NO_DIRECTION)
-			bullet->m_missile_target_position = sf::Vector2f(getPosition().x, ((m_fire_direction + 1) / 2) * SCENE_SIZE_Y);//0 if player, SCENE_SIZE_Y if enemy
-		else if ((*CurrentGame).m_direction == DIRECTION_DOWN)
-			bullet->m_missile_target_position = sf::Vector2f(getPosition().x, ((- m_fire_direction + 1) / 2) * SCENE_SIZE_Y);//SCENE_SIZE_Y if player, 0 if enemy
-		else if ((*CurrentGame).m_direction == DIRECTION_RIGHT)
-			bullet->m_missile_target_position = sf::Vector2f(((- m_fire_direction + 1) / 2) * SCENE_SIZE_X, getPosition().y);//SCENE_SIZE_X if player, 0 if enemy
-		else if ((*CurrentGame).m_direction == DIRECTION_LEFT)
-			bullet->m_missile_target_position = sf::Vector2f(((m_fire_direction + 1) / 2) * SCENE_SIZE_X, getPosition().y);//0 if player, SCENE_SIZE_X if enemy
+		bullet->m_missile_target_position = sf::Vector2f(getPosition().x, ((m_fire_direction + 1) / 2) * SCENE_SIZE_Y);//0 if player, SCENE_SIZE_Y if enemy
 
 		//missile trail fx
 		if (collider_type == EnemyFire && bullet->m_trail != NULL)

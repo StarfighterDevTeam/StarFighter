@@ -307,7 +307,6 @@ public:
 	virtual void GetDamageFrom(GameObject& object);
 	virtual void GetDamage(int damage);
 	string getName();
-	virtual void Respawn();
 	GameObject* Clone();
 	virtual void Death();
 	virtual void GenerateLoot();
@@ -392,7 +391,7 @@ public:
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 
-	sf::Vector2f getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0, 0));
+	sf::Vector2f getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0, 0));
 	sf::Vector2f setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
 	static sf::Vector2f ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size);

@@ -3,7 +3,7 @@
 extern Game* CurrentGame;
 
 //ITEMS STATS PANEL
-SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state, GameObject* comparison_object) : SFPanel(size, SFPanel_ItemStats)
+SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playership, FocusedItemStates item_state, GameObject* comparison_object) : SFPanel(size, SFPanel_ItemStats)
 {
 	if (object)
 	{
@@ -69,7 +69,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		if (comparison_object != NULL)
 		{
 			int equip_type = object->m_equipment_loot ? object->m_equipment_loot->m_equipmentType : (object->m_weapon_loot ? NBVAL_Equipment : -1);
-			if (playerShip->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->m_elements[equip_type]->m_object != NULL)
+			if (playership->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->m_elements[equip_type]->m_object != NULL)
 			{
 				m_title_text_comparison.setString("EQUIPPED");
 				text_height += m_title_text_comparison.getGlobalBounds().height / 2;
@@ -124,7 +124,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			
 			ostringstream ss_buy_and_equip;
 			ss_buy_and_equip << "Buy and equip: $" << price;
-			if (playerShip->m_money < price)
+			if (playership->m_money < price)
 			{
 				ss_buy_and_equip << " (insufficient credits)";
 			}
@@ -132,13 +132,13 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 
 			ostringstream ss_buy;
 			ss_buy << "Buy: $" << price;
-			if (playerShip->m_money < price)
+			if (playership->m_money < price)
 			{
 				ss_buy << " (insufficient credits)";
 			}
 			m_actions->SetString(ss_buy.str(), ActionButton_X);
 
-			if (playerShip->m_money < price)
+			if (playership->m_money < price)
 			{
 				m_actions->m_texts[ActionButton_A].setColor(sf::Color(255, 50, 50, 255));//red
 				m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 50, 50, 255));//red

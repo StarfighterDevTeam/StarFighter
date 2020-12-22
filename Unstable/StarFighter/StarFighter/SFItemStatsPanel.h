@@ -6,7 +6,7 @@
 class SFItemStatsPanel : public SFPanel
 {
 public:
-	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state, GameObject* comparison_object);
+	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playership, FocusedItemStates item_state, GameObject* comparison_object);
 	~SFItemStatsPanel();
 	void DisplayItemStats(GameObject* object);
 	void Draw(sf::RenderTexture& screen) override;

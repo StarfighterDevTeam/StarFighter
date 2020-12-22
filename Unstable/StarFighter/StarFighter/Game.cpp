@@ -23,11 +23,10 @@ void Game::init(RenderWindow* window)
 
 	resetHazard();;//initalisation of the scoring system
 	m_BeastScoreBonus = 0;
-	m_direction = NO_DIRECTION;
 	m_hyperspeedMultiplier = 1.0f;
 	m_vspeed = 0;
 
-	m_playerShip = NULL;
+	m_playership = NULL;
 	m_waiting_for_dialog_validation = false;
 	m_waiting_for_scene_transition = false;
 	m_Pause = false;
@@ -178,9 +177,9 @@ sf::RenderWindow* Game::getMainWindow()
 	return m_window;
 }
 
-void Game::SetPlayerShip(Ship* playerShip)
+void Game::SetPlayerShip(Ship* playership)
 {
-	m_playerShip = playerShip;
+	m_playership = playership;
 }
 
 int Game::LoadSFX()
@@ -392,7 +391,7 @@ void Game::killGameObjectType(GameObjectType type)
 			//Combo
 			//if (type == EnemyFire)
 			//{
-			//	GameObject* obj = (GameObject*)m_playerShip;
+			//	GameObject* obj = (GameObject*)m_playership;
 			//	obj->AddComboCount(10);
 			//}
 		}
@@ -650,9 +649,9 @@ void Game::resetHazard(int hazard_overkill)
 	m_hazardSpawned = 0;
 }
 
-float Game::GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore)
+float Game::GetBeastScoreBonus(float playershipBeastScore, float sceneBeastScore)
 {
-	m_BeastScoreBonus = playerShipBeastScore + sceneBeastScore;
+	m_BeastScoreBonus = playershipBeastScore + sceneBeastScore;
 	return m_BeastScoreBonus;
 
 }
@@ -661,8 +660,8 @@ GameObject* Game::GetNearestGameObject(GameObjectType type, sf::Vector2f ref_pos
 {
 	float shortest_distance = -1;
 
-	if (type == PlayerShip && m_playerShip != NULL)
-		return (GameObject*)m_playerShip;
+	if (type == PlayerShip && m_playership != NULL)
+		return (GameObject*)m_playership;
 	
 	GameObject* object_found = NULL;
 	for (GameObject* object : m_sceneGameObjectsTyped[type])
@@ -719,25 +718,18 @@ float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_po
 		{
 			shortest_distance = sqrtf(shortest_distance);
 			//angle = acos((ref_position.y - pos.y) / shortest_distance);
-			sf::Vector2f diff_position = GameObject::getSize_for_Direction(m_direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
-			diff_position.x *= GameObject::getDirectionMultiplier(m_direction).x;
+			sf::Vector2f diff_position = sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x));
 			angle = acos(diff_position.x / shortest_distance);
 			angle = angle * 180 / M_PI;
 
-			diff_position.y *= GameObject::getDirectionMultiplier(m_direction).y;
-
 			//if (ref_position.x < pos.x)
 			if (diff_position.y < 0)
-			{
-				angle = -angle;
-			}
+				angle = - angle;
 		}
 	}
 	//if no target found, the default value for enemies is 180 degrees (firing straight ahead)
 	else if (type == PlayerShip)
-	{
 		return 180;
-	}
 
 	return angle;
 }

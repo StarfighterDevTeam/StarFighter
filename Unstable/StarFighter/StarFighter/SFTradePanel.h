@@ -6,7 +6,7 @@
 class SFTradePanel : public SFInventoryPanel
 {
 public:
-	SFTradePanel(sf::Vector2f size, Ship* playerShip);
+	SFTradePanel(sf::Vector2f size, Ship* playership);
 	void Draw(sf::RenderTexture& screen) override;
 
 	sf::Text m_title_text2;

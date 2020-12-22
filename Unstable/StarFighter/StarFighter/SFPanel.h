@@ -77,7 +77,7 @@ public:
 	bool m_visible;
 	SFPanelTypes m_panel_type;
 	SFActionBox* m_actions;
-	Ship* m_playerShip;
+	Ship* m_playership;
 
 	virtual void SetSelectedOptionIndex(int index);
 	virtual int GetSelectedOptionIndex();
