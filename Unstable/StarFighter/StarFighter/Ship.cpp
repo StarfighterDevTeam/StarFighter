@@ -760,16 +760,16 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
 
 			//Teleportation
-			if (m_SFTargetPanel->GetTeleportationCost() > 0 && m_money >= m_SFTargetPanel->GetTeleportationCost())
-			{
-				if (m_inputs_states[Action_Firing] == Input_Tap)
-				{
-					Teleport(m_SFTargetPanel->GetTeleportationDestination());
-					m_money -= m_SFTargetPanel->GetTeleportationCost();
-					SavePlayerMoneyAndHealth(this);
-					m_HUD_state = HUD_Idle;
-				}
-			}
+			//if (m_SFTargetPanel->GetTeleportationCost() > 0 && m_money >= m_SFTargetPanel->GetTeleportationCost())
+			//{
+			//	if (m_inputs_states[Action_Firing] == Input_Tap)
+			//	{
+			//		Teleport(m_SFTargetPanel->GetTeleportationDestination());
+			//		m_money -= m_SFTargetPanel->GetTeleportationCost();
+			//		SavePlayerMoneyAndHealth(this);
+			//		m_HUD_state = HUD_Idle;
+			//	}
+			//}
 
 			//Center view
 			if (m_inputs_states[Action_Braking] == Input_Tap)
@@ -1592,7 +1592,7 @@ void Ship::Respawn(bool no_save)
 	m_bot_list.clear();
 
 	m_level = 1;
-	m_money = 0;
+	m_money = 100;
 	m_knownScenes.clear();
 
 	//saving
@@ -2032,7 +2032,6 @@ int Ship::UpdateShipLevel()
 }
 
 //SAVING AND LOADING 
-
 int Ship::SavePlayerScenes(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Saving scenes in profile.\n");
@@ -2044,11 +2043,10 @@ int Ship::SavePlayerScenes(Ship* ship)
 		// instructions
 		for (map<string, int>::iterator it = ship->m_knownScenes.begin(); it != ship->m_knownScenes.end(); it++)
 		{
-			data << it->first.c_str() << " " << it->second;
+			data << it->first.c_str();// << " " << it->second;
 			if (it->first.c_str() == ship->m_respawnSceneName)
-			{
 				data << " " << "!";
-			}
+			
 			data << endl;
 		}
 
@@ -2077,17 +2075,13 @@ string Ship::LoadPlayerScenes(Ship* ship)
 		while (std::getline(data, line))
 		{
 			string scene;
-			int level;
-			std::istringstream(line) >> scene >> level;
 			string current_scene;
 
-			std::istringstream(line) >> scene >> level >> current_scene;
+			std::istringstream(line) >> scene >> current_scene;
 
-			ship->m_knownScenes.insert(std::pair<string, int>(scene, level));
+			ship->m_knownScenes.insert(std::pair<string, int>(scene, 0));
 			if (current_scene.compare("!") == 0)
-			{
 				return_current_scene = scene;
-			}
 		}
 
 		data.close();  // on ferme le fichier
@@ -2126,7 +2120,7 @@ int Ship::SavePlayerMoneyAndHealth(Ship* ship)
 
 bool Ship::LoadPlayerMoneyAndHealth(Ship* ship)
 {
-	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
+	LOGGER_WRITE(Logger::DEBUG, "Loading money and health from profile.\n");
 	assert(ship != NULL);
 
 	std::ifstream  data(string(getSavesPath()) + MONEY_AND_HEALTH_SAVE_FILE, ios::in);
@@ -2852,7 +2846,7 @@ void Ship::SetUpgrade(string upgrade_name)
 	{
 		m_upgrades.push_back(upgrade_name);
 
-		string locked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_LOCKED_BY];
+		string locked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_UNLOCKED_BY];
 		if (locked_by.compare("0") != 0)
 		{
 			for (vector<string>::iterator it = m_upgrades_short.begin(); it != m_upgrades_short.end(); it++)
@@ -2934,6 +2928,46 @@ void Ship::SetUpgrade(string upgrade_name)
 		SetWeapon("minirocket4");
 	else if (upgrade_name.compare("Upgrade_minirocket_5") == 0)
 		SetWeapon("minirocket5");
+	else if (upgrade_name.compare("Upgrade_drone_laser_1") == 0)
+		SetDrone("bot_laser", 1);
+	else if (upgrade_name.compare("Upgrade_drone_laser_2") == 0)
+		SetDrone("bot_laser", 2);
+	else if (upgrade_name.compare("Upgrade_drone_laser_3") == 0)
+		SetDrone("bot_laser", 3);
+	else if (upgrade_name.compare("Upgrade_drone_laser_4") == 0)
+		SetDrone("bot_laser", 4);
+	else if (upgrade_name.compare("Upgrade_drone_laser_5") == 0)
+		SetDroneWeapon("laser1");
+	else if (upgrade_name.compare("Upgrade_drone_laserbeam_1") == 0)
+		SetDrone("bot_laserbeam", 1);
+	else if (upgrade_name.compare("Upgrade_drone_laserbeam_2") == 0)
+		SetDroneWeapon("laserbeam1");
+	else if (upgrade_name.compare("Upgrade_drone_laserbeam_3") == 0)
+		SetDroneWeapon("laserbeam2");
+	else if (upgrade_name.compare("Upgrade_drone_laserbeam_4") == 0)
+		SetDroneWeapon("laserbeam3");
+	else if (upgrade_name.compare("Upgrade_drone_laserbeam_5") == 0)
+	{
+		SetDrone("bot_laserbeam", 2);
+		SetDroneWeapon("laserbeam3");
+	}
+	else if (upgrade_name.compare("Upgrade_drone_minirocket_1") == 0)
+		SetDrone("bot_minirocket", 1);
+	else if (upgrade_name.compare("Upgrade_drone_minirocket_2") == 0)
+		SetDroneWeapon("minirocket1");
+	else if (upgrade_name.compare("Upgrade_drone_minirocket_3") == 0)
+	{
+		SetDrone("bot_minirocket", 2);
+		SetDroneWeapon("minirocket1");
+	}
+	else if (upgrade_name.compare("Upgrade_drone_minirocket_4") == 0)
+		SetDroneWeapon("minirocket2");
+	else if (upgrade_name.compare("Upgrade_drone_minirocket_5") == 0)
+		SetDroneWeapon("minirocket3");
+	else if (upgrade_name.compare("Restores_hp_1") == 0)
+		m_armor++;
+
+
 	else if (upgrade_name.compare("Restores_hp_1") == 0)
 		m_armor++;
 }
@@ -2942,6 +2976,43 @@ void Ship::SetWeapon(string weapon_name)
 {
 	delete m_weapon;
 	m_weapon = Enemy::LoadWeapon(weapon_name, -1);
+}
+
+void Ship::SetDrone(string drone_name, int number)
+{
+	for (Bot* bot : m_bot_list)
+		delete bot;
+
+	m_bot_list.clear();
+
+	Bot* bot = Enemy::LoadBot(drone_name);
+	m_bot_list.push_back(bot);
+
+	for (int i = 1; i < number; i++)
+	{
+		Bot* new_bot = bot->Clone();
+
+		//bots auto spreading based on number of bots
+		int s = i % 2 == 0 ? 1 : -1;
+		int x = i / 2;
+		new_bot->m_spread.x *= s * (1 + x);
+	}
+
+	GenerateBots(this);
+}
+
+void Ship::SetDroneWeapon(string weapon_name)
+{
+	if (m_bot_list.empty() == false)
+	{
+		Weapon* weapon = Enemy::LoadWeapon(weapon_name, -1);
+		
+		for (Bot* bot : m_bot_list)
+		{
+			delete bot->m_weapon;
+			bot->m_weapon = bot == m_bot_list.front() ? weapon : weapon->Clone();
+		}
+	}
 }
 
 void Ship::RandomizeUpgrades(Shop* target_shop)
@@ -2973,11 +3044,11 @@ void Ship::RandomizeUpgrades(Shop* target_shop)
 
 		//locked by
 		bool unlocked = false;
-		if (it->second[UPGRADE_LOCKED_BY].compare("0") != 0)
+		if (it->second[UPGRADE_UNLOCKED_BY].compare("0") != 0)
 		{
 			for (vector<string>::iterator it2 = m_upgrades.begin(); it2 != m_upgrades.end(); it2++)
 			{
-				if (it2->compare(it->second[UPGRADE_LOCKED_BY]) == 0)
+				if (it2->compare(it->second[UPGRADE_UNLOCKED_BY]) == 0)
 				{
 					unlocked = true;
 					break;

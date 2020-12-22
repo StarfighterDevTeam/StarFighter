@@ -179,31 +179,31 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, 
 		m_location_name = hub->m_display_name;
 
 		//text content
-		m_title_text.setString(hub->m_display_name.c_str());
+		m_title_text.setString(SFReplaceTexts(hub->m_display_name.c_str(), -1));
 
-		bool teleportation_available = teleportation_cost > 0;
+		//bool teleportation_available = teleportation_cost > 0;
 		ostringstream ss;
-		if (teleportation_available)
-		{
-			m_actions = new SFActionBox ((*CurrentGame).m_font[Font_Arial]);
-
-			ss << "Teleportation: $" << teleportation_cost;
-			if (playership->m_money < teleportation_cost)
-			{
-				ss << " (insufficient credits)";
-			}
-
-			m_actions->SetString(ss.str(), ActionButton_A);
-			if (playership->m_money < teleportation_cost)
-			{
-				m_actions->m_texts[ActionButton_A].setColor(sf::Color(255, 50, 50, 255));//red
-			}
-		}
-		else
-		{
+		//if (teleportation_available)
+		//{
+		//	m_actions = new SFActionBox ((*CurrentGame).m_font[Font_Arial]);
+		//
+		//	ss << "Teleportation: $" << teleportation_cost;
+		//	if (playership->m_money < teleportation_cost)
+		//	{
+		//		ss << " (insufficient credits)";
+		//	}
+		//
+		//	m_actions->SetString(ss.str(), ActionButton_A);
+		//	if (playership->m_money < teleportation_cost)
+		//	{
+		//		m_actions->m_texts[ActionButton_A].setColor(sf::Color(255, 50, 50, 255));//red
+		//	}
+		//}
+		//else
+		//{
 			ss << "Current location";
 			m_text.setString(ss.str());
-		}
+		//}
 		
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
@@ -230,17 +230,17 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f siz
 		//text content
 		m_title_text.setString(segment->m_display_name.c_str());
 
-		ostringstream ss;
-		ss << "Hazard level unlocked: " << segment->m_max_hazard_unlocked + 1 << " / " << NB_HAZARD_LEVELS;
-		m_text.setString(ss.str());
+		//ostringstream ss;
+		//ss << "Hazard level unlocked: " << segment->m_max_hazard_unlocked + 1 << " / " << NB_HAZARD_LEVELS;
+		//m_text.setString(ss.str());
 
 		//text position
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
 		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
-		text_height += m_title_text.getCharacterSize() + INTERACTION_INTERLINE;
-		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+		//text_height += m_title_text.getCharacterSize() + INTERACTION_INTERLINE;
+		//m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 	}
 }
 
@@ -251,7 +251,7 @@ void SFStellarInfoPanel::Draw(sf::RenderTexture& screen)
 		SFPanel::Draw(screen);
 
 		screen.draw(m_title_text);
-		screen.draw(m_text);
+		//screen.draw(m_text);
 
 		if (m_actions)
 		{
@@ -320,7 +320,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 
 	text_height += m_title_text.getGlobalBounds().height / 2 + INTERACTION_INTERBLOCK;
 	ostringstream ss_text;
-	ss_text << "Current location: " << playership->m_currentScene_name;
+	ss_text << "Current location: " << SFReplaceTexts(playership->m_currentScene_name, -1);
 	m_text.setString(ss_text.str());
 	m_text.setPosition(sf::Vector2f(getPosition().x - m_text.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height));
 

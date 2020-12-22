@@ -145,6 +145,8 @@ public :
 	vector<string> m_upgrades;
 	vector<string> m_upgrades_short;
 	void SetWeapon(string weapon_name);
+	void SetDrone(string drone_name, int number);
+	void SetDroneWeapon(string weapon_name);
 	
 	void SetVisibility(bool visible);
 	void Death() override;

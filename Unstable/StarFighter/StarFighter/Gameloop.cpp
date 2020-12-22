@@ -35,13 +35,14 @@ void Gameloop::Initialize(Player player)
 
 	//Initialisation of player ship
 	m_playership->Init();
-	m_playership->ResplenishHealth();
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
 	//Loading save files or creating new ones
 	m_playership->m_respawnSceneName = Ship::LoadPlayerScenes(m_playership);
 	if (m_playership->m_respawnSceneName.empty() == false)
 	{
+		(*CurrentGame).m_playership->Respawn(true);
+
 		if (!Ship::LoadPlayerUpgrades(m_playership))
 			Ship::SavePlayerUpgrades(m_playership);
 
@@ -52,8 +53,7 @@ void Gameloop::Initialize(Player player)
 	}
 	else
 	{
-		//New game save
-		(*CurrentGame).m_playership->Respawn(true);
+		(*CurrentGame).m_playership->Respawn(false);
 
 		//Loading starting scene
 		SpawnInScene(STARTING_SCENE, (*CurrentGame).m_playership, false);
@@ -535,6 +535,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
 	(*CurrentGame).m_is_in_hub = m_currentScene->m_is_hub;
 	m_playership->m_currentScene_name = m_currentScene->m_name;
+	AddToKnownScenes(m_currentScene->m_name);
 
 	(*CurrentGame).m_playership->m_HUD_state = HUD_Idle;
 
@@ -554,6 +555,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_Y_RATIO);
 	if (next_scene_is_hub == true)
 	{
+		(*CurrentGame).m_playership->m_disable_fire = true;
 		(*CurrentGame).m_playership->m_disableHyperspeed = true;
 		(*CurrentGame).m_playership->m_disableJump = true;
 		(*CurrentGame).m_playership->m_disableSlowmotion = true;
@@ -565,12 +567,11 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 		//Saving
 		if (scene_name.compare(m_playership->m_respawnSceneName) != 0)
 		{
-			AddToKnownScenes(m_currentScene->m_name);
+			m_playership->m_respawnSceneName = scene_name;
+
 			Ship::SavePlayerScenes(m_playership);
 			Ship::SavePlayerMoneyAndHealth(m_playership);
 		}
-
-		m_playership->m_respawnSceneName = scene_name;
 
 		m_IG_State = HUB_ROAMING;
 	}
@@ -597,6 +598,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	//(*CurrentGame).m_waiting_for_scene_transition = false;
 	(*CurrentGame).m_playership->m_immune = false;
 	(*CurrentGame).m_playership->m_is_asking_scene_transition = false;
+	(*CurrentGame).m_playership->m_collision_timer = 0;
 
 	//Play scene title feedback if we come from a Hub or getting to a Hub
 	if (display_scene_name == true || m_currentScene->m_is_hub == true)

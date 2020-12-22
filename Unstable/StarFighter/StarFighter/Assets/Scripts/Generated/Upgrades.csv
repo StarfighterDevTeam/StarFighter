@@ -1,4 +1,5 @@
-#upgrade_name,category,permanent,price,is_locked_by,image,display_name,text_description,condition,op,value
+#upgrade_name,category,permanent,price,is_unlocked_by,image,display_name,text_description,condition,op,value
+Restores_hp_1,0,0,100,0,2D\Equipment\life.png,Light_repare,Restores_1_Life_point.,life,lesser,100
 Upgrade_hp_1,0,1,100,0,2D\Equipment\Armor.png,HP_lvl_1,Increases_your_max_life_points_up_to_4.,0,,
 Upgrade_hp_2,0,1,200,Upgrade_hp_1,2D\Equipment\Armor.png,HP_lvl_2,Increases_your_max_life_points_up_to_5.,0,,
 Upgrade_hp_3,0,1,300,Upgrade_hp_2,2D\Equipment\Armor.png,HP_lvl_3,Increases_your_max_life_points_up_to_6.,0,,
@@ -24,4 +25,18 @@ Upgrade_minirocket_2,2,1,600,Upgrade_minirocket_1,2D\Equipment\minirocket.png,Mi
 Upgrade_minirocket_3,2,1,700,Upgrade_minirocket_2,2D\Equipment\minirocket.png,Minirocket_lvl_3,Increases_the_number_of_missiles_shots.,0,,
 Upgrade_minirocket_4,2,1,800,Upgrade_minirocket_3,2D\Equipment\minirocket.png,Minirocket_lvl_4,Increases_the_number_of_missiles_shots.,0,,
 Upgrade_minirocket_5,2,1,900,Upgrade_minirocket_4,2D\Equipment\minirocket.png,Minirocket_lvl_5,Increases_the_number_of_missiles_shots.,0,,
-Restores_hp_1,0,0,100,0,2D\Equipment\life.png,Light_repare,Restores_1_Life_point.,life,lesser,100
+Upgrade_drone_laser_1,3,1,200,0,2D\Equipment\upgrade_bot_laser.png,Drone_laser_lvl_1,Adds_an_escort_drone_that_automatically_shoots_lasers_when_you_shoot.,0,,
+Upgrade_drone_laser_2,3,1,300,Upgrade_drone_laser_1,2D\Equipment\upgrade_bot_laser.png,Drone_laser_lvl_2,Adds_an_additional_drone_that_shoots_lasers_when_you_shoot.,0,,
+Upgrade_drone_laser_3,3,1,400,Upgrade_drone_laser_2,2D\Equipment\upgrade_bot_laser.png,Drone_laser_lvl_3,Adds_an_additional_drone_that_shoots_lasers_when_you_shoot.,0,,
+Upgrade_drone_laser_4,3,1,500,Upgrade_drone_laser_3,2D\Equipment\upgrade_bot_laser.png,Drone_laser_lvl_4,Adds_an_additional_drone_that_shoots_lasers_when_you_shoot.,0,,
+Upgrade_drone_laser_5,3,1,500,Upgrade_drone_laser_4,2D\Equipment\upgrade_bot_laser.png,Drone_laser_lvl_5,Increases_the_number_of_shots_fired_by_the_drones.,0,,
+Upgrade_drone_laserbeam_1,3,1,200,0,2D\Equipment\upgrade_bot_laserbeam.png,Drone_laserbeam_lvl_1,Adds_an_escort_drone_that_shoots_a_laserbeam_targeted_at_the_enemies_when_you_shoot.,0,,
+Upgrade_drone_laserbeam_2,3,1,300,Upgrade_drone_laserbeam_1,2D\Equipment\upgrade_bot_laserbeam.png,Drone_laserbeam_lvl_2,Increases_the_power_of_your_drone's_laserbeam.,0,,
+Upgrade_drone_laserbeam_3,3,1,400,Upgrade_drone_laserbeam_2,2D\Equipment\upgrade_bot_laserbeam.png,Drone_laserbeam_lvl_3,Increases_the_power_of_your_drone's_laserbeam.,0,,
+Upgrade_drone_laserbeam_4,3,1,500,Upgrade_drone_laserbeam_3,2D\Equipment\upgrade_bot_laserbeam.png,Drone_laserbeam_lvl_4,Increases_the_power_of_your_drone's_laserbeam.,0,,
+Upgrade_drone_laserbeam_5,3,1,500,Upgrade_drone_laserbeam_4,2D\Equipment\upgrade_bot_laserbeam.png,Drone_laserbeam_lvl_5,Adds_an_additional_drone_that_shoots_a_laserbeam_targeted_at_the_enemies_when_you_shoot.,0,,
+Upgrade_drone_laser_1,3,1,200,0,2D\Equipment\upgrade_bot_minirocket.png,Drone_laser_lvl_1,Adds_an_escort_drone_that_shoots_guided_missiles_with_an_area_of_effect.,0,,
+Upgrade_drone_laser_2,3,1,300,Upgrade_drone_laser_1,2D\Equipment\upgrade_bot_minirocket.png,Drone_laser_lvl_2,The_escort_drones_shoots_additional_guided_missiles_with_an_area_of_effect.,0,,
+Upgrade_drone_laser_3,3,1,400,Upgrade_drone_laser_2,2D\Equipment\upgrade_bot_minirocket.png,Drone_laser_lvl_3,Adds_an_escort_drone_that_shoots_guided_missiles_with_an_area_of_effect.,0,,
+Upgrade_drone_laser_4,3,1,500,Upgrade_drone_laser_3,2D\Equipment\upgrade_bot_minirocket.png,Drone_laser_lvl_4,The_escort_drones_shoots_additional_guided_missiles_with_an_area_of_effect.,0,,
+Upgrade_drone_laser_5,3,1,500,Upgrade_drone_laser_4,2D\Equipment\upgrade_bot_minirocket.png,Drone_laser_lvl_5,The_escort_drones_shoots_additional_guided_missiles_with_an_area_of_effect.,0,,

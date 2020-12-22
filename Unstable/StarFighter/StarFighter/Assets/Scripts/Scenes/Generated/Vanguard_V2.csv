@@ -1,4 +1,4 @@
 #,enemies_name,proba,enemy_class,Level,spawnCost,repeatChance,MissChance
 enemy,V_Alpha1,1,1,2,4,0.30f,0.10f
 enemy,V_Sigma1,1,2,2,10,0.2,0.5
-enemy,V_Beta1,1,5,2,15,0.1,0.2
+enemy,V_Beta1,1,5,2,18,0,0.2

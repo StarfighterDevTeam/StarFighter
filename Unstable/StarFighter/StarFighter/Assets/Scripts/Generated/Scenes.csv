@@ -1,7 +1,7 @@
 #scene_name,filename,display_name,link_UP,link_DOWN,link_RIGHT,link_LEFT,background_filename,width,height,vspeed,is_hub,size_in_stellar_map,music
 Sandbox,Scripts/Scenes/Generated/Sandbox.csv,Sandbox,Vanguard_Hub0,0,0,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
 Vanguard_HubIntro,Scripts/Scenes/Generated/Vanguard_HubIntro.csv,Vanguard Hub Intro,Vanguard_VIntro,0,0,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,0,,Music/Boss.ogg
-Vanguard_VIntro,Scripts/Scenes/Generated/Vanguard_VIntro.csv,Vanguard V Intro,Vanguard_Hub0,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,150,0,1,Music/Conflict.ogg
+Vanguard_VIntro,Scripts/Scenes/Generated/Vanguard_VIntro.csv,Vanguard V Intro,Vanguard_Hub0,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,400,0,1,Music/Conflict.ogg
 Vanguard_Hub0,Scripts/Scenes/Generated/Vanguard_Hub0.csv,Vanguard Hub 0,Vanguard_V1,0,0,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
 Vanguard_Hub1,Scripts/Scenes/Generated/Vanguard_Hub1.csv,Vanguard Hub 1,Vanguard_V3,0,Vanguard_H1,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
 Vanguard_Hub2,Scripts/Scenes/Generated/Vanguard_Hub2.csv,Vanguard Hub 2,Vanguard_V5,0,Vanguard_H3,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
@@ -9,8 +9,8 @@ Vanguard_Hub3,Scripts/Scenes/Generated/Vanguard_Hub3.csv,Vanguard Hub 3,0,0,Vang
 Vanguard_Hub4,Scripts/Scenes/Generated/Vanguard_Hub4.csv,Vanguard Hub 4,Vanguard_V8,0,0,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
 Vanguard_Hub5,Scripts/Scenes/Generated/Vanguard_Hub5.csv,Vanguard Hub 5,Vanguard_V10,0,0,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
 Vanguard_Hub6,Scripts/Scenes/Generated/Vanguard_Hub6.csv,Vanguard Hub 6,0,0,0,0,2D/Backgrounds/BGIntro.jpg,1080,1080,0,1,,0
-Vanguard_V1,Scripts/Scenes/Generated/Vanguard_V1.csv,Vanguard V1,Vanguard_V2,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,100,0,1,0
-Vanguard_V2,Scripts/Scenes/Generated/Vanguard_V2.csv,Vanguard V2,Vanguard_Hub1,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,100,0,1,0
+Vanguard_V1,Scripts/Scenes/Generated/Vanguard_V1.csv,Vanguard V1,Vanguard_V2,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,500,0,1,0
+Vanguard_V2,Scripts/Scenes/Generated/Vanguard_V2.csv,Vanguard V2,Vanguard_Hub1,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,500,0,1,0
 Vanguard_V3,Scripts/Scenes/Generated/Vanguard_V3.csv,Vanguard V3,Vanguard_V4,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,100,0,1,0
 Vanguard_V4,Scripts/Scenes/Generated/Vanguard_V4.csv,Vanguard V4,Vanguard_Hub2,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,100,0,1,0
 Vanguard_V5,Scripts/Scenes/Generated/Vanguard_V5.csv,Vanguard V5,Vanguard_V6,0,0,0,2D/Backgrounds/BGVertical_1.jpg,1080,5400,100,0,1,0
