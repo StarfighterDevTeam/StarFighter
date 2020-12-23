@@ -22,6 +22,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_display_name = "Ammo";
 	m_is_missile_model = is_missile_model;
 	m_trail = NULL;
+	m_area_of_effect = 0;
 	
 	//(*CurrentGame).addToScene(m_trail, false);
 
@@ -78,6 +79,7 @@ Ammo* Ammo::Clone()
 	ammo->m_DontGarbageMe = this->m_isBeam || this->m_is_missile_model;
 	ammo->m_is_missile_model = this->m_is_missile_model;
 	ammo->setAnimationLine(m_currentAnimationIndex);
+	ammo->m_area_of_effect = m_area_of_effect;
 
 	return ammo;
 }

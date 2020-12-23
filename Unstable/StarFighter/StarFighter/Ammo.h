@@ -33,6 +33,7 @@ public:
 	string m_sound_name;
 	Aura* m_trail;
 	bool m_is_missile_model;
+	float m_area_of_effect;
 
 	//missile motion model
 	float m_missile_turn_speed;

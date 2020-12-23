@@ -371,10 +371,11 @@ void Enemy::RotateFeedbacks(float angle)
 
 void Enemy::GetDamageFrom(GameObject& object)
 {
+	Ammo& ammo = (Ammo&)object;
+
 	if (object.m_collider_type == FriendlyFire)
 	{
-		//display impact FX regardless of damage
-		Ammo& ammo = (Ammo&)object;
+		//display impact FX regardless of damage	
 		if (ammo.m_isBeam == false)
 			ammo.Death();
 
@@ -393,11 +394,13 @@ void Enemy::GetDamageFrom(GameObject& object)
 
 	if (object.m_collision_timer <= 0)
 	{
-		GetDamage(object.m_damage);
+		if (ammo.m_area_of_effect == 0)
+			GetDamage(object.m_damage);
+		else
+			(*CurrentGame).DamageObjectsInRange(EnemyObjectLayer, object.getPosition(), ammo.m_area_of_effect, ammo.m_damage);
 
 		if (object.m_collider_type == FriendlyFire)//bullet versus ship
 		{
-			Ammo& ammo = (Ammo&)object;
 			if (ammo.m_isBeam == false)
 				object.m_collision_timer = TIME_BETWEEN_BULLET_DAMAGE_TICK;
 			else
@@ -1145,9 +1148,9 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 			weapon->m_shot_mode = NoShotMode;
 
 			weapon->m_ammunition->m_damage = stoi((*it)[WEAPON_DAMAGE]);
-			weapon->m_ammunition->m_ref_speed = stoi((*it)[WEAPON_SPEED]);
+			weapon->m_ammunition->m_ref_speed = (float)stoi((*it)[WEAPON_SPEED]);
 			weapon->m_ammunition->m_speed = sf::Vector2f(0, weapon->m_ammunition->m_ref_speed);
-			weapon->m_ammunition->m_range = stoi((*it)[WEAPON_RANGE]);
+			weapon->m_ammunition->m_range = (float)stoi((*it)[WEAPON_RANGE]);
 
 			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), WEAPON_PATTERN);
 			weapon->m_ammunition->m_pattern.setPattern_v2(pattern);
@@ -1184,9 +1187,9 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 			}
 				
 			weapon->m_textureName = (*it)[WEAPON_IMAGE_NAME];
-			weapon->m_size = sf::Vector2f(stoi((*it)[WEAPON_WIDTH]), stoi((*it)[WEAPON_HEIGHT]));
+			weapon->m_size = sf::Vector2f((float)stoi((*it)[WEAPON_WIDTH]), (float)stoi((*it)[WEAPON_HEIGHT]));
 			weapon->m_frameNumber = stoi((*it)[WEAPON_FRAMES]);
-			weapon->m_angle_offset = stoi((*it)[WEAPON_ANGLE_OFFSET]);
+			weapon->m_angle_offset = (float)stoi((*it)[WEAPON_ANGLE_OFFSET]);
 
 			if ((*it)[WEAPON_TARGET_HOMING].compare("0") != 0)
 			{
@@ -1212,7 +1215,7 @@ Ammo* Enemy::LoadAmmo(string name)
 		if ((*it)[0].compare(name) == 0)
 		{
 			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), (*it)[AMMO_IMAGE_NAME],
-				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_FRAMES]), stoi((*it)[AMMO_NB_SKINS]), 0, LoadFX((*it)[AMMO_FX]), (bool)stoi((*it)[AMMO_MISSILE_MODEL]));
+				Vector2f((float)stoi((*it)[AMMO_WIDTH]), (float)stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_FRAMES]), stoi((*it)[AMMO_NB_SKINS]), 0, LoadFX((*it)[AMMO_FX]), (bool)stoi((*it)[AMMO_MISSILE_MODEL]));
 
 			new_ammo->setAnimationLine(stoi((*it)[AMMO_SKIN]) - 1);
 			new_ammo->m_display_name = (*it)[AMMO_NAME];
@@ -1221,7 +1224,8 @@ Ammo* Enemy::LoadAmmo(string name)
 			if (!(*it)[AMMO_FX].empty())
 				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
 
-			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);
+			new_ammo->m_rotation_speed = (float)stoi((*it)[AMMO_ROTATION_SPEED]);
+			new_ammo->m_area_of_effect = (float)stoi((*it)[AMMO_AREA_OF_EFFECT]);
 			return new_ammo;
 		}
 	}
@@ -1240,7 +1244,7 @@ FX* Enemy::LoadFX(string name)
 			if ((*it)[FX_NAME].compare(name) == 0)
 			{
 				float duration = atof(((*it)[FX_DURATION]).c_str());
-				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FX_FILENAME], Vector2f(stoi((*it)[FX_WIDTH]), stoi((*it)[FX_HEIGHT])), stoi((*it)[FX_FRAMES]), sf::seconds(duration));
+				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FX_FILENAME], Vector2f((float)stoi((*it)[FX_WIDTH]), (float)stoi((*it)[FX_HEIGHT])), stoi((*it)[FX_FRAMES]), sf::seconds(duration));
 				myFX->m_display_name = (*it)[FX_NAME];
 
 				return myFX;
@@ -1259,7 +1263,7 @@ Bot* Enemy::LoadBot(string name)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
-			Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), (*it)[BOT_IMAGE_NAME], sf::Vector2f(stoi((*it)[BOT_WIDTH]), stoi((*it)[BOT_HEIGHT])));
+			Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), (*it)[BOT_IMAGE_NAME], sf::Vector2f((float)stoi((*it)[BOT_WIDTH]), (float)stoi((*it)[BOT_HEIGHT])));
 
 			((GameObject*)bot)->m_display_name = (*it)[BOT_NAME];
 			((GameObject*)bot)->m_armor = stoi((*it)[BOT_ARMOR]);

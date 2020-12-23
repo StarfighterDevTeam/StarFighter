@@ -539,7 +539,7 @@ void Game::colisionChecksV2(Time deltaTime)
 		//Player bullets on enemy
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[FriendlyFire].begin(); it2 != m_sceneGameObjectsTyped[FriendlyFire].end(); it2++)
 		{
-			//Bullets are invisible after impact
+			//Bullets impact on enemy
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 				(*it1)->GetDamageFrom(*(*it2));
 		}
@@ -782,5 +782,20 @@ EquipmentQuality Game::GetItemQualityClass(float quality)
 	else
 	{
 		return ItemQuality_Epic;
+	}
+}
+
+void Game::DamageObjectsInRange(LayerType layer, sf::Vector2f position, float range, int damage)
+{
+	for (GameObject* object : m_sceneGameObjectsLayered[layer])
+	{
+		if (object->m_immune == true || object->m_isOnScene == false)
+			continue;
+
+		sf::Vector2f diff_position = sf::Vector2f((object->getPosition().y - position.y), (object->getPosition().x - position.x));
+		float distance_square = diff_position.x * diff_position.x + diff_position.y * diff_position.y;
+		
+		if (distance_square < (range + object->m_diag) * (range + object->m_diag))
+			object->GetDamage(damage);
 	}
 }

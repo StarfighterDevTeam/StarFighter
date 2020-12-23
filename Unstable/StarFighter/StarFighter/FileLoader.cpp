@@ -82,7 +82,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 	}
 
 	EnemyBase* base = new EnemyBase;
-	base->m_enemy = new Enemy(sf::Vector2f(0, 0), sf::Vector2f(0, stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_SPEED])), (*CurrentGame).m_enemiesConfig[name][ENEMY_IMAGE_NAME], sf::Vector2f(stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_WIDTH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_HEIGHT])), LoadFX((*CurrentGame).m_enemiesConfig[name][ENEMY_FX_DEATH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_FRAMES]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_NB_SKINS]));
+	base->m_enemy = new Enemy(sf::Vector2f(0, 0), sf::Vector2f(0, (float)stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_SPEED])), (*CurrentGame).m_enemiesConfig[name][ENEMY_IMAGE_NAME], sf::Vector2f((float)stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_WIDTH]), (float)stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_HEIGHT])), LoadFX((*CurrentGame).m_enemiesConfig[name][ENEMY_FX_DEATH]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_FRAMES]), stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_NB_SKINS]));
 	base->m_enemy->setAnimationLine(stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_SKIN]) - 1);//the skin counts starts at 1
 	base->m_probability = probability;
 	base->m_enemyclass = enemyClass;
@@ -143,7 +143,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 		if ((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3].compare("0") != 0)
 			base->m_enemy->m_weapons_list.push_back(FileLoader::LoadWeapon((*CurrentGame).m_enemiesConfig[name][ENEMY_WEAPON_3], 1));
 
-		base->m_enemy->m_rotation_speed = stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_ROTATION_SPEED]);
+		base->m_enemy->m_rotation_speed = (float)stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_ROTATION_SPEED]);
 	}
 
 	return base;
@@ -185,10 +185,10 @@ ShipModel* FileLoader::LoadShipModel(string name)
 		{
 			if((*it)[EQUIPMENT_NAME].compare(name) == 0)
 			{
-				ShipModel* s = new ShipModel(stoi((*it)[EQUIPMENT_MAXSPEED]), stoi((*it)[EQUIPMENT_ACCELERATION]), stoi((*it)[EQUIPMENT_DECCELERATION]), 
+				ShipModel* s = new ShipModel((float)stoi((*it)[EQUIPMENT_MAXSPEED]), (float)stoi((*it)[EQUIPMENT_ACCELERATION]), (float)stoi((*it)[EQUIPMENT_DECCELERATION]),
 					stoi((*it)[EQUIPMENT_HYPERSPEED]), stoi((*it)[EQUIPMENT_HYPERSPEED_FUEL]), stoi((*it)[EQUIPMENT_ARMOR]), stoi((*it)[EQUIPMENT_SHIELD]), stoi((*it)[EQUIPMENT_SHIELD_REGEN]),
 					atof((*it)[EQUIPMENT_SHIELD_RECOVERY].c_str()), stoi((*it)[EQUIPMENT_DAMAGE]),
-					(*it)[EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EQUIPMENT_WIDTH]), stoi((*it)[EQUIPMENT_HEIGHT])), 
+					(*it)[EQUIPMENT_IMAGE_NAME], Vector2f((float)stoi((*it)[EQUIPMENT_WIDTH]), (float)stoi((*it)[EQUIPMENT_HEIGHT])),
 					stoi((*it)[EQUIPMENT_FRAMES]), (*it)[EQUIPMENT_NAME]);
 
 				if ((*it)[EQUIPMENT_BOT].compare("0") != 0)
@@ -200,7 +200,7 @@ ShipModel* FileLoader::LoadShipModel(string name)
 					&& !(*it)[EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
 				{
 					s->m_fake_textureName = (*it)[EQUIPMENT_FAKE_TEXTURE];
-					s->m_fake_size = sf::Vector2f(stoi((*it)[EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EQUIPMENT_FAKE_HEIGHT]));
+					s->m_fake_size = sf::Vector2f((float)stoi((*it)[EQUIPMENT_FAKE_WIDTH]), (float)stoi((*it)[EQUIPMENT_FAKE_HEIGHT]));
 					s->m_fake_frameNumber = stoi((*it)[EQUIPMENT_FAKE_FRAMES]);
 				}
 

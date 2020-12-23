@@ -266,13 +266,11 @@ void GameObject::setGhost(bool ghost)
 		setColor(m_color);
 	}
 }
-//void GameObject::Follow(GameObject* target)
-//{
-//	this->setPosition(target->getPosition().x, target->getPosition().x);
-//}
 
 void GameObject::GetDamageFrom(GameObject& object)
 {
+	//see override function in class Enemy
+
 	if (object.m_collision_timer <= 0)
 	{
 		GetDamage(object.m_damage);
@@ -283,6 +281,7 @@ void GameObject::GetDamageFrom(GameObject& object)
 
 void GameObject::GetDamage(int damage)
 {
+	//see override function in class Enemy
 	if (m_immune == true)
 		return;
 

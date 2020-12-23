@@ -90,6 +90,7 @@ public:
 	void damageGameObjectType(GameObjectType type, int damage);
 	void SetLayerSpeed(LayerType layer, sf::Vector2f speed);
 	void SetLayerRotation(LayerType layer, float angle);
+	void DamageObjectsInRange(LayerType layer, sf::Vector2f position, float range, int damage);
 
 	sf::RenderTexture m_mainScreen;
 	sf::Vector2i m_screen_size;
