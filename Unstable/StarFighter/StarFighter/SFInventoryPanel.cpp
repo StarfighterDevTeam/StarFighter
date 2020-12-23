@@ -147,21 +147,12 @@ void SFInventoryPanel::SetCursorVisible_v2(bool visible)
 	//default reposition
 	if (m_cursor.m_visible == false && visible == true)
 	{
+		
 		TradeGrids grid_type = m_panel_type == SFPanel_HUD ? Trade_EquippedGrid : Trade_ShopGrid;
-		bool found = false;
-		for (GridElement* element : m_grids_v2[grid_type]->m_elements)
+		if (m_grids_v2[grid_type] != NULL)
 		{
-			if (element->m_object != NULL)
-			{
-				m_cursor.setPosition(element->getPosition());
-				found = true;
-				break;
-			}
-		}
-
-		if (found == false && grid_type == Trade_EquippedGrid)
-		{
-			for (GridElement* element : m_grids_v2[Trade_StashGrid]->m_elements)
+			bool found = false;
+			for (GridElement* element : m_grids_v2[grid_type]->m_elements)
 			{
 				if (element->m_object != NULL)
 				{
@@ -170,10 +161,23 @@ void SFInventoryPanel::SetCursorVisible_v2(bool visible)
 					break;
 				}
 			}
-		}
 
-		if (found == false)
-			m_cursor.setPosition(m_grids_v2[grid_type]->m_elements[0]->getPosition());
+			if (found == false && grid_type == Trade_EquippedGrid)
+			{
+				for (GridElement* element : m_grids_v2[Trade_StashGrid]->m_elements)
+				{
+					if (element->m_object != NULL)
+					{
+						m_cursor.setPosition(element->getPosition());
+						found = true;
+						break;
+					}
+				}
+			}
+
+			if (found == false)
+				m_cursor.setPosition(m_grids_v2[grid_type]->m_elements[0]->getPosition());
+		}
 	}
 
 	//switch visibility

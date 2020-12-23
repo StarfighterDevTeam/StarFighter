@@ -233,8 +233,8 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 		GenerateBots(this);
 	}
 	
-	if (!no_save)
-		Ship::SaveItems(this);
+	//if (!no_save)
+	//	Ship::SaveItems(this);
 
 	return true;
 }
@@ -257,8 +257,8 @@ bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
 		
 	Init();
 
-	if (!no_save)
-		Ship::SaveItems(this);
+	//if (!no_save)
+	//	Ship::SaveItems(this);
 	
 	return true;
 }
@@ -277,8 +277,8 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 		this->Init();
 	}
 
-	if (!no_save)
-		Ship::SaveItems(this);
+	//if (!no_save)
+	//	Ship::SaveItems(this);
 }
 
 void Ship::cleanWeapon(bool no_save)
@@ -291,8 +291,8 @@ void Ship::cleanWeapon(bool no_save)
 		Init();
 	}
 
-	if (!no_save)
-		Ship::SaveItems(this);
+	//if (!no_save)
+	//	Ship::SaveItems(this);
 }
 
 void Ship::setShipModel(ShipModel* ship_model, bool no_save)
@@ -312,8 +312,8 @@ void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 		GenerateBots(this);
 	}
 
-	if (!no_save)
-		Ship::SaveItems(this);
+	//if (!no_save)
+	//	Ship::SaveItems(this);
 }
 
 void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
@@ -803,18 +803,18 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		else//Idle combat, shop menu, portal menu (where ship can continue to move)
 		{
 			//Opening hud
-			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-			{
-				m_HUD_state = HUD_OpeningEquipment;
-				m_SFHudPanel->SetCursorVisible_v2(true);
-				
-				if (!m_disableSlowmotion)
-				{
-					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
-				}
-
-				m_actions_states[Action_Firing] = false;
-			}
+			//if (UpdateAction(Action_OpeningHud, Input_Tap, true))
+			//{
+			//	m_HUD_state = HUD_OpeningEquipment;
+			//	m_SFHudPanel->SetCursorVisible_v2(true);
+			//	
+			//	if (!m_disableSlowmotion)
+			//	{
+			//		(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
+			//	}
+			//
+			//	m_actions_states[Action_Firing] = false;
+			//}
 
 			//Moving
 			m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
@@ -1581,6 +1581,8 @@ void Ship::Respawn(bool no_save)
 
 	m_upgrades.clear();
 	m_upgrades_short.clear();
+	m_SFHudPanel->UpdateUpgradeIcons();
+
 	m_armor_max = 3;
 	m_armor = m_armor_max;
 	m_shield_max = 0;
@@ -1594,7 +1596,7 @@ void Ship::Respawn(bool no_save)
 	m_level = 1;
 	m_money = 100;
 	m_knownScenes.clear();
-
+	
 	//saving
 	if (no_save == false)
 	{
@@ -2088,8 +2090,10 @@ string Ship::LoadPlayerScenes(Ship* ship)
 	}
 	else  // si l'ouverture a échoué
 	{
-		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
+		cerr << "DEBUG: Failed to open PLAYER SAVE FILE !" << endl;
 	}
+
+	printf("DEBUG: Loaded %d known scenes from profile. Respawn scene: %s.\n", ship->m_knownScenes.size(), return_current_scene.c_str());
 
 	return return_current_scene;
 }
@@ -2370,6 +2374,9 @@ bool Ship::LoadPlayerUpgrades(Ship* ship)
 
 			ship->SetUpgrade(upgrade_name);
 		}
+
+		//update HUD
+		ship->m_SFHudPanel->UpdateUpgradeIcons();
 		
 		data.close();  // on ferme le fichier
 
@@ -2967,8 +2974,6 @@ void Ship::SetUpgrade(string upgrade_name)
 		SetDroneWeapon("minirocket3");
 	else if (upgrade_name.compare("Restores_hp_1") == 0)
 		m_armor++;
-
-
 	else if (upgrade_name.compare("Restores_hp_1") == 0)
 		m_armor++;
 }

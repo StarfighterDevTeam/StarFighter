@@ -202,5 +202,8 @@ bool SFUpgradesPanel::BuyUpgrade()
 	Ship::SavePlayerUpgrades(m_playership);
 	Shop::SaveShopUpgrades(m_playership->m_targetShop);
 
+	//update HUD
+	m_playership->m_SFHudPanel->UpdateUpgradeIcons();
+
 	return true;
 }

@@ -7,8 +7,12 @@ class SFHUDPanel : public SFInventoryPanel
 {
 public:
 	SFHUDPanel(sf::Vector2f size, Ship* playership);
+	~SFHUDPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
+	void UpdateUpgradeIcons() override;
+
+	vector<GameObject*> m_upgrades_icons;
 
 	sf::RectangleShape m_armorBar;
 	sf::RectangleShape m_armorBarContainer;

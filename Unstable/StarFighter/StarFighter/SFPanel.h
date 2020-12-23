@@ -104,6 +104,7 @@ public:
 	virtual void SetCursorVisible_v2(bool visible);
 
 	virtual bool BuyUpgrade();
+	virtual void UpdateUpgradeIcons();
 };
 
 #endif // SFPANEL_H_INCLUDED

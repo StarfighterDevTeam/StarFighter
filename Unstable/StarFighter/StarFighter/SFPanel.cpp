@@ -300,3 +300,8 @@ bool SFPanel::BuyUpgrade()
 	//see override function in SFUpgradesPanel
 	return false;
 }
+
+void SFPanel::UpdateUpgradeIcons()
+{
+	//see override function in SFUpgradesPanel
+}

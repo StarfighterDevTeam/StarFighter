@@ -205,6 +205,12 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 	}
 }
 
+SFHUDPanel::~SFHUDPanel()
+{
+	for (GameObject* object : m_upgrades_icons)
+		delete object;
+}
+
 void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	SFInventoryPanel::Update(deltaTime, inputs_directions);
@@ -398,6 +404,22 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	m_text.setString(ss_ship_stats.str());
 }
 
+void SFHUDPanel::UpdateUpgradeIcons()
+{
+	for (GameObject* icon : m_upgrades_icons)
+		delete icon;
+	m_upgrades_icons.clear();
+
+	int i = 0;
+	for (vector<string>::iterator it = m_playership->m_upgrades_short.begin(); it != m_playership->m_upgrades_short.end(); it++)
+	{
+		sf::Vector2f pos = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + UPGRADES_PICTURE_WIDTH * 0.5 + i * (UPGRADES_PICTURE_WIDTH + UPGRADES_PICTURES_INTERLINE), 300);
+		GameObject* icon = new GameObject(pos, sf::Vector2f(0, 0), (*CurrentGame).m_upgradesConfig[*it][UPGRADE_IMAGE], sf::Vector2f(UPGRADES_PICTURE_WIDTH, UPGRADES_PICTURE_HEIGHT));
+		m_upgrades_icons.push_back(icon);
+		i++;
+	}
+}
+
 void SFHUDPanel::Draw(sf::RenderTexture& screen)
 {
 	sf::RectangleShape black_background;
@@ -453,4 +475,7 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	//{
 	//	m_item_stats_panel_compare->Draw(screen);
 	//}
+
+	for (GameObject* icon : m_upgrades_icons)
+		icon->Draw(screen);
 }
