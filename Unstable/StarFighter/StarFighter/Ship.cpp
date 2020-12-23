@@ -529,7 +529,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 
 bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	bool firing = m_collision_timer <= 0 && m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_recall_text->m_visible == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
+	bool firing = m_visible == true && m_collision_timer <= 0 && m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_recall_text->m_visible == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
 		&& (*CurrentGame).m_waiting_for_dialog_validation == false && hyperspeedMultiplier <= 1 && (m_actions_states[Action_Firing] == true || m_automatic_fire == true);
 
 	//Fire function
@@ -2846,6 +2846,7 @@ void Ship::SetUpgrade(string upgrade_name)
 	{
 		m_upgrades.push_back(upgrade_name);
 
+		//keep a short list of the most advances upgrades
 		string locked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_UNLOCKED_BY];
 		if (locked_by.compare("0") != 0)
 		{
@@ -3021,17 +3022,18 @@ void Ship::RandomizeUpgrades(Shop* target_shop)
 	//select eligible upgrades:
 	//- not already possessed
 	//- unlocked
-	//- condition checked
+	//- not forbidden
+	//- condition true
 	vector<string> random_upgrades;
 	for (map<string, vector<string> >::iterator it = (*CurrentGame).m_upgradesConfig.begin(); it != (*CurrentGame).m_upgradesConfig.end(); it++)
 	{
 		if (stoi(it->second[UPGRADE_PERMANENT]) == 1)
 		{
-			//already possessed?
+			//already possessed? forbidden by another possessed upgrade?
 			bool found = false;
 			for (vector<string>::iterator it2 = m_upgrades.begin(); it2 != m_upgrades.end(); it2++)
 			{
-				if (it2->compare(it->second[UPGRADE_NAME]) == 0)
+				if (it2->compare(it->first) == 0 || (*CurrentGame).m_upgradesConfig[*it2][UPGRADE_FORBIDS_1].compare(it->first) == 0 || (*CurrentGame).m_upgradesConfig[*it2][UPGRADE_FORBIDS_2].compare(it->first) == 0)
 				{
 					found = true;
 					break;
@@ -3090,7 +3092,7 @@ void Ship::RandomizeUpgrades(Shop* target_shop)
 		}
 
 		//add to the short list
-		random_upgrades.push_back(it->second[UPGRADE_NAME]);
+		random_upgrades.push_back(it->first);
 	}
 
 	//randomize among the short list

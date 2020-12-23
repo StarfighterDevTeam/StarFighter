@@ -6,7 +6,6 @@ enemy,V_Sigma3,2,2,10,,,
 enemy,V_Beta2,1,3,10,12,0.2,0.30f
 enemy,V_Beta3,2,3,10,,,
 enemy,V_Gamma3,1,4,10,10,0.4f,0.3f
-enemy,V_Delta1,1,5,10,15,0.3f,0.3f
 enemy,V_Zeta_01,2,0,8,1,0.2f,0.6f
 enemy,V_Zeta_02,1,0,8,,,
 enemy,V_Zeta_03,2,0,8,,,

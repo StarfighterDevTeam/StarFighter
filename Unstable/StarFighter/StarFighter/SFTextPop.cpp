@@ -83,17 +83,8 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 	//move
 	float newspeed = m_speed_y;
 
-	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
-
-	//slowmotion
-	newspeed += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
-
-	if (m_target)
-	{
+	if (m_target != NULL)
 		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2 + m_offset.x, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset.y - newspeed * deltaTime.asSeconds()));
-	}
 	else
-	{
 		setPosition(sf::Vector2f(getPosition().x, getPosition().y - newspeed * deltaTime.asSeconds()));
-	}
 }

@@ -38,11 +38,10 @@ void Gameloop::Initialize(Player player)
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
 	//Loading save files or creating new ones
+	(*CurrentGame).m_playership->Respawn(true);
 	m_playership->m_respawnSceneName = Ship::LoadPlayerScenes(m_playership);
 	if (m_playership->m_respawnSceneName.empty() == false)
 	{
-		(*CurrentGame).m_playership->Respawn(true);
-
 		if (!Ship::LoadPlayerUpgrades(m_playership))
 			Ship::SavePlayerUpgrades(m_playership);
 
@@ -53,7 +52,10 @@ void Gameloop::Initialize(Player player)
 	}
 	else
 	{
-		(*CurrentGame).m_playership->Respawn(false);
+		Ship::SavePlayerMoneyAndHealth(m_playership);
+		Ship::SavePlayerUpgrades(m_playership);
+		Ship::SavePlayerScenes(m_playership);
+		Shop::SaveShopUpgrades(NULL);
 
 		//Loading starting scene
 		SpawnInScene(STARTING_SCENE, (*CurrentGame).m_playership, false);
@@ -219,7 +221,6 @@ bool Gameloop::AddToKnownScenes(string scene_name, Ship* playership)
 	if (playership == NULL)
 		return false;
 
-	playership->m_currentScene_name = scene_name;
 	map<string, int>::iterator it = playership->m_knownScenes.find(scene_name);
 
 	//if scene not already known

@@ -20,6 +20,12 @@ StellarHub::StellarHub(string hub_name) : StellarHub()
 	m_display_name = hub_name;
 }
 
+StellarHub::StellarHub(string hub_name, sf::Vector2f coordinates) : StellarHub()
+{
+	m_display_name = hub_name;
+	m_coordinates = coordinates;
+}
+
 bool StellarHub::Update(GameObject& cursor, bool forbid_collision)
 {
 	bool cursor_colliding = SFPanel::IsCursorCollidingWithRectangle(cursor, *this);
@@ -50,9 +56,14 @@ StellarNode::StellarNode()
 	m_feedback_state = StellarComponent_NormalState;
 }
 
+StellarNode::StellarNode(sf::Vector2f coordinates) : StellarNode()
+{
+	m_coordinates = coordinates;
+}
+
 StellarSegment::StellarSegment(bool vertical, float segment_size)
 {
-	m_size_on_stellar_map = segment_size;
+	m_size = segment_size;
 	sf::Vector2f size = vertical ? sf::Vector2f(STELLAR_SEGMENT_THICKNESS, STELLARMAP_SCALE * segment_size) : sf::Vector2f(STELLARMAP_SCALE * segment_size, STELLAR_SEGMENT_THICKNESS);
 	setSize(size);
 	setOrigin(sf::Vector2f(getSize().x / 2, getSize().y / 2));
@@ -61,6 +72,20 @@ StellarSegment::StellarSegment(bool vertical, float segment_size)
 	m_coordinates = sf::Vector2f(0, 0);
 	m_feedback_state = StellarComponent_NormalState;
 	m_max_hazard_unlocked = HAZARD_LEVEL_1 + 1;
+}
+
+StellarSegment::StellarSegment(string segment_name, Directions direction, float segment_size, sf::Vector2f coordinates) : StellarSegment(direction == DIRECTION_UP || direction == DIRECTION_DOWN, segment_size)
+{
+	if (direction == DIRECTION_UP)
+		m_coordinates = sf::Vector2f(coordinates.x, coordinates.y - segment_size * 0.5);
+	else if (direction == DIRECTION_DOWN)
+			m_coordinates = sf::Vector2f(coordinates.x, coordinates.y + segment_size * 0.5);
+	else if (direction == DIRECTION_LEFT)
+		m_coordinates = sf::Vector2f(coordinates.x + segment_size * 0.5, coordinates.y);
+	else if (direction == DIRECTION_RIGHT)
+		m_coordinates = sf::Vector2f(coordinates.x - segment_size * 0.5, coordinates.y);
+
+	m_display_name = segment_name;
 }
 
 bool StellarSegment::Update(GameObject& cursor, bool forbid_collision, vector<StellarSegment*> branch_segments)
@@ -96,6 +121,11 @@ bool StellarSegment::Update(GameObject& cursor, bool forbid_collision, vector<St
 StellarBranch::StellarBranch()
 {
 	m_hub = NULL;
+}
+
+StellarBranch::StellarBranch(string name) : StellarBranch()
+{
+	m_name = name;
 }
 
 void StellarBranch::SetPosition(sf::Vector2f position)
@@ -282,6 +312,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 	m_playership = playership;
 	m_info_panel = NULL;
 	m_teleportation_cost = 0;
+	m_hightlighted_branch = NULL;
 
 	//panel position and color
 	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
@@ -332,40 +363,145 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 	m_scroll_offset = sf::Vector2f(0, 0);
 
 	//CONSTRUCTION OF THE MAP
-	//start with hub 0
-	StellarBranch* mother_branch = new StellarBranch();
-	mother_branch->m_hub = new StellarHub();
-	mother_branch->m_hub->m_display_name = STARTING_SCENE_STELLAR_MAP;
-	m_branches.push_back(mother_branch);
-
-	//StellarBranch* mother_branch = new StellarBranch();
-	//m_current_hub = new StellarHub();
-	//mother_branch->m_hub = m_current_hub;
-	//mother_branch->m_hub->m_display_name = m_playership->m_currentScene_name;
-	//mother_branch->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
-	//m_branches.push_back(mother_branch);
-
-	//scan branches around
-	ScanBranches(STARTING_SCENE_STELLAR_MAP, NO_DIRECTION, sf::Vector2f(0, 0));
-
-	//Retrive current hub
-	for (StellarBranch* branch : m_branches)
-		if (branch->m_hub != NULL && branch->m_hub->m_display_name.compare(m_playership->m_currentScene_name) == 0)
-		{
-			m_current_hub = branch->m_hub;
-			break;
-		}
-
-	//get size of the known area
-	m_map_content_area = GetStellarMapKnownSize();
-
-	//set position of all elements, based on their computed coordinates
-	UpdateBranchesPosition(false, false);
+	CreateStellarMap_v2();
 }
 
 SFMapPanel::~SFMapPanel()
 {
 
+}
+
+void SFMapPanel::CreateStellarMap_v2()
+{
+	float min_x = 0;
+	float max_x = 0;
+	float min_y = 0;
+	float max_y = 0;
+
+	vector<pair<string, sf::Vector2f> > branches_to_create;
+	vector<string> branches_already_processed;
+	branches_to_create.push_back(pair<string, sf::Vector2f>(STARTING_SCENE_STELLAR_MAP, sf::Vector2f(0, 0)));
+	branches_already_processed.push_back(STARTING_SCENE_STELLAR_MAP);
+
+	while (branches_to_create.empty() == false)
+	{
+		string name = branches_to_create.back().first;
+		sf::Vector2f coordinates = branches_to_create.back().second;
+
+		StellarBranch* new_branch = new StellarBranch(name);
+		m_branches.push_back(new_branch);
+		branches_to_create.pop_back();
+
+		//hub or segment?
+		if ((bool)stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_IS_HUB]) == true)
+		{
+			//hub
+			StellarHub* new_hub = new StellarHub(name, coordinates);
+			new_branch->m_hub = new_hub;
+			new_branch->m_direction = NO_DIRECTION;
+
+			//flag current hub
+			if (name.compare(m_playership->m_currentScene_name) == 0)
+				m_current_hub = new_branch->m_hub;
+
+			//next scenes to create
+			for (int i = 0; i < NO_DIRECTION; i++)
+				if ((*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP + i].compare("0") != 0)
+				{
+					bool found = false;
+					for (vector<string>::iterator it = branches_already_processed.begin(); it != branches_already_processed.end(); it++)
+					{
+						if (it->compare((*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP + i]) == 0)
+						{
+							found = true;
+							break;
+						}
+					}
+
+					if (found == false)
+					{
+						branches_to_create.push_back(pair<string, sf::Vector2f>((*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP + i], coordinates));
+						branches_already_processed.push_back((*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP + i]);
+					}
+				}
+					
+		}
+		else//segment
+		{
+			bool known_scene = IsSceneKnownByThePlayer(name);
+
+			//get segment's direction
+			for (int i = 0; i < NO_DIRECTION; i++)
+			{
+				if ((*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP + i].compare("0") != 0)
+				{
+					new_branch->m_direction = (Directions)i;
+					break;
+				}
+			}
+
+			//linked to a hub (stop there) or to another segment (->create a node and loop)
+			bool next_scene_is_a_hub = false;
+			string segment_name = name;
+			while (next_scene_is_a_hub == false)
+			{
+				//create segment
+				int size = stoi((*CurrentGame).m_generalScenesConfig[segment_name][SCENE_SIZE_IN_STELLAR_MAP]);
+				coordinates.x += ((new_branch->m_direction == DIRECTION_RIGHT) - (new_branch->m_direction == DIRECTION_LEFT)) * size;
+				coordinates.y += ((new_branch->m_direction == DIRECTION_UP) - (new_branch->m_direction == DIRECTION_DOWN)) * size;
+
+				//save min-max coordinates
+				min_x = coordinates.x < min_x ? coordinates.x : min_x;
+				min_y = coordinates.y < min_y ? coordinates.y : min_y;
+				max_x = coordinates.x > max_x ? coordinates.x : max_x;
+				max_y = coordinates.y > max_y ? coordinates.y : max_y;
+
+				StellarSegment* new_segment = new StellarSegment(segment_name, new_branch->m_direction, size, coordinates);
+				new_branch->m_segments.push_back(new_segment);
+
+				string next_segment_name = (*CurrentGame).m_generalScenesConfig[segment_name][SCENE_LINK_UP + (int)new_branch->m_direction];
+
+				if ((bool)stoi((*CurrentGame).m_generalScenesConfig[next_segment_name][SCENE_IS_HUB]) == false && known_scene == true && IsSceneKnownByThePlayer(next_segment_name) == true)
+				{
+					StellarNode* new_node = new StellarNode(coordinates);
+					new_branch->m_nodes.push_back(new_node);
+					segment_name = (*CurrentGame).m_generalScenesConfig[segment_name][SCENE_LINK_UP + (int)new_branch->m_direction];
+				}
+				else if (known_scene == true)
+				{
+					next_scene_is_a_hub = true;
+
+					bool found = false;
+					for (vector<string>::iterator it = branches_already_processed.begin(); it != branches_already_processed.end(); it++)
+					{
+						if (it->compare(next_segment_name) == 0)
+						{
+							found = true;
+							break;
+						}
+					}
+
+					if (found == false)
+					{
+						if (IsSceneKnownByThePlayer(next_segment_name) == true)
+						{
+							branches_to_create.push_back(pair<string, sf::Vector2f>(next_segment_name, coordinates));
+							branches_already_processed.push_back(next_segment_name);
+						}
+					}
+				}
+
+				if (known_scene == false)
+					next_scene_is_a_hub = true;//stop after the first unknown scene
+			}
+		}
+	}
+
+	//get size of the known area
+	m_map_content_area = sf::FloatRect(sf::Vector2f(min_x * STELLARMAP_SCALE, max_y * STELLARMAP_SCALE), sf::Vector2f((max_x - min_x) * STELLARMAP_SCALE, (max_y - min_y) * STELLARMAP_SCALE));//   GetStellarMapKnownSize();
+
+	//set position of all elements, based on their computed coordinates
+	UpdateBranchesPosition(false, false);
 }
 
 void SFMapPanel::SetMapViewOffset(sf::Vector2f offset)
@@ -379,111 +515,71 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//Scrolling
 	GetScrollingInput(m_cursor, deltaTime);
 	UpdateBranchesPosition(false, false);
+
 	if (m_current_hub)
-	{
 		m_ship.setPosition(m_current_hub->getPosition());
-	}
 
-	//check collisions, with priority on hubs over segments, and only chose one element to highlight
-	bool already_colllided_with_a_hub = false;
-	bool already_colllided_with_a_segment = false;
-
-	if (!m_branches.empty())
+	//Collision between cursor and stellarmap elements
+	StellarBranch* highlighted_branch = NULL;
+	for (StellarBranch* branch : m_branches)
 	{
-		if (!m_branches.empty())
+		if (branch->m_hub != NULL)//check hubs first
 		{
-			size_t branchesVectorSize = m_branches.size();
-			for (size_t i = 0; i < branchesVectorSize; i++)
-			{
-				if (m_branches[i]->m_hub)
-				{
-					//flag if we have already collided with a hub
-					if (!already_colllided_with_a_hub)
-					{
-						already_colllided_with_a_hub = m_branches[i]->m_hub->Update(m_cursor, false);
-						//create info panel
-						if (already_colllided_with_a_hub)
-						{
-							//are we hovering a new location that requires to create a new info panel?
-							if (!m_info_panel || (m_info_panel && m_branches[i]->m_hub->m_display_name != m_info_panel->m_location_name))
-							{
-								//delete old panel if existing
-								if (m_info_panel)
-								{
-									delete m_info_panel;
-								}
-								m_teleportation_cost = ComputeTeleportationCost(m_branches[i]->m_hub);
-								m_targeted_location = m_branches[i]->m_hub->m_display_name;
-								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, m_teleportation_cost, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playership);
-							}
-						}
-					}
-					else
-					{
-						m_branches[i]->m_hub->Update(m_cursor, true);
-					}
-				}
-			}
-			
-			for (size_t i = 0; i < branchesVectorSize; i++)
-			{
-				size_t segmentsVectorSize = m_branches[i]->m_segments.size();
-				for (size_t j = 0; j < segmentsVectorSize; j++)
-				{
-					//flag if we have already collided with a segment
-					if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
-					{
-						already_colllided_with_a_segment = m_branches[i]->m_segments[j]->Update(m_cursor, false, m_branches[i]->m_segments);
-						//create info panel
-						if (already_colllided_with_a_segment)
-						{
-							//are we hovering a new location that requires to create a new info panel?
-							if (!m_info_panel || (m_info_panel && m_branches[i]->m_segments[j]->m_display_name != m_info_panel->m_location_name))
-							{
-								//delete old panel if existing
-								if (m_info_panel)
-								{
-									delete m_info_panel;
-								}
-								m_teleportation_cost = -1;
-								m_targeted_location = "";
-								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playership);
-							}
+			branch->m_hub->m_feedback_state = StellarComponent_NormalState;
+			branch->m_hub->setFillColor(sf::Color::Red);
 
-							break;
-						}
-					}
-					else
-					{
-						StellarSegment* first_segment = m_branches[i]->m_segments.empty() ? NULL : m_branches[i]->m_segments.front();
-						m_branches[i]->m_segments[j]->Update(m_cursor, true, m_branches[i]->m_segments);
-					}
-				}
+			if (highlighted_branch == NULL && SFPanel::IsCursorCollidingWithRectangle(m_cursor, *branch->m_hub) == true)
+			{
+				highlighted_branch = branch;
+				branch->m_hub->setFillColor(sf::Color::Yellow);
+			}
+			else
+			{
+				branch->m_hub->setFillColor(sf::Color::Red);
 			}
 		}
 	}
+
+	for (StellarBranch* branch : m_branches)
+	{
+		if (branch->m_hub == NULL)//check segments in second
+		{
+			for (StellarSegment* segment : branch->m_segments)
+			{
+				segment->setFillColor(sf::Color::White);
+				
+				if (highlighted_branch == NULL && SFPanel::IsCursorCollidingWithRectangle(m_cursor, *segment) == true)
+					highlighted_branch = branch;
+			}
+
+			if (highlighted_branch != NULL && highlighted_branch == branch)
+				for (StellarSegment* segment : branch->m_segments)
+					segment->setFillColor(sf::Color::Yellow);
+		}
+	}
+	
+	//info panel
+	if (highlighted_branch == NULL)
+	{
+		delete m_info_panel;
+		m_info_panel = NULL;
+	}
+	else if (highlighted_branch != m_hightlighted_branch)
+	{
+		delete m_info_panel;
+		if (highlighted_branch->m_hub != NULL)
+			m_info_panel = new SFStellarInfoPanel(highlighted_branch->m_hub, 0, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playership);
+		else
+			m_info_panel = new SFStellarInfoPanel(highlighted_branch->m_segments[0], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playership);
+	}
+
+	m_hightlighted_branch = highlighted_branch;
 
 	//Update cursor state
-	if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
-	{
+	if (m_hightlighted_branch == NULL)
 		m_cursor.setAnimationLine(Cursor_NormalState);
-	}
 	else
-	{
 		m_cursor.setAnimationLine(Cursor_HighlightState);
-	}
-
-	//Delete stellar map info panel if not needed anymore
-	if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
-	{
-		if (m_info_panel)
-		{
-			delete m_info_panel;
-			m_info_panel = NULL;
-			m_teleportation_cost = -1;
-			m_targeted_location = "";
-		}
-	}
 }
 
 void SFMapPanel::Draw(sf::RenderTexture& screen)
@@ -579,27 +675,22 @@ void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 	}
 
 	//constraints
-	float left_border = -getSize().x / 2 + m_map_content_area.left + STELLARMAP_MARGIN_SIDES_WIDTH;
-	float right_border = getSize().x / 2 - (m_map_content_area.width + m_map_content_area.left) - STELLARMAP_MARGIN_SIDES_WIDTH;
-	float up_border = -getSize().y / 2 + m_map_content_area.top + STELLARMAP_MARGIN_SIDES_WIDTH;
-	float down_border = getSize().y / 2 - (m_map_content_area.height - m_map_content_area.top) - STELLARMAP_MARGIN_SIDES_WIDTH;
+	float left_border = - getSize().x / 2 + m_map_content_area.left + m_current_hub->m_coordinates.x * STELLARMAP_SCALE + STELLARMAP_MARGIN_SIDES_WIDTH;
+	float right_border = getSize().x / 2 - (m_map_content_area.left + m_map_content_area.width - m_current_hub->m_coordinates.x * STELLARMAP_SCALE) - STELLARMAP_MARGIN_SIDES_WIDTH;
+	float up_border = getSize().y / 2 - m_map_content_area.top - m_current_hub->m_coordinates.y * STELLARMAP_SCALE + STELLARMAP_MARGIN_SIDES_WIDTH;
+	float down_border = -getSize().y / 2 + (m_map_content_area.top + m_map_content_area.height - m_current_hub->m_coordinates.y * STELLARMAP_SCALE) - STELLARMAP_MARGIN_SIDES_WIDTH;
 
 	if (m_scroll_offset.x < left_border)
-	{
 		m_scroll_offset.x = left_border;
-	}
+	
 	if (m_scroll_offset.x > right_border)
-	{
 		m_scroll_offset.x = right_border;
-	}
-	if (m_scroll_offset.y < up_border)
-	{
+	
+	if (m_scroll_offset.y > up_border)
 		m_scroll_offset.y = up_border;
-	}
-	if (m_scroll_offset.y > down_border)
-	{
+	
+	if (m_scroll_offset.y < down_border)
 		m_scroll_offset.y = down_border;
-	}
 }
 
 void SFMapPanel::UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates)
@@ -609,80 +700,15 @@ void SFMapPanel::UpdateBranchesPosition(bool into_real_coordinates, bool into_fa
 		size_t branchesVectorSize = m_branches.size();
 		for (size_t i = 0; i < branchesVectorSize; i++)
 		{
-			sf::Vector2f pos = sf::Vector2f(this->getPosition().x + m_scroll_offset.x + m_current_hub->m_coordinates.x * STELLARMAP_SCALE, this->getPosition().y + m_scroll_offset.y + m_current_hub->m_coordinates.y * STELLARMAP_SCALE);
-			if (into_real_coordinates)
-			{
+			sf::Vector2f pos = sf::Vector2f(getPosition().x + m_scroll_offset.x - m_current_hub->m_coordinates.x * STELLARMAP_SCALE, getPosition().y + m_scroll_offset.y + m_current_hub->m_coordinates.y * STELLARMAP_SCALE);
+			if (into_real_coordinates == true)
 				m_branches[i]->SetPosition(SFStellarInfoPanel::GetRealCoordinates(pos, getPosition(), getSize()));
-			}
-			else if (into_fake_coordinates)
-			{
+			else if (into_fake_coordinates == true)
 				m_branches[i]->SetPosition(SFStellarInfoPanel::GetFakeCoordinates(pos, getPosition(), getSize()));
-			}
 			else
-			{
 				m_branches[i]->SetPosition(pos);
-			}
 		}
 	}
-}
-
-void SFMapPanel::GetMaxCoordinates(sf::Vector2f* current_max_horizontal, sf::Vector2f* current_max_vertical, sf::Vector2f object_coordinates)
-{
-	if (object_coordinates.x < current_max_horizontal->x)
-	{
-		current_max_horizontal->x = object_coordinates.x;
-	}
-	if (object_coordinates.x > current_max_horizontal->y)
-	{
-		current_max_horizontal->y = object_coordinates.x;
-	}
-	if (object_coordinates.y < current_max_vertical->x)
-	{
-		current_max_vertical->x = object_coordinates.y;
-	}
-	if (object_coordinates.y > current_max_vertical->y)
-	{
-		current_max_vertical->y = object_coordinates.y;
-	}
-}
-
-sf::FloatRect SFMapPanel::GetStellarMapKnownSize()
-{
-	sf::Vector2f max_vertical = sf::Vector2f(0, 0);
-	sf::Vector2f max_horizontal = sf::Vector2f(0, 0);
-
-	if (!m_branches.empty())
-	{
-		size_t branchesVectorSize = m_branches.size();
-		for (size_t i = 0; i < branchesVectorSize; i++)
-		{
-			if (m_branches[i]->m_hub)
-			{
-				GetMaxCoordinates(&max_horizontal, &max_vertical, m_branches[i]->m_hub->m_coordinates);
-			}
-
-			size_t segmentsVectorSize = m_branches[i]->m_segments.size();
-			for (size_t j = 0; j < segmentsVectorSize; j++)
-			{
-				bool vertical_segment = m_branches[i]->m_segments[j]->m_vertical;
-				bool minimum_value_modified = vertical_segment ? m_branches[i]->m_segments[j]->m_coordinates.y < 0 : m_branches[i]->m_segments[j]->m_coordinates.x < 0;
-				int axis = minimum_value_modified ? -1 : 1;
-
-				GetMaxCoordinates(&max_horizontal, &max_vertical, sf::Vector2f(m_branches[i]->m_segments[j]->m_coordinates.x + 0.5*axis*!vertical_segment, m_branches[i]->m_segments[j]->m_coordinates.y + 0.5*axis*vertical_segment));
-			}
-
-			size_t nodesVectorSize = m_branches[i]->m_nodes.size();
-			for (size_t j = 0; j < nodesVectorSize; j++)
-			{
-				GetMaxCoordinates(&max_horizontal, &max_vertical, m_branches[i]->m_nodes[j]->m_coordinates);
-			}
-		}
-	}
-
-	float width = (max_horizontal.y - max_horizontal.x) * STELLARMAP_SCALE;
-	float height = (max_vertical.y - max_vertical.x) * STELLARMAP_SCALE;
-
-	return sf::FloatRect(max_horizontal.x * STELLARMAP_SCALE, max_vertical.y * STELLARMAP_SCALE, width, height);
 }
 
 int SFMapPanel::ComputeTeleportationCost(StellarHub* destination)
@@ -711,191 +737,17 @@ int SFMapPanel::ComputeTeleportationCost(StellarHub* destination)
 	}
 }
 
-void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::Vector2f starting_coordinates)
-{
-	if (starting_scene.empty())
-	{
-		printf("ERROR: <!> loading an empty stellar hub or with an empty name, in SFMapPanel::ScanBranches().\n");
-		return;
-	}
-
-	//scene already checked?
-	if (IsSceneAlreadyChecked(starting_scene, true))
-	{
-		//scene has already been scanned, no need to created a new branch
-		return;
-	}
-
-	//get linked scenes
-	string links[NO_DIRECTION] = { "0", "0", "0", "0" };
-	//all directions
-	if (direction == NO_DIRECTION)
-	{
-		links[DIRECTION_UP] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_UP];
-		links[DIRECTION_DOWN] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_DOWN];
-		links[DIRECTION_RIGHT] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_RIGHT];
-		links[DIRECTION_LEFT] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_LEFT];
-	}
-	//forced direction
-	else
-		links[direction] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_UP + direction];
-
-	//scan linked scenes
-	for (int direction = 0; direction < NO_DIRECTION; direction++)
-	{
-		sf::Vector2f starting_coordinates_ = starting_coordinates;
-		if (!links[direction].empty() && links[direction].compare("0") != 0)
-		{
-			//scene already checked?
-			if (IsSceneAlreadyChecked(links[direction], false))
-			{
-				//scene has already been scanned, no need to created a new branch
-				continue;
-			}
-			//scene has been scouted by the player?
-			//else if (!IsSceneKnownByThePlayer(links[direction]))
-			//{
-			//	//scene is not known by the plauer
-			//	continue;
-			//}
-
-			//create a new branch
-			StellarBranch* new_branch = new StellarBranch();
-			m_branches.push_back(new_branch);
-			//printf("\n\nBranch created (from %s)\n", starting_scene.c_str());
-
-			//start looping until reaching a hub (= branch ending)
-			vector<string> scenes_to_scan;
-			scenes_to_scan.push_back(links[direction]);
-			while (!scenes_to_scan.empty())
-			{
-				links[direction] = scenes_to_scan.front();//update loop to match currently scanned segment
-				scenes_to_scan.clear();
-				//scene already checked?
-				if (IsSceneAlreadyChecked(links[direction], false))
-				{
-					//scene has already been scanned
-					continue;
-				}
-				else if (!IsSceneKnownByThePlayer(links[direction]) && !m_branches.back()->m_segments.empty())
-				{
-					//scene is not known by the player
-					continue;
-				}
-
-				//Get filename of the next scene to scan
-				string scene_filename = (*CurrentGame).m_generalScenesConfig[links[direction]][SCENE_FILENAME];
-
-				//Scan the file
-				if (scene_filename.empty())
-				{
-					continue;
-				}
-				//Hub found?
-				//printf("Scene scanned: %s (direction: %d)\n", links[direction].c_str(), direction);
-				if (ScanScene(links[direction], (Directions)direction, starting_coordinates_))
-				{
-					//if hub is not known yet: SCAN-CEPTION: repeat process with this new hub, until we reached all known hubs
-					if (m_branches.back()->m_hub &&!links[direction].empty() && links[direction].compare("0") != 0)
-					{
-						ScanBranches(links[direction], NO_DIRECTION, starting_coordinates_);
-					}
-				}
-				else
-				{
-					//hub not found: new segment
-					StellarSegment* segment = m_branches.back()->m_segments.back();//get segment freshly created and update it
-					float size_of_new_segment = segment->m_size_on_stellar_map;
-					starting_coordinates_.x += (((Directions)direction == DIRECTION_RIGHT) - ((Directions)direction == DIRECTION_LEFT)) * size_of_new_segment;
-					starting_coordinates_.y += (((Directions)direction == DIRECTION_UP) - ((Directions)direction == DIRECTION_DOWN)) * size_of_new_segment;
-					segment->m_vertical = ((Directions)direction == DIRECTION_UP || (Directions)direction == DIRECTION_DOWN);
-
-					//get next linked scene name
-					string next_scene_name = (*CurrentGame).m_generalScenesConfig[links[direction]][SCENE_LINK_UP + direction];
-
-					//register the name of the next scene and register it as a scene to scan
-					if (!next_scene_name.empty())
-					{
-						//segment->m_display_name = links[direction];
-						scenes_to_scan.push_back(next_scene_name);
-					}
-
-					//printf("Segment created: %s\n", segment->m_display_name.c_str());
-
-					m_checked_scenes.push_back(links[direction]);
-					segment = NULL;
-				}
-			}
-		}
-	}
-}
-
-bool SFMapPanel::ScanScene(string scene_name, Directions direction, sf::Vector2f starting_coordinates)
-{
-	//hub?
-	if ((bool)stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_IS_HUB]) == true)
-	{
-		//create new hub
-		StellarHub* new_hub = new StellarHub(scene_name);
-		new_hub->m_coordinates = starting_coordinates;
-		new_hub->m_display_name = scene_name;
-		//new_hub->m_level = stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_LEVEL]);
-		m_branches.back()->m_hub = new_hub;
-
-		//printf("Hub created: %s\n", scene.c_str());
-
-		return true;
-	}
-	//case new segment reached
-	else
-	{
-		//if previous scanned scene was a segment too, create a node
-		if (!m_branches.back()->m_segments.empty())
-		{
-			StellarNode* new_node = new StellarNode();
-			m_branches.back()->m_nodes.push_back(new_node);
-			new_node->m_coordinates = starting_coordinates;
-
-			//printf("Node created\n");
-		}
-
-		//create new segment
-		float segment_size = atof((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_SIZE_IN_STELLAR_MAP].c_str());
-		bool vertical = direction == DIRECTION_UP || direction == DIRECTION_DOWN;
-		StellarSegment* new_segment = new StellarSegment(vertical, segment_size);
-		new_segment->m_display_name = m_branches.back()->m_segments.empty() ? scene_name : m_branches.back()->m_segments.front()->m_display_name;
-		m_branches.back()->m_segments.push_back(new_segment);
-
-		new_segment->m_size_on_stellar_map = segment_size;
-		new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;
-		new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
-
-		//new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene_name);
-		////scenes that have not been explored yet, but that has been scouted (player has seen the portal leading to it), should be displayed as the minimal hazard unlocked (instead of the -1 error code)
-		//if (new_segment->m_max_hazard_unlocked < 0)
-		//	new_segment->m_max_hazard_unlocked = 0;
-
-		return false;
-	}
-}
-
 bool SFMapPanel::IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked)
 {
 	size_t checkedScenesVectorSize = m_checked_scenes.size();
 	for (size_t i = 0; i < checkedScenesVectorSize; i++)
-	{
-		//element found
 		if (m_checked_scenes[i].compare(new_scene) == 0)
-		{
 			return true;
-		}
-	}
 
 	//element not found
 	if (add_if_not_checked)
-	{
 		m_checked_scenes.push_back(new_scene);
-	}
+	
 	return false;
 }
 
