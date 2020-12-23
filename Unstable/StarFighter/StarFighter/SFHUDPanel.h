@@ -12,7 +12,12 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 	void UpdateUpgradeIcons() override;
 
-	vector<GameObject*> m_upgrades_icons;
+	vector<GameObject> m_upgrades_icons;
+
+	sf::RectangleShape m_progressionBar;
+	sf::RectangleShape m_progressionExit;
+	GameObject m_ship;
+	sf::Text m_progression_text;
 
 	sf::RectangleShape m_armorBar;
 	sf::RectangleShape m_armorBarContainer;

@@ -13,7 +13,6 @@ public:
 	Ship* m_playership;
 	Scene* m_currentScene;
 	Scene* m_nextScene;
-	InGameStateMachine m_IG_State;
 
 	void Initialize(Player player);
 	void Update(Time deltaTime);
@@ -28,7 +27,7 @@ public:
 	void LoadAllUpgrades(string upgrades_file);
 	void UpdateShipConfig(Ship* ship, string config_name);
 
-	void InGameStateMachineCheck(sf::Time deltaTime);
+	void GameloopStateMachineCheck(sf::Time deltaTime);
 	void SpawnInScene(string scene_name, Ship* playership, bool display_scene_name);
 
 	void PlayerTakesExit();

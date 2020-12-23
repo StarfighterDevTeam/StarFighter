@@ -159,7 +159,7 @@ void Gameloop::Update(Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//State machine
-	InGameStateMachineCheck(deltaTime);
+	GameloopStateMachineCheck(deltaTime);
 
 	//Create and destroy HUD panels
 	//case 1: destroying a panel
@@ -270,12 +270,12 @@ int Gameloop::GetSceneHazardLevelUnlocked(string scene_name, Ship* playership)
 	return 0;
 }
 
-void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
+void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 {
 	float w = m_currentScene->m_bg->m_size.x;
 	float h = m_currentScene->m_bg->m_size.y;
 
-	if (m_IG_State == SCROLLING)
+	if ((*CurrentGame).m_gameloop_state == SCROLLING)
 	{
 		if (m_currentScene->m_generating_enemies == true)
 			m_currentScene->GenerateEnemiesv2(deltaTime);
@@ -302,11 +302,11 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 			(*CurrentGame).garbageLayer(EnemyObjectLayer, true, true);
 
 			//Switch state
-			m_IG_State = LAST_SCREEN;
+			(*CurrentGame).m_gameloop_state = LAST_SCREEN;
 		}
 	}
 	
-	if (m_IG_State == LAST_SCREEN)
+	if ((*CurrentGame).m_gameloop_state == LAST_SCREEN)
 	{	
 		//Optional script to skip boss procedures, for scripted missions
 		if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss] == true)
@@ -342,7 +342,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					(*CurrentGame).PlayMusic(Music_Boss);
 					m_currentScene->SpawnBoss();
-					m_IG_State = BOSS_FIGHT;
+					(*CurrentGame).m_gameloop_state = BOSS_FIGHT;
 				}
 			}
 			else
@@ -385,17 +385,17 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 		}
 	}
 
-	if (m_IG_State == BOSS_FIGHT)
+	if ((*CurrentGame).m_gameloop_state == BOSS_FIGHT)
 	{
 		//is boss dead?
 		if ((*CurrentGame).isLastEnemyDead() == true)
 		{
 			m_currentScene->m_generating_boss = false;
-			m_IG_State = LAST_SCREEN;
+			(*CurrentGame).m_gameloop_state = LAST_SCREEN;
 		}
 	}
 
-	if (m_IG_State == HUB_ROAMING)
+	if ((*CurrentGame).m_gameloop_state == HUB_ROAMING)
 	{
 		m_currentScene->m_bg->SetPortalsState(PortalOpen);
 			
@@ -403,32 +403,7 @@ void Gameloop::InGameStateMachineCheck(sf::Time deltaTime)
 
 		//player takes exit?
 		if ((*CurrentGame).m_playership->m_is_asking_scene_transition == true)
-		{
 			PlayerTakesExit();
-			/*
-			m_currentScene->m_bg->SetPortalsState(PortalGhost);
-
-			(*CurrentGame).PlaySFX(SFX_EnteringPortal);
-
-			bool reverse = false;
-			if ((*CurrentGame).m_playership->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).m_playership->m_targetPortal->m_direction == DIRECTION_LEFT)
-				reverse = true;
-				
-			string nextScene_filename = (*CurrentGame).m_playership->m_targetPortal->m_destination_name;
-
-			m_nextScene = new Scene(nextScene_filename, (*CurrentGame).m_playership->m_SFTargetPanel->GetSelectedOptionIndex(), reverse, false);
-			(*CurrentGame).m_playership->m_last_hazard_level_played = (*CurrentGame).m_playership->m_SFTargetPanel->GetSelectedOptionIndex();
-			UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
-			m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
-
-			//Putting the player on rails
-			(*CurrentGame).m_playership->m_disable_inputs = true;
-			(*CurrentGame).m_playership->m_disable_fire = true;
-			(*CurrentGame).m_playership->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
-				
-			m_IG_State = SCROLLING;
-			*/
-		}
 	}
 }
 
@@ -534,6 +509,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	m_nextScene = NULL;
 
 	(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
+	(*CurrentGame).m_background = m_currentScene->m_bg;
 	(*CurrentGame).m_is_in_hub = m_currentScene->m_is_hub;
 	m_playership->m_currentScene_name = m_currentScene->m_name;
 	AddToKnownScenes(m_currentScene->m_name);
@@ -574,7 +550,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 			Ship::SavePlayerMoneyAndHealth(m_playership);
 		}
 
-		m_IG_State = HUB_ROAMING;
+		(*CurrentGame).m_gameloop_state = HUB_ROAMING;
 	}
 	else
 	{
@@ -586,7 +562,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 		(*CurrentGame).m_playership->m_disableRecall = false;
 		(*CurrentGame).m_playership->SetBotsVisibility(true);
 
-		m_IG_State = SCROLLING;
+		(*CurrentGame).m_gameloop_state = SCROLLING;
 	}
 
 	//player position
@@ -648,7 +624,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 		(*CurrentGame).m_playership->m_disable_bots = false;
 		(*CurrentGame).m_playership->m_disableRecall = false;
 		(*CurrentGame).m_playership->SetBotsVisibility(true);
-		m_IG_State = SCROLLING;
+		m_gameloop_state = SCROLLING;
 		ship_pos = sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_X_RATIO);
 
 		if (!m_currentScene->m_scene_music.empty())
@@ -665,7 +641,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 		(*CurrentGame).m_playership->m_disable_bots = true;
 		(*CurrentGame).m_playership->m_disableRecall = true;
 		(*CurrentGame).m_playership->SetBotsVisibility(false);
-		m_IG_State = HUB_ROAMING;
+		m_gameloop_state = HUB_ROAMING;
 		playership->m_respawnSceneName = m_currentScene->m_name;
 
 		(*CurrentGame).resetHazard();

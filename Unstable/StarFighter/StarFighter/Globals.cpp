@@ -66,6 +66,10 @@ float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios)
 float ProrataBetweenThreshold(float value, sf::Vector2f min_max_threshold)
 {
 	float max = min_max_threshold.y - min_max_threshold.x;
+
+	if (max == 0)
+		return 1;
+
 	float scaled_value = value - min_max_threshold.x;
 	float prorata = scaled_value / max;
 	if (prorata > 1)

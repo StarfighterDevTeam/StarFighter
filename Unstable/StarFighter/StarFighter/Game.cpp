@@ -27,6 +27,7 @@ void Game::init(RenderWindow* window)
 	m_vspeed = 0;
 
 	m_playership = NULL;
+	m_background = NULL;
 	m_waiting_for_dialog_validation = false;
 	m_waiting_for_scene_transition = false;
 	m_Pause = false;

@@ -202,13 +202,37 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 		//	GameObject* capsule = Enemy::CloneWeaponIntoGameObject(playership->m_weapon);
 		//	m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, NBVAL_Equipment, false);
 		//}
+
+		//Scene progression bar
+		m_progressionBar.setSize(sf::Vector2f(SCENE_PROGRESSION_BAR_WIDTH, SCENE_PROGRESSION_BAR_HEIGHT));
+		m_progressionBar.setOrigin(sf::Vector2f(m_progressionBar.getSize().x * 0.5, m_progressionBar.getSize().y * 0.5));
+		m_progressionBar.setFillColor(sf::Color(255, 255, 255, 200));
+		m_progressionBar.setPosition(sf::Vector2f(SCENE_SIZE_X + INTERACTION_PANEL_MARGIN_SIDES + ASSUMED_SHIP_SIZE + SCENE_PROGRESSION_BAR_WIDTH * 0.5 + SCENE_PROGRESSION_BAR_OFFSET_X, SCENE_PROGRESSION_BAR_POS_Y));
+	
+		m_progressionExit.setSize(sf::Vector2f(24, 24));
+		m_progressionExit.setOrigin(sf::Vector2f(m_progressionExit.getSize().x * 0.5, m_progressionExit.getSize().y * 0.5));
+		m_progressionExit.setFillColor(sf::Color::Red);
+		m_progressionExit.setPosition(sf::Vector2f(m_progressionBar.getPosition().x, m_progressionBar.getPosition().y - m_progressionBar.getSize().y * 0.5));
+
+		sf::Vector2f ship_size = playership->m_fake_ship ? playership->m_fake_ship->m_size : playership->m_size;
+		string ship_texture = playership->m_fake_ship ? playership->m_fake_ship->m_textureName : playership->m_textureName;
+		int frameNumber = playership->m_fake_ship ? playership->m_fake_ship->m_frameNumber : playership->m_frameNumber;
+		int animationNumber = playership->m_fake_ship ? playership->m_fake_ship->m_animationNumber : playership->m_animationNumber;
+
+		m_ship = GameObject(getPosition(), sf::Vector2f(0, 0), ship_texture, ship_size, sf::Vector2f(ship_size.x / 2, ship_size.y / 2), animationNumber, frameNumber);
+		m_ship.setPosition(sf::Vector2f(m_progressionBar.getPosition().x, m_progressionBar.getPosition().y + m_progressionBar.getSize().y * 0.5));
+		m_ship.setColor(sf::Color(255, 255, 255, 255));
+		m_ship.setScale(STELLARMAP_SHIP_MINIATURE_SCALE, STELLARMAP_SHIP_MINIATURE_SCALE);
+
+		m_progression_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+		m_progression_text.setCharacterSize(14);
+		m_progression_text.setColor(_white);
 	}
 }
 
 SFHUDPanel::~SFHUDPanel()
 {
-	for (GameObject* object : m_upgrades_icons)
-		delete object;
+
 }
 
 void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
@@ -402,19 +426,37 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//ss_ship_stats << "\nContact damage: " << m_playership->m_damage << "\nHyperspeed: " << m_playership->m_hyperspeed << "\nFuel: " << m_playership->m_hyperspeed_fuel_max
 	//	<< "\nShield regen: " << m_playership->m_shield_regen << "/sec" << "\nShield recovery: " << m_playership->m_shield_recovery_time << "sec";
 	m_text.setString(ss_ship_stats.str());
+
+	//Scene progression bar
+	float progression_ratio = ProrataBetweenThreshold((*CurrentGame).m_background->getPosition().y, sf::Vector2f(-(*CurrentGame).m_background->m_size.y * 0.5 + SCENE_SIZE_Y, (*CurrentGame).m_background->m_size.y * 0.5));
+	m_ship.setPosition(sf::Vector2f(m_progressionBar.getPosition().x, m_progressionBar.getPosition().y + m_progressionBar.getSize().y * (0.5 - progression_ratio)));
+	m_progression_text.setString(to_string((int)(progression_ratio * 100)) + " %");
+	m_progression_text.setPosition(sf::Vector2f(m_ship.getPosition().x - m_ship.m_size.x * 0.5 - m_progression_text.getGlobalBounds().width - 1, m_ship.getPosition().y));
+
+	for (int i = 0; i < 4; i++)
+	{
+		string next_linked_scene = (*CurrentGame).m_generalScenesConfig[m_playership->m_currentScene_name][SCENE_LINK_UP + i];
+		if (next_linked_scene.compare("0") != 0)
+		{
+			if ((bool)stoi((*CurrentGame).m_generalScenesConfig[next_linked_scene][SCENE_IS_HUB]) == true)
+				m_progressionExit.setFillColor(sf::Color::Red);
+			else
+				m_progressionExit.setFillColor(sf::Color(255, 255, 255, 0));
+
+			break;
+		}
+	}
 }
 
 void SFHUDPanel::UpdateUpgradeIcons()
 {
-	for (GameObject* icon : m_upgrades_icons)
-		delete icon;
 	m_upgrades_icons.clear();
 
 	int i = 0;
 	for (vector<string>::iterator it = m_playership->m_upgrades_short.begin(); it != m_playership->m_upgrades_short.end(); it++)
 	{
 		sf::Vector2f pos = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + UPGRADES_PICTURE_WIDTH * 0.5 + i * (UPGRADES_PICTURE_WIDTH + UPGRADES_PICTURES_INTERLINE), 300);
-		GameObject* icon = new GameObject(pos, sf::Vector2f(0, 0), (*CurrentGame).m_upgradesConfig[*it][UPGRADE_IMAGE], sf::Vector2f(UPGRADES_PICTURE_WIDTH, UPGRADES_PICTURE_HEIGHT));
+		GameObject icon(pos, sf::Vector2f(0, 0), (*CurrentGame).m_upgradesConfig[*it][UPGRADE_IMAGE], sf::Vector2f(UPGRADES_PICTURE_WIDTH, UPGRADES_PICTURE_HEIGHT));
 		m_upgrades_icons.push_back(icon);
 		i++;
 	}
@@ -476,6 +518,14 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	//	m_item_stats_panel_compare->Draw(screen);
 	//}
 
-	for (GameObject* icon : m_upgrades_icons)
-		icon->Draw(screen);
+	for (GameObject icon : m_upgrades_icons)
+		icon.Draw(screen);
+
+	if ((*CurrentGame).m_gameloop_state == SCROLLING || (*CurrentGame).m_gameloop_state == LAST_SCREEN)
+	{
+		screen.draw(m_progressionBar);
+		screen.draw(m_progressionExit);
+		screen.draw(m_progression_text);
+		m_ship.Draw(screen);
+	}
 }

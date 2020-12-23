@@ -5,15 +5,6 @@
 
 using namespace std;
 
-enum InGameStateMachine
-{
-	LOADING,
-	SCROLLING,
-	LAST_SCREEN,
-	BOSS_FIGHT,
-	HUB_ROAMING,
-};
-
 enum ScenesData
 {
 	SCENE_NAME,//0

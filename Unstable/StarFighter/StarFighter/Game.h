@@ -18,7 +18,7 @@
 #include <SFML/Audio.hpp>
 
 class Ship;
-class Scene;
+class Background;
 
 enum SFX_Bank
 {
@@ -41,6 +41,15 @@ enum Music_Bank
 	Music_Scene,
 	Music_Boss,
 	NBVAL_MUSIC_BANK,
+};
+
+enum GameloopStateMachine
+{
+	LOADING,
+	SCROLLING,
+	LAST_SCREEN,
+	BOSS_FIGHT,
+	HUB_ROAMING,
 };
 
 using namespace sf;
@@ -87,6 +96,7 @@ public:
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
 	bool m_is_in_hub;
+	GameloopStateMachine m_gameloop_state;
 
 	bool m_waiting_for_dialog_validation;
 	bool m_waiting_for_scene_transition;
@@ -105,6 +115,8 @@ public:
 	float m_BeastScoreBonus;
 
 	Ship* m_playership;
+	Background* m_background;
+
 	bool m_Pause;
 
 	void SetPlayerShip(Ship* playership);
