@@ -14,14 +14,18 @@ void Gameloop::Initialize(Player player)
 	mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 
-	//Loading all scenes
+	//Pre-load config files
 	LoadAllScenes(SCENES_FILE);
-	//Loading all FX
 	LoadAllFX(FX_FILE);
-	//Loading all enemies
 	LoadAllEnemies(ENEMY_FILE);
-	//Loading all upgrades
 	LoadAllUpgrades(UPGRADES_FILE);
+	LoadAllWeapons(WEAPONS_FILE);
+	LoadAllAmmunitions(AMMO_FILE);
+	LoadAllDialogs(DIALOGS_FILE);
+	LoadAllEnemyPhases(PHASES_FILE);
+	LoadAllBots(BOTS_FILE);
+	
+	PreloadAssets(Faction_Vanguard);
 
 	//creating new ship
 	m_playership = FileLoader::LoadShipConfig("default");
@@ -670,19 +674,17 @@ void Gameloop::LoadAllScenes(string scenes_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading all scenes scripts.");
 
 	vector<vector<string> > generalScenesConfig = *(FileLoaderUtils::FileLoader(scenes_file));
-	size_t allScenesVectorSize = generalScenesConfig.size();
-	for (size_t i = 0; i < allScenesVectorSize; i++)
+	size_t vectorSize = generalScenesConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
 	{
 		(*CurrentGame).m_generalScenesConfig.insert(std::map<string, vector<string> >::value_type(generalScenesConfig[i][SCENE_NAME], generalScenesConfig[i]));
 		TextureLoader *loader = TextureLoader::getInstance();
 		loader->loadTexture(generalScenesConfig[i][SCENE_BACKGROUND_FILENAME], stoi(generalScenesConfig[i][SCENE_BACKGROUND_WIDTH]), stoi(generalScenesConfig[i][SCENE_BACKGROUND_HEIGHT]));
 	}
 
-	for (size_t j = 0; j < allScenesVectorSize; j++)
+	for (size_t j = 0; j < vectorSize; j++)
 		if (!generalScenesConfig[j][SCENE_FILENAME].empty() && generalScenesConfig[j][SCENE_FILENAME].compare("0") != 0)
 			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> > >::value_type(generalScenesConfig[j][SCENE_NAME], *(FileLoaderUtils::FileLoader(generalScenesConfig[j][SCENE_FILENAME]))));
-
-	generalScenesConfig.clear();
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
@@ -692,8 +694,8 @@ void Gameloop::LoadAllEnemies(string enemies_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading all enemies.");
 
 	vector<vector<string> > enemiesConfig = *(FileLoaderUtils::FileLoader(enemies_file));
-	size_t allEnemiesVectorSize = enemiesConfig.size();
-	for (size_t i = 0; i < allEnemiesVectorSize; i++)
+	size_t vectorSize = enemiesConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_enemiesConfig.insert(std::map<string, vector<string> >::value_type(enemiesConfig[i][ENEMY_NAME], enemiesConfig[i]));
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
@@ -704,8 +706,8 @@ void Gameloop::LoadAllFX(string FX_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading all FX.");
 
 	vector<vector<string> > FXConfig = *(FileLoaderUtils::FileLoader(FX_file));
-	size_t allFXVectorSize = FXConfig.size();
-	for (size_t i = 0; i < allFXVectorSize; i++)
+	size_t vectorSize = FXConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_FXConfig.insert(std::map<string, vector<string> >::value_type(FXConfig[i][FX_NAME], FXConfig[i]));
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
@@ -716,11 +718,107 @@ void Gameloop::LoadAllUpgrades(string upgrades_file)
 	LOGGER_WRITE(Logger::DEBUG, "Loading all upgrades.");
 
 	vector<vector<string> > UpgradesConfig = *(FileLoaderUtils::FileLoader(upgrades_file));
-	size_t allFXVectorSize = UpgradesConfig.size();
-	for (size_t i = 0; i < allFXVectorSize; i++)
+	size_t vectorSize = UpgradesConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_upgradesConfig.insert(std::map<string, vector<string> >::value_type(UpgradesConfig[i][UPGRADE_NAME], UpgradesConfig[i]));
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void Gameloop::LoadAllWeapons(string weapons_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all weapons.");
+
+	vector<vector<string> > WeaponsConfig = *(FileLoaderUtils::FileLoader(weapons_file));
+	size_t vectorSize = WeaponsConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
+		(*CurrentGame).m_weaponsConfig.insert(std::map<string, vector<string> >::value_type(WeaponsConfig[i][WEAPON_NAME], WeaponsConfig[i]));
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void Gameloop::LoadAllAmmunitions(string ammo_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all ammunitions.");
+
+	vector<vector<string> > AmmoConfig = *(FileLoaderUtils::FileLoader(ammo_file));
+	size_t vectorSize = AmmoConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
+		(*CurrentGame).m_ammoConfig.insert(std::map<string, vector<string> >::value_type(AmmoConfig[i][AMMO_NAME], AmmoConfig[i]));
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void Gameloop::LoadAllDialogs(string dialogs_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all dialogs.");
+
+	vector<vector<string> > DialogsConfig = *(FileLoaderUtils::FileLoader(dialogs_file));
+	size_t vectorSize = DialogsConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
+		(*CurrentGame).m_dialogsConfig.insert(std::map<string, vector<string> >::value_type(DialogsConfig[i][DIALOG_NAME], DialogsConfig[i]));
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void Gameloop::LoadAllEnemyPhases(string phases_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all enemy phases.");
+
+	vector<vector<string> > PhasesConfig = *(FileLoaderUtils::FileLoader(phases_file));
+	size_t vectorSize = PhasesConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
+		(*CurrentGame).m_phasesConfig.insert(std::map<string, vector<string> >::value_type(PhasesConfig[i][PHASE_NAME], PhasesConfig[i]));
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+
+void Gameloop::LoadAllBots(string bots_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all bots.");
+
+	vector<vector<string> > BotsConfig = *(FileLoaderUtils::FileLoader(bots_file));
+	size_t vectorSize = BotsConfig.size();
+	for (size_t i = 0; i < vectorSize; i++)
+		(*CurrentGame).m_botsConfig.insert(std::map<string, vector<string> >::value_type(BotsConfig[i][BOT_NAME], BotsConfig[i]));
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void Gameloop::PreloadAssets(FactionType faction)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Preloading assets.");
+	
+	TextureLoader* loader = TextureLoader::getInstance();
+	
+	string key;
+	switch (faction)
+	{
+		case Faction_Vanguard:
+			key = "V";
+			break;
+		case Faction_Royale:
+			key = "R";
+			break;
+		case Faction_Corsair:
+			key = "C";
+			break;
+		case Faction_Ancient:
+			key = "A";
+			break;
+		case Faction_Swarm:
+			key = "S";
+			break;
+	}
+
+	for (map<string, vector<string> >::iterator it = (*CurrentGame).m_enemiesConfig.begin(); it != (*CurrentGame).m_enemiesConfig.end(); it++)
+		if (it->first.substr(0, 1).compare(key) == 0)
+			loader->loadTexture(it->second[ENEMY_IMAGE_NAME], stoi(it->second[ENEMY_WIDTH]) * stoi(it->second[ENEMY_FRAMES]), stoi(it->second[ENEMY_HEIGHT]) * stoi(it->second[ENEMY_NB_SKINS]));
+
+	for (map<string, vector<string> >::iterator it = (*CurrentGame).m_ammoConfig.begin(); it != (*CurrentGame).m_ammoConfig.end(); it++)
+		if (it->first.substr(0, 1).compare(key) == 0)
+			loader->loadTexture(it->second[AMMO_IMAGE_NAME], stoi(it->second[AMMO_WIDTH]) * stoi(it->second[AMMO_FRAMES]), stoi(it->second[AMMO_HEIGHT]) * stoi(it->second[AMMO_NB_SKINS]));
 }
 
 void Gameloop::PlayerTakesExit()

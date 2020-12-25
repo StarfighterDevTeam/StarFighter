@@ -53,7 +53,7 @@ Ammo::~Ammo()
 		delete m_trail;
 }
 
-void Ammo::Death()
+void Ammo::Death(bool give_money)
 {
 	FX* explosion = m_explosion->Clone();
 	explosion->setPosition(getPosition());

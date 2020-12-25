@@ -311,7 +311,7 @@ public:
 	virtual void GetDamage(int damage);
 	string getName();
 	GameObject* Clone();
-	virtual void Death();
+	virtual void Death(bool give_money = false);
 	virtual void GenerateLoot();
 	void ShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 

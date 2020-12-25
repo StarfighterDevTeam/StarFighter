@@ -349,7 +349,7 @@ void GameObject::setMoney(int loot_value)
 	m_money = loot_value;
 }
 
-void GameObject::Death()
+void GameObject::Death(bool give_money)
 {
 	m_visible = false;
 	m_garbageMe = true;

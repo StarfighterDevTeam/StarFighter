@@ -137,6 +137,11 @@ public:
 	map<string, vector<string> > m_enemiesConfig;
 	map<string, vector<string> > m_FXConfig;
 	map<string, vector<string> > m_upgradesConfig;
+	map<string, vector<string> > m_weaponsConfig;
+	map<string, vector<string> > m_ammoConfig;
+	map<string, vector<string> > m_dialogsConfig;
+	map<string, vector<string> > m_phasesConfig;
+	map<string, vector<string> > m_botsConfig;
 
 	//SFX
 	int LoadSFX();

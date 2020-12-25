@@ -403,15 +403,8 @@ void Game::killGameObjectType(GameObjectType type)
 void Game::damageGameObjectType(GameObjectType type, int damage)
 {
 	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
-	{
-		if ((*it) != NULL)
-		{
-			if ((*it)->m_isOnScene)
-			{
-				(*it)->GetDamage(damage);
-			}
-		}
-	}
+		if ((*it)->m_isOnScene == true)
+			(*it)->GetDamage(damage);
 }
 
 void Game::drawScene()
@@ -636,7 +629,7 @@ void Game::SetLayerSpeed(LayerType layer, sf::Vector2f speed)
 
 bool Game::isLastEnemyDead()
 {
-	return m_sceneGameObjectsTyped[EnemyFire].empty() == true && m_sceneGameObjectsTyped[EnemyObject].empty() == true;
+	return m_sceneGameObjectsTyped[EnemyFire].empty() == true && m_sceneGameObjectsTyped[EnemyObject].empty() == true && m_sceneGameObjectsCreated.empty() == true;
 }
 
 int Game::getHazard()

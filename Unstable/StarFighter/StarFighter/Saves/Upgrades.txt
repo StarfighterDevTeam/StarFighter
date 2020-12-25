@@ -1,5 +1,0 @@
-Upgrade_hp_1
-Upgrade_laser_2
-Upgrade_laser_3
-Upgrade_minirocket_1
-Upgrade_minirocket_2

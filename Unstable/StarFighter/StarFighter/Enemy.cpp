@@ -443,9 +443,8 @@ void Enemy::GetDamage(int damage)
 	if (m_armor <= 0)
 	{
 		m_armor == 0;
-		Death();
+		Death(true);
 	}
-		
 }
 
 Enemy* Enemy::Clone()
@@ -644,7 +643,7 @@ void Enemy::setPhase(Phase* phase)
 			}
 			case DeathModifier:
 			{
-				Death();
+				Death(true);
 				break;
 			}
 			case FaceTarget:
@@ -799,141 +798,121 @@ void Enemy::setPhase(Phase* phase)
 
 Dialog* Enemy::LoadDialog(string name)
 {
-	vector<vector<string> > dialogConfig = *(FileLoaderUtils::FileLoader(DIALOGS_FILE));
+	Dialog* dialog = new Dialog();
 
-	for (std::vector<vector<string> >::iterator it = (dialogConfig).begin(); it != (dialogConfig).end(); it++)
-	{
-		if ((*it)[DIALOG_NAME].compare(name) == 0)
-		{
-			Dialog* dialog = new Dialog();
+	dialog->m_name = name;
+	dialog->m_fade_in = (bool)(stoi((*CurrentGame).m_dialogsConfig[name][DIALOG_FADE_IN]));
+	dialog->m_fade_out = (bool)(stoi((*CurrentGame).m_dialogsConfig[name][DIALOG_FADE_OUT]));
+	dialog->m_enemy_speaking = (*CurrentGame).m_dialogsConfig[name][DIALOG_ENEMY_SPEAKING].compare("0") != 0;
+	dialog->m_duration = atof((*CurrentGame).m_dialogsConfig[name][DIALOG_DURATION].c_str());
+	dialog->m_title = (*CurrentGame).m_dialogsConfig[name][DIALOG_TITLE];
+	dialog->m_title = ReplaceAll(dialog->m_title, "_", " ");
+	dialog->m_title = ReplaceAll(dialog->m_title, "[COMA]", ",");
+	dialog->m_body = (*CurrentGame).m_dialogsConfig[name][DIALOG_BODY];
+	dialog->m_body = ReplaceAll(dialog->m_body, "_", " ");
+	dialog->m_body = ReplaceAll(dialog->m_body, "[COMA]", ",");
+	dialog->m_picture_name = (*CurrentGame).m_dialogsConfig[name][DIALOG_PICTURE];
+	dialog->m_next_dialog_name = (*CurrentGame).m_dialogsConfig[name][DIALOG_NEXT];
 
-			dialog->m_name = name;
-			dialog->m_fade_in = (bool)(stoi((*it)[DIALOG_FADE_IN]));
-			dialog->m_fade_out = (bool)(stoi((*it)[DIALOG_FADE_OUT]));
-			dialog->m_enemy_speaking = (*it)[DIALOG_ENEMY_SPEAKING].compare("0") != 0;
-			dialog->m_duration = atof((*it)[DIALOG_DURATION].c_str());
-			dialog->m_title = (*it)[DIALOG_TITLE];
-			dialog->m_title = ReplaceAll(dialog->m_title, "_", " ");
-			dialog->m_title = ReplaceAll(dialog->m_title, "[COMA]", ",");
-			dialog->m_body = (*it)[DIALOG_BODY];
-			dialog->m_body = ReplaceAll(dialog->m_body, "_", " ");
-			dialog->m_body = ReplaceAll(dialog->m_body, "[COMA]", ",");
-			dialog->m_picture_name = (*it)[DIALOG_PICTURE];
-			dialog->m_next_dialog_name = (*it)[DIALOG_NEXT];
+	TextureLoader *loader = TextureLoader::getInstance();
+	loader->loadTexture(dialog->m_picture_name, DIALOG_PANEL_PORTRAIT_SIZE_X, DIALOG_PANEL_PORTRAIT_SIZE_X);
 
-			TextureLoader *loader = TextureLoader::getInstance();
-			loader->loadTexture(dialog->m_picture_name, DIALOG_PANEL_PORTRAIT_SIZE_X, DIALOG_PANEL_PORTRAIT_SIZE_X);
-
-			return dialog;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Dialog '%s'. Please check the config file", (char*)name.c_str()));
+	return dialog;
 }
 
 Phase* Enemy::LoadPhase(string name)
 {
-	vector<vector<string> > phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
+	Phase* phase = new Phase();
 
-	for (std::vector<vector<string> >::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
+	phase->m_name = name;
+	phase->m_display_name = (*CurrentGame).m_phasesConfig[name][PHASE_NAME];
+	phase->m_vspeed = stoi((*CurrentGame).m_phasesConfig[name][PHASE_VSPEED]);
+
+	//loading weapons and ammos
+	for (int i = 0; i < 6; i++)
 	{
-		if ((*it)[0].compare(name) == 0)
+		if ((*CurrentGame).m_phasesConfig[name][PHASE_WEAPON + (i * 3)].compare("0") != 0)
 		{
-			Phase* phase = new Phase();
-
-			phase->m_name = name;
-			phase->m_display_name = (*it)[PHASE_NAME];
-			phase->m_vspeed = stoi((*it)[PHASE_VSPEED]);
-
-			//loading weapons and ammos
-			for (int i = 0; i < 6; i++)
-			{
-				if ((*it)[PHASE_WEAPON + (i * 3)].compare("0") != 0)
-				{
-					Weapon* m_weapon = Enemy::LoadWeapon((*it)[PHASE_WEAPON + (i * 3)], 1);
-					m_weapon->m_weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 3)].c_str());
-					m_weapon->m_delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 3)].c_str());
-					phase->m_weapons_list.push_back(m_weapon);
-				}
-			}
-
-			//loading phases
-			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), PHASE_PATTERN);
-			phase->m_pattern = pattern;
-
-			//loading rotation speed
-			phase->m_rotation_speed = stoi((*it)[PHASE_ROTATION_SPEED]);
-
-			//loading modifier (immune to damage, etc.)
-			for (int i = 0; i < 3; i++)
-			{
-				Modifier l_new_modifier = NoModifier;
-				if ((*it)[PHASE_MODIFIER + i].compare("0") != 0)
-				{
-					if ((*it)[PHASE_MODIFIER + i].compare("immune") == 0)
-						l_new_modifier = Immune;
-					else if ((*it)[PHASE_MODIFIER + i].compare("ghost") == 0)
-						l_new_modifier = GhostModifier;
-					else if ((*it)[PHASE_MODIFIER + i].compare("death") == 0)
-						l_new_modifier = DeathModifier;
-					else if ((*it)[PHASE_MODIFIER + i].compare("face_target") == 0)
-						l_new_modifier = FaceTarget;
-					else if ((*it)[PHASE_MODIFIER + i].compare("reset_facing") == 0)
-						l_new_modifier = ResetFacing;
-					else if ((*it)[PHASE_MODIFIER + i].compare("shoot_when_aligned") == 0)
-						l_new_modifier = ShootWhenAligned;
-					else if ((*it)[PHASE_MODIFIER + i].compare("reset_facing") == 0)
-						l_new_modifier = ResetFacing;
-					else if ((*it)[PHASE_MODIFIER + i].compare("bouncing") == 0)
-						l_new_modifier = Bouncing;
-					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingH") == 0)
-						l_new_modifier = BouncingH;
-					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingV") == 0)
-						l_new_modifier = BouncingV;
-					else if ((*it)[PHASE_MODIFIER + i].compare("freeze") == 0)
-						l_new_modifier = FreezePlayer;
-					else if ((*it)[PHASE_MODIFIER + i].compare("kill_bullets") == 0)
-						l_new_modifier = KillBullets;
-				}
-
-				phase->m_modifiers.push_back(l_new_modifier);
-			}
-
-			//loading welcome shot
-			if ((*it)[PHASE_WELCOME_WEAPON].compare("0") != 0)
-				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[PHASE_WELCOME_WEAPON], 1);
-			
-			//load enemies (by name) to wake up
-			if ((*it)[PHASE_WAKEUP].compare("0") != 0)
-				phase->m_wake_up_name = (*it)[PHASE_WAKEUP];
-
-			//loading transition to next phase
-			if ((*it)[PHASE_CONDITION].compare("0") != 0)
-				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), PHASE_CONDITION));
-
-			if ((*it)[PHASE_CONDITION_2].compare("0") != 0)
-				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), PHASE_CONDITION_2));
-
-			//loading dialogs
-			if ((*it)[PHASE_DIALOG_NAME].compare("0") != 0)
-			{
-				Dialog* dialog = Enemy::LoadDialog((*it)[PHASE_DIALOG_NAME]);
-				phase->m_dialogs.push_back(dialog);
-				while (!dialog->m_next_dialog_name.empty() && dialog->m_next_dialog_name.compare("0") != 0)
-				{
-					dialog = Enemy::LoadDialog(dialog->m_next_dialog_name);
-					phase->m_dialogs.push_back(dialog);
-				}
-			}
-
-			return phase;
+			Weapon* m_weapon = Enemy::LoadWeapon((*CurrentGame).m_phasesConfig[name][PHASE_WEAPON + (i * 3)], 1);
+			m_weapon->m_weaponOffset.x = atof((*CurrentGame).m_phasesConfig[name][PHASE_WEAPON_OFFSET + (i * 3)].c_str());
+			m_weapon->m_delay = atof((*CurrentGame).m_phasesConfig[name][PHASE_WEAPON_DELAY + (i * 3)].c_str());
+			phase->m_weapons_list.push_back(m_weapon);
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPhase '%s'. Please check the config file", (char*)name.c_str()));
+	//loading phases
+	GeometryPattern* pattern = GeometryPattern::LoadPattern((*CurrentGame).m_phasesConfig[name], PHASE_PATTERN);
+	phase->m_pattern = pattern;
+
+	//loading rotation speed
+	phase->m_rotation_speed = stoi((*CurrentGame).m_phasesConfig[name][PHASE_ROTATION_SPEED]);
+
+	//loading modifier (immune to damage, etc.)
+	for (int i = 0; i < 3; i++)
+	{
+		Modifier l_new_modifier = NoModifier;
+		if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("0") != 0)
+		{
+			if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("immune") == 0)
+				l_new_modifier = Immune;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("ghost") == 0)
+				l_new_modifier = GhostModifier;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("death") == 0)
+				l_new_modifier = DeathModifier;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("face_target") == 0)
+				l_new_modifier = FaceTarget;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("reset_facing") == 0)
+				l_new_modifier = ResetFacing;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("shoot_when_aligned") == 0)
+				l_new_modifier = ShootWhenAligned;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("reset_facing") == 0)
+				l_new_modifier = ResetFacing;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("bouncing") == 0)
+				l_new_modifier = Bouncing;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("bouncingH") == 0)
+				l_new_modifier = BouncingH;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("bouncingV") == 0)
+				l_new_modifier = BouncingV;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("freeze") == 0)
+				l_new_modifier = FreezePlayer;
+			else if ((*CurrentGame).m_phasesConfig[name][PHASE_MODIFIER + i].compare("kill_bullets") == 0)
+				l_new_modifier = KillBullets;
+		}
+
+		phase->m_modifiers.push_back(l_new_modifier);
+	}
+
+	//loading welcome shot
+	if ((*CurrentGame).m_phasesConfig[name][PHASE_WELCOME_WEAPON].compare("0") != 0)
+		phase->m_welcomeWeapon = Enemy::LoadWeapon((*CurrentGame).m_phasesConfig[name][PHASE_WELCOME_WEAPON], 1);
+			
+	//load enemies (by name) to wake up
+	if ((*CurrentGame).m_phasesConfig[name][PHASE_WAKEUP].compare("0") != 0)
+		phase->m_wake_up_name = (*CurrentGame).m_phasesConfig[name][PHASE_WAKEUP];
+
+	//loading transition to next phase
+	if ((*CurrentGame).m_phasesConfig[name][PHASE_CONDITION].compare("0") != 0)
+		phase->m_transitions_list.push_back(Phase::ConditionLoader((*CurrentGame).m_phasesConfig[name], PHASE_CONDITION));
+
+	if ((*CurrentGame).m_phasesConfig[name][PHASE_CONDITION_2].compare("0") != 0)
+		phase->m_transitions_list.push_back(Phase::ConditionLoader((*CurrentGame).m_phasesConfig[name], PHASE_CONDITION_2));
+
+	//loading dialogs
+	if ((*CurrentGame).m_phasesConfig[name][PHASE_DIALOG_NAME].compare("0") != 0)
+	{
+		Dialog* dialog = Enemy::LoadDialog((*CurrentGame).m_phasesConfig[name][PHASE_DIALOG_NAME]);
+		phase->m_dialogs.push_back(dialog);
+		while (!dialog->m_next_dialog_name.empty() && dialog->m_next_dialog_name.compare("0") != 0)
+		{
+			dialog = Enemy::LoadDialog(dialog->m_next_dialog_name);
+			phase->m_dialogs.push_back(dialog);
+		}
+	}
+
+	return phase;
 }
 
-void Enemy::Death()
+void Enemy::Death(bool give_money)
 {
 	GameObject* playership = (GameObject*)(*CurrentGame).m_playership;
 
@@ -960,18 +939,15 @@ void Enemy::Death()
 	//	GenerateLoot();
 	//}
 
-	playership->addMoney(m_money);
+	if (give_money == true)
+		playership->addMoney(m_money);
 
 	GameObject::Death();
 
 	if (m_enemy_class < ENEMYPOOL_DELTA)
-	{
 		(*CurrentGame).PlaySFX(SFX_Kill);
-	}
 	else
-	{
 		(*CurrentGame).PlaySFX(SFX_BigKill);
-	}
 
 	//unlock player if blocked
 	if (playership->GetInputBlocker() == this)
@@ -1135,159 +1111,122 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 
 Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 {
-	vector<vector<string> > weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
+	Weapon* weapon = new Weapon(Enemy::LoadAmmo((*CurrentGame).m_weaponsConfig[name][WEAPON_AMMO]));
+	weapon->m_display_name = (*CurrentGame).m_weaponsConfig[name][WEAPON_DISPLAY_NAME];
+	weapon->m_fire_direction = fire_direction;
+	weapon->m_rate_of_fire = atof((*CurrentGame).m_weaponsConfig[name][WEAPON_RATE_OF_FIRE].c_str());
+	weapon->m_shot_mode = NoShotMode;
 
-	for (std::vector<vector<string> >::iterator it = weaponConfig.begin(); it != weaponConfig.end(); it++)
+	weapon->m_ammunition->m_damage = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_DAMAGE]);
+	weapon->m_ammunition->m_ref_speed = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_SPEED]);
+	weapon->m_ammunition->m_speed = sf::Vector2f(0, weapon->m_ammunition->m_ref_speed);
+	weapon->m_ammunition->m_range = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_RANGE]);
+
+	GeometryPattern* pattern = GeometryPattern::LoadPattern((*CurrentGame).m_weaponsConfig[name], WEAPON_PATTERN);
+	weapon->m_ammunition->m_pattern.setPattern_v2(pattern);
+	delete pattern;
+
+	weapon->m_multishot = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_MULTISHOT]);
+	if (weapon->m_multishot > 1)
 	{
-		if ((*it)[0].compare(name) == 0)
+		weapon->m_xspread = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_XSPREAD]);
+		weapon->m_dispersion = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_DISPERSION]);
+		if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("0") != 0)
 		{
-			Weapon* weapon = new Weapon(Enemy::LoadAmmo((*it)[WEAPON_AMMO]));
-			weapon->m_display_name = (*it)[WEAPON_DISPLAY_NAME];
-			weapon->m_fire_direction = fire_direction;
-			weapon->m_rate_of_fire = atof((*it)[WEAPON_RATE_OF_FIRE].c_str());
-			weapon->m_shot_mode = NoShotMode;
-
-			weapon->m_ammunition->m_damage = stoi((*it)[WEAPON_DAMAGE]);
-			weapon->m_ammunition->m_ref_speed = (float)stoi((*it)[WEAPON_SPEED]);
-			weapon->m_ammunition->m_speed = sf::Vector2f(0, weapon->m_ammunition->m_ref_speed);
-			weapon->m_ammunition->m_range = (float)stoi((*it)[WEAPON_RANGE]);
-
-			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), WEAPON_PATTERN);
-			weapon->m_ammunition->m_pattern.setPattern_v2(pattern);
-			delete pattern;
-
-			weapon->m_multishot = stoi((*it)[WEAPON_MULTISHOT]);
-			if (weapon->m_multishot > 1)
-			{
-				weapon->m_xspread = stoi((*it)[WEAPON_XSPREAD]);
-				weapon->m_dispersion = stoi((*it)[WEAPON_DISPERSION]);
-				if ((*it)[WEAPON_ALTERNATE].compare("0") != 0)
-				{
-					if ((*it)[WEAPON_ALTERNATE].compare("alternate") == 0)
-						weapon->m_shot_mode = AlternateShotMode;
-					if ((*it)[WEAPON_ALTERNATE].compare("ascending") == 0)
-						weapon->m_shot_mode = AscendingShotMode;
-					if ((*it)[WEAPON_ALTERNATE].compare("descending") == 0)
-						weapon->m_shot_mode = DescendingShotMode;
-					if ((*it)[WEAPON_ALTERNATE].compare("ascending2") == 0)
-						weapon->m_shot_mode = Ascending2ShotMode;
-					if ((*it)[WEAPON_ALTERNATE].compare("descending2") == 0)
-						weapon->m_shot_mode = Descending2ShotMode;
-				}
-			}
-			
-			weapon->m_rafale = stoi((*it)[WEAPON_RAFALE]);
-			if (weapon->m_rafale != 0)
-			{
-				weapon->m_rafale_cooldown = atof((*it)[WEAPON_RAFALE_COOLDOWN].c_str());
-				weapon->m_rafale_locking = (bool)(stoi((*it)[WEAPON_RAFALE_LOCKING]));
-
-				if (weapon->m_rafale < 0)
-					weapon->m_ammunition->m_isBeam = true;
-			}
-				
-			weapon->m_textureName = (*it)[WEAPON_IMAGE_NAME];
-			weapon->m_size = sf::Vector2f((float)stoi((*it)[WEAPON_WIDTH]), (float)stoi((*it)[WEAPON_HEIGHT]));
-			weapon->m_frameNumber = stoi((*it)[WEAPON_FRAMES]);
-			weapon->m_angle_offset = (float)stoi((*it)[WEAPON_ANGLE_OFFSET]);
-
-			if ((*it)[WEAPON_TARGET_HOMING].compare("0") != 0)
-			{
-				if ((*it)[WEAPON_TARGET_HOMING].compare("semi_homing") == 0)
-					weapon->m_target_homing = SEMI_HOMING;
-				else if ((*it)[WEAPON_TARGET_HOMING].compare("homing") == 0)
-					weapon->m_target_homing = HOMING;
-			}
-
-			return weapon;
+			if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("alternate") == 0)
+				weapon->m_shot_mode = AlternateShotMode;
+			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("ascending") == 0)
+				weapon->m_shot_mode = AscendingShotMode;
+			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("descending") == 0)
+				weapon->m_shot_mode = DescendingShotMode;
+			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("ascending2") == 0)
+				weapon->m_shot_mode = Ascending2ShotMode;
+			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("descending2") == 0)
+				weapon->m_shot_mode = Descending2ShotMode;
 		}
 	}
+			
+	weapon->m_rafale = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_RAFALE]);
+	if (weapon->m_rafale != 0)
+	{
+		weapon->m_rafale_cooldown = atof((*CurrentGame).m_weaponsConfig[name][WEAPON_RAFALE_COOLDOWN].c_str());
+		weapon->m_rafale_locking = (bool)(stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_RAFALE_LOCKING]));
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file", (char*)name.c_str()));
+		if (weapon->m_rafale < 0)
+			weapon->m_ammunition->m_isBeam = true;
+	}
+				
+	weapon->m_textureName = (*CurrentGame).m_weaponsConfig[name][WEAPON_IMAGE_NAME];
+	weapon->m_size = sf::Vector2f((float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_WIDTH]), (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_HEIGHT]));
+	weapon->m_frameNumber = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_FRAMES]);
+	weapon->m_angle_offset = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_ANGLE_OFFSET]);
+
+	if ((*CurrentGame).m_weaponsConfig[name][WEAPON_TARGET_HOMING].compare("0") != 0)
+	{
+		if ((*CurrentGame).m_weaponsConfig[name][WEAPON_TARGET_HOMING].compare("semi_homing") == 0)
+			weapon->m_target_homing = SEMI_HOMING;
+		else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_TARGET_HOMING].compare("homing") == 0)
+			weapon->m_target_homing = HOMING;
+	}
+
+	return weapon;
 }
 
 Ammo* Enemy::LoadAmmo(string name)
 {
-	vector<vector<string> > ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+	Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_ammoConfig[name][AMMO_IMAGE_NAME],
+		Vector2f((float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_WIDTH]), (float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_HEIGHT])), stoi((*CurrentGame).m_ammoConfig[name][AMMO_FRAMES]), stoi((*CurrentGame).m_ammoConfig[name][AMMO_NB_SKINS]), 0, LoadFX((*CurrentGame).m_ammoConfig[name][AMMO_FX]), (bool)stoi((*CurrentGame).m_ammoConfig[name][AMMO_MISSILE_MODEL]));
 
-	for (std::vector<vector<string> >::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
-	{
-		if ((*it)[0].compare(name) == 0)
-		{
-			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), (*it)[AMMO_IMAGE_NAME],
-				Vector2f((float)stoi((*it)[AMMO_WIDTH]), (float)stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_FRAMES]), stoi((*it)[AMMO_NB_SKINS]), 0, LoadFX((*it)[AMMO_FX]), (bool)stoi((*it)[AMMO_MISSILE_MODEL]));
+	new_ammo->setAnimationLine(stoi((*CurrentGame).m_ammoConfig[name][AMMO_SKIN]) - 1);
+	new_ammo->m_display_name = (*CurrentGame).m_ammoConfig[name][AMMO_NAME];
+	new_ammo->m_sound_name = (*CurrentGame).m_ammoConfig[name][AMMO_SOUND];
 
-			new_ammo->setAnimationLine(stoi((*it)[AMMO_SKIN]) - 1);
-			new_ammo->m_display_name = (*it)[AMMO_NAME];
-			new_ammo->m_sound_name = (*it)[AMMO_SOUND];
+	if ((*CurrentGame).m_ammoConfig[name][AMMO_FX].empty() == false)
+		new_ammo->m_explosion->m_display_name = (*CurrentGame).m_ammoConfig[name][AMMO_FX];
 
-			if (!(*it)[AMMO_FX].empty())
-				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
+	new_ammo->m_rotation_speed = (float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_ROTATION_SPEED]);
+	new_ammo->m_area_of_effect = (float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_AREA_OF_EFFECT]);
 
-			new_ammo->m_rotation_speed = (float)stoi((*it)[AMMO_ROTATION_SPEED]);
-			new_ammo->m_area_of_effect = (float)stoi((*it)[AMMO_AREA_OF_EFFECT]);
-			return new_ammo;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file", (char*)name.c_str()));
+	return new_ammo;
 }
 
 FX* Enemy::LoadFX(string name)
 {
-	vector<vector<string> >FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
-
-	for (std::vector<vector<string> >::iterator it = FXConfig.begin(); it != FXConfig.end(); it++)
+	if ((*CurrentGame).m_FXConfig[name][FX_TYPE].compare("explosion") == 0)
 	{
-		if ((*it)[FX_TYPE].compare("explosion") == 0)
-		{
-			if ((*it)[FX_NAME].compare(name) == 0)
-			{
-				float duration = atof(((*it)[FX_DURATION]).c_str());
-				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FX_FILENAME], Vector2f((float)stoi((*it)[FX_WIDTH]), (float)stoi((*it)[FX_HEIGHT])), stoi((*it)[FX_FRAMES]), sf::seconds(duration));
-				myFX->m_display_name = (*it)[FX_NAME];
+		float duration = atof(((*CurrentGame).m_FXConfig[name][FX_DURATION]).c_str());
+		FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_FXConfig[name][FX_FILENAME], Vector2f((float)stoi((*CurrentGame).m_FXConfig[name][FX_WIDTH]), (float)stoi((*CurrentGame).m_FXConfig[name][FX_HEIGHT])), stoi((*CurrentGame).m_FXConfig[name][FX_FRAMES]), sf::seconds(duration));
+		myFX->m_display_name = (*CurrentGame).m_FXConfig[name][FX_NAME];
 
-				return myFX;
-			}
-		}
+		return myFX;
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file", (char*)name.c_str()));
+	return NULL;
 }
 
 Bot* Enemy::LoadBot(string name)
 {
-	vector<vector<string> >botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
+	Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_botsConfig[name][BOT_IMAGE_NAME], sf::Vector2f((float)stoi((*CurrentGame).m_botsConfig[name][BOT_WIDTH]), (float)stoi((*CurrentGame).m_botsConfig[name][BOT_HEIGHT])));
 
-	for (std::vector<vector<string> >::iterator it = (botConfig).begin(); it != (botConfig).end(); it++)
-	{
-		if ((*it)[0].compare(name) == 0)
-		{
-			Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), (*it)[BOT_IMAGE_NAME], sf::Vector2f((float)stoi((*it)[BOT_WIDTH]), (float)stoi((*it)[BOT_HEIGHT])));
+	((GameObject*)bot)->m_display_name = (*CurrentGame).m_botsConfig[name][BOT_NAME];
+	((GameObject*)bot)->m_armor = stoi((*CurrentGame).m_botsConfig[name][BOT_ARMOR]);
+	((GameObject*)bot)->m_armor_max = stoi((*CurrentGame).m_botsConfig[name][BOT_ARMOR]);
+	((GameObject*)bot)->m_shield = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD]);
+	((GameObject*)bot)->m_shield_max = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD]);
+	((GameObject*)bot)->m_shield_regen = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD_REGEN]);
+	((GameObject*)bot)->m_damage = stoi((*CurrentGame).m_botsConfig[name][BOT_DAMAGE]);
+	bot->m_spread = Vector2f(stoi((*CurrentGame).m_botsConfig[name][BOT_XSPREAD]), stoi((*CurrentGame).m_botsConfig[name][BOT_YSPREAD]));
 
-			((GameObject*)bot)->m_display_name = (*it)[BOT_NAME];
-			((GameObject*)bot)->m_armor = stoi((*it)[BOT_ARMOR]);
-			((GameObject*)bot)->m_armor_max = stoi((*it)[BOT_ARMOR]);
-			((GameObject*)bot)->m_shield = stoi((*it)[BOT_SHIELD]);
-			((GameObject*)bot)->m_shield_max = stoi((*it)[BOT_SHIELD]);
-			((GameObject*)bot)->m_shield_regen = stoi((*it)[BOT_SHIELD_REGEN]);
-			((GameObject*)bot)->m_damage = stoi((*it)[BOT_DAMAGE]);
-			bot->m_spread = Vector2f(stoi((*it)[BOT_XSPREAD]), stoi((*it)[BOT_YSPREAD]));
+	GeometryPattern* pattern = GeometryPattern::LoadPattern((*CurrentGame).m_botsConfig[name], BOT_PATTERN);
+	bot->m_pattern.setPattern_v2(pattern);
+	delete pattern;
 
-			GeometryPattern* pattern = GeometryPattern::LoadPattern((*it), BOT_PATTERN);
-			bot->m_pattern.setPattern_v2(pattern);
-			delete pattern;
+	bot->m_rotation_speed = stoi((*CurrentGame).m_botsConfig[name][BOT_ROTATION_SPEED]);
 
-			bot->m_rotation_speed = stoi((*it)[BOT_ROTATION_SPEED]);
+	if ((*CurrentGame).m_botsConfig[name][BOT_WEAPON].compare("0") != 0)
+		bot->m_weapon = Enemy::LoadWeapon((*CurrentGame).m_botsConfig[name][BOT_WEAPON], -1);
 
-			if ((*it)[BOT_WEAPON].compare("0") != 0)
-				bot->m_weapon = Enemy::LoadWeapon((*it)[BOT_WEAPON], -1);
-
-			return bot;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Bot '%s'. Please check the config file", (char*)name.c_str()));
+	return bot;
 }
 
 Equipment* Enemy::LoadEquipment(string name)

@@ -47,7 +47,7 @@
 //#define SHIELD_FILENAME			"2D/Equipment/Shield.png"
 //#define THRUSTER_FILENAME		"2D/Equipment/Thruster.png"
 //#define MODULE_FILENAME			"2D/Equipment/Module.png"
-//#define BOT_FILENAME			"2D/Equipment/bot.png"
+//#define BOTS_FILENAME			"2D/Equipment/bot.png"
 
 #define QUALITY_BACKGROUND				"2D/HUD/quality_background.png"
 #define EQUIPMENT_SIZE					48

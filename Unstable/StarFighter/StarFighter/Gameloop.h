@@ -5,6 +5,16 @@
 
 extern Game* CurrentGame;
 
+enum FactionType
+{
+	Faction_Vanguard,
+	Faction_Royale,
+	Faction_Corsair,
+	Faction_Ancient,
+	Faction_Swarm,
+	NB_FACTION_TYPES,
+};
+
 class Gameloop : public GameState
 {
 public:
@@ -25,6 +35,12 @@ public:
 	void LoadAllEnemies(string enemies_file);
 	void LoadAllFX(string FX_file);
 	void LoadAllUpgrades(string upgrades_file);
+	void LoadAllWeapons(string weapons_file);
+	void LoadAllAmmunitions(string ammo_file);
+	void LoadAllDialogs(string dialogs_file);
+	void LoadAllEnemyPhases(string phases_file);
+	void LoadAllBots(string bots_file);
+	void PreloadAssets(FactionType faction);
 	void UpdateShipConfig(Ship* ship, string config_name);
 
 	void GameloopStateMachineCheck(sf::Time deltaTime);

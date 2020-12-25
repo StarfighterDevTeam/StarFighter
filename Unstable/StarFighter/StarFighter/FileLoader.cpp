@@ -59,7 +59,6 @@ Ship* FileLoader::LoadShipConfig(string name)
 
 EnemyPool* FileLoader::LoadEnemyPool(string name)
 {
-	
 	vector<vector<string> > enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
 
 	for (std::vector<vector<string> >::iterator it = (enemypoolConfig).begin(); it != (enemypoolConfig).end(); it++)

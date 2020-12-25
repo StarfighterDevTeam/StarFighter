@@ -521,7 +521,7 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	for (GameObject icon : m_upgrades_icons)
 		icon.Draw(screen);
 
-	if ((*CurrentGame).m_gameloop_state == SCROLLING || (*CurrentGame).m_gameloop_state == LAST_SCREEN)
+	if ((*CurrentGame).m_gameloop_state == SCROLLING)
 	{
 		screen.draw(m_progressionBar);
 		screen.draw(m_progressionExit);

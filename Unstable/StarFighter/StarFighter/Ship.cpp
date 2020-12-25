@@ -488,8 +488,9 @@ void Ship::Draw(sf::RenderTexture& screen)
 
 		GameObject::Draw(screen);
 
-		if ((*CurrentGame).m_is_in_hub == false && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
-			screen.draw(m_graze_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
+		if ((*CurrentGame).m_gameloop_state == SCROLLING || (*CurrentGame).m_gameloop_state == BOSS_FIGHT)
+			if ((*CurrentGame).m_is_in_hub == false && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
+				screen.draw(m_graze_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
 	}
 }
 
@@ -1342,9 +1343,7 @@ void Ship::Bomb()
 
 	//ghost
 	if (m_ghost_timer < sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION))
-	{
 		m_ghost_timer = sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION);
-	}
 }
 
 void Ship::Jump()
@@ -1616,7 +1615,7 @@ void Ship::SetVisibility(bool visible)
 	SetBotsVisibility(visible);
 }
 
-void Ship::Death()
+void Ship::Death(bool give_money)
 {
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
@@ -1964,6 +1963,8 @@ void Ship::GetDamageFrom(GameObject& object)
 
 	m_collision_timer = IMMUNE_DELAY_AFTER_HIT_TAKEN;
 	(*CurrentGame).killGameObjectType(EnemyFire);
+	if ((*CurrentGame).m_gameloop_state != BOSS_FIGHT)
+		(*CurrentGame).killGameObjectType(EnemyObject);
 
 	int damage = 1;//object.m_damage
 	if (damage > m_shield)

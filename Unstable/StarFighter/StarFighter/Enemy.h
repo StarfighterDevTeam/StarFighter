@@ -29,7 +29,7 @@ public:
 	void Enemy::Draw(sf::RenderTexture& screen) override;//DEBUG
 	void UpdateHealthBars();
 	Enemy* Clone();
-	void Death() override;
+	void Death(bool give_money) override;
 
 	vector<Weapon*> m_weapons_list;
 	FX* m_FX_death;

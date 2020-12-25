@@ -149,7 +149,7 @@ public :
 	void SetDroneWeapon(string weapon_name);
 	
 	void SetVisibility(bool visible);
-	void Death() override;
+	void Death(bool give_money = false) override;
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
