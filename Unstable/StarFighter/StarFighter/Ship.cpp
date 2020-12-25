@@ -2854,19 +2854,26 @@ void Ship::SetUpgrade(string upgrade_name)
 		m_upgrades.push_back(upgrade_name);
 
 		//keep a short list of the most advances upgrades
-		string locked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_UNLOCKED_BY];
-		if (locked_by.compare("0") != 0)
+		bool replaced = false;
+		string unlocked_by = (*CurrentGame).m_upgradesConfig[upgrade_name][UPGRADE_UNLOCKED_BY];
+		while (unlocked_by.compare("0") != 0)
 		{
 			for (vector<string>::iterator it = m_upgrades_short.begin(); it != m_upgrades_short.end(); it++)
 			{
-				if (it->compare(locked_by) == 0)
+				if (it->compare(unlocked_by) == 0)
 				{
 					*it = upgrade_name;
+					unlocked_by = "0";
+					replaced = true;
 					break;
 				}
 			}
+
+			if (replaced == false)
+				unlocked_by = (*CurrentGame).m_upgradesConfig[unlocked_by][UPGRADE_UNLOCKED_BY];
 		}
-		else
+		
+		if (replaced == false)
 			m_upgrades_short.push_back(upgrade_name);
 	}
 	
