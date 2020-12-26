@@ -23,8 +23,8 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playership) : SFPanel(size
 	m_target_position = sf::Vector2f(-size.x / 2, SCENE_SIZE_Y - DIALOG_PANEL_OFFSET_Y - size.y / 2);
 	if (!m_is_downscreen)
 	{
-		setPosition(GameObject::getPosition_for_Direction(DIRECTION_DOWN, getPosition()));
-		m_target_position = GameObject::getPosition_for_Direction(DIRECTION_DOWN, m_target_position);
+		setPosition(sf::Vector2f(SCENE_SIZE_X - getPosition().x, SCENE_SIZE_Y - getPosition().y));
+		m_target_position = sf::Vector2f(SCENE_SIZE_X - m_target_position.x, SCENE_SIZE_Y - m_target_position.y);
 	}
 	
 	if (m_dialog->m_enemy_speaking)

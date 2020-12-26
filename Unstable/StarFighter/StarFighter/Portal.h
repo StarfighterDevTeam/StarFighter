@@ -28,7 +28,6 @@ public:
 	void Close();
 
 	std::string m_destination_name;
-	int m_max_unlocked_hazard_level;
 	sf::Vector2f m_offset;//respect to the background
 	PortalState m_state;
 	Directions m_direction;

@@ -2,61 +2,6 @@
 
 extern Game* CurrentGame;
 
-Ship* FileLoader::LoadShipConfig(string name)
-{
-	LOGGER_WRITE(Logger::DEBUG, "Loading ship config file");
-	try
-	{
-		vector<vector<string> > shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
-
-		for (std::vector<vector<string> >::iterator it = (shipConfig).begin(); it != (shipConfig).end(); it++)
-		{
-			if((*it)[SHIPCONFIG_NAME].compare(name) == 0)
-			{
-				//Loading Ship Model
-				LOGGER_WRITE(Logger::DEBUG, "Loading ship model\n");
-				ShipModel* ship_model = FileLoader::LoadShipModel((*it)[SHIPCONFIG_SHIPMODEL]);
-
-				Ship* ship = new Ship(ship_model);
-
-				//Loading equipment
-				LOGGER_WRITE(Logger::DEBUG, "Loading ship equipment\n");
-				if ((*it)[SHIPCONFIG_ENGINE].compare("0") != 0)
-					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_ENGINE]), false, true);
-				if ((*it)[SHIPCONFIG_MODULE].compare("0") != 0)
-					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_MODULE]), false, true);
-				if ((*it)[SHIPCONFIG_ARMOR].compare("0") != 0)
-					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_ARMOR]), false, true);
-				if ((*it)[SHIPCONFIG_SHIELD].compare("0") != 0)
-					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_SHIELD]), false, true);//false because of shipC->Init() below that will recompute the ship config stats
-
-				//Loading FX
-				if ((*it)[SHIPCONFIG_DEATH_FX].compare("0") != 0)
-					ship->m_FX_death = FileLoader::LoadFX((*it)[SHIPCONFIG_DEATH_FX]);
-	
-				//Loading weapon
-				if ((*it)[SHIPCONFIG_WEAPON].compare("0") != 0)
-				{
-					LOGGER_WRITE(Logger::DEBUG, "Loading ship weapon\n");
-					ship->m_weapon = FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1);//false because of shipC->Init() below that will recompute the ship config stats
-				}
-
-				//Computing the ship config
-				ship->Init();
-
-				return ship;
-			}
-		}
-	}
-	catch( const std::exception & ex ) 
-	{
-		//An error occured
-		LOGGER_WRITE(Logger::LERROR,ex.what());
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ship config '%s'. Please check the config file", (char*)name.c_str()));
-}
-
 EnemyPool* FileLoader::LoadEnemyPool(string name)
 {
 	vector<vector<string> > enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
@@ -164,49 +109,7 @@ FX* FileLoader::LoadFX(string name)
 	return Enemy::LoadFX(name);
 }
 
-Equipment* FileLoader::LoadEquipment(string name)
-{
-	return Enemy::LoadEquipment(name);
-}
-
 Bot* FileLoader::LoadBot(string name)
 {
 	return Enemy::LoadBot(name);
-}
-
-ShipModel* FileLoader::LoadShipModel(string name)
-{
-	vector<vector<string> > equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
-
-	for (std::vector<vector<string> >::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
-	{
-		if((*it)[EQUIPMENT_COMPARE].compare("shipmodel") == 0)
-		{
-			if((*it)[EQUIPMENT_NAME].compare(name) == 0)
-			{
-				ShipModel* s = new ShipModel((float)stoi((*it)[EQUIPMENT_MAXSPEED]), (float)stoi((*it)[EQUIPMENT_ACCELERATION]), (float)stoi((*it)[EQUIPMENT_DECCELERATION]),
-					stoi((*it)[EQUIPMENT_HYPERSPEED]), stoi((*it)[EQUIPMENT_HYPERSPEED_FUEL]), stoi((*it)[EQUIPMENT_ARMOR]), stoi((*it)[EQUIPMENT_SHIELD]), stoi((*it)[EQUIPMENT_SHIELD_REGEN]),
-					atof((*it)[EQUIPMENT_SHIELD_RECOVERY].c_str()), stoi((*it)[EQUIPMENT_DAMAGE]),
-					(*it)[EQUIPMENT_IMAGE_NAME], Vector2f((float)stoi((*it)[EQUIPMENT_WIDTH]), (float)stoi((*it)[EQUIPMENT_HEIGHT])),
-					stoi((*it)[EQUIPMENT_FRAMES]), (*it)[EQUIPMENT_NAME]);
-
-				if ((*it)[EQUIPMENT_BOT].compare("0") != 0)
-				{
-					s->m_bot = LoadBot((*it)[EQUIPMENT_BOT]);
-				}
-
-				if(!(*it)[EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_WIDTH].compare("0") == 0
-					&& !(*it)[EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
-				{
-					s->m_fake_textureName = (*it)[EQUIPMENT_FAKE_TEXTURE];
-					s->m_fake_size = sf::Vector2f((float)stoi((*it)[EQUIPMENT_FAKE_WIDTH]), (float)stoi((*it)[EQUIPMENT_FAKE_HEIGHT]));
-					s->m_fake_frameNumber = stoi((*it)[EQUIPMENT_FAKE_FRAMES]);
-				}
-
-				return s;
-			}	
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find ShipModel '%s'. Please check the config file", (char*)name.c_str()));
 }

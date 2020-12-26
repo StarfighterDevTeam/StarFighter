@@ -56,6 +56,7 @@ void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions
 
 void SFInventoryPanel::DrawItemLevels(sf::RenderTexture& screen)
 {
+	/*
 	for (int i = 0; i < NBVAL_TradeGrids; i++)
 		if (m_grids_v2[i] != NULL)
 			for (GridElement* element : m_grids_v2[i]->m_elements)
@@ -78,6 +79,7 @@ void SFInventoryPanel::DrawItemLevels(sf::RenderTexture& screen)
 					item_level.setPosition(sf::Vector2f(element->getPosition().x + GRID_SLOT_SIZE * 0.5 - item_level.getGlobalBounds().width - 4, element->getPosition().y + GRID_SLOT_SIZE * 0.5 - item_level.getCharacterSize() - 4));
 					screen.draw(item_level);
 				}
+	*/
 }
 
 void SFInventoryPanel::Draw(sf::RenderTexture& screen)
@@ -105,22 +107,10 @@ void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 	}
 }
 
-
-bool SFInventoryPanel::GetPrioritaryFeedback()
-{
-	return m_has_prioritary_feedback;
-}
-
 void SFInventoryPanel::SetItemStatsPanel(SFItemStatsPanel* panel)
 {
 	m_item_stats_panel = panel;
 }
-
-void SFInventoryPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
-{
-	m_has_prioritary_feedback = has_priotiary_feedback;
-}
-
 
 int SFInventoryPanel::GetItemsStatsPanelIndex()
 {
@@ -305,9 +295,9 @@ GridElement* SFInventoryPanel::getCursorCollision(GameObject& cursor)
 				m_item_stats_panel = new SFItemStatsPanel(element->m_object, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playership, item_state, NULL);
 
 				//update compare panel
-				int equip_type = Grid::GetEquipmentType(element->m_object);
-				if (element->m_grid != m_grids_v2[Trade_EquippedGrid] && m_grids_v2[Trade_EquippedGrid]->m_elements[equip_type]->m_object != NULL)//compare only if it's not the equipped grid
-					m_item_stats_panel_compare = new SFItemStatsPanel(element->m_object, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playership, item_state, m_grids_v2[Trade_EquippedGrid]->m_elements[equip_type]->m_object);
+				//int equip_type = Grid::GetEquipmentType(element->m_object);
+				//if (element->m_grid != m_grids_v2[Trade_EquippedGrid] && m_grids_v2[Trade_EquippedGrid]->m_elements[equip_type]->m_object != NULL)//compare only if it's not the equipped grid
+				//	m_item_stats_panel_compare = new SFItemStatsPanel(element->m_object, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playership, item_state, m_grids_v2[Trade_EquippedGrid]->m_elements[equip_type]->m_object);
 			}
 		}
 	}

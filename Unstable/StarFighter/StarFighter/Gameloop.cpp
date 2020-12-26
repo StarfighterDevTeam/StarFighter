@@ -28,7 +28,7 @@ void Gameloop::Initialize(Player player)
 	PreloadAssets(Faction_Vanguard);
 
 	//creating new ship
-	m_playership = FileLoader::LoadShipConfig("default");
+	m_playership = new Ship("2D/Equipment/Natalia16.png", sf::Vector2f(16, 16), "2D/Equipment/ShipModel_default.png", sf::Vector2f(70, 80), 3, NB_ShipAnimations);
 	(*CurrentGame).SetPlayerShip(m_playership);
 
 	//initializing HUD
@@ -36,10 +36,6 @@ void Gameloop::Initialize(Player player)
 	m_playership->m_SFHudPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playership));
 	(*CurrentGame).addToPanels(m_playership->m_SFHudPanel);
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
-
-	//Initialisation of player ship
-	m_playership->Init();
-	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
 	//Loading save files or creating new ones
 	(*CurrentGame).m_playership->Respawn(true);
@@ -69,67 +65,6 @@ void Gameloop::Initialize(Player player)
 
 	//DEBUG
 	//SpawnInScene("Sandbox", (*CurrentGame).m_playership);
-}
-
-void Gameloop::UpdateShipConfig(Ship* ship, string config_name)
-{
-	if (!ship || config_name.empty())
-		return;
-
-	LOGGER_WRITE(Logger::DEBUG, "Loading ship config file");
-	try
-	{
-		vector<vector<string> > shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
-
-		for (std::vector<vector<string> >::iterator it = (shipConfig).begin(); it != (shipConfig).end(); it++)
-		{
-			if ((*it)[SHIPCONFIG_NAME].compare(config_name) == 0)
-			{
-				//Clear equipped items
-				ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->ClearGrid();
-
-				//Loading equipment
-				for (int i = 0; i < NBVAL_Equipment; i++)
-				{
-					if ((*it)[i + 1].compare("0") != 0)
-					{
-						ship->setShipEquipment(FileLoader::LoadEquipment((*it)[i + 1]), true);
-
-						GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(ship->m_equipment[i]);
-						ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
-					}
-					else if (ship->m_equipment[i])
-					{
-						delete ship->m_equipment[i];
-						ship->m_equipment[i] = NULL;
-					}
-				}
-
-				//Loading weapon
-				if ((*it)[SHIPCONFIG_WEAPON].compare("0") != 0)
-				{
-					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1), true);
-
-					GameObject* capsule = Enemy::CloneWeaponIntoGameObject(ship->m_weapon);
-					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
-				}
-				else if (ship->m_weapon)
-				{
-					delete ship->m_weapon;
-					ship->m_weapon = NULL;
-				}
-
-				return;
-			}
-		}
-	}
-	catch (const std::exception & ex)
-	{
-		//An error occured
-		LOGGER_WRITE(Logger::LERROR, ex.what());
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ship config '%s'. Please check the config file", (char*)config_name.c_str()));
 }
 
 void Gameloop::Update(Time deltaTime)
@@ -192,7 +127,8 @@ void Gameloop::Update(Time deltaTime)
 	if (InputGuy::spawnInSandbox() && (*CurrentGame).m_waiting_for_dialog_validation == false)
 	{
 		SpawnInScene("Sandbox", (*CurrentGame).m_playership, false);
-		(*CurrentGame).m_playership->ResplenishHealth();
+		m_playership->m_armor = m_playership->m_armor_max;
+		m_playership->m_shield = m_playership->m_shield_max;
 	}
 
 	//F7: relad saved items and enemy config
@@ -201,7 +137,6 @@ void Gameloop::Update(Time deltaTime)
 		(*CurrentGame).m_enemiesConfig.clear();
 		LoadAllEnemies(ENEMY_FILE);
 
-		Ship::LoadPlayerItems(m_playership);
 		Ship::LoadPlayerMoneyAndHealth(m_playership);
 	}
 #endif
@@ -292,9 +227,6 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 			m_currentScene->m_bg->m_speed = sf::Vector2f(0, 0);
 			(*CurrentGame).m_vspeed = 0;
 
-			//Disable hyperspeed capacity
-			(*CurrentGame).m_playership->m_disableHyperspeed = true;
-
 			//Stop spawning enemies
 			m_currentScene->m_generating_enemies = false;
 			if (m_currentScene->m_generating_boss == true)
@@ -356,18 +288,7 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 
 				if (m_hasDisplayedDestructionRatio == false)
 				{
-					//is the scene capable of hazard break? (= last scene before hub)
-					if (m_currentScene->m_canHazardBreak == true)
-					{
-						//what is our destruction ratio? (displaying score). 100% = Hazard break
-						if (m_currentScene->CheckHazardBreakConditions() == true && m_currentScene->getSceneHazardLevelUnlockedValue() == m_currentScene->getSceneHazardLevelValue())
-						{
-							m_currentScene->DisplayScore(true);
-							m_currentScene->HazardBreak();
-						}
-						else
-							m_currentScene->DisplayScore();
-					}
+					m_currentScene->DisplayScore();
 
 					m_currentScene->m_bg->SetPortalsState(PortalOpen);
 
@@ -408,30 +329,6 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 		//player takes exit?
 		if ((*CurrentGame).m_playership->m_is_asking_scene_transition == true)
 			PlayerTakesExit();
-	}
-}
-
-void Gameloop::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playership)
-{
-	//getting the max hazard value for the upcoming scene
-	map<string, int>::iterator it = playership->m_knownScenes.find(scene->m_name);
-	if (it != playership->m_knownScenes.end())
-		scene->setSceneHazardLevelUnlockedValue(playership->m_knownScenes[scene->m_name]);
-	else//destination is not know yet -> default max hazard value
-		scene->setSceneHazardLevelUnlockedValue(0);
-	
-
-	//loading the scene's portals with the info about their respective max hazard values
-	for (int i = 0; i < NO_DIRECTION; i++)
-	{
-		if (scene->m_bg->m_portals[(Directions)i] != NULL)
-		{
-			map<string, int>::iterator it = playership->m_knownScenes.find(scene->m_bg->m_portals[(Directions)i]->m_destination_name);
-			if (it != playership->m_knownScenes.end())
-				scene->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = playership->m_knownScenes[scene->m_bg->m_portals[(Directions)i]->m_destination_name];
-			else//destination is not know yet -> default max hazard value
-				scene->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = 0;
-		}
 	}
 }
 
@@ -537,7 +434,6 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	if (next_scene_is_hub == true)
 	{
 		(*CurrentGame).m_playership->m_disable_fire = true;
-		(*CurrentGame).m_playership->m_disableHyperspeed = true;
 		(*CurrentGame).m_playership->m_disableJump = true;
 		(*CurrentGame).m_playership->m_disableSlowmotion = true;
 		(*CurrentGame).m_playership->m_disable_bots = true;
@@ -559,7 +455,6 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	else
 	{
 		(*CurrentGame).m_playership->m_disable_fire = false;
-		(*CurrentGame).m_playership->m_disableHyperspeed = false;
 		(*CurrentGame).m_playership->m_disableJump = false;
 		(*CurrentGame).m_playership->m_disableSlowmotion = false;
 		(*CurrentGame).m_playership->m_disable_bots = false;

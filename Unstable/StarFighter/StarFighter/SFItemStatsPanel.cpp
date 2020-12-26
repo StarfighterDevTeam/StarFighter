@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 //ITEMS STATS PANEL
 SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playership, FocusedItemStates item_state, GameObject* comparison_object) : SFPanel(size, SFPanel_ItemStats)
 {
+	/*
 	if (object)
 	{
 		setSize(size);
@@ -185,6 +186,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
 		m_actions->SetPosition(sf::Vector2f(getPosition().x - (getSize().x / 2) + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
+	*/
 }
 
 SFItemStatsPanel::~SFItemStatsPanel()
@@ -229,6 +231,7 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 
 void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 {
+	/*
 	if (object)
 	{
 		int focused_item_type = object->m_weapon_loot ? NBVAL_Equipment : object->m_equipment_loot->m_equipmentType;
@@ -482,4 +485,5 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 		m_title_text.setString(ss_itam_name.str());
 		m_text.setString(ss_stats.str());
 	}
+	*/
 }

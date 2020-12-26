@@ -49,13 +49,10 @@ public:
 
 	string m_name;
 	float m_vspeed;
-	bool m_hazardbreak_has_occurred;
 
 	int m_score_destruction;
 	int m_score_graze;
 	int m_score_total;
-
-	static float getSceneBeastScore(int for_hazard_level);
 
 	Background* m_bg;
 	bool m_generating_enemies;
@@ -69,10 +66,6 @@ public:
 	string m_scene_music;
 	bool m_is_hub;
 
-	int getSceneHazardLevelUnlockedValue();
-	void setSceneHazardLevelUnlockedValue(int hazard_unlocked_value);
-	int getSceneHazardLevelValue();
-
 	std::string m_links[NO_DIRECTION];
 
 	vector<EnemyGenerator*> m_sceneEnemyGenerators;
@@ -82,22 +75,14 @@ public:
 	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)NBVAL_EnemyClass);
 	void ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy);
 
-	void HazardBreak();
-
-	bool m_canHazardBreak;
-	vector <string> m_scenesLinkedToUpdate;
-
-	bool CheckHazardBreakConditions();
-	void DisplayDestructions(bool hazard_break = false);//OLD: to remove
-	void DisplayScore(bool hazard_break = false);
+	void DisplayDestructions();
+	void DisplayScore();
 	bool IsLastSceneBeforeHub();
 
 private:
 	vector<EnemyBase*> m_boss_list;
 	vector<EnemyBase*> m_enemies_ranked_by_class[NBVAL_EnemyClass];
 	int m_total_class_probability[NBVAL_EnemyClass];
-	int m_hazard_level;
-	int m_hazard_level_unlocked;
 };
 
 #endif // STARFIGHTER_H_INCLUDED

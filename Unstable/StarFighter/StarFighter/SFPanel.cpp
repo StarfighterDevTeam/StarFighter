@@ -209,12 +209,6 @@ Grid* SFPanel::GetGrid_v2(int grid)
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 
-bool SFPanel::GetPrioritaryFeedback()
-{
-	return false;
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
 SFItemStatsPanel* SFPanel::GetItemStatsPanel()
 {
 	return NULL;
@@ -222,12 +216,6 @@ SFItemStatsPanel* SFPanel::GetItemStatsPanel()
 }
 
 void SFPanel::SetItemStatsPanel(SFItemStatsPanel* panel)
-{
-	return;
-	//see override function in SFInventoryPanel and other types of SF panels
-}
-
-void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 {
 	return;
 	//see override function in SFInventoryPanel and other types of SF panels

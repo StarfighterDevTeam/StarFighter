@@ -46,8 +46,8 @@ void GridElement::SetObject(GameObject* object, bool delete_current_object)
 	{
 		m_object->setPosition(getPosition());
 
-		int quality = (int)Game::GetItemQualityClass(object->m_equipment_loot != NULL ? object->m_equipment_loot->m_quality : object->m_weapon_loot->m_quality);
-		m_quality_overlay->setAnimationLine(quality);
+		//int quality = (int)Game::GetItemQualityClass(object->m_equipment_loot != NULL ? object->m_equipment_loot->m_quality : object->m_weapon_loot->m_quality);
+		//m_quality_overlay->setAnimationLine(quality);
 	}
 		
 	m_quality_overlay->m_visible = m_object != NULL;
@@ -194,32 +194,4 @@ void Grid::ClearGrid()
 		element->SetObject(NULL, true);
 
 	m_first_empty_slot_index = 0;
-}
-
-void Grid::UpdateGreyMaskOnInsufficientCredits(int money)
-{
-	for (GridElement* element : m_elements)
-	{
-		GameObject* item = element->m_object;
-		element->m_grey_overlay->m_visible = Grid::GetPrice(item) > money || money == 0;
-	}
-}
-
-int Grid::GetPrice(GameObject* capsule)
-{
-	if (capsule == NULL)
-		return 0;
-
-	int credits = capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_credits : capsule->m_weapon_loot->m_credits;
-	float quality = capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_quality : capsule->m_weapon_loot->m_quality;
-
-	return GameObject::GetPrice(credits, quality);
-}
-
-int Grid::GetEquipmentType(GameObject* capsule)
-{
-	if (capsule == NULL)
-		return -1;
-
-	return capsule->m_equipment_loot != NULL ? capsule->m_equipment_loot->m_equipmentType : NBVAL_Equipment;
 }

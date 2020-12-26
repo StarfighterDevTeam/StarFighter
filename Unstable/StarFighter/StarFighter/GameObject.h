@@ -29,25 +29,6 @@ enum SFPanelTypes
 	SFPanel_Upgrades,
 };
 
-enum FighterStats
-{
-	Fighter_Armor,
-	Fighter_ArmorMax,
-	Fighter_Shield,
-	Fighter_ShieldMax,
-	Fighter_ShieldRegen,
-	Fighter_ShieldRecovery,
-	Fighter_ContactDamage,
-	Fighter_MaxSpeed,
-	Fighter_Acceleration,
-	Fighter_Deceleration,
-	Fighter_Hyperspeed,
-	Fighter_HyperspeedFuel,
-	Fighter_Credits,
-	Fighter_Level,
-	NBVAL_FighterStats,
-};
-
 enum LayerType 
 {
 	BackgroundLayer,
@@ -167,32 +148,6 @@ enum BotData
 	BOT_ROTATION_SPEED,//17
 	BOT_XSPREAD,//18
 	BOT_YSPREAD,//19
-};
-
-enum EquipmentData
-{
-	EQUIPMENT_COMPARE,
-	EQUIPMENT_NAME,
-	EQUIPMENT_DISPLAY_NAME,
-	EQUIPMENT_IMAGE_NAME,
-	EQUIPMENT_WIDTH,
-	EQUIPMENT_HEIGHT,
-	EQUIPMENT_FRAMES,
-	EQUIPMENT_MAXSPEED,
-	EQUIPMENT_DECCELERATION,
-	EQUIPMENT_ACCELERATION,
-	EQUIPMENT_HYPERSPEED,
-	EQUIPMENT_HYPERSPEED_FUEL,
-	EQUIPMENT_ARMOR,
-	EQUIPMENT_SHIELD,
-	EQUIPMENT_SHIELD_REGEN,
-	EQUIPMENT_SHIELD_RECOVERY,
-	EQUIPMENT_DAMAGE,
-	EQUIPMENT_BOT,
-	EQUIPMENT_FAKE_TEXTURE,
-	EQUIPMENT_FAKE_WIDTH,
-	EQUIPMENT_FAKE_HEIGHT,
-	EQUIPMENT_FAKE_FRAMES,
 };
 
 enum UpgradeData
@@ -324,16 +279,6 @@ public:
 	virtual void GetShop(GameObject* object);
 	virtual void setGhost(bool ghost);
 	void setAnimationLine(int animation_line, bool keep_frame_index = false);
-
-	bool get_equipment_from(GameObject& object);
-	bool setEquipmentLoot(Equipment* equipment);
-	Equipment* getEquipmentLoot();
-
-	bool get_weapon_from(GameObject& object);
-	bool setWeaponLoot(Weapon* weapon);
-	Weapon* getWeaponLoot();
-	
-	static int GetPrice(int credits, float quality);
 	
 	bool clearLoots();
 	virtual void AddComboCount(int value);
@@ -365,21 +310,6 @@ public:
 	int m_currentAnimationIndex;
 	float m_collision_timer;
 
-	//TIPS:
-	// direction = the scene border you refer too
-	// offset = the (positive) distance to that border
-	// outside_screen = true if the sprite is on the outside (example: if direction is UP, if the sprite is northern than the border)
-	// player_side = true if the sprite is a playership
-
-	static sf::Vector2f getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position, float sprite_sizeY);
-
-	static sf::Vector2i getDirectionMultiplier(Directions direction);
-	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
-	static sf::Vector2i getSize_for_Direction(Directions direction, sf::Vector2i size);
-	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
-	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f speed);
-	static float getRotation_for_Direction(Directions direction);
-	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 	static float GetVectorLength(sf::Vector2f vector);
@@ -391,26 +321,20 @@ public:
 	sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle);
 	bool TurnToTargetAngle(float target_angle, float rotation_speed, sf::Time deltaTime, float hyperspeedMultiplier);//in degress
 
+	sf::Vector2f getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0, 0));
+
+	static sf::Vector2f ApplyScreenBordersConstraints(sf::Vector2f position, sf::Vector2f size);
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
-
-	sf::Vector2f getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0, 0));
-	sf::Vector2f setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
-
-	static sf::Vector2f ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size);
 
 	//utilitary methods
 	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
 	static void ScaleVector(sf::Vector2f* vector, float target_value);
 
 	int m_money;
-	Equipment* m_equipment_loot;
-	Weapon* m_weapon_loot;
 	std::string m_textureName;
 	bool m_immune;
 
-	virtual float getFighterFloatStatValue(FighterStats stat);
-	virtual int getFighterIntStatValue(FighterStats stat);
 	virtual bool CheckCondition();
 	virtual void AddDialog(Dialog* dialog);
 	virtual void SetInputBlocker(GameObject* blocker);

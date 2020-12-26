@@ -55,8 +55,8 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playership) : SFMenu
 		sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
 		if (m_direction != NO_DIRECTION)
 		{
-			sf::Vector2f l_sizeNormalized = GameObject::getSize_for_Direction(m_direction, size);
-			position = GameObject::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y / 2 + INTERACTION_PANEL_OFFSET_Y));
+			sf::Vector2f l_sizeNormalized = size;
+			position = sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y / 2 + INTERACTION_PANEL_OFFSET_Y);
 		}
 		setPosition(position.x, position.y);
 
@@ -93,7 +93,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(
 		m_actions->SetString("Hazard up", ActionButton_X);
 
 		m_actions_with_selection = new SFActionBoxWithSelection();
-		for (int i = 0; i < NB_HAZARD_LEVELS; i++)
+		/*for (int i = 0; i < NB_HAZARD_LEVELS; i++)
 		{
 			stringstream ss;
 			ss << "Hazard " << i + 1;
@@ -128,6 +128,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(
 				}
 			}
 		}
+		*/
 
 		//size and position of panel
 		setSize(size);
@@ -135,8 +136,8 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(
 		sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
 		if (m_direction != NO_DIRECTION)
 		{
-			sf::Vector2f l_sizeNormalized = GameObject::getSize_for_Direction(m_direction, size);
-			position = GameObject::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y/2 + INTERACTION_PANEL_OFFSET_Y));
+			sf::Vector2f l_sizeNormalized = size;
+			position = sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y/2 + INTERACTION_PANEL_OFFSET_Y);
 		}
 		setPosition(position.x, position.y);
 
@@ -157,8 +158,8 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(
 		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 		//default selected index
-		m_selected_option_index = (m_playership->m_last_hazard_level_played <= m_playership->m_targetPortal->m_max_unlocked_hazard_level ? m_playership->m_last_hazard_level_played : m_playership->m_targetPortal->m_max_unlocked_hazard_level);
-		m_actions_with_selection->SetSelectedAction(m_selected_option_index);
+		//m_selected_option_index = (m_playership->m_last_hazard_level_played <= m_playership->m_targetPortal->m_max_unlocked_hazard_level ? m_playership->m_last_hazard_level_played : m_playership->m_targetPortal->m_max_unlocked_hazard_level);
+		//m_actions_with_selection->SetSelectedAction(m_selected_option_index);
 	}
 }
 
@@ -187,21 +188,21 @@ void SFPortalPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 			else
 				m_actions->m_texts[ActionButton_Y].setColor(sf::Color(255, 255, 255, 255));//white
 
-			if (m_selected_option_index == m_playership->m_targetPortal->m_max_unlocked_hazard_level)
-				m_actions->m_texts[ActionButton_X].setColor(sf::Color(80, 80, 80, 255));//greyed
-			else
-				m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 255, 255, 255));//white
+			//if (m_selected_option_index == m_playership->m_targetPortal->m_max_unlocked_hazard_level)
+			//	m_actions->m_texts[ActionButton_X].setColor(sf::Color(80, 80, 80, 255));//greyed
+			//else
+			//	m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 255, 255, 255));//white
 		}
 
 		//hint text
-		if (m_selected_option_index > 0)
-		{
-			ostringstream ss;
-			ss << "Bonus:\n+" << (int)(HazardLevelsBeastBonus[m_selected_option_index]*100/(2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES)) << "% quality drop\n\n" << "Malus:\n+" << (enemySpeedModifierTable[m_selected_option_index] - 1) * 100 << "% enemy presence\n" << "+" << (enemySpeedModifierTable[m_selected_option_index] - 1) * 100 << "% enemy speed and bullets speed";
-			m_text.setString(ss.str());
-		}
-		else
-			m_text.setString("");
+		//if (m_selected_option_index > 0)
+		//{
+		//	ostringstream ss;
+		//	ss << "Bonus:\n+" << (int)(HazardLevelsBeastBonus[m_selected_option_index]*100/(2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES)) << "% quality drop\n\n" << "Malus:\n+" << (enemySpeedModifierTable[m_selected_option_index] - 1) * 100 << "% enemy presence\n" << "+" << (enemySpeedModifierTable[m_selected_option_index] - 1) * 100 << "% enemy speed and bullets speed";
+		//	m_text.setString(ss.str());
+		//}
+		//else
+		//	m_text.setString("");
 	}
 }
 

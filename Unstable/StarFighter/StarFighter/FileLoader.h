@@ -107,14 +107,11 @@ enum EnemyPoolData
 class FileLoader
 {
 public:
-	static Ship* LoadShipConfig(string name);
-	static ShipModel* LoadShipModel(string name);
 	static EnemyBase* LoadEnemyBase(string name, int probability, int enemyClass);
 	static EnemyPool* LoadEnemyPool(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
-	static Equipment* LoadEquipment(string name);
 	static Bot* LoadBot(string name);
 };
 

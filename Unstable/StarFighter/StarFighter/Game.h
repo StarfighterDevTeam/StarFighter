@@ -128,9 +128,8 @@ public:
 	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string display_name);
 
-	int GetPlayerStatsMultiplierForLevel(int level_);
-	int GetEnemiesStatsMultiplierForLevel(int level_);
-	int GetBonusStatsMultiplierToBeOnParForLevel(int level_);
+	int GetPlayerStatsMultiplierForLevel(int level);
+	int GetEnemiesStatsMultiplierForLevel(int level);
 
 	map<string, vector<string> > m_generalScenesConfig;
 	map<string, vector<vector<string> > > m_sceneConfigs;

@@ -171,8 +171,6 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_rotation_speed = 0.f;
 	m_disable_fire = false;
 	m_wake_up = true;
-	m_equipment_loot = NULL;
-	m_weapon_loot = NULL;
 	m_isCollidingWithInteractiveObject = No_Interaction;
 	m_collision_timer = 0;
 	m_damage_feedbackTimer = 0;
@@ -193,8 +191,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 
 GameObject::~GameObject()
 {
-	delete m_equipment_loot;
-	delete m_weapon_loot;
+
 }
 
 void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -333,8 +330,6 @@ GameObject* GameObject::Clone()
 	clone->m_display_name = this->m_display_name;
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
-	clone->m_equipment_loot = this->m_equipment_loot;//cautious: we are not cloning those, it's just shared reference. The clone should NOT be deleting them.
-	clone->m_weapon_loot = this->m_weapon_loot;//cautious: we are not cloning those, it's just shared reference. The clone should NOT be deleting them.
 
 	return clone;
 }
@@ -391,7 +386,7 @@ void GameObject::ShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 
 bool GameObject::GetLoot(GameObject& object)
 {
-	if (this->get_money_from(object) || this->get_equipment_from(object) || this->get_weapon_from(object))
+	if (this->get_money_from(object))
 		return true;
 	else
 		return false;
@@ -408,85 +403,9 @@ void GameObject::GetShop(GameObject* object)
 	//see override function in class Ship
 }
 
-bool GameObject::get_equipment_from(GameObject& object)
-{
-	if (object.m_equipment_loot != NULL && m_equipment_loot == NULL)
-	{
-		m_equipment_loot = object.getEquipmentLoot();
-		object.m_equipment_loot = NULL;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool GameObject::setEquipmentLoot(Equipment* equipment)
-{
-	if (m_equipment_loot == NULL)
-	{
-		m_equipment_loot = equipment;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-Equipment* GameObject::getEquipmentLoot()
-{
-	return m_equipment_loot;
-}
-
-bool GameObject::get_weapon_from(GameObject& object)
-{
-	if (object.m_weapon_loot != NULL && m_weapon_loot == NULL)
-	{
-		m_weapon_loot = object.getWeaponLoot();
-		object.m_weapon_loot = NULL;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool GameObject::setWeaponLoot(Weapon* weapon)
-{
-	if (m_weapon_loot == NULL)
-	{
-		m_weapon_loot = weapon;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-Weapon* GameObject::getWeaponLoot()
-{
-	return m_weapon_loot;
-}
-
 bool GameObject::clearLoots()
 {
 	bool something_cleared = false;
-	if (m_equipment_loot)
-	{
-		delete m_equipment_loot;
-		m_equipment_loot = NULL;
-		something_cleared = true;
-	}
-	if (m_weapon_loot)
-	{
-		delete m_weapon_loot;
-		m_weapon_loot = NULL;
-		something_cleared = true;
-	}
 	if (m_money > 0)
 	{
 		m_money = 0;
@@ -510,173 +429,6 @@ GameObject* GameObject::GetFakeShip()
 {
 	return NULL;
 	//see overide function in class Ship
-}
-
-int GameObject::GetPrice(int credits, float quality)
-{
-	return credits * MONEY_COST_OF_LOOT_CREDITS * quality * 0.01 * 2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES;
-}
-
-sf::Vector2f GameObject::getSpeed_for_Scrolling(Directions direction, float vspeed)
-{
-	sf::Vector2f speed = sf::Vector2f(0, 0);
-
-	if (direction == DIRECTION_UP)
-	{
-		speed.y = vspeed;
-	}
-	else if (direction == DIRECTION_DOWN)
-	{
-		speed.y = -vspeed;
-	}
-	else if (direction == DIRECTION_RIGHT)
-	{
-		speed.x = -vspeed;
-	}
-	else if (direction == DIRECTION_LEFT)
-	{
-		speed.x = vspeed;
-	}
-
-	return speed;
-}
-
-sf::Vector2f GameObject::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position, float sprite_sizeY)
-{
-	sf::Vector2f speed = sf::Vector2f(0, 0);
-
-	sf::Vector2f future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y - sprite_sizeY / 2 - SCREEN_BORDER_OFFSET_CONSTRAINT_Y));
-	if (future_direction == NO_DIRECTION)
-		future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_X_RATIO));
-
-	if (current_direction == DIRECTION_UP || current_direction == DIRECTION_DOWN
-		|| future_direction == DIRECTION_UP || future_direction == DIRECTION_DOWN)
-	{
-		speed.x = vspeed * ((future_pos.x) - sprite_position.x) / SCENE_SIZE_Y;
-		speed.y = vspeed * ((future_pos.y) - sprite_position.y) / SCENE_SIZE_Y;
-	}
-
-	else if (current_direction == DIRECTION_RIGHT || current_direction == DIRECTION_LEFT
-		|| future_direction == DIRECTION_RIGHT || future_direction == DIRECTION_LEFT)
-	{
-		speed.x = vspeed * ((future_pos.x) - sprite_position.x) / SCENE_SIZE_X;
-		speed.y = vspeed * ((future_pos.y) - sprite_position.y) / SCENE_SIZE_X;
-	}
-
-	return speed;
-}
-
-sf::Vector2i GameObject::getDirectionMultiplier(Directions direction)
-{
-	int x = 1;
-	int y = 1;
-	if (direction == DIRECTION_DOWN || direction == DIRECTION_RIGHT)
-	{
-		x *= -1;
-	}
-	if (direction == DIRECTION_DOWN || direction == DIRECTION_LEFT)
-	{
-		y *= -1;
-	}
-
-	return sf::Vector2i(x, y);
-}
-
-sf::Vector2f GameObject::getSize_for_Direction(Directions direction, sf::Vector2f size)
-{
-	if (direction == DIRECTION_LEFT || direction == DIRECTION_RIGHT)
-	{
-		return sf::Vector2f(size.y, size.x);
-	}
-	else
-	{
-		return size;
-	}
-}
-
-sf::Vector2i GameObject::getSize_for_Direction(Directions direction, sf::Vector2i size)
-{
-	if (direction == DIRECTION_LEFT || direction == DIRECTION_RIGHT)
-	{
-		return sf::Vector2i(size.y, size.x);
-	}
-	else
-	{
-		return size;
-	}
-}
-
-sf::Vector2f GameObject::getSpeed_for_Direction(Directions direction, sf::Vector2f speed)
-{
-	speed = GameObject::getSize_for_Direction(direction, sf::Vector2f(speed.x, speed.y));
-
-	if (direction == DIRECTION_DOWN)
-	{
-		speed.x = -speed.x;
-		speed.y = -speed.y;
-	}
-
-	if (direction == DIRECTION_RIGHT)
-	{
-		speed.x = -speed.x;
-		speed.y = speed.y;
-	}
-
-	if (direction == DIRECTION_LEFT)
-	{
-		speed.x = speed.x;
-		speed.y = -speed.y;
-	}
-
-	return sf::Vector2f(speed.x, speed.y);
-}
-
-float GameObject::getRotation_for_Direction(Directions direction)
-{
-	if (direction == DIRECTION_DOWN)
-		return 180;
-	else if (direction == DIRECTION_RIGHT)
-		return 90;
-	else if (direction == DIRECTION_LEFT)
-		return 270;
-	else
-		return 0;
-}
-
-sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale)
-{
-	float x = position.x;
-	float y = position.y;
-
-	if (direction == DIRECTION_DOWN)
-	{
-		x = SCENE_SIZE_X - x;
-		y = SCENE_SIZE_Y - y;
-	}
-	else if (direction == DIRECTION_RIGHT)
-	{
-		if (rescale)
-		{
-			x = x * SCENE_SIZE_Y / SCENE_SIZE_X;
-			y = y * SCENE_SIZE_X / SCENE_SIZE_Y;
-		}
-		float x_ = x;
-		x = SCENE_SIZE_X - y;
-		y = x_;
-	}
-	else if (direction == DIRECTION_LEFT)
-	{
-		if (rescale)
-		{
-			x = x * SCENE_SIZE_Y / SCENE_SIZE_X;
-			y = y * SCENE_SIZE_X / SCENE_SIZE_Y;
-		}
-		float x_ = x;
-		x = y;
-		y = SCENE_SIZE_Y - x_;
-	}
-
-	return sf::Vector2f(x, y);
 }
 
 float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)
@@ -807,6 +559,69 @@ float GameObject::GetDeltaAngleToTargetAngle(float ref_rotation_in_deg, float ta
 	return delta_angle;
 }
 
+sf::Vector2f GameObject::getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
+{
+	//default argument for cluster size
+	if (cluster_size == sf::Vector2f(0, 0))
+	{
+		cluster_size = max_enemy_size;
+	}
+
+	//now calculating the starting coordinate (left)
+	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
+	rand_coordinates_min.x += 200;//marging for movement patterns
+	cluster_size.x += 200;//marging for movement patterns
+
+	//length of the allowed spread
+	float allowed_spread = (SCENE_SIZE_X - cluster_size.x);
+
+	//cutting clusters bigger than the scene (+ debug message)
+	if (allowed_spread < 0)
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
+
+	//random value inside the allowed spread
+	float random_posX = RandomizeFloatBetweenValues(0, allowed_spread);
+
+	//getting position coordinates (min + random value)
+	float pos_x = rand_coordinates_min.x + random_posX;
+	float pos_y = rand_coordinates_min.y;
+
+	return sf::Vector2f(pos_x, pos_y);
+}
+
+sf::Vector2f GameObject::ApplyScreenBordersConstraints(sf::Vector2f position, sf::Vector2f size)
+{
+	sf::Vector2f new_position = position;
+	sf::Vector2f l_size = sf::Vector2f(size.x, size.y);
+
+	float l_overlap_left = position.x - (l_size.x / 2);
+	if (l_overlap_left < 0)
+	{
+		new_position = sf::Vector2f((l_size.x / 2), position.y);
+	}
+
+	float l_overlap_right = position.x + (l_size.x / 2);
+	if (l_overlap_right > SCENE_SIZE_X)
+	{
+		new_position = sf::Vector2f(SCENE_SIZE_X - (l_size.x / 2), position.y);
+	}
+
+	float l_overlap_up = position.y - (l_size.y / 2);
+	if (l_overlap_up < 0)
+	{
+		new_position = sf::Vector2f(position.x, (l_size.y / 2));
+	}
+
+	float l_overlap_down = position.y + (l_size.y / 2);
+	if (l_overlap_down > SCENE_SIZE_Y)
+	{
+		new_position = sf::Vector2f(position.x, SCENE_SIZE_Y - (l_size.x / 2));
+	}
+
+	return new_position;
+}
+
+
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	if (direction == DIRECTION_UP)
@@ -877,171 +692,10 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 			return LESSER_THAN;
 }
 
-sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
-{
-	if (direction == DIRECTION_UP || direction == NO_DIRECTION)
-	{
-		if (!centered)
-		{
-			setPosition(sf::Vector2f(getPosition().x, target_position.y));
-			return sf::Vector2f(getPosition().x, target_position.y);
-		}
-		else
-		{
-			setPosition(sf::Vector2f(target_position.x, target_position.y));
-			return sf::Vector2f(target_position.x, target_position.y);
-		}
-	}
-
-	else if (direction == DIRECTION_DOWN)
-	{
-		if (!centered)
-		{
-			setPosition(sf::Vector2f(getPosition().x, SCENE_SIZE_Y - target_position.y));
-			return sf::Vector2f(getPosition().x, SCENE_SIZE_Y - target_position.y);
-		}
-		else
-		{
-			setPosition(sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y));
-			return sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y);
-		}
-	}
-
-	else if (direction == DIRECTION_RIGHT)
-	{
-		if (!centered)
-		{
-			setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.x, getPosition().y));
-			return sf::Vector2f(SCENE_SIZE_X - target_position.x, getPosition().y);
-		}
-		else
-		{
-			setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x));
-			return sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x);
-		}
-	}
-
-	else
-	{
-		if (!centered)
-		{
-			setPosition(sf::Vector2f(target_position.x, getPosition().y));
-			return sf::Vector2f(target_position.x, getPosition().y);
-		}
-		else
-		{
-			setPosition(sf::Vector2f(target_position.y, target_position.x));
-			return sf::Vector2f(target_position.y, target_position.x);
-		}
-	}
-}
-
-sf::Vector2f GameObject::getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
-{
-	//default argument for cluster size
-	if (cluster_size == sf::Vector2f(0, 0))
-	{
-		cluster_size = max_enemy_size;
-	}
-
-	//now calculating the starting coordinate (left)
-	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
-	rand_coordinates_min.x += 200;//marging for movement patterns
-	cluster_size.x += 200;//marging for movement patterns
-
-	//length of the allowed spread
-	float allowed_spread = (SCENE_SIZE_X - cluster_size.x);
-
-	//cutting clusters bigger than the scene (+ debug message)
-	if (allowed_spread < 0)
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
-
-	//random value inside the allowed spread
-	float random_posX = RandomizeFloatBetweenValues(0, allowed_spread);
-
-	//getting position coordinates (min + random value)
-	float pos_x = rand_coordinates_min.x + random_posX;
-	float pos_y = rand_coordinates_min.y;
-
-	return sf::Vector2f(pos_x, pos_y);
-}
-
-sf::Vector2f GameObject::ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size)
-{
-	sf::Vector2f new_position = position;
-	sf::Vector2f l_size = GameObject::getSize_for_Direction(direction, sf::Vector2f(size.x, size.y));
-
-	float l_overlap_left = position.x - (l_size.x / 2);
-	if (l_overlap_left < 0)
-	{
-		new_position = sf::Vector2f((l_size.x / 2), position.y);
-	}
-
-	float l_overlap_right = position.x + (l_size.x / 2);
-	if (l_overlap_right > SCENE_SIZE_X)
-	{
-		new_position = sf::Vector2f(SCENE_SIZE_X - (l_size.x / 2), position.y);
-	}
-
-	float l_overlap_up = position.y - (l_size.y / 2);
-	if (l_overlap_up < 0)
-	{
-		new_position = sf::Vector2f(position.x, (l_size.y / 2));
-	}
-
-	float l_overlap_down = position.y + (l_size.y / 2);
-	if (l_overlap_down > SCENE_SIZE_Y)
-	{
-		new_position = sf::Vector2f(position.x, SCENE_SIZE_Y - (l_size.x / 2));
-	}
-
-	return new_position;
-}
 
 void GameObject::updatePostCollision()
 {
 	//see override in class Ship
-}
-
-float GameObject::getFighterFloatStatValue(FighterStats stat)
-{
-	//see override in class Ship
-	return -1;
-}
-
-int GameObject::getFighterIntStatValue(FighterStats stat)
-{
-	switch (stat)
-	{
-		case Fighter_Armor:
-		{
-			return m_armor;
-		}
-		case Fighter_ArmorMax:
-		{
-			return m_armor_max;
-		}
-		case Fighter_Shield:
-		{
-			return m_shield;
-		}
-		case Fighter_ShieldMax:
-		{
-			return m_shield_max;
-		}
-		case Fighter_ShieldRegen:
-		{
-			return m_shield_regen;
-		}
-		case Fighter_ContactDamage:
-		{
-			return m_damage;
-		}
-		default:
-		{
-			return -1;
-		}
-	}
 }
 
 bool GameObject::CheckCondition()

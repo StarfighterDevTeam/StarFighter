@@ -740,21 +740,15 @@ void Game::WakeUpEnemiesWithName(string display_name)
 	}
 }
 
-int Game::GetPlayerStatsMultiplierForLevel(int level_)
+int Game::GetPlayerStatsMultiplierForLevel(int level)
 {
-	int result_ = round(100 * (pow((1 + PLAYER_LEVELING_STATS_MULTIPLIER), (level_ - 1))));
+	int result_ = round(100 * (pow((1 + PLAYER_LEVELING_STATS_MULTIPLIER), (level - 1))));
 	return result_;
 }
 
-int Game::GetEnemiesStatsMultiplierForLevel(int level_)
+int Game::GetEnemiesStatsMultiplierForLevel(int level)
 {
-	int result_ = round(100 * (pow((1 + ENEMIES_LEVELING_STATS_MULTIPLIER), (level_ - 1))));
-	return result_;
-}
-
-int Game::GetBonusStatsMultiplierToBeOnParForLevel(int level_)
-{
-	int result_ = GetEnemiesStatsMultiplierForLevel(level_) - GetPlayerStatsMultiplierForLevel(level_);
+	int result_ = round(100 * (pow((1 + ENEMIES_LEVELING_STATS_MULTIPLIER), (level - 1))));
 	return result_;
 }
 

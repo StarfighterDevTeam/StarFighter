@@ -53,7 +53,6 @@ Loot* Loot::Clone()
 {
 	Loot* new_loot = new Loot(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_display_name);
 	new_loot->m_money = this->m_money;
-	new_loot->m_equipment_loot = this->m_equipment_loot;
-
+	
 	return new_loot;
 }

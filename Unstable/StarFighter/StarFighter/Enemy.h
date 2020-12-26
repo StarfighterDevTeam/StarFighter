@@ -37,27 +37,11 @@ public:
 	float m_radius;
 	float m_angspeed;
 
-	void GenerateLoot() override;
-	bool CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus = 0, bool force_BeastScale = false, float BeastScale_min = 0.0f, float BeastScale_max = 6.0f);
-	static bool AssignRandomEquipment(EquipmentType equipment_type, int level, GameObject* object, float beastScore);
 	void GetDamageFrom(GameObject& object) override;
 	void GetDamage(int damage) override;
+	void GenerateLoot() override;
 
 	EnemyClass m_enemy_class;
-
-	static Weapon* CreateRandomWeapon(int level, bool is_bot, float beastScore);
-	static Equipment* CreateRandomArmor(int level, float beastScore);
-	static Equipment* CreateRandomShield(int level, float beastScore);
-	static Equipment* CreateRandomEngine(int level, float beastScore);
-	static Equipment* CreateRandomModule(int level, float beastScore);
-
-	static Equipment* LoadSavedEquipmentFromLine(string line);
-	static Weapon* LoadSavedWeaponFromLine(string line);
-	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
-	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
-
-	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
-	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
 
 	//phases
 	void setPhase(Phase* phase);
@@ -77,7 +61,6 @@ public:
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
 	static Bot* LoadBot(string name);
-	static Equipment* LoadEquipment(string name);
 	
 	bool m_face_target;
 	bool m_reset_facing;
@@ -95,23 +78,17 @@ public:
 	float m_armorBar_offsetY;
 	float m_shieldBar_offsetY;
 
-	//float offsetBetweenHealthBars;
-	void RotateFeedbacks(float angle);
-
 	float m_health_feedbackTimer;
 	int m_level;
 
 	void ApplyLevelModifiers();
-
-private:
-	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);
 };
 
 struct EnemyBase
 {
 public:
 	EnemyBase(){};
-	~EnemyBase();
+	~EnemyBase(){};
 	Enemy* m_enemy;
 	int m_probability;
 	int m_enemyclass;
@@ -122,4 +99,4 @@ public:
 	int m_proba_max;
 };
 
-#endif // INDEPENDANT_H_INCLUDED
+#endif // ENEMY_H_INCLUDED

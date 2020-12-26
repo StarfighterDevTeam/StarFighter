@@ -1,7 +1,7 @@
 #ifndef GRID_H_INCLUDED
 #define GRID_H_INCLUDED
 
-#include "Equipment.h"
+#include "Bot.h"
 
 enum SlotFeedbackStates
 {
@@ -61,9 +61,6 @@ public:
 	int InsertObject(GameObject* object, int index, bool force_overwrite);
 	void CloneGridContentFrom(Grid* grid);
 	void ClearGrid();
-	void UpdateGreyMaskOnInsufficientCredits(int money);//buggé
-	static int GetPrice(GameObject* capsule);
-	static int GetEquipmentType(GameObject* capsule);
 
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;

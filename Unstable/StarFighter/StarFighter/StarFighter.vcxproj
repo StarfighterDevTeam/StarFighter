@@ -96,7 +96,6 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyGenerator.cpp" />
     <ClCompile Include="EnemyPool.cpp" />
-    <ClCompile Include="Equipment.cpp" />
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -145,7 +144,6 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyGenerator.h" />
     <ClInclude Include="EnemyPool.h" />
-    <ClInclude Include="Equipment.h" />
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="FX.h" />

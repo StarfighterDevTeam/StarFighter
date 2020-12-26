@@ -4,21 +4,13 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), ship_model->m_textureName, ship_model->m_size, Vector2f((ship_model->m_size.x / 2), (ship_model->m_size.y / 2)), ship_model->m_frameNumber)
+Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::Vector2f fake_size, int fake_frameNumber, int fake_animationNumber) : GameObject(Vector2f(0, 0), Vector2f(0, 0), textureName, size, Vector2f(size.x * 0.5, size.y * 0.5), 1, 1)
 {
-	if (!ship_model)
-		return;
-
 	m_collider_type = PlayerShip;
 	m_layer = PlayerShipLayer;
 
-	m_ship_model = ship_model;
-
+	m_transparent = true;
 	m_automatic_fire = false;
-
-	for (int i = 0; i < NBVAL_Equipment; i++)
-		m_equipment[i] = NULL;
-
 	m_display_name = "Wisteria";
 	m_weapon = NULL;
 	m_FX_death = NULL;
@@ -27,40 +19,34 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_visible = true;
 	m_DontGarbageMe = true;
 	m_damage = 0;
-	m_hyperspeed = 1.0f;
 	m_armor = 1;
 	m_shield = 0;
 	m_shield_regen = 0;
 	m_disable_inputs = false;
 	m_disable_fire = false;
-	m_disableHyperspeed = false;
 	m_disableSlowmotion = false;
 	m_disableRecall = false;
 	m_disableJump = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
-	m_last_hazard_level_played = 0;
 	m_disable_bots = true;
 	m_is_asking_scene_transition = false;
 	m_currentScene_hazard = 0;
 	m_input_blocker = NULL;
 	m_is_jumping = false;
+	m_ghost_timer = 0;
 	m_hits_taken = 0;
 	m_release_to_fire = false;
 	m_release_to_throw = false;
 
 	m_level = 1;
-	m_level_max = FIRST_LEVEL_MAX;
 	m_xp = 0;
-	m_xp_max = XP_MAX_FIRST_LEVEL;
-
+	
 	m_combo_count = 0;
 	m_combo_count_max = COMBO_COUNT_FIRST_LEVEL;
 	m_combo_level = 0;
 
-	m_fake_ship = NULL;
-	if (!ship_model->m_fake_textureName.empty())
-		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
+	m_fake_ship = new FakeShip(this, fake_textureName, fake_size, fake_frameNumber, fake_animationNumber);
 		//(*CurrentGame).addToScene(m_fake_ship, false);
 
 	m_combo_aura = new Aura(this, "2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
@@ -81,8 +67,6 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
-	m_equipment_loot = NULL;
-	m_weapon_loot = NULL;
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
@@ -108,16 +92,10 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_recall_text->m_visible = false;
 	delete text_feedback;
 	(*CurrentGame).addToTextPops(m_recall_text);
-
-	Init();
 }
 
 Ship::~Ship()
 {
-	for (int i = 0; i < NBVAL_Equipment; i++)
-		delete m_equipment[i];
-
-	delete m_ship_model;
 	delete m_weapon;
 	delete m_FX_death;
 
@@ -131,189 +109,6 @@ Ship::~Ship()
 
 	if (m_recall_text != NULL)
 		m_recall_text->GarbageMe();
-}
-
-void Ship::Init()
-{
-	UpdateShipLevel();
-
-	m_max_speed = getFighterFloatStatValue(Fighter_MaxSpeed);
-	m_deceleration = getFighterFloatStatValue(Fighter_Deceleration);
-	m_acceleration = getFighterFloatStatValue(Fighter_Acceleration);
-	m_hyperspeed = getFighterFloatStatValue(Fighter_Hyperspeed);
-	m_hyperspeed_fuel_max = getFighterIntStatValue(Fighter_HyperspeedFuel);
-	if (m_hyperspeed_fuel > m_hyperspeed_fuel_max)
-	{
-		m_hyperspeed_fuel = m_hyperspeed_fuel_max;
-	}
-	m_armor_max = getFighterIntStatValue(Fighter_ArmorMax);
-	if (m_armor > m_armor_max)
-	{
-		m_armor = m_armor_max;
-	}
-	m_shield_max = getFighterIntStatValue(Fighter_ShieldMax);
-	if (m_shield > m_shield_max)
-	{
-		m_shield = m_shield_max;
-	}
-	m_shield_regen = getFighterIntStatValue(Fighter_ShieldRegen);
-	m_shield_recovery_time = getFighterFloatStatValue(Fighter_ShieldRecovery);
-	m_damage = getFighterIntStatValue(Fighter_ContactDamage);
-	m_size = !m_ship_model->m_fake_textureName.empty() ? m_ship_model->m_fake_size : m_ship_model->m_size;
-	m_textureName = m_ship_model->m_textureName;
-	m_frameNumber = m_ship_model->m_frameNumber;
-
-	//fake texture
-	m_transparent = !m_ship_model->m_fake_textureName.empty();
-
-	//Loading bots
-	m_bot_list.clear();
-	if (m_ship_model->m_bot)
-	{
-		m_bot_list.push_back(m_ship_model->m_bot);
-	}
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i] != NULL)
-		{
-			for (Bot* bot : m_equipment[i]->m_bots)
-				m_bot_list.push_back(bot);
-		}
-	}
-}
-
-void Ship::CleanGarbagedEquipments()
-{
-	size_t shipEquipmentsSize = m_garbageEquipments.size();
-	for (size_t i = 0; i < shipEquipmentsSize; i++)
-	{
-		if (m_garbageEquipments[i] == NULL)
-			continue;
-
-		delete m_garbageEquipments[i];
-	}
-	m_garbageEquipments.clear();
-
-	size_t shipWeaponsSize = m_garbageWeapons.size();
-	for (size_t i = 0; i < shipWeaponsSize; i++)
-	{
-		if (m_garbageWeapons[i] == NULL)
-			continue;
-
-		delete m_garbageWeapons[i];
-	}
-	m_garbageWeapons.clear();
-}
-
-bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool no_save)
-{
-	assert(equipment != NULL);
-
-	if (!overwrite_existing && m_equipment[equipment->m_equipmentType])
-	{
-		return false;
-	}
-
-	if (overwrite_existing && m_equipment[equipment->m_equipmentType] && !m_equipment[equipment->m_equipmentType]->m_bots.empty())
-	{
-		DestroyBots();
-	}
-
-	if (overwrite_existing && m_equipment[equipment->m_equipmentType])
-	{
-		m_garbageEquipments.push_back(m_equipment[equipment->m_equipmentType]);
-	}
-
-	m_equipment[equipment->m_equipmentType] = equipment;
-	
-	Ship::Init();
-
-	if (!equipment->m_bots.empty())
-	{
-		GenerateBots(this);
-	}
-	
-	//if (!no_save)
-	//	Ship::SaveItems(this);
-
-	return true;
-}
-
-bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
-{
-	assert(weapon != NULL);
-
-	if (!overwrite_existing && m_weapon)
-	{
-		return false;
-	}
-
-	if (overwrite_existing && m_weapon)
-	{
-		m_garbageWeapons.push_back(m_weapon);
-	}
-		
-	m_weapon = weapon;
-		
-	Init();
-
-	//if (!no_save)
-	//	Ship::SaveItems(this);
-	
-	return true;
-}
-
-void Ship::cleanEquipment(int equipment_type, bool no_save)
-{
-	if (m_equipment[equipment_type])
-	{
-		if (!m_equipment[equipment_type]->m_bots.empty())
-		{
-			DestroyBots();
-		}
-		delete m_equipment[equipment_type];
-		m_equipment[equipment_type] = NULL;
-
-		this->Init();
-	}
-
-	//if (!no_save)
-	//	Ship::SaveItems(this);
-}
-
-void Ship::cleanWeapon(bool no_save)
-{
-	if (m_weapon)
-	{
-		delete m_weapon;
-		m_weapon = NULL;
-
-		Init();
-	}
-
-	//if (!no_save)
-	//	Ship::SaveItems(this);
-}
-
-void Ship::setShipModel(ShipModel* ship_model, bool no_save)
-{
-	assert(ship_model != NULL);
-
-	if (ship_model->m_bot)
-	{
-		DestroyBots();
-	}
-
-	m_ship_model = ship_model;
-	Init();
-
-	if (ship_model->m_bot)
-	{
-		GenerateBots(this);
-	}
-
-	//if (!no_save)
-	//	Ship::SaveItems(this);
 }
 
 void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
@@ -415,7 +210,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			setColor(Color(255, 255, 255, 255), true);
 	
-			if (m_ship_model->m_fake_textureName.empty() == false)
+			if (m_fake_ship != NULL)
 				m_fake_ship->setColor(Color(255, 255, 255, 255), true);
 		}
 	}
@@ -424,9 +219,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (m_visible == false)
 		return;
-	
-	//clean the dust
-	CleanGarbagedEquipments();
 	
 	//Resetting flags
 	if (m_isCollidingWithInteractiveObject != PortalInteraction && m_is_asking_scene_transition == false)
@@ -510,21 +302,6 @@ bool Ship::IsVisible()
 	else
 	{
 		return m_visible;
-	}
-}
-
-void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
-{
-	if ((*CurrentGame).m_waiting_for_dialog_validation == true)
-	{
-		AnimatedSprite::update(deltaTime);
-		return;
-	}
-
-	//sheld regen if not maximum
-	if (m_shield > 0 || m_shield_recovery_clock.getElapsedTime().asSeconds() > m_shield_recovery_time)
-	{
-		ShieldRegen(deltaTime, hyperspeedMultiplier);
 	}
 }
 
@@ -675,85 +452,43 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			return;
 		}
 		//EQUIPMENT HUD
-		else if (m_HUD_state == HUD_OpeningEquipment && m_SFHudPanel)
-		{
-			//Cursor movement
-			m_SFHudPanel->SetCursorVisible_v2(true);
-
-			//Freeze cursor if throwing item, otherwise move it
-			if (m_SFHudPanel->GetCursor()->m_currentAnimationIndex < Cursor_Focus1_8 || m_SFHudPanel->GetCursor()->m_currentAnimationIndex > Cursor_Focus8_8)
-				MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
-
-			//Actions
-			GridElement* highlighted_element = (m_SFTargetPanel == NULL || m_SFTargetPanel->GetHighlightedElement() == NULL) ? (m_SFHudPanel->GetHighlightedElement() == NULL ? NULL : m_SFHudPanel->GetHighlightedElement()) : m_SFTargetPanel->GetHighlightedElement();
-			if (highlighted_element != NULL && highlighted_element->m_object != NULL)
-			{
-				//A: equip item
-				if (m_inputs_states[Action_Firing] == Input_Tap && highlighted_element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_StashGrid))
-					EquipItem_v2(highlighted_element);
-
-				//A: desequip from HUD panel
-				else if (m_inputs_states[Action_Firing] == Input_Tap && highlighted_element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid))
-					DesquipItem_v2(highlighted_element);
-
-				//A: desequip from HUD panel
-				else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold))
-					ThrowingItem_v2(highlighted_element);
-
-				else
-					m_SFHudPanel->SetPrioritaryFeedback(false);
-			}
-
-			//Weapon firing
-			bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
-
-			//Closing hud
-			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-			{
-				m_HUD_state = HUD_Idle;
-				if (m_SFHudPanel)
-				{
-					m_SFHudPanel->SetCursorVisible_v2(false);
-				}
-			}
-		}
-		//TRADE (BUY/SELL)
-		else if (m_HUD_state == HUD_Trade && m_SFTargetPanel)
-		{
-			//Cursor movement
-			MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
-
-			GridElement* highlighted_element = (m_SFTargetPanel == NULL || m_SFTargetPanel->GetHighlightedElement() == NULL) ? (m_SFHudPanel->GetHighlightedElement() == NULL ? NULL : m_SFHudPanel->GetHighlightedElement()) : m_SFTargetPanel->GetHighlightedElement();
-			if (highlighted_element != NULL && highlighted_element->m_object != NULL)
-			{
-				//A: buy item
-				if (m_inputs_states[Action_Firing] == Input_Tap && highlighted_element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_ShopGrid))
-					BuyingItem_v2(highlighted_element, true);
-
-				//X: buy item and equip it directly
-				else if (m_inputs_states[Action_Braking] == Input_Tap && highlighted_element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_ShopGrid))
-					BuyingItem_v2(highlighted_element, false);
-
-				//X: equip item
-				else if (m_inputs_states[Action_Braking] == Input_Tap && highlighted_element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_StashGrid))
-					EquipItem_v2(highlighted_element);
-
-				//A: sell
-				else if (m_inputs_states[Action_Firing] == Input_Tap && (highlighted_element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid) || highlighted_element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)))
-					SellingItem_v2(highlighted_element);
-
-				//X: desequip
-				else if (m_inputs_states[Action_Braking] == Input_Tap && highlighted_element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid))
-					DesquipItem_v2(highlighted_element);
-			}
-
-			//exit
-			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
-			{
-				m_HUD_state = HUD_ShopMainMenu;
-				m_SFTargetPanel->SetCursorVisible_v2(false);
-			}
-		}
+		//else if (m_HUD_state == HUD_OpeningEquipment && m_SFHudPanel)
+		//{
+		//	//Cursor movement
+		//	m_SFHudPanel->SetCursorVisible_v2(true);
+		//
+		//	//Freeze cursor if throwing item, otherwise move it
+		//	if (m_SFHudPanel->GetCursor()->m_currentAnimationIndex < Cursor_Focus1_8 || m_SFHudPanel->GetCursor()->m_currentAnimationIndex > Cursor_Focus8_8)
+		//		MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
+		//
+		//
+		//	//Weapon firing
+		//	bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
+		//
+		//	//Closing hud
+		//	if (UpdateAction(Action_OpeningHud, Input_Tap, true))
+		//	{
+		//		m_HUD_state = HUD_Idle;
+		//		if (m_SFHudPanel)
+		//		{
+		//			m_SFHudPanel->SetCursorVisible_v2(false);
+		//		}
+		//	}
+		//}
+		////TRADE (BUY/SELL)
+		//else if (m_HUD_state == HUD_Trade && m_SFTargetPanel)
+		//{
+		//	//Cursor movement
+		//	MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
+		//
+		//
+		//	//exit
+		//	if (m_inputs_states[Action_Slowmotion] == Input_Tap)
+		//	{
+		//		m_HUD_state = HUD_ShopMainMenu;
+		//		m_SFTargetPanel->SetCursorVisible_v2(false);
+		//	}
+		//}
 		//STELLAR MAP
 		else if (m_HUD_state == HUD_ShopStellarMap)
 		{
@@ -838,32 +573,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					m_recall_text->m_visible = false;
 
 				//Slow_motion and hyperspeed
-				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed && !m_actions_states[Action_Recalling]);
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
-				//hyperspeed
-				if (CanHyperspeed() && m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
-				{
-					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
-					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_CRUISING * deltaTime.asSeconds();
-					if (m_hyperspeed_fuel < 0)
-					{
-						m_hyperspeed_fuel = 0;
-					}
-				}
-
 				//jump
-				else if (CanJump() && m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableJump && m_hyperspeed_fuel >= SHIP_JUMPING_COST && m_moving)
+				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableJump && m_moving == true)
 				{
-					m_hyperspeed_fuel -= SHIP_JUMPING_COST;
-
 					Jump();
 				}
 
 				//bomb
-				else if ((*CurrentGame).m_is_in_hub == false && GetNumberOfBombs() > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / GetNumberOfBombs()) && !m_actions_states[Action_Recalling] && !m_immune)
+				else if ((*CurrentGame).m_is_in_hub == false && m_bombs > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && !m_actions_states[Action_Recalling] && !m_immune)
 				{
-					m_hyperspeed_fuel -= m_hyperspeed_fuel_max / GetNumberOfBombs();
 					Bomb();
 				}
 				else if (!m_actions_states[Action_Recalling])
@@ -906,17 +626,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			else if (m_HUD_state == HUD_PortalInteraction)
 			{
 				//Up and down in options, IF LEVEL CHOOSER IS AVAILABLE
-				if (m_SFTargetPanel)
-				{
-					if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
-					{
-						m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
-					}
-					else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
-					{
-						m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
-					}
-				}
+				//if (m_SFTargetPanel)
+				//{
+				//	if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
+				//	{
+				//		m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
+				//	}
+				//	else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
+				//	{
+				//		m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
+				//	}
+				//}
 
 				//Weapon firing
 				bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
@@ -964,7 +684,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	if (m_is_jumping)
+	if (m_is_jumping == true)
 	{
 		if (m_is_jumping && m_jump_clock.getElapsedTime().asSeconds() > SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
 		{
@@ -977,20 +697,20 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 		}
 	}
 
-	m_speed.x += inputs_direction.x*getFighterFloatStatValue(Fighter_Acceleration);
-	m_speed.y += inputs_direction.y*getFighterFloatStatValue(Fighter_Acceleration);
+	m_speed.x += inputs_direction.x * m_acceleration;
+	m_speed.y += inputs_direction.y * m_acceleration;
 
 	//max speed constraints
-	GameObject::NormalizeVector(&m_speed, getFighterFloatStatValue(Fighter_MaxSpeed));
+	GameObject::NormalizeVector(&m_speed, m_max_speed);
 }
 
 void Ship::ManageGhost(sf::Time deltaTime)
 {
 	//ghost status expires?
-	if (m_ghost_timer > sf::seconds(0))
+	if (m_ghost_timer > 0)
 	{
-		m_ghost_timer -= deltaTime;
-		setGhost(m_ghost_timer >= sf::seconds(0));
+		m_ghost_timer -= deltaTime.asSeconds();
+		setGhost(m_ghost_timer > 0);
 	}
 }
 
@@ -1060,256 +780,6 @@ void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Ti
 	}
 }
 
-bool Ship::BuyingItem_v2(GridElement* element, bool equip_directly)
-{
-	GameObject* item = element->m_object;
-	int equipment_type = Grid::GetEquipmentType(item);
-	int price = Grid::GetPrice(item);
-	Grid* equipped_grid = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid);
-	Grid* stash_grid = m_SFHudPanel->GetGrid_v2(Trade_StashGrid);
-	
-	//check price
-	if (price > m_money)
-		return false;
-
-	bool success = false;
-
-	if (equip_directly == true)//try to equip it in priority
-	{
-		if (equipped_grid->InsertObject(item, equipment_type, false) == equipment_type)//try equip directly in the dedicated slot, success?
-		{
-			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, false);//clone in copy grid
-			(*CurrentGame).PlaySFX(SFX_Equip);
-			Equip_v2(item);
-
-			success = true;
-		}
-		else if (stash_grid->InsertObject(equipped_grid->m_elements[equipment_type]->m_object, -1, false) >= 0)//try swapping equipped object with stash then equip it, success?
-		{
-			m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->m_elements[equipment_type]->m_object, -1, false);//replicate in copy grid
-
-			equipped_grid->InsertObject(item, equipment_type, true);
-			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, true);//clone in copy grid
-
-			(*CurrentGame).PlaySFX(SFX_Equip);
-			Equip_v2(item);
-
-			success = true;
-		}
-		else
-			success = false;
-	}
-	else//try to stash it in priority
-	{
-		if (stash_grid->InsertObject(item, -1, false) >= 0)//try Inserting in the stash, success?)
-		{
-			m_SFTargetPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(item->Clone(), -1, false);//clone in copy grid
-			success = true;
-		}
-		else if (equipped_grid->InsertObject(item, equipment_type, false) == equipment_type)//try inserting in equipped slots, success?
-		{
-			m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(item->Clone(), equipment_type, false);//clone in copy grid
-			(*CurrentGame).PlaySFX(SFX_Equip);
-			Equip_v2(item);
-
-			success = true;
-		}
-	}
-
-	//pay the price and remove from shop
-	if (success == true)
-	{
-		m_money -= price;
-		//m_SFTargetPanel->GetGrid_v2(Trade_ShopGrid)->UpdateGreyMaskOnInsufficientCredits(m_money);//buggé
-		
-		(*CurrentGame).PlaySFX(SFX_BuyOrSell);
-
-		//clear item from shop
-		m_targetShop->m_grid_v2->InsertObject(NULL, element->m_index, true);
-
-		Ship::SaveItems(this);
-		Ship::SavePlayerMoneyAndHealth(this);
-		//Shop::SaveShop(m_targetShop);
-	}
-
-	return success;
-}
-
-void Ship::SellingItem_v2(GridElement* element)
-{
-	GameObject* item = element->m_object;
-	int equipment_type = Grid::GetEquipmentType(item);
-	Grid* equipped_grid = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid);
-	Grid* stash_grid = m_SFHudPanel->GetGrid_v2(Trade_StashGrid);
-
-	bool success = m_targetShop->m_grid_v2->InsertObject(item, -1, false) >= 0;//trying to insert in shop grid, success?
-
-	//sell anyway
-	element->m_grid->InsertObject(NULL, element->m_index, true);
-
-	if (element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid))//replicate in copy grid
-		equipped_grid->InsertObject(NULL, element->m_index, true);
-	else
-		stash_grid->InsertObject(NULL, element->m_index, true);
-	
-	int price = Grid::GetPrice(item);
-	m_money += price;
-	//m_SFTargetPanel->GetGrid_v2(Trade_ShopGrid)->UpdateGreyMaskOnInsufficientCredits(m_money);//buggé
-	
-	(*CurrentGame).PlaySFX(SFX_BuyOrSell);
-
-	if (success == false)//no space in shop, object has been sold and is lost permanently
-		delete item;
-
-	if (element->m_grid == m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid))
-		Desequip_v2(item);
-
-	Ship::SaveItems(this);
-	Ship::SavePlayerMoneyAndHealth(this);
-	//Shop::SaveShop(m_targetShop);
-}
-
-bool Ship::DesquipItem_v2(GridElement* element)
-{
-	GameObject* item = element->m_object;
-	int equipment_type = Grid::GetEquipmentType(item);
-	Grid* equipped_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid);
-	Grid* stash_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_StashGrid) : m_SFTargetPanel->GetGrid_v2(Trade_StashGrid);
-	Grid* copy_equipped_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)) : NULL;
-	Grid* copy_stash_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_StashGrid) : m_SFHudPanel->GetGrid_v2(Trade_StashGrid)) : NULL;
-	
-	if (stash_grid->InsertObject(item, -1, false) >= 0)
-	{
-		equipped_grid->InsertObject(NULL, element->m_index, true);
-
-		if (copy_equipped_grid != NULL && copy_stash_grid != NULL)//replicate in copy grid if any
-		{
-			copy_stash_grid->InsertObject(copy_equipped_grid->m_elements[element->m_index]->m_object, -1, false);
-			copy_equipped_grid->InsertObject(NULL, element->m_index, true);
-		}
-
-		Desequip_v2(item);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool Ship::EquipItem_v2(GridElement* element)
-{
-	GameObject* item = element->m_object;
-	int equipment_type = Grid::GetEquipmentType(item);
-	Grid* equipped_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid);
-	Grid* stash_grid = element->m_grid->m_panel == m_SFHudPanel ? m_SFHudPanel->GetGrid_v2(Trade_StashGrid) : m_SFTargetPanel->GetGrid_v2(Trade_StashGrid);
-	Grid* copy_equipped_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_EquippedGrid) : m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)) : NULL;
-	Grid* copy_stash_grid = (m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Trade) ? (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid) ? m_SFTargetPanel->GetGrid_v2(Trade_StashGrid) : m_SFHudPanel->GetGrid_v2(Trade_StashGrid)) : NULL;
-
-	if (equipped_grid->InsertObject(item, equipment_type, false) == equipment_type)//try equipping, success?
-	{
-		stash_grid->InsertObject(NULL, element->m_index, true);
-		
-		if (copy_equipped_grid != NULL && copy_stash_grid != NULL)//replicate in copy grid if any
-		{
-			copy_equipped_grid->InsertObject(copy_stash_grid->m_elements[element->m_index]->m_object, equipment_type, false);
-			copy_stash_grid->InsertObject(NULL, element->m_index, true);
-		}
-	}
-	else//swap item with stash
-	{
-		GameObject* item_tmp = equipped_grid->m_elements[equipment_type]->m_object;
-
-		equipped_grid->InsertObject(item, equipment_type, true);
-		stash_grid->InsertObject(item_tmp, element->m_index, true);
-
-		if (copy_equipped_grid != NULL && copy_stash_grid != NULL)
-		{
-			GameObject* copy_item_tmp = copy_equipped_grid->m_elements[equipment_type]->m_object;//replicate in copy grid
-			copy_equipped_grid->InsertObject(copy_stash_grid->m_elements[element->m_index]->m_object, equipment_type, true);
-			copy_stash_grid->InsertObject(copy_item_tmp, element->m_index, true);
-		}
-
-		stash_grid->m_panel->SetHighlightedElement(NULL);//reset highlighted element in grid
-	}
-
-	Equip_v2(item);
-	(*CurrentGame).PlaySFX(SFX_Equip);
-
-	return false;
-}
-
-void Ship::ThrowingItem_v2(GridElement* element)
-{
-	if (m_inputs_states[Action_Braking] == Input_Tap)
-	{
-		m_brakingHoldingClock.restart();
-		m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8, false);
-		m_SFHudPanel->SetPrioritaryFeedback(true);
-	}
-	else if (m_SFHudPanel->GetPrioritaryFeedback())
-	{
-		if (m_inputs_states[Action_Braking] != Input_Hold || m_release_to_throw == true)
-		{
-			m_brakingHoldingClock.restart();
-			m_SFHudPanel->SetPrioritaryFeedback(false);
-		}
-		else
-		{
-			if (m_brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
-			{
-				m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
-				if (m_brakingHoldingClock.getElapsedTime().asSeconds() < HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8)
-					m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
-
-				//throw item
-				if (element->m_grid == m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid))
-					Desequip_v2(element->m_object);
-
-				delete element->m_grid->m_elements[element->m_index]->m_object;
-				element->m_grid->InsertObject(NULL, element->m_index, true);
-
-				m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_HighlightState, false);
-				m_release_to_throw = true;
-				
-				//Save items
-				SaveItems(this);
-
-				m_brakingHoldingClock.restart();
-
-			}
-			//holding feedback
-			else
-			{
-				for (int k = 0; k < HUD_CURSOR_HOLDING_FRACTIONS; k++)
-				{
-					if (m_brakingHoldingClock.getElapsedTime().asSeconds() < (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / HUD_CURSOR_HOLDING_FRACTIONS) * (k + 1))
-					{
-						m_SFHudPanel->GetCursor()->setAnimationLine((CursorFeedbackStates)(Cursor_Focus1_8 + k));
-						break;
-					}
-				}
-			}
-		}
-	}
-}
-
-bool Ship::Equip_v2(GameObject* object)
-{
-	if (object->m_equipment_loot != NULL)
-		return setShipEquipment(object->m_equipment_loot->Clone(), true, false);
-	else
-		return setShipWeapon(object->m_weapon_loot->Clone(), true, false);
-}
-
-void Ship::Desequip_v2(GameObject* object)
-{
-	if (object->m_equipment_loot != NULL)
-		cleanEquipment(object->m_equipment_loot->m_equipmentType, false);
-	else
-		cleanWeapon(false);
-}
-
-
 void Ship::Recalling()
 {
 	if (!m_disableSlowmotion)
@@ -1337,13 +807,12 @@ void Ship::Recalling()
 
 void Ship::Bomb()
 {
-	int i = GetBombsDamage();
-	(*CurrentGame).damageGameObjectType(EnemyObject, GetBombsDamage());
+	(*CurrentGame).killGameObjectType(EnemyObject);
 	(*CurrentGame).killGameObjectType(EnemyFire);
 
 	//ghost
-	if (m_ghost_timer < sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION))
-		m_ghost_timer = sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION);
+	if (m_ghost_timer < SHIP_BOMBING_IMMUNITY_DURATION)
+		m_ghost_timer = SHIP_BOMBING_IMMUNITY_DURATION;
 }
 
 void Ship::Jump()
@@ -1352,10 +821,8 @@ void Ship::Jump()
 	m_is_jumping = true;
 
 	//ghost
-	if (m_ghost_timer < sf::seconds(SHIP_JUMPING_IMMUNITY_DURATION))
-	{
-		m_ghost_timer = sf::seconds(SHIP_JUMPING_IMMUNITY_DURATION);
-	}
+	if (m_ghost_timer < SHIP_JUMPING_IMMUNITY_DURATION)
+		m_ghost_timer = SHIP_JUMPING_IMMUNITY_DURATION;
 
 	PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
 
@@ -1367,7 +834,7 @@ void Ship::SettingTurnAnimations()
 	//setting animation
 	const float x = m_speed.x;
 
-	if (!m_ship_model->m_fake_textureName.empty())
+	if (m_fake_ship != NULL)
 	{
 		if (x > 0 && m_currentAnimationIndex != ShipTurningRight && !m_disable_inputs)
 			m_currentAnimationIndex = ShipTurningRight;
@@ -1441,15 +908,13 @@ void Ship::ScreenBorderConstraints()
 
 void Ship::IdleDecelleration(sf::Time deltaTime)
 {
-	if (m_is_jumping)
-	{
+	if (m_is_jumping == true)
 		return;
-	}
 
 	//idle deceleration
 	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment || m_recall_text->m_visible == true)
 	{
-		m_speed.x -= (m_speed.x) * deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
+		m_speed.x -= m_speed.x * deltaTime.asSeconds() * (m_deceleration / 100);
 
 		if (abs(m_speed.x) < SHIP_MIN_SPEED_X)
 			m_speed.x = 0;
@@ -1457,101 +922,10 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 	if (!m_movingY || m_HUD_state == HUD_OpeningEquipment || m_recall_text->m_visible == true)
 	{
-		m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
+		m_speed.y -= m_speed.y * deltaTime.asSeconds() * (m_deceleration / 100);
 
 		if (abs(m_speed.y) < SHIP_MIN_SPEED_Y)
 			m_speed.y = 0;
-	}
-}
-
-/*
-void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type)
-{
-	//Specific equipment type requested?
-	int equipment_type_roll = equipment_type;
-	if (equipment_type_roll < 0 || equipment_type_roll > NBVAL_Equipment)
-	{
-		equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
-	}
-
-	//Generate random loots in shop
-	for (size_t i = 0; i < num_spawned_objects; i++)
-	{
-		//double random_number = (double)rand() / (RAND_MAX);
-		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class].x, LootTable_BeastScale_Base[loot_class].y);
-
-		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, shop->m_level, shop, random_beast_scale))
-		{
-			GameObject* capsule = NULL;
-			if (equipment_type_roll < NBVAL_Equipment)
-			{
-				capsule = Enemy::CloneEquipmentIntoGameObject(shop->m_equipment_loot);
-				shop->m_equipment_loot = NULL;
-			}
-			else
-			{
-				capsule = Enemy::CloneWeaponIntoGameObject(shop->m_weapon_loot);
-				shop->m_weapon_loot = NULL;
-			}
-
-			shop->m_grid_v2->InsertObject(capsule, -1, false);
-		}
-		else
-		{
-			printf("<!> Error: could not generate equipment in Shop, with Enemy::AssignRandomEquipment(), on i=%zu\n", i);
-		}
-	}
-}
-*/
-
-bool Ship::ResplenishHealth()
-{
-	bool hasHealthToResplenish = false;
-	if (m_armor < m_armor_max)
-	{
-		m_armor = m_armor_max;
-		hasHealthToResplenish = true;
-	}
-	if (m_shield < m_shield_max)
-	{
-		m_shield = m_shield_max;
-		hasHealthToResplenish = true;
-	}
-	if (m_hyperspeed_fuel < m_hyperspeed_fuel_max)
-	{
-		m_hyperspeed_fuel = m_hyperspeed_fuel_max;
-		hasHealthToResplenish = true;
-	}
-	return hasHealthToResplenish;
-}
-
-void Ship::RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel)
-{
-	if (HUB_FAST_REGEN_DURATION == 0)
-	{
-		ResplenishHealth();
-		return;
-	}
-
-	float armor_regen_f = 1.0f * m_armor_max / HUB_FAST_REGEN_DURATION * deltaTime.asSeconds();
-	int armor_regen = armor_regen_f + 1;
-	if (m_armor < m_armor_max && armor)
-	{
-		m_armor = m_armor + armor_regen <= m_armor_max ? m_armor + armor_regen : m_armor_max;
-	}
-
-	float shield_regen_f = 1.0f * m_shield_max / HUB_FAST_REGEN_DURATION * deltaTime.asSeconds();
-	int shield_regen = shield_regen_f + 1;
-	if (m_shield < m_shield_max && shield)
-	{
-		m_shield = m_shield + armor_regen <= m_shield_max ? m_shield + shield_regen : m_shield_max;
-	}
-
-	float hyperspeed_fuel_regen_f = 1.0f * m_hyperspeed_fuel_max / HUB_FAST_REGEN_DURATION * deltaTime.asSeconds();
-	int hyperspeed_fuel_regen = hyperspeed_fuel_regen_f + 1;
-	if (m_hyperspeed_fuel < m_hyperspeed_fuel_max && hyperspeed_fuel)
-	{
-		m_hyperspeed_fuel = m_hyperspeed_fuel + hyperspeed_fuel_regen <= m_hyperspeed_fuel_max ? m_hyperspeed_fuel + hyperspeed_fuel_regen : m_hyperspeed_fuel_max;
 	}
 }
 
@@ -1570,8 +944,6 @@ void Ship::setGhost(bool ghost)
 
 void Ship::Respawn(bool no_save)
 {
-	//Init();
-	////GenerateBots(this);
 	SetVisibility(true);
 	
 	m_collision_timer = 0;
@@ -1581,6 +953,10 @@ void Ship::Respawn(bool no_save)
 	m_upgrades.clear();
 	m_upgrades_short.clear();
 	m_SFHudPanel->UpdateUpgradeIcons();
+
+	m_max_speed = 750;
+	m_deceleration = 2000;
+	m_acceleration = 800;
 
 	m_armor_max = 3;
 	m_armor = m_armor_max;
@@ -1595,6 +971,10 @@ void Ship::Respawn(bool no_save)
 	m_level = 1;
 	m_money = 100;
 	m_knownScenes.clear();
+
+	m_can_jump = false;
+	m_can_cloak = false;
+	m_bombs = 0;
 	
 	//saving
 	if (no_save == false)
@@ -1648,64 +1028,7 @@ void Ship::Death(bool give_money)
 
 bool Ship::GetLoot(GameObject& object)
 {
-	//EQUIPMENT
-	if (object.m_equipment_loot)
-	{
-		bool success = false;
-		GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(object.m_equipment_loot);
-		//stash it
-		if (m_equipment[object.m_equipment_loot->m_equipmentType] != NULL)
-		{
-			success = m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, -1, false) >= 0;
-		}
-		//equip it
-		else
-		{
-			setShipEquipment(object.m_equipment_loot->Clone(), true);
-			//and update HUD
-			success = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, object.m_equipment_loot->m_equipmentType, false);
-		}
-		
-		if (success)
-		{
-			delete object.m_equipment_loot;
-			object.m_equipment_loot = NULL;
-			Ship::SaveItems(this);
-			(*CurrentGame).PlaySFX(SFX_Equip);
-		}
-
-		return success;
-	}
-	//WEAPON
-	else if (object.m_weapon_loot)
-	{
-		bool success = false;
-		GameObject* capsule = Enemy::CloneWeaponIntoGameObject(object.m_weapon_loot);
-		//stash it
-		if (m_weapon != NULL)
-		{
-			success = m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, -1, false) >= 0;
-		}
-		//equip it
-		else
-		{
-			setShipWeapon(object.m_weapon_loot->Clone(), true);
-			//and update HUD
-			success = m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
-		}
-
-		if (success)
-		{
-			delete object.m_weapon_loot;
-			object.m_weapon_loot = NULL;
-			Ship::SaveItems(this);
-			(*CurrentGame).PlaySFX(SFX_Equip);
-		}
-
-		return success;
-	}
-	//MONEY
-	else if (object.m_money > 0)
+	if (object.m_money > 0)
 	{
 		//feedback
 		sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
@@ -1883,28 +1206,6 @@ void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 	*/
 }
 
-int Ship::getGrazeCount()
-{
-	return m_graze_count;
-}
-
-float Ship::getShipBeastScore()
-{
-	float bonus = 0;
-	if (m_graze_level < NB_GRAZE_LEVELS && m_graze_level >= 0)
-	{
-		bonus = GrazeLevelsBeastBonus[m_graze_level];
-	}
-	else
-	{
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", m_graze_level));
-		m_graze_count = 0;
-		m_graze_level = 0;
-	}
-
-	return bonus;
-}
-
 void Ship::GetDamageFrom(GameObject& object)
 {
 	if (m_collision_timer > 0 || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
@@ -1914,6 +1215,9 @@ void Ship::GetDamageFrom(GameObject& object)
 		return;
 
 	if (object.m_collision_timer > 0)
+		return;
+
+	if (m_ghost_timer > 0)
 		return;
 
 	if (object.m_collider_type == EnemyFire)
@@ -1974,8 +1278,6 @@ void Ship::GetDamageFrom(GameObject& object)
 	}
 	else
 		m_shield -= damage;
-
-	m_shield_recovery_clock.restart();
 	
 	//Combo
 	//(*CurrentGame).m_playership->AddComboCount(-(*CurrentGame).m_playership->m_combo_count_max / 2);
@@ -1990,48 +1292,9 @@ void Ship::GetDamageFrom(GameObject& object)
 	//	Death();
 }
 
-
-int Ship::GetFocusedPortalMaxUnlockedHazardLevel()
-{
-	if (m_targetPortal == NULL)
-		return -1;
-	
-	return m_targetPortal->m_max_unlocked_hazard_level;
-}
-
 sf::Vector2f Ship::GetShipSize()
 {
 	return m_fake_ship != NULL ? m_fake_ship->m_size : m_size;
-}
-
-int Ship::UpdateShipLevel()
-{
-	int level_ = 1;
-	int credits_ = 0;
-
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i])
-		{
-			credits_ += m_equipment[i]->m_credits;
-		}
-	}
-	if (m_weapon)
-	{
-		credits_ += m_weapon->m_credits;
-	}
-
-	while (credits_ >= ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1))
-	{
-		credits_ -= ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1);
-		level_++;
-	}
-
-	m_level = level_;
-	m_xp = credits_;
-	m_xp_max = ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1);
-
-	return level_;
 }
 
 //SAVING AND LOADING 
@@ -2164,173 +1427,6 @@ bool Ship::LoadPlayerMoneyAndHealth(Ship* ship)
 	}
 }
 
-int Ship::SaveItems(Ship* ship)
-{
-	return 0;
-	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
-	assert(ship != NULL);
-
-	ofstream data(string(getSavesPath()) + ITEMS_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
-	{
-		// instructions
-		for (int i = 0; i < NBVAL_Equipment; i++)
-		{
-			switch (i)
-			{
-				case Engine:
-				{
-					data << "Engine ";
-					break;
-				}
-				case Armor:
-				{
-					data << "Armor ";
-					break;
-				}
-				case Shield:
-				{
-					data << "Shield ";
-					break;
-				}
-				case Module:
-				{
-					data << "Module ";
-					break;
-				}
-				default:
-				{
-					data << "Unknown ";
-					break;
-				}
-			}
-
-			Enemy::SaveEquipmentData(data, ship->m_equipment[i], true);
-		}
-
-		data << "Weapon ";
-		Enemy::SaveWeaponData(data, ship->m_weapon, true);
-
-		//stash
-		for (GridElement* element : ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->m_elements)
-		{
-			if (element->m_object == NULL)
-			{
-				data << "0";
-				data << endl;
-			}
-			else if (element->m_object->m_equipment_loot != NULL)
-				Enemy::SaveEquipmentData(data, element->m_object->m_equipment_loot, false);
-			else
-				Enemy::SaveWeaponData(data, element->m_object->m_weapon_loot, false);
-		}
-
-		data.close();  // on ferme le fichier
-	}
-	else  // si l'ouverture a échoué
-	{
-		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
-	}
-
-	return 0;
-}
-
-bool Ship::LoadPlayerItems(Ship* ship)
-{
-	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
-	assert(ship != NULL);
-
-	std::ifstream  data(string(getSavesPath()) + ITEMS_SAVE_FILE, ios::in);
-
-	if (data) // si ouverture du fichier réussie
-	{
-		//clear current equipment
-		ship->cleanWeapon(true);
-		for (int i = 0; i < NBVAL_Equipment; i++)
-			ship->cleanEquipment(i, true);
-		ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->ClearGrid();
-		ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->ClearGrid();
-
-		//load save
-		std::string line;
-		int i = 0;
-		while (std::getline(data, line))
-		{
-			string equipment_type;
-			string display_name;
-
-			//Loading equipment
-			if (i < NBVAL_Equipment)
-			{
-				std::istringstream(line) >> equipment_type >> display_name;
-				if (display_name.compare("0") != 0)
-				{
-					Equipment* equipment = Enemy::LoadSavedEquipmentFromLine(line);
-					ship->setShipEquipment(equipment, true, true);//Equipped items will be loaded later in HUD
-
-					GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(equipment);
-					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, i, false);
-				}
-			}
-			//Loading weapon
-			else if (i == NBVAL_Equipment)
-			{
-				std::istringstream(line) >> equipment_type >> display_name;
-				if (display_name.compare("0") != 0)
-				{
-					Weapon* weapon = Enemy::LoadSavedWeaponFromLine(line);
-					ship->setShipWeapon(weapon, true, true);//Equipped items will be loaded later in HUD
-
-					GameObject* capsule = Enemy::CloneWeaponIntoGameObject(weapon);
-					ship->m_SFHudPanel->GetGrid_v2(Trade_EquippedGrid)->InsertObject(capsule, NBVAL_Equipment, false);
-				}
-			}
-			//Loading stash
-			else
-			{
-				std::istringstream(line) >> equipment_type;
-
-				int index = i - NBVAL_Equipment - 1;
-				if (!ship->m_SFHudPanel)
-				{
-					printf("Error: <!> in Ship::LoadPlayerItems() <!> this ship doesn't have a HUD panel.\n");
-				}
-				else
-				{
-					if (equipment_type.compare("0") != 0)//Load stash in HUD
-					{
-						if (equipment_type.compare("Weapon") == 0)
-						{
-							Weapon* weapon = Enemy::LoadSavedWeaponFromLine(line);
-							GameObject* capsule = Enemy::CloneWeaponIntoGameObject(weapon);
-							ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, index, false);
-							delete weapon;
-						}
-						else
-						{
-							Equipment* equipment = Enemy::LoadSavedEquipmentFromLine(line);
-							GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(equipment);
-							ship->m_SFHudPanel->GetGrid_v2(Trade_StashGrid)->InsertObject(capsule, index, false);
-							delete equipment;
-						}
-					}
-				}
-			}
-
-			i++;
-		}
-
-		data.close();  // on ferme le fichier
-
-		return i == NBVAL_Equipment + 1 + STASH_GRID_NB_LINES*STASH_GRID_NB_ROWS;
-	}
-	else  // si l'ouverture a échoué
-	{
-		cerr << "DEBUG: No ITEMS SAVE FILE found. A new file is going to be created.\n" << endl;
-		return false;
-	}
-}
-
 int Ship::SavePlayerUpgrades(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Saving upgrades in profile.\n");
@@ -2394,204 +1490,6 @@ void Ship::updatePostCollision()
 {
 	m_previouslyCollidingWithInteractiveObject = m_isCollidingWithInteractiveObject;
 	m_isCollidingWithInteractiveObject = No_Interaction;
-}
-
-float Ship::getFighterFloatStatValue(FighterStats stat)
-{
-	float new_stat_value = 0;
-	float equipment_value = 0;
-
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i])
-		{
-			switch (stat)
-			{
-				case Fighter_Hyperspeed:
-				{
-					equipment_value += m_equipment[i]->m_hyperspeed;
-					break;
-				}
-				case Fighter_MaxSpeed:
-				{
-					equipment_value += m_equipment[i]->m_max_speed;
-					break;
-				}
-				case Fighter_Acceleration:
-				{
-					equipment_value += m_equipment[i]->m_acceleration;
-					break;
-				}
-				case Fighter_Deceleration:
-				{
-					equipment_value += m_equipment[i]->m_deceleration;
-					break;
-				}
-				case Fighter_ShieldRecovery:
-				{
-					equipment_value += m_equipment[i]->m_shield_recovery_time;
-					break;
-				}
-				default:
-				{
-					equipment_value += 0;
-				}
-			}
-		}
-		else
-		{
-			equipment_value += 0;
-		}
-	}
-
-	//adding ship model stats
-	switch (stat)
-	{
-		case Fighter_Hyperspeed:
-		{
-			new_stat_value = m_ship_model->m_hyperspeed + equipment_value;
-			break;
-		}
-		case Fighter_MaxSpeed:
-		{
-			new_stat_value = m_ship_model->m_max_speed + equipment_value;
-			break;
-		}
-		case Fighter_Acceleration:
-		{
-			new_stat_value = m_ship_model->m_acceleration + equipment_value;
-			break;
-		}
-		case Fighter_Deceleration:
-		{
-			new_stat_value = m_ship_model->m_deceleration + equipment_value;
-			break;
-		}
-		case Fighter_ShieldRecovery:
-		{
-			new_stat_value = m_ship_model->m_shield_recovery_time + equipment_value;
-			break;
-		}
-		default:
-		{
-			new_stat_value = equipment_value;
-		}
-	}
-
-	return new_stat_value;
-}
-
-int Ship::getFighterIntStatValue(FighterStats stat)
-{
-	int new_stat_value = 0;
-	int equipment_value = 0;
-
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i])
-		{
-			switch (stat)
-			{
-				case Fighter_Armor:
-				{
-					return m_armor;
-				}
-				case Fighter_ArmorMax:
-				{
-					equipment_value += m_equipment[i]->m_armor;
-					break;
-				}
-				case Fighter_Shield:
-				{
-					return m_shield;
-				}
-				case Fighter_ShieldMax:
-				{
-					equipment_value += m_equipment[i]->m_shield;
-					break;
-				}
-				case Fighter_ShieldRegen:
-				{
-					equipment_value += m_equipment[i]->m_shield_regen;
-					break;
-				}
-				case Fighter_HyperspeedFuel:
-				{
-					equipment_value += m_equipment[i]->m_hyperspeed_fuel;
-					break;
-				}
-				case Fighter_ContactDamage:
-				{
-					equipment_value += m_equipment[i]->m_damage;
-					break;
-				}
-				case Fighter_Credits:
-				{
-					equipment_value += m_equipment[i]->m_credits;
-					break;
-				}
-				case Fighter_Level:
-				{
-					equipment_value += m_equipment[i]->m_level;
-					break;
-				}
-				default:
-				{
-					equipment_value += 0;
-				}
-			}
-		}
-		else
-		{
-			equipment_value += 0;
-		}
-	}
-
-	//adding ship model stats
-	switch (stat)
-	{
-		case Fighter_ArmorMax:
-		{
-			new_stat_value = m_ship_model->m_armor + equipment_value;
-			break;
-		}
-		case Fighter_ShieldMax:
-		{
-			new_stat_value = m_ship_model->m_shield + equipment_value;
-			break;
-		}
-		case Fighter_ShieldRegen:
-		{
-			new_stat_value = m_ship_model->m_shield_regen + equipment_value;
-			break;
-		}
-		case Fighter_HyperspeedFuel:
-		{
-			new_stat_value = m_ship_model->m_hyperspeed_fuel + equipment_value;
-			break;
-		}
-		case Fighter_ContactDamage:
-		{
-			new_stat_value = m_ship_model->m_damage + equipment_value;
-			break;
-		}
-		case Fighter_Credits:
-		{
-			new_stat_value = equipment_value;
-			break;
-		}
-		case Fighter_Level:
-		{
-			new_stat_value = equipment_value;
-			break;
-		}
-		default:
-		{
-			new_stat_value = equipment_value;
-		}
-	}
-
-	return new_stat_value;
 }
 
 void Ship::GenerateBots(GameObject* target)
@@ -2687,63 +1585,6 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 			m_stroboscopic_effect_clock.restart();
 		}
 	}
-}
-
-bool Ship::CanHyperspeed()
-{
-	if (m_ship_model && m_ship_model->m_can_hyperspeed)
-	{
-		return true;
-	}
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i] && m_equipment[i]->m_can_hyperspeed)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Ship::CanJump()
-{
-	if (m_ship_model && m_ship_model->m_can_jump)
-	{
-		return true;
-	}
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i] && m_equipment[i]->m_can_jump)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-int Ship::GetNumberOfBombs()
-{
-	int bombs = 0;
-	if (m_ship_model)
-	{
-		bombs += m_ship_model->m_bombs;
-	}
-	for (int i = 0; i < NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i])
-		{
-			bombs += m_equipment[i]->m_bombs;
-		}
-	}
-
-	return bombs;
-}
-
-int Ship::GetBombsDamage()
-{
-	return GetNumberOfBombs() > 0 ? BOMB_FIRST_LEVEL_DAMAGE*(*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level)*0.01 : 0;
 }
 
 void Ship::AddComboCount(int value)
@@ -2982,8 +1823,8 @@ void Ship::SetUpgrade(string upgrade_name)
 		SetDroneWeapon("minirocket3");
 	else if (upgrade_name.compare("Restores_hp_1") == 0)
 		m_armor++;
-	else if (upgrade_name.compare("Restores_hp_1") == 0)
-		m_armor++;
+	else if (upgrade_name.compare("Upgrade_jump_1") == 0)
+		m_can_jump = true;
 }
 
 void Ship::SetWeapon(string weapon_name)

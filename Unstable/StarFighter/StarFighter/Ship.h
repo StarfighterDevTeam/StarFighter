@@ -19,10 +19,7 @@
 
 class Loot;
 class Dialog;
-class ShipModel;
 class Enemy;
-
-static float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 1.5, 2.0 };
 
 enum ShipAnimations
 {
@@ -94,16 +91,14 @@ enum ShopOptions
 class Ship : public GameObject
 {
 public :
-	Ship(ShipModel* ship_model);
+	Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::Vector2f fake_size, int fake_frameNumber, int fake_animationNumber);
 	~Ship();
-	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void updatePostCollision() override;
 	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
 	bool IsVisible();
 	void ManageJumpFeedbacks();
-	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	bool ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
@@ -113,28 +108,11 @@ public :
 	void ManageImmunity(sf::Time deltaTime);
 	void ManageGhost(sf::Time deltaTime);
 	void ManageGrazingFeedback();
-	bool ResplenishHealth();
-	void RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderConstraints();
 	void SettingTurnAnimations();
 	void RotateShip(float angle);
 	void setGhost(bool ghost) override;
-
-	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
-	bool setShipWeapon(Weapon* weapon, bool overwrite = false, bool no_save = false);
-	void setShipModel(ShipModel* ship_model, bool no_save = false);
-	void cleanEquipment(int equipment_type, bool no_save = false);
-	void cleanWeapon(bool no_save = false);
-	bool CanHyperspeed();
-	bool CanJump();
-	int GetNumberOfBombs();
-	int GetBombsDamage();
-
-	void CleanGarbagedEquipments();
-
-	vector<Equipment*> m_garbageEquipments;
-	vector<Weapon*> m_garbageWeapons;
 
 	string m_currentScene_name;
 	int m_currentScene_hazard;
@@ -164,14 +142,6 @@ public :
 
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 
-	bool BuyingItem_v2(GridElement* element, bool equip_directly = false);
-	void SellingItem_v2(GridElement* element);
-	bool DesquipItem_v2(GridElement* element);
-	bool EquipItem_v2(GridElement* element);
-	void ThrowingItem_v2(GridElement* element);
-	bool Equip_v2(GameObject* object);
-	void Desequip_v2(GameObject* object);
-
 	void ContinueDialog();
 	void Recalling();
 	void Teleport(string destination_name);
@@ -180,11 +150,11 @@ public :
 	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
 	void Jump();
 	void Respawn(bool no_save);
-
-	sf::Clock m_stroboscopic_effect_clock;
-	sf::Clock m_jump_clock;
-	bool m_is_jumping;
-	sf::Time m_ghost_timer;
+	void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	void GetDamageFrom(GameObject& object) override;
+	void GenerateBots(GameObject* target);
+	void SetBotsVisibility(bool visible);
+	void DestroyBots();
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
@@ -196,22 +166,11 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 	SFPanel* m_SFHudPanel;
 	string m_is_asking_teleportation;
-
 	sf::Clock m_brakingHoldingClock;
 
-	void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier) override;
-	int getGrazeCount();
-	float getShipBeastScore();
-	void GetDamageFrom (GameObject& object) override;
-
-	Equipment* m_equipment[NBVAL_Equipment];
-	ShipModel* m_ship_model;
 	Weapon* m_weapon;
 	vector<Bot*> m_bot_list;
 	FX* m_FX_death;
-	void GenerateBots(GameObject* target);
-	void SetBotsVisibility(bool visible);
-	void DestroyBots();
 	FakeShip* m_fake_ship;
 	bool m_automatic_fire;
 
@@ -219,7 +178,6 @@ public :
 	bool m_disable_inputs;
 	Aura* m_combo_aura;
 	Aura* m_trail;
-	bool m_disableHyperspeed;
 	bool m_disableJump;
 	bool m_disableRecall;
 	bool m_disableSlowmotion;
@@ -228,11 +186,9 @@ public :
 	bool m_release_to_fire;
 	bool m_release_to_throw;
 
+	float m_hyperspeed;
 	string m_respawnSceneName;
-	int m_last_hazard_level_played;
-
 	sf::Clock m_recall_clock;
-
 	int m_graze_count;
 	int m_graze_level;
 	sf::Vertex m_graze_percent_points[GRAZING_FEEDBACK_CIRCLE_POINTS * 2];
@@ -243,37 +199,33 @@ public :
 	int m_combo_count_max;
 	int m_combo_level;
 
-	int GetFocusedPortalMaxUnlockedHazardLevel();
-
 	int m_level;
 	int m_level_max;
 	int m_xp;
 	int m_xp_max;
-	//void gain_xp (int xp_earned_);
-	//void LevelUp();
-	int UpdateShipLevel();
+
+	float m_max_speed;
+	float m_acceleration;
+	float m_deceleration;
+
+	bool m_can_cloak;
+	bool m_can_jump;
+	int m_bombs;
+
+	sf::Clock m_stroboscopic_effect_clock;
+	sf::Clock m_jump_clock;
+	bool m_is_jumping;
+	float m_ghost_timer;
+
 
 	static int SavePlayerScenes(Ship* ship);
 	static string LoadPlayerScenes(Ship* ship);
 	static int SavePlayerMoneyAndHealth(Ship* ship);
 	static bool LoadPlayerMoneyAndHealth(Ship* ship);
-	static int SaveItems(Ship* ship);
-	static bool LoadPlayerItems(Ship* ship);
 	static int SavePlayerUpgrades(Ship* ship);
 	static bool LoadPlayerUpgrades(Ship* ship);
 
-	int m_hyperspeed_fuel_max;
-	float m_hyperspeed_fuel;
 
-	float m_hyperspeed;
-	float m_max_speed;
-	float m_acceleration;
-	float m_deceleration;
-
-	sf::Clock m_shield_recovery_clock;
-
-	int getFighterIntStatValue(FighterStats stat) override;
-	float getFighterFloatStatValue(FighterStats stat) override;
 	void AddComboCount(int value) override;
 	void AddDialog(Dialog* dialog) override;
 	void SetInputBlocker(GameObject* blocker) override;

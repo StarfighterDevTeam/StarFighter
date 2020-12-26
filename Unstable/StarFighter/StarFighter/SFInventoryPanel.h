@@ -11,9 +11,7 @@ public:
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 	void DrawItemLevels(sf::RenderTexture& screen);
-	bool GetPrioritaryFeedback() override;
 	void SetItemStatsPanel(SFItemStatsPanel* panel) override;
-	void SetPrioritaryFeedback(bool has_priotiary_feedback) override;
 	int GetItemsStatsPanelIndex() override;
 	void SetItemsStatsPanelIndex(int index) override;
 

@@ -85,8 +85,6 @@ public:
 
 	virtual Grid* GetGrid_v2(int grid);
 
-	virtual bool GetPrioritaryFeedback();
-	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);
 	virtual string GetTeleportationDestination();
 	virtual int GetTeleportationCost();
 	virtual void SetMapViewOffset(sf::Vector2f offset);

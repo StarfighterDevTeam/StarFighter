@@ -41,7 +41,6 @@ public:
 	void LoadAllEnemyPhases(string phases_file);
 	void LoadAllBots(string bots_file);
 	void PreloadAssets(FactionType faction);
-	void UpdateShipConfig(Ship* ship, string config_name);
 
 	void GameloopStateMachineCheck(sf::Time deltaTime);
 	void SpawnInScene(string scene_name, Ship* playership, bool display_scene_name);
@@ -52,7 +51,6 @@ public:
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;
 
-	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playership = (*CurrentGame).m_playership);
 	void CheckScriptedDialogs();
 
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playership);

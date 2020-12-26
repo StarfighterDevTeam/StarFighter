@@ -14,9 +14,6 @@ Scene::Scene(string name)//, int hazard_level, bool reverse_scene, bool first_sc
 
 	m_generating_enemies = false;
 	m_generating_boss = false;
-	m_hazardbreak_has_occurred = false;//old
-	m_canHazardBreak = false;//old
-	m_hazard_level = 1;// hazard_level;//old
 
 	for (int i = 0; i < NBVAL_SceneScripts; i++)
 		m_scripts[i] = false;
@@ -56,16 +53,8 @@ Scene::Scene(string name)//, int hazard_level, bool reverse_scene, bool first_sc
 			m_bg->m_portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), m_bg->m_speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
 			sf::Vector2f bg_size = sf::Vector2f(w, h);// GameObject::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
 
-			//applying offset respect to the center of the background, depending on the direction
-			if (m_is_hub == true)
-				m_bg->m_portals[(Directions)i]->m_offset = GameObject::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
-			else
-				m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
-
+			m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
 			m_bg->m_portals[(Directions)i]->setPosition(m_bg->getPosition().x, m_bg->getPosition().y - 0.5 * bg_size.y + 0.5 * PORTAL_HEIGHT);
-
-			//rotation
-			m_bg->m_portals[(Directions)i]->setRotation(GameObject::getRotation_for_Direction((Directions)i));
 
 			//direction
 			m_bg->m_portals[(Directions)i]->m_direction = (Directions)i;
@@ -121,9 +110,9 @@ Scene::Scene(string name)//, int hazard_level, bool reverse_scene, bool first_sc
 					//setting enemy generators: we need to create one generator per class
 					if (m_total_class_probability[e->m_enemyclass] == 0)
 					{
-						float l_spawnCost = stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
+						float l_spawnCost = stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[0];
 						EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->m_enemyclass, stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_REPEAT_CHANCE]), stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_MISS_CHANCE]));
-						generator->m_spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
+						generator->m_spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[0];
 						m_sceneEnemyGenerators.push_back(generator);
 					}
 
@@ -226,70 +215,7 @@ void Scene::PlayTitleFeedback()
 	(*CurrentGame).addToTextPops(pop_feedback);
 }
 
-bool Scene::CheckHazardBreakConditions()
-{
-	//Score = destruction rank + graze rank
-	//RANKS: 0 = D, 1 = C, 2 = B, 3 = A, 4 = S, 5 = SS
-
-	//Destruction
-	if ((*CurrentGame).getHazard() == (*CurrentGame).m_hazardSpawned)
-	{
-		m_score_destruction = 4;//S
-	}
-	else if (1.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned > 0.95)
-	{
-		m_score_destruction = 3;//A
-	}
-	else if (1.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned > 0.8)
-	{
-		m_score_destruction = 2;//B
-	}
-	else
-	{
-		m_score_destruction = 1;//C
-	}
-
-	//Graze
-	//m_score_graze = (*CurrentGame).m_playership->m_graze_level + 1;
-
-	//Hits taken
-	if ((*CurrentGame).m_playership->m_hits_taken == 0)//untouched
-	{
-		m_score_graze = 4;//S
-	}
-	else if ((*CurrentGame).m_playership->m_hits_taken < 6)//1-5 hits taken
-	{
-		m_score_graze = 3;//A
-	}
-	else if ((*CurrentGame).m_playership->m_hits_taken < 16)//6-15 hits taken
-	{
-		m_score_graze = 2;//B
-	}
-	else//>10 hits taken
-	{
-		m_score_graze = 1;//C
-	}
-
-	//Total
-	m_score_total = (m_score_destruction + m_score_graze) / 2;
-	if ((m_score_destruction + m_score_graze) % 2 == 1 && (m_score_destruction + m_score_graze) < 8)
-	{
-		m_score_total++;//because we want to round up A + S = S
-	}
-	if (m_score_destruction == 1 && m_score_graze == 1)
-	{
-		m_score_total = 0;//C + C = D
-	}
-	if (m_score_destruction == 4 && m_score_graze == 4)
-	{
-		m_score_total = 5;//S + S = SS
-	}
-
-	//return m_score_total >= 4;//S rank minimum for hazard break
-	return true;
-}
-
-void Scene::DisplayDestructions(bool hazard_break)//OLD: to remove
+void Scene::DisplayDestructions()
 {
 	ostringstream ss;
 	ss.precision(1);
@@ -303,27 +229,11 @@ void Scene::DisplayDestructions(bool hazard_break)//OLD: to remove
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	(*CurrentGame).addToTextPops(pop_feedback);
-
-	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
-	{
-		text_feedback->setString("HAZARD BREAK!!!");
-		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y + pop_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK));
-		(*CurrentGame).addToTextPops(pop_feedback2);
-	}
-	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
-	{
-		text_feedback->setString("Score 100% to unlock next hazard level");
-		text_feedback->setCharacterSize(18);
-		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y + pop_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK));
-		(*CurrentGame).addToTextPops(pop_feedback2);
-	}
 	
 	delete text_feedback;
 }
 
-void Scene::DisplayScore(bool hazard_break)
+void Scene::DisplayScore()
 {
 	//Display
 	ostringstream ss_destruction;
@@ -446,54 +356,6 @@ void Scene::DisplayScore(bool hazard_break)
 	pop_feedback3->setPosition(sf::Vector2f(position.x - pop_feedback3->getGlobalBounds().width / 2, text_height));
 	(*CurrentGame).addToTextPops(pop_feedback3);
 
-	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
-	{
-		text_feedback->setString("STAGE CLEARED! Next hazard level unlocked!!");
-		text_feedback->setCharacterSize(18);
-		sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
-		text_feedback->setColor(_yellow);
-		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
-		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToTextPops(pop_feedback4);
-	}
-	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
-	{
-		text_feedback->setString("STAGE CLEARED! Get a total S Rank to unlock next hazard level");
-		text_feedback->setCharacterSize(18);
-		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
-		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToTextPops(pop_feedback4);
-	}
-	else
-	{
-		text_feedback->setString("STAGE CLEARED! Hazard level already beaten");
-		text_feedback->setCharacterSize(18);
-		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
-		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToTextPops(pop_feedback4);
-	}
-	//else if (m_hazard_level < m_hazard_level_unlocked)
-	//{
-	//	text_feedback->setString("Hazard level already beaten");
-	//	text_feedback->setCharacterSize(18);
-	//	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
-	//	SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-	//	pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-	//	(*CurrentGame).addToTextPops(pop_feedback4);
-	//}
-	//else if (m_hazard_level == NB_HAZARD_LEVELS - 1)
-	//{
-	//	text_feedback->setString("Max hazard level reached");
-	//	text_feedback->setCharacterSize(18);
-	//	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
-	//	SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-	//	pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-	//	(*CurrentGame).addToTextPops(pop_feedback4);
-	//}
-
 	delete text_feedback;
 }
 
@@ -577,7 +439,7 @@ void Scene::SpawnEnemy(int enemy_class)
 		if (dice_roll >= (*it)->m_proba_min && dice_roll <= (*it)->m_proba_max)
 		{
 			enemy = (*it)->m_enemy->Clone();
-			ApplyHazardLevelModifiers(getSceneHazardLevelValue(), *enemy);
+			ApplyHazardLevelModifiers(0, *enemy);
 			break;
 		}
 	}
@@ -706,45 +568,3 @@ void Scene::GenerateEnemies(Time deltaTime)
 		}
 	}
 }
-
-void Scene::HazardBreak()
-{
-	if (m_hazard_level_unlocked < HazardLevels::NB_HAZARD_LEVELS - 1)
-	{
-		m_hazard_level_unlocked++;
-	}
-	
-	LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Hazard level up: %d/5\n", m_hazard_level + 1));
-}
-
-float Scene::getSceneBeastScore(int for_hazard_level)
-{
-	float bonus = 0;
-	if (for_hazard_level < HazardLevels::NB_HAZARD_LEVELS && for_hazard_level >= 0)
-	{
-		bonus = HazardLevelsBeastBonus[for_hazard_level];
-	}
-	else
-	{
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", for_hazard_level));
-		for_hazard_level = 0;
-	}
-
-	return bonus;
-}
-
-int Scene::getSceneHazardLevelUnlockedValue()
-{
-	return m_hazard_level_unlocked;
-}
-
-void Scene::setSceneHazardLevelUnlockedValue(int hazard_unlocked_value)
-{
-	m_hazard_level_unlocked = hazard_unlocked_value;
-}
-
-int Scene::getSceneHazardLevelValue()
-{
-	return m_hazard_level;
-}
-

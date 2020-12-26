@@ -17,9 +17,7 @@ const char* getSavesPath();
 	#define MONEY_AND_HEALTH_SAVE_FILE							"Money.txt"
 #else
 	#define SCENES_SAVE_FILE							"Saves/KnownScenes.txt"
-	#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
 	#define MONEY_AND_HEALTH_SAVE_FILE				"Saves/MoneyAndHealth.txt"
-	#define SHOP_SAVE_FILE							"Saves/Shop.txt"
 	#define SHOP_UPGRADES_SAVE_FILE					"Saves/ShopUpgrades.txt"
 	#define PLAYER_UPGRADES_SAVE_FILE				"Saves/Upgrades.txt"
 #endif
@@ -69,13 +67,11 @@ const char* getSavesPath();
 #define HUD_CURSOR_SPEED							700
 #define HUD_HOLD_TIME_BEFORE_REMOVE_ITEM			1.0f
 
-#define SHIP_FILE "Scripts/Generated/Ship.csv"
 #define ENEMY_FILE	"Scripts/Generated/Enemies.csv"
 #define WEAPONS_FILE	 "Scripts/Generated/Weapons.csv"
 #define AMMO_FILE "Scripts/Generated/Ammo.csv"
 #define ENEMYPOOL_FILE "Scripts/Generated/EnemyPool.csv"
 #define FX_FILE "Scripts/Generated/FX.csv"
-#define EQUIPMENT_FILE "Scripts/Generated/Equipment.csv"
 #define BOTS_FILE "Scripts/Generated/Bot.csv"
 #define SCENES_FILE "Scripts/Generated/Scenes.csv"
 #define PHASES_FILE	"Scripts/Generated/EnemyPhases.csv"
@@ -98,9 +94,11 @@ const char* getSavesPath();
 #define PIXELS_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT_BEAM		40
 #define ANGLE_TOLERANCE_FOR_FACE_TARGET_ALIGNMENT			1
 #define ENEMY_LASERBEAM_WARNING_DELAY						1.2
-#define GRAZING_COUNT_TO_REGEN_SHIELD						100
+#define GRAZING_COUNT_TO_REGEN_SHIELD						40
 #define GRAZING_FEEDBACK_CIRCLE_POINTS						64
 #define NB_UPGRADE_CHOICES									3
+#define PLAYER_LEVELING_STATS_MULTIPLIER						0.04
+#define ENEMIES_LEVELING_STATS_MULTIPLIER					0.10
 
 //HUD
 #define ARMOR_BAR_SIZE_X								320
@@ -158,13 +156,6 @@ const char* getSavesPath();
 #define DIALOG_PANEL_FADE_IN_TIME				1.5f
 #define DIALOG_PANEL_FADE_OUT_TIME				0.5f
 #define DIALOG_PANEL_ARROW_OFFSET_X				20
-
-//SHOP
-#define ITEM_STATS_SHOP_OFFSET_X						16
-#define ITEM_STATS_SHOP_OFFSET_Y						16
-#define MONEY_COST_OF_LOOT_CREDITS						10
-#define NUMBER_OF_OBJECTS_GENERATED_IN_SHOP				9
-#define NUMBER_OF_RARE_OBJECTS_GENERATED_IN_SHOP		1
 
 //ENEMY LIFE BARS
 #define ENEMY_HP_BAR_CONTAINER_SIZE_X					90
@@ -246,23 +237,10 @@ const char* getSavesPath();
 #define SPAWN_MISS_MAXIMUM_RESOURCE						0.70f
 
 //HYPERSPEED
-#define HYPERSPEED_CONSUMPTION_FOR_CRUISING				2
-#define HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION			2
-#define SHIP_JUMPING_SPEED								2500.f
-#define SHIP_JUMPING_DISTANCE							250.f
-#define SHIP_JUMPING_COST								20
+#define SHIP_JUMPING_SPEED								2500
+#define SHIP_JUMPING_DISTANCE							250
 #define SHIP_JUMPING_IMMUNITY_DURATION					0.6
 #define SHIP_BOMBING_IMMUNITY_DURATION					2
-
-//LEVELING
-#define FIRST_LEVEL_MAX									20
-#define XP_MAX_FIRST_LEVEL								100
-#define XP_MAX_INCREASE_PER_LEVEL						0.50
-#define XP_DEATH_MALUS_PERCENTAGE						0.05
-#define PLAYER_LEVELING_STATS_MULTIPLIER				0.04
-#define ENEMIES_LEVELING_STATS_MULTIPLIER				0.10
-#define BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES			3.0f
-#define MAX_BEAST_SCALE									6.0f
 
 //COMBO
 #define COMBO_COUNT_FIRST_LEVEL							200
@@ -286,28 +264,7 @@ const char* getSavesPath();
 //#define FIRST_LEVEL_FUEL								100
 //#define DEFAULT_AMMO_SPEED								2200
 #define ASSUMED_SHIP_SIZE								70
-#define ASSUMED_BOT_SIZE								32
-
-#define BOT_STATS_MULTIPLIER							0.35
-#define CREDITS_COST_PER_ONE_MULTISHOT					10
-#define COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL		0.4
-#define CREDITS_COST_PER_ONE_ADDITIONAL_BOT				50
-#define COST_PER_ONE_BOT_MULTIPLIER_PER_LEVEL			0.6
-#define MAX_NUMBER_OF_BOTS_PER_ITEM						4
-#define MIN_VALUE_OF_MULTISHOT							2
-#define MAX_RATE_OF_FIRE_BONUS							90
-#define MIN_WEAPON_XSPREAD								10
-#define MIN_MULTISHOTS_FOR_DISPERSION					5
-#define MIN_MULTISHOTS_FOR_DISPERSION_FOR_BOT			2
-#define WEAPON_MIN_VSPEED_VALUE							300
-#define WEAPON_CHANCE_OF_ALTERNATE						0.3
-#define WEAPON_CHANCE_OF_DISPERSION						0.5
-#define WEAPON_CHANCE_OF_BEAM							0.1
-#define WEAPON_MIN_DISPERSION							20
-#define WEAPON_MAX_DISPERSION							60
-#define WEAPON_MAX_DISPERSION_FOR_BOT					60
-#define WEAPON_HOMING_DAMAGE_MALUS						0.2
-#define WEAPON_DISPERSION_DAMAGE_MALUS					0.2
+#define ASSUMED_BOT_SIZE									32
 
 //TEXTPOP FEEDBACK
 #define MONEY_LOOT_DISPLAY_NOT_FADED_TIME				0.8f
