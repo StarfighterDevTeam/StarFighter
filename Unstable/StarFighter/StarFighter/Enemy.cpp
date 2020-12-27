@@ -1068,16 +1068,10 @@ Ammo* Enemy::LoadAmmo(string name)
 
 FX* Enemy::LoadFX(string name)
 {
-	if ((*CurrentGame).m_FXConfig[name][FX_TYPE].compare("explosion") == 0)
-	{
-		float duration = atof(((*CurrentGame).m_FXConfig[name][FX_DURATION]).c_str());
-		FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_FXConfig[name][FX_FILENAME], Vector2f((float)stoi((*CurrentGame).m_FXConfig[name][FX_WIDTH]), (float)stoi((*CurrentGame).m_FXConfig[name][FX_HEIGHT])), stoi((*CurrentGame).m_FXConfig[name][FX_FRAMES]), sf::seconds(duration));
-		myFX->m_display_name = (*CurrentGame).m_FXConfig[name][FX_NAME];
+	FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_FXConfig[name][FX_FILENAME], Vector2f((float)stoi((*CurrentGame).m_FXConfig[name][FX_WIDTH]), (float)stoi((*CurrentGame).m_FXConfig[name][FX_HEIGHT])), (bool)stoi((*CurrentGame).m_FXConfig[name][FX_IS_PERMANENT]), stoi((*CurrentGame).m_FXConfig[name][FX_FRAMES]));
+	myFX->m_display_name = (*CurrentGame).m_FXConfig[name][FX_NAME];
 
-		return myFX;
-	}
-
-	return NULL;
+	return myFX;
 }
 
 Bot* Enemy::LoadBot(string name)

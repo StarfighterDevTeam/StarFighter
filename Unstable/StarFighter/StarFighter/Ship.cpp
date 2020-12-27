@@ -33,11 +33,13 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_is_asking_scene_transition = false;
 	m_currentScene_hazard = 0;
 	m_input_blocker = NULL;
-	m_is_jumping = false;
-	m_ghost_timer = 0;
 	m_hits_taken = 0;
 	m_release_to_fire = false;
 	m_release_to_throw = false;
+	m_ghost_timer = 0;
+	m_jump_ghost_timer = 0;
+	m_jump_timer = 0;
+	m_jump_cooldown = 0;
 
 	m_level = 1;
 	m_xp = 0;
@@ -242,6 +244,9 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (m_targetDialogs.empty() == false && m_SFTargetPanel != NULL && m_SFTargetPanel->m_panel_type == SFPanel_Dialog && m_SFTargetPanel->GetDuration() > 0 && m_SFTargetPanel->GetDurationTimer() <= 0)
 		ContinueDialog();
 
+	ManageGhost(deltaTime * l_hyperspeedMuliplier);
+	ManageJump(deltaTime  * l_hyperspeedMuliplier);
+
 	//Manage inputs
 	ManageInputs(deltaTime, hyperspeedMultiplier, directions);
 
@@ -250,9 +255,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	GameObject::update(deltaTime, hyperspeedMultiplier);
 	ScreenBorderConstraints();
 	SettingTurnAnimations();
-	
-	ManageGhost(deltaTime * l_hyperspeedMuliplier);
-	ManageJumpFeedbacks();
 	
 	//member objects follow
 	if (m_combo_aura != NULL)
@@ -284,12 +286,6 @@ void Ship::Draw(sf::RenderTexture& screen)
 			if ((*CurrentGame).m_is_in_hub == false && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
 				screen.draw(m_graze_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
 	}
-}
-
-void Ship::ManageJumpFeedbacks()
-{
-	if (m_is_jumping == true)
-		PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
 }
 
 bool Ship::IsVisible()
@@ -576,10 +572,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
 				//jump
-				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableJump && m_moving == true)
-				{
+				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableJump == false && m_ghost_timer <= 0 && m_jump_cooldown <= 0 && m_collision_timer <= 0)
 					Jump();
-				}
+
+				if (m_jump_timer == 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+					if (m_moving == true)
+					{
+						ScaleVector(&m_speed, SHIP_JUMPING_SPEED);
+						m_jump_timer -= deltaTime.asSeconds();
+					}
 
 				//bomb
 				else if ((*CurrentGame).m_is_in_hub == false && m_bombs > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && !m_actions_states[Action_Recalling] && !m_immune)
@@ -684,18 +685,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	if (m_is_jumping == true)
-	{
-		if (m_is_jumping && m_jump_clock.getElapsedTime().asSeconds() > SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
-		{
-			m_is_jumping = false;
-			m_speed = sf::Vector2f(0, 0);
-		}
-		else
-		{
-			return;
-		}
-	}
+	if (m_jump_timer > 0 && m_jump_timer < 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)//jumping
+		return;
 
 	m_speed.x += inputs_direction.x * m_acceleration;
 	m_speed.y += inputs_direction.y * m_acceleration;
@@ -711,6 +702,34 @@ void Ship::ManageGhost(sf::Time deltaTime)
 	{
 		m_ghost_timer -= deltaTime.asSeconds();
 		setGhost(m_ghost_timer > 0);
+	}
+}
+
+
+void Ship::ManageJump(sf::Time deltaTime)
+{
+	if (m_jump_cooldown > 0)
+		m_jump_cooldown -= deltaTime.asSeconds();
+
+	if (m_jump_ghost_timer > 0)
+	{
+		m_jump_ghost_timer -= deltaTime.asSeconds();
+
+		if (m_jump_ghost_timer <= 0)
+			m_jump_cooldown = SHIP_JUMPING_COOLDOWN;
+
+		if (m_ghost_timer < m_jump_ghost_timer)
+			m_ghost_timer = m_jump_ghost_timer;
+	}
+
+	if (m_jump_timer > 0 && m_jump_timer < 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+	{
+		PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01), m_ghost_timer > 0 ? GHOST_ALPHA_VALUE : 255);
+
+		m_jump_timer -= deltaTime.asSeconds();
+
+		if (m_jump_timer <= 0)//end of jump
+			m_speed = sf::Vector2f(0, 0);
 	}
 }
 
@@ -809,24 +828,15 @@ void Ship::Bomb()
 {
 	(*CurrentGame).killGameObjectType(EnemyObject);
 	(*CurrentGame).killGameObjectType(EnemyFire);
-
-	//ghost
-	if (m_ghost_timer < SHIP_BOMBING_IMMUNITY_DURATION)
-		m_ghost_timer = SHIP_BOMBING_IMMUNITY_DURATION;
 }
 
 void Ship::Jump()
 {
-	ScaleVector(&m_speed, SHIP_JUMPING_SPEED);
-	m_is_jumping = true;
+	m_jump_timer = 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED;
+	m_jump_ghost_timer = SHIP_JUMPING_GHOST_DURATION;
 
-	//ghost
-	if (m_ghost_timer < SHIP_JUMPING_IMMUNITY_DURATION)
-		m_ghost_timer = SHIP_JUMPING_IMMUNITY_DURATION;
-
-	PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
-
-	m_jump_clock.restart();
+	FX* fx_jump = new FX(getPosition(), sf::Vector2f(0, 0), "2D/FX/FX_jump.png", sf::Vector2f(100, 100), false, 4);
+	(*CurrentGame).addToScene(fx_jump, true);
 }
 
 void Ship::SettingTurnAnimations()
@@ -908,7 +918,7 @@ void Ship::ScreenBorderConstraints()
 
 void Ship::IdleDecelleration(sf::Time deltaTime)
 {
-	if (m_is_jumping == true)
+	if (m_jump_timer > 0)//jumping
 		return;
 
 	//idle deceleration
@@ -1247,8 +1257,7 @@ void Ship::GetDamageFrom(GameObject& object)
 		if (object.m_collider_type == EnemyObject)//FX mutal collision
 		{
 			string fx_name = "explosion_S";
-			float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
-			FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
+			FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), (bool)stoi((*CurrentGame).m_FXConfig[fx_name][FX_IS_PERMANENT]), 2);
 
 			float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
 			fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x / 2, getPosition().y + cos(angle)*GetShipSize().y / 2);
@@ -1571,15 +1580,15 @@ void Ship::CenterMapView(sf::Vector2f offset)
 	m_SFTargetPanel->SetMapViewOffset(offset);
 }
 
-void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
+void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses, int max_alpha)
 {
 	if (m_fake_ship != NULL)
-		m_fake_ship->PlayStroboscopicEffect(effect_duration, time_between_poses);
+		m_fake_ship->PlayStroboscopicEffect(effect_duration, time_between_poses, max_alpha);
 	else
 	{
 		if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
 		{
-			Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
+			Stroboscopic* strobo = new Stroboscopic(effect_duration, this, max_alpha);
 			(*CurrentGame).addToScene(strobo, true);
 
 			m_stroboscopic_effect_clock.restart();

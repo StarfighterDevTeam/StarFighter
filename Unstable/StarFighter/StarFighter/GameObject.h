@@ -123,7 +123,7 @@ enum FXData
 	FX_WIDTH,//3
 	FX_HEIGHT,//4
 	FX_FRAMES,//5
-	FX_DURATION,//6
+	FX_IS_PERMANENT,//6
 };
 
 enum BotData

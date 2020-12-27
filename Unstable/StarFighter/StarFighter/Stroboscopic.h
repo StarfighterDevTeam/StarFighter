@@ -6,7 +6,7 @@
 class Stroboscopic : public GameObject
 {
 public :
-	Stroboscopic(sf::Time decade_time, GameObject* parent);
+	Stroboscopic(sf::Time decade_time, GameObject* parent, int max_alpha);
 	virtual ~Stroboscopic();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier = 1) override;
 

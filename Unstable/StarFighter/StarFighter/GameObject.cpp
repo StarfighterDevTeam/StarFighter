@@ -204,10 +204,10 @@ void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	newspeed.x = m_speed.x * l_hyperspeedMultiplier;
 	newspeed.y = m_speed.y * l_hyperspeedMultiplier;
 	
-	if (m_ghost == false && l_hyperspeedMultiplier > 1)
-		setGhost(true);
-	else if (m_ghost == true)
-		setGhost(false);
+	//if (m_ghost == false && l_hyperspeedMultiplier > 1)
+	//	setGhost(true);
+	//else if (m_ghost == true)
+	//	setGhost(false);
 	
 	//Basic movement (initial vector)
 	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();

@@ -98,7 +98,6 @@ public :
 	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
 	bool IsVisible();
-	void ManageJumpFeedbacks();
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	bool ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
@@ -107,6 +106,7 @@ public :
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageImmunity(sf::Time deltaTime);
 	void ManageGhost(sf::Time deltaTime);
+	void ManageJump(sf::Time deltaTime);
 	void ManageGrazingFeedback();
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderConstraints();
@@ -147,7 +147,7 @@ public :
 	void Teleport(string destination_name);
 	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));
 	void Bomb();
-	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
+	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses, int max_alpha);
 	void Jump();
 	void Respawn(bool no_save);
 	void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier) override;
@@ -213,10 +213,11 @@ public :
 	int m_bombs;
 
 	sf::Clock m_stroboscopic_effect_clock;
-	sf::Clock m_jump_clock;
-	bool m_is_jumping;
-	float m_ghost_timer;
+	float m_jump_timer;
+	float m_jump_cooldown;
+	float m_jump_ghost_timer;
 
+	float m_ghost_timer;
 
 	static int SavePlayerScenes(Ship* ship);
 	static string LoadPlayerScenes(Ship* ship);
