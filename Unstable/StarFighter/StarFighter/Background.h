@@ -13,7 +13,7 @@ public:
 	Shop* m_shop;
 
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
-	void SetPortalsState(PortalState m_state);
+	void SetPortalsState(PortalState state);
 };
 
 #endif // BACKGROUND_H_INCLUDED

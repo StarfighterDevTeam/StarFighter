@@ -239,10 +239,11 @@ const char* getSavesPath();
 //SPECIAL
 #define SHIP_JUMPING_SPEED								2500
 #define SHIP_JUMPING_DISTANCE							250
-#define SHIP_JUMPING_COOLDOWN							2
+#define SHIP_JUMPING_COOLDOWN							5
 #define SHIP_JUMPING_GHOST_DURATION						0.8
 
 #define SHIP_CLOAK_GHOST_DURATION						3
+#define SHIP_CLOAK_COOLDOWN								12
 
 //COMBO
 #define COMBO_COUNT_FIRST_LEVEL							200

@@ -107,7 +107,9 @@ public :
 	void ManageImmunity(sf::Time deltaTime);
 	void ManageGhost(sf::Time deltaTime);
 	void ManageJump(sf::Time deltaTime);
+	void ManageCloak(sf::Time deltaTime);
 	void ManageGrazingFeedback();
+	void ManageSpecialFeedback();
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderConstraints();
 	void SettingTurnAnimations();
@@ -115,7 +117,6 @@ public :
 	void setGhost(bool ghost) override;
 
 	string m_currentScene_name;
-	int m_currentScene_hazard;
 	map<string, int> m_knownScenes;
 
 	void RandomizeUpgrades(Shop* target_shop);
@@ -196,6 +197,8 @@ public :
 	sf::Clock m_graze_sinus_clock;
 	int m_hits_taken;
 
+	sf::Vertex m_special_percent_points[GRAZING_FEEDBACK_CIRCLE_POINTS * 2];
+
 	int m_combo_count;
 	int m_combo_count_max;
 	int m_combo_level;
@@ -219,6 +222,7 @@ public :
 	float m_jump_ghost_timer;
 
 	float m_cloak_cooldown;
+	float m_cloak_ghost_timer;
 
 	float m_ghost_timer;
 

@@ -56,17 +56,18 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	AnimatedSprite::update(deltaTime);
 }
 
-void Background::SetPortalsState(PortalState m_state)
+void Background::SetPortalsState(PortalState state)
 {
 	for (int i = 0; i < NO_DIRECTION; i++)
 	{
-		if (m_portals[(Directions)i] != NULL)
+		if (m_portals[(Directions)i] != NULL && m_portals[(Directions)i]->m_state != state)
 		{
-			switch (m_state)
+			m_portals[(Directions)i]->m_state = state;
+
+			switch (state)
 			{
 				case PortalGhost:
 				{
-					m_portals[(Directions)i]->m_state = PortalGhost;
 					m_portals[(Directions)i]->m_visible = true;
 					m_portals[(Directions)i]->setGhost(true);
 					break;
@@ -74,7 +75,6 @@ void Background::SetPortalsState(PortalState m_state)
 
 				case PortalClose:
 				{
-					m_portals[(Directions)i]->m_state = PortalClose;
 					m_portals[(Directions)i]->m_visible = true;
 					m_portals[(Directions)i]->setGhost(false);
 					m_portals[(Directions)i]->Close();
@@ -83,7 +83,6 @@ void Background::SetPortalsState(PortalState m_state)
 
 				case PortalOpen:
 				{
-					m_portals[(Directions)i]->m_state = PortalOpen;
 					m_portals[(Directions)i]->m_visible = true;
 					m_portals[(Directions)i]->setGhost(false);
 					m_portals[(Directions)i]->Open();
@@ -92,7 +91,6 @@ void Background::SetPortalsState(PortalState m_state)
 
 				case PortalInvisible:
 				{
-					m_portals[(Directions)i]->m_state = PortalInvisible;
 					m_portals[(Directions)i]->setGhost(false);
 					m_portals[(Directions)i]->Close();
 					break;

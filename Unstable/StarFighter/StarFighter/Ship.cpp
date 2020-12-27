@@ -31,7 +31,6 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_graze_level = 0;
 	m_disable_bots = true;
 	m_is_asking_scene_transition = false;
-	m_currentScene_hazard = 0;
 	m_input_blocker = NULL;
 	m_hits_taken = 0;
 	m_release_to_fire = false;
@@ -40,6 +39,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_jump_ghost_timer = 0;
 	m_jump_timer = 0;
 	m_jump_cooldown = 0;
+	m_cloak_ghost_timer = 0;
 	m_cloak_cooldown = 0;
 
 	m_level = 1;
@@ -63,9 +63,14 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 
 	for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS; i++)
 	{
-		float angle = 360.f * i / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
 		m_graze_percent_points[i * 2].color = sf::Color(0, 0, 0, 0);
 		m_graze_percent_points[i * 2 + 1].color = m_graze_percent_points[i * 2].color;
+	}
+
+	for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS; i++)
+	{
+		m_special_percent_points[i * 2].color = sf::Color(0, 0, 0, 0);
+		m_special_percent_points[i * 2 + 1].color = m_special_percent_points[i * 2].color;
 	}
 
 	m_targetPortal = NULL;
@@ -201,6 +206,49 @@ void Ship::ManageGrazingFeedback()
 	}
 }
 
+
+void Ship::ManageSpecialFeedback()
+{
+	float angle_to_fill;
+	if ((m_jump_cooldown > 0 && m_jump_cooldown < SHIP_JUMPING_COOLDOWN) || (m_cloak_cooldown > 0 && m_cloak_cooldown < SHIP_CLOAK_COOLDOWN))
+	{
+		float radius = GRAZE_DISTANCE - 8;
+		float thickness = 2;
+
+		if (m_jump_cooldown > 0)
+			angle_to_fill = 90 + 180.f * (float)(SHIP_JUMPING_COOLDOWN - m_jump_cooldown) / SHIP_JUMPING_COOLDOWN;
+		else if (m_cloak_cooldown > 0)
+			angle_to_fill = 90 + 180.f * (float)(SHIP_CLOAK_COOLDOWN - m_cloak_cooldown) / SHIP_CLOAK_COOLDOWN;
+
+		//position
+		for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
+		{
+			float angle = 90 + 360.f * (i / 2) / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
+
+			m_special_percent_points[i].position.x = getPosition().x + (radius + (i % 2) * thickness) * cos(-M_PI_2 + angle * M_PI / 180);
+			m_special_percent_points[i].position.y = getPosition().y + (radius + (i % 2) * thickness) * sin(-M_PI_2 + angle * M_PI / 180);
+
+			//color
+			if (angle_to_fill > 1.f / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1) && angle <= angle_to_fill)
+			{
+				float s = 0.50 + 1 * abs(sin(2 * m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
+				m_special_percent_points[i].color = sf::Color(223, 183, 19, 200 * s);
+			}
+			else if (angle <= 270)
+			{
+				float s = 0.25 + 3 * abs(sin(4 * m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
+				m_special_percent_points[i].color = sf::Color(255, 255, 255, 20 * s);
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
+			m_special_percent_points[i].color = sf::Color(0, 0, 0, 0);
+	}
+}
+
+
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	float l_hyperspeedMuliplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
@@ -236,9 +284,9 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	m_moving = false;
 	m_is_asking_SFPanel = SFPanel_None;
 
-	//Graze feedback
 	ManageGrazingFeedback();
-	
+	ManageSpecialFeedback();
+
 	sf::Vector2f directions = InputGuy::getDirections();
 	
 	//Update dialogs that have a limited lifespam
@@ -247,6 +295,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	ManageGhost(deltaTime * l_hyperspeedMuliplier);
 	ManageJump(deltaTime  * l_hyperspeedMuliplier);
+	ManageCloak(deltaTime  * l_hyperspeedMuliplier);
 
 	//Manage inputs
 	ManageInputs(deltaTime, hyperspeedMultiplier, directions);
@@ -286,6 +335,8 @@ void Ship::Draw(sf::RenderTexture& screen)
 		if ((*CurrentGame).m_gameloop_state == SCROLLING || (*CurrentGame).m_gameloop_state == BOSS_FIGHT)
 			if ((*CurrentGame).m_is_in_hub == false && m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
 				screen.draw(m_graze_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
+
+		screen.draw(m_special_percent_points, GRAZING_FEEDBACK_CIRCLE_POINTS * 2, sf::TrianglesStrip);
 	}
 }
 
@@ -584,18 +635,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					}
 
 				//cloack
-				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_ghost_timer <= 0)
+				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_cloak_cooldown <= 0)
 					Cloak();
 
 				//bomb
-				else if ((*CurrentGame).m_is_in_hub == false && m_bombs > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && !m_actions_states[Action_Recalling] && !m_immune)
-				{
-					Bomb();
-				}
-				else if (!m_actions_states[Action_Recalling])
-				{
+				//else if ((*CurrentGame).m_is_in_hub == false && m_bombs > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && !m_actions_states[Action_Recalling] && !m_immune)
+				//{
+				//	Bomb();
+				//}
+				
+				if (!m_actions_states[Action_Recalling])
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;//resetting hyperspeed
-				}
 
 				//Auto fire option (F key)
 				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
@@ -622,10 +672,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Braking and speed malus on firing
 				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
 				//brake speed malus
-				if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
+				if (m_jump_timer <= 0)
 				{
-					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
-					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
+					{
+						m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
+						m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					}
 				}
 			}
 			//PORTAL
@@ -649,17 +702,18 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 				//Bots firing
 				for (Bot* bot : m_bot_list)
-				{
 					bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
-				}
 
 				//brake speed malus
-				if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
+				if (m_jump_timer <= 0)
 				{
-					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
-					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
+					{
+						m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
+						m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					}
 				}
-
+				
 				//Entering portal
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
@@ -710,7 +764,6 @@ void Ship::ManageGhost(sf::Time deltaTime)
 	}
 }
 
-
 void Ship::ManageJump(sf::Time deltaTime)
 {
 	if (m_jump_ghost_timer > 0)
@@ -733,6 +786,20 @@ void Ship::ManageJump(sf::Time deltaTime)
 		if (m_jump_timer <= 0)//end of jump
 			m_speed = sf::Vector2f(0, 0);
 	}
+}
+
+void Ship::ManageCloak(sf::Time deltaTime)
+{
+	if (m_cloak_ghost_timer > 0)
+	{
+		m_cloak_ghost_timer -= deltaTime.asSeconds();
+
+		if (m_ghost_timer < m_cloak_ghost_timer)
+			m_ghost_timer = m_cloak_ghost_timer;
+	}
+
+	if (m_cloak_cooldown > 0 && m_cloak_ghost_timer <= 0)
+		m_cloak_cooldown -= deltaTime.asSeconds();
 }
 
 void Ship::ManageImmunity(sf::Time deltaTime)
@@ -844,7 +911,8 @@ void Ship::Jump()
 
 void Ship::Cloak()
 {
-	m_ghost_timer = SHIP_CLOAK_GHOST_DURATION;
+	m_cloak_ghost_timer = SHIP_CLOAK_GHOST_DURATION;
+	m_cloak_cooldown = SHIP_CLOAK_COOLDOWN;
 
 	FX* fx_jump = new FX(getPosition(), sf::Vector2f(0, 0), "2D/FX/FX_jump.png", sf::Vector2f(100, 100), false, 4);
 	(*CurrentGame).addToScene(fx_jump, true);

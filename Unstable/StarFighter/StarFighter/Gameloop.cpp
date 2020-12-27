@@ -286,14 +286,13 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 				//(*CurrentGame).m_playership->RegenHealthFast(deltaTime, false, true, false);
 				(*CurrentGame).m_playership->m_disableSlowmotion = true;
 
-				if (m_hasDisplayedDestructionRatio == false)
-				{
-					//m_currentScene->DisplayScore();
+				//if (m_hasDisplayedDestructionRatio == false)
+				//{
+				//	m_currentScene->DisplayScore();
+				//	m_hasDisplayedDestructionRatio = true;
+				//}
 
-					m_currentScene->m_bg->SetPortalsState(PortalOpen);
-
-					m_hasDisplayedDestructionRatio = true;
-				}
+				m_currentScene->m_bg->SetPortalsState(PortalOpen);
 			}
 
 			//player takes exit?
