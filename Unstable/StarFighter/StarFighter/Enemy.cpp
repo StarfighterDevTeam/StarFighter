@@ -267,8 +267,11 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				if (m_reset_facing == true)
 					target_angle = 0;
 				else if (m_face_target == true)
-					target_angle = fmod(getRotation() + 180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 360);
-
+				{
+					if (playership->m_ghost == false)
+						target_angle = fmod(getRotation() + 180 - GameObject::GetAngleDegToTargetPosition(getPosition(), getRotation(), playership->getPosition()), 360);
+				}
+					
 				//rotate towards target angle
 				TurnToTargetAngle(target_angle, m_rotation_speed, deltaTime, l_hyperspeedMultiplier);
 			}
@@ -299,15 +302,17 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				//- we have some kind of Homing (!=NO_HOMING)
 				//AND we must not be a laserbeam, because that is to strong on the enemy
 				if (weapon->m_target_homing != NO_HOMING && weapon->m_rafale >= 0)
+				{
 					theta += delta;
+					if (playership->m_ghost == false)
+						weapon->m_shot_angle = theta * M_PI / 180;//switching to radians
+				}
+				else
+					weapon->m_shot_angle = theta * M_PI / 180;//switching to radians
 
 				//calcule weapon offset
-				theta *= M_PI / 180;//switching to radians
-				weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (-weapon->m_fire_direction);
-				weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (-weapon->m_fire_direction);
-
-				//transmitting the angle to the weapon, which will pass it to the bullets
-				weapon->m_shot_angle = theta;
+				weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(weapon->m_shot_angle) + m_size.y / 2 * sin(weapon->m_shot_angle) * (-weapon->m_fire_direction);
+				weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(weapon->m_shot_angle) - m_size.y / 2 * cos(weapon->m_shot_angle) * (-weapon->m_fire_direction);
 			}
 
 			weapon->setPosition(getPosition().x + weapon->m_weapon_current_offset.x, getPosition().y + weapon->m_weapon_current_offset.y);

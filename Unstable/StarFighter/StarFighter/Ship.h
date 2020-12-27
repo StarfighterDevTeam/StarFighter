@@ -149,6 +149,7 @@ public :
 	void Bomb();
 	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses, int max_alpha);
 	void Jump();
+	void Cloak();
 	void Respawn(bool no_save);
 	void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void GetDamageFrom(GameObject& object) override;
@@ -178,7 +179,7 @@ public :
 	bool m_disable_inputs;
 	Aura* m_combo_aura;
 	Aura* m_trail;
-	bool m_disableJump;
+	bool m_disableSpecial;
 	bool m_disableRecall;
 	bool m_disableSlowmotion;
 	bool m_is_asking_scene_transition;
@@ -216,6 +217,8 @@ public :
 	float m_jump_timer;
 	float m_jump_cooldown;
 	float m_jump_ghost_timer;
+
+	float m_cloak_cooldown;
 
 	float m_ghost_timer;
 

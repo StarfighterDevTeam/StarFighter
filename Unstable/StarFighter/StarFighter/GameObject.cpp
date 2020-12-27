@@ -253,15 +253,11 @@ void GameObject::ScaleVector(sf::Vector2f* vector, float target_value)
 void GameObject::setGhost(bool ghost)
 {
 	if (ghost == true)
-	{
-		m_ghost = true;
 		setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
-	}
 	else
-	{
-		m_ghost = false;
 		setColor(m_color);
-	}
+	
+	m_ghost = ghost;
 }
 
 void GameObject::GetDamageFrom(GameObject& object)

@@ -288,7 +288,7 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 
 				if (m_hasDisplayedDestructionRatio == false)
 				{
-					m_currentScene->DisplayScore();
+					//m_currentScene->DisplayScore();
 
 					m_currentScene->m_bg->SetPortalsState(PortalOpen);
 
@@ -434,7 +434,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	if (next_scene_is_hub == true)
 	{
 		(*CurrentGame).m_playership->m_disable_fire = true;
-		(*CurrentGame).m_playership->m_disableJump = true;
+		(*CurrentGame).m_playership->m_disableSpecial = true;
 		(*CurrentGame).m_playership->m_disableSlowmotion = true;
 		(*CurrentGame).m_playership->m_disable_bots = true;
 		(*CurrentGame).m_playership->m_disableRecall = true;
@@ -455,7 +455,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	else
 	{
 		(*CurrentGame).m_playership->m_disable_fire = false;
-		(*CurrentGame).m_playership->m_disableJump = false;
+		(*CurrentGame).m_playership->m_disableSpecial = false;
 		(*CurrentGame).m_playership->m_disableSlowmotion = false;
 		(*CurrentGame).m_playership->m_disable_bots = false;
 		(*CurrentGame).m_playership->m_disableRecall = false;
@@ -518,7 +518,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	{
 		(*CurrentGame).m_playership->m_disable_fire = false;
 		(*CurrentGame).m_playership->m_disableHyperspeed = false;
-		(*CurrentGame).m_playership->m_disableJump = false;
+		(*CurrentGame).m_playership->m_disableSpecial = false;
 		(*CurrentGame).m_playership->m_disableSlowmotion = false;
 		(*CurrentGame).m_playership->m_disable_bots = false;
 		(*CurrentGame).m_playership->m_disableRecall = false;
@@ -535,7 +535,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	{
 		(*CurrentGame).m_playership->m_disable_fire = true;
 		(*CurrentGame).m_playership->m_disableHyperspeed = true;
-		(*CurrentGame).m_playership->m_disableJump = true;
+		(*CurrentGame).m_playership->m_disableSpecial = true;
 		(*CurrentGame).m_playership->m_disableSlowmotion = true;
 		(*CurrentGame).m_playership->m_disable_bots = true;
 		(*CurrentGame).m_playership->m_disableRecall = true;

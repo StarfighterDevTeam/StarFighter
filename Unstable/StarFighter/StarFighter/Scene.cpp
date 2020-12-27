@@ -429,7 +429,6 @@ void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multipli
 
 void Scene::SpawnEnemy(int enemy_class)
 {
-	return;
 	Enemy* enemy = NULL;
 	//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
 	//int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;

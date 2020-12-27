@@ -26,7 +26,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_disable_fire = false;
 	m_disableSlowmotion = false;
 	m_disableRecall = false;
-	m_disableJump = false;
+	m_disableSpecial = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
 	m_disable_bots = true;
@@ -40,6 +40,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_jump_ghost_timer = 0;
 	m_jump_timer = 0;
 	m_jump_cooldown = 0;
+	m_cloak_cooldown = 0;
 
 	m_level = 1;
 	m_xp = 0;
@@ -572,7 +573,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
 				//jump
-				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableJump == false && m_ghost_timer <= 0 && m_jump_cooldown <= 0 && m_collision_timer <= 0)
+				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_jump_cooldown <= 0)
 					Jump();
 
 				if (m_jump_timer == 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
@@ -581,6 +582,10 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						ScaleVector(&m_speed, SHIP_JUMPING_SPEED);
 						m_jump_timer -= deltaTime.asSeconds();
 					}
+
+				//cloack
+				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_ghost_timer <= 0)
+					Cloak();
 
 				//bomb
 				else if ((*CurrentGame).m_is_in_hub == false && m_bombs > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && !m_actions_states[Action_Recalling] && !m_immune)
@@ -708,19 +713,16 @@ void Ship::ManageGhost(sf::Time deltaTime)
 
 void Ship::ManageJump(sf::Time deltaTime)
 {
-	if (m_jump_cooldown > 0)
-		m_jump_cooldown -= deltaTime.asSeconds();
-
 	if (m_jump_ghost_timer > 0)
 	{
 		m_jump_ghost_timer -= deltaTime.asSeconds();
 
-		if (m_jump_ghost_timer <= 0)
-			m_jump_cooldown = SHIP_JUMPING_COOLDOWN;
-
 		if (m_ghost_timer < m_jump_ghost_timer)
 			m_ghost_timer = m_jump_ghost_timer;
 	}
+
+	if (m_jump_cooldown > 0 && m_jump_ghost_timer <= 0)
+		m_jump_cooldown -= deltaTime.asSeconds();
 
 	if (m_jump_timer > 0 && m_jump_timer < 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
 	{
@@ -834,6 +836,15 @@ void Ship::Jump()
 {
 	m_jump_timer = 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED;
 	m_jump_ghost_timer = SHIP_JUMPING_GHOST_DURATION;
+	m_jump_cooldown = SHIP_JUMPING_COOLDOWN;
+
+	FX* fx_jump = new FX(getPosition(), sf::Vector2f(0, 0), "2D/FX/FX_jump.png", sf::Vector2f(100, 100), false, 4);
+	(*CurrentGame).addToScene(fx_jump, true);
+}
+
+void Ship::Cloak()
+{
+	m_ghost_timer = SHIP_CLOAK_GHOST_DURATION;
 
 	FX* fx_jump = new FX(getPosition(), sf::Vector2f(0, 0), "2D/FX/FX_jump.png", sf::Vector2f(100, 100), false, 4);
 	(*CurrentGame).addToScene(fx_jump, true);
@@ -1834,6 +1845,8 @@ void Ship::SetUpgrade(string upgrade_name)
 		m_armor++;
 	else if (upgrade_name.compare("Upgrade_jump_1") == 0)
 		m_can_jump = true;
+	else if (upgrade_name.compare("Upgrade_cloak_1") == 0)
+		m_can_cloak = true;
 }
 
 void Ship::SetWeapon(string weapon_name)

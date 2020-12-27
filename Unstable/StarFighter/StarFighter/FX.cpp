@@ -46,13 +46,12 @@ void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 FX* FX::Clone()
 {
-	FX* new_FX = new FX(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_frameNumber, this->m_duration);
+	FX* new_FX = new FX(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, bool(this->m_duration == 0), this->m_frameNumber, this->m_animationNumber);
 	new_FX->m_display_name = this->m_display_name;
 	return new_FX;
 }
 
 // AURA
-
 Aura::Aura(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber) : FX(target->getPosition(), sf::Vector2f(0, 0), textureName, size, true, frameNumber, animationNumber)
 {
 	m_target = target;
