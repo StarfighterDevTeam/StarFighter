@@ -116,6 +116,7 @@ class Phase
 public:
 	Phase();
 	~Phase();
+	Phase* Clone();
 
 	string m_display_name;
 	string m_name;

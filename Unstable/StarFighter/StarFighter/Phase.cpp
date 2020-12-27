@@ -23,6 +23,41 @@ Phase::~Phase()
 	delete m_pattern;
 }
 
+Phase* Phase::Clone()
+{
+	Phase* phase = new Phase();
+
+	phase->m_display_name = m_display_name;
+	phase->m_name = m_name;
+
+	for (Weapon* weapon : m_weapons_list)
+		phase->m_weapons_list.push_back(weapon->Clone());
+
+	phase->m_pattern = new GeometryPattern(*m_pattern);
+
+	for (Modifier modifier : m_modifiers)
+		phase->m_modifiers.push_back(modifier);
+
+	phase->m_angspeed = m_angspeed;
+	phase->m_radius = m_radius;
+	phase->m_vspeed = m_vspeed;
+	phase->m_rotation_speed = m_rotation_speed;
+	phase->m_freeze_player = m_freeze_player;
+
+	for (ConditionTransition* condition : m_transitions_list)
+		phase->m_transitions_list.push_back(condition);
+
+	phase->m_wake_up_name = m_wake_up_name;
+
+	if (phase->m_welcomeWeapon != NULL)
+		phase->m_welcomeWeapon = m_welcomeWeapon->Clone();
+	
+	for (Dialog* dialog : m_dialogs)
+		phase->m_dialogs.push_back(dialog);
+
+	return phase;
+}
+
 ConditionTransition::ConditionTransition(ConditionType condition, FloatCompare op, float value, std::string nextPhase_name)
 {
 	m_condition = condition;

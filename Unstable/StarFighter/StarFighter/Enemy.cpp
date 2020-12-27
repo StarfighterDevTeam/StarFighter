@@ -20,14 +20,15 @@ void Enemy::Draw(sf::RenderTexture& screen)
 
 	//display
 	//ss << "type: " << to_string(int(m_pattern.m_pattern_type)) << " / w: " << to_string(int(m_pattern.m_width)) << " / h: " << to_string(int(m_pattern.m_height));
-	ss << "\n " << m_currentPhase->m_display_name.c_str();// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
-	ss << "\nclock: " << to_string((int)m_phaseTimer.asSeconds());
+	//ss << "\n " << m_currentPhase->m_display_name.c_str();// << " / offy: " << to_string(m_pattern.m_offset.y) << " / spd: " << to_string(int(m_pattern.m_speed));
+	ss << "\nclock: " << to_string((int)m_pattern.m_clockwise);
 	
 	//for (float f : m_pattern.m_patternParams)
 	//	ss << to_string(int(f)) << " / ";
 
 	text.setString(ss.str());
-	screen.draw(text);*/
+	screen.draw(text);
+	*/
 
 	for (Weapon* weapon : m_weapons_list)
 		weapon->Draw(screen);
@@ -473,7 +474,7 @@ Enemy* Enemy::Clone()
 	enemy->setRotation(getRotation());
 
 	for (Phase* phase : m_phases)
-		enemy->m_phases.push_back(phase);
+		enemy->m_phases.push_back(phase->Clone());
 
 	//if (m_currentPhase != NULL)
 	//	enemy->m_currentPhase = enemy->m_phases.front();
@@ -746,6 +747,14 @@ void Enemy::setPhase(Phase* phase)
 		m_weapons_list.push_back(weapon);
 		
 	//MOVEMENT PATTERN
+	if (phase->m_pattern->m_clockwise == 0 && m_pattern.m_clockwise == 0)//if random clockwise, choose depending on getPosition().x
+	{
+		if (getPosition().x < SCENE_SIZE_X * 0.40)
+			phase->m_pattern->m_clockwise = 1;
+		else if (getPosition().x > SCENE_SIZE_X * 0.50)
+			phase->m_pattern->m_clockwise = -1;
+	}
+
 	m_pattern.setPattern_v2(phase->m_pattern); //vitesse angulaire (degres/s)
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
