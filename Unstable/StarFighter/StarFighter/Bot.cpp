@@ -9,6 +9,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	m_visible = false;
 	m_isOnScene = true;
 	m_DontGarbageMe = true;
+	setGhost(true);
 	m_vspeed = 0;
 	m_spread = sf::Vector2f(0,0);
 	m_damage = 0;
@@ -79,7 +80,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Bot::setGhost(bool ghost)
 {
-	GameObject::setGhost(ghost || m_damage == 0);
+	GameObject::setGhost(ghost);
 }
 
 void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)

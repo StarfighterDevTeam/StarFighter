@@ -2,4 +2,4 @@ Money 100
 Health 3
 Shield 0
 Graze 0
-Level 2
+Level 1

@@ -392,6 +392,18 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 {
 	if (playership == NULL)
 		return;
+
+	//cleaning layers
+	(*CurrentGame).garbageLayer(FriendlyFireLayer, false, true);
+	(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
+	(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
+	(*CurrentGame).garbageLayer(ExplosionLayer, false, true);
+	(*CurrentGame).garbageLayer(LootLayer, false, true);
+	(*CurrentGame).garbageLayer(FeedbacksLayer, false, true);
+
+	for (Dialog* dialog : m_playership->m_targetDialogs)
+		delete dialog;
+	m_playership->m_targetDialogs.clear();
 	
 	//Level up if next scene is a Hub
 	bool next_scene_is_hub = (bool)stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_IS_HUB]);
@@ -415,18 +427,6 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	AddToKnownScenes(m_currentScene->m_name);
 
 	(*CurrentGame).m_playership->m_HUD_state = HUD_Idle;
-
-	//cleaning layers
-	(*CurrentGame).garbageLayer(FriendlyFireLayer, false, true);
-	(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
-	(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
-	(*CurrentGame).garbageLayer(ExplosionLayer, false, true);
-	(*CurrentGame).garbageLayer(LootLayer, false, true);
-	(*CurrentGame).garbageLayer(FeedbacksLayer, false, true);
-
-	for (Dialog* dialog : m_playership->m_targetDialogs)
-		delete dialog;
-	m_playership->m_targetDialogs.clear();
 
 	//enabling/disabling abilities depending if next scene is a Hub or not
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_Y_RATIO);
@@ -480,7 +480,7 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 		m_currentScene->PlayTitleFeedback();
 
 	//Music changes
-	if (m_currentScene->m_scene_music.empty() == false)
+	if (m_currentScene->m_scene_music.compare("0") != 0)
 		(*CurrentGame).PlayMusic(Music_Scene, m_currentScene->m_scene_music);
 	else if (m_currentScene->m_is_hub == true)
 		(*CurrentGame).PlayMusic(Music_Hub);
@@ -719,6 +719,7 @@ void Gameloop::PlayerTakesExit()
 {
 	m_currentScene->m_bg->SetPortalsState(PortalGhost);
 	(*CurrentGame).PlaySFX(SFX_EnteringPortal);
+	(*CurrentGame).m_playership->m_release_to_fire = true;
 
 	string nextScene_filename = (*CurrentGame).m_playership->m_targetPortal->m_destination_name;
 

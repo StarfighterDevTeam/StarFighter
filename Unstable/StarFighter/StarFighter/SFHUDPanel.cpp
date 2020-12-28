@@ -428,11 +428,14 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	m_text.setString(ss_ship_stats.str());
 
 	//Scene progression bar
-	float progression_ratio = ProrataBetweenThreshold((*CurrentGame).m_background->getPosition().y, sf::Vector2f(-(*CurrentGame).m_background->m_size.y * 0.5 + SCENE_SIZE_Y, (*CurrentGame).m_background->m_size.y * 0.5));
-	m_ship.setPosition(sf::Vector2f(m_progressionBar.getPosition().x, m_progressionBar.getPosition().y + m_progressionBar.getSize().y * (0.5 - progression_ratio)));
-	m_progression_text.setString(to_string((int)(progression_ratio * 100)) + " %");
-	m_progression_text.setPosition(sf::Vector2f(m_ship.getPosition().x - m_ship.m_size.x * 0.5 - m_progression_text.getGlobalBounds().width - 1, m_ship.getPosition().y));
-
+	if (m_playership->m_armor > 0)
+	{
+		float progression_ratio = ProrataBetweenThreshold((*CurrentGame).m_background->getPosition().y, sf::Vector2f(-(*CurrentGame).m_background->m_size.y * 0.5 + SCENE_SIZE_Y, (*CurrentGame).m_background->m_size.y * 0.5));
+		m_ship.setPosition(sf::Vector2f(m_progressionBar.getPosition().x, m_progressionBar.getPosition().y + m_progressionBar.getSize().y * (0.5 - progression_ratio)));
+		m_progression_text.setString(to_string((int)(progression_ratio * 100)) + " %");
+		m_progression_text.setPosition(sf::Vector2f(m_ship.getPosition().x - m_ship.m_size.x * 0.5 - m_progression_text.getGlobalBounds().width - 1, m_ship.getPosition().y));
+	}
+	
 	for (int i = 0; i < 4; i++)
 	{
 		string next_linked_scene = (*CurrentGame).m_generalScenesConfig[m_playership->m_currentScene_name][SCENE_LINK_UP + i];

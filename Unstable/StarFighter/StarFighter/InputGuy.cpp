@@ -19,13 +19,13 @@ bool InputGuy::isFiring()
 	return false;
 }
 
-bool InputGuy::isHyperspeeding()
+bool InputGuy::isHyperspeeding()//special
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 		return true;
 
 	if (sf::Joystick::isConnected(0))
-		if (sf::Joystick::isButtonPressed(0, 3))// Y button
+		if (sf::Joystick::isButtonPressed(0, 2))// X button
 			return true;
 
 	return false;
@@ -37,7 +37,7 @@ bool InputGuy::isSlowMotion()
 		return true;
 
 	if (sf::Joystick::isConnected(0))
-		if (sf::Joystick::isButtonPressed(0, 1))// B button
+		if (sf::Joystick::isButtonPressed(0, 3))// Y button
 			return true;
 
 	return false;
@@ -49,7 +49,7 @@ bool InputGuy::isBraking()
 		return true;
 
 	if (sf::Joystick::isConnected(0))
-		if (sf::Joystick::isButtonPressed(0, 2))// X button
+		if (sf::Joystick::isButtonPressed(0, 1))// B button
 			return true;
 
 	return false;

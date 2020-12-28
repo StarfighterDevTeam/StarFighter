@@ -193,9 +193,11 @@ Scene::~Scene()
 	if (m_bg != NULL)
 	{
 		for (int i = 0; i < NO_DIRECTION; i++)
+		{
 			if (m_bg->m_portals[i] != NULL)
 				m_bg->m_portals[i]->Death();
-
+		}
+			
 		if (m_bg->m_shop != NULL)
 			m_bg->m_shop->Death();
 

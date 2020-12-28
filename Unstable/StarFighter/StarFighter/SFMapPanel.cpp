@@ -675,10 +675,10 @@ void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 	}
 
 	//constraints
-	float left_border = - getSize().x / 2 + m_map_content_area.left + m_current_hub->m_coordinates.x * STELLARMAP_SCALE + STELLARMAP_MARGIN_SIDES_WIDTH;
-	float right_border = getSize().x / 2 - (m_map_content_area.left + m_map_content_area.width - m_current_hub->m_coordinates.x * STELLARMAP_SCALE) - STELLARMAP_MARGIN_SIDES_WIDTH;
-	float up_border = getSize().y / 2 - m_map_content_area.top - m_current_hub->m_coordinates.y * STELLARMAP_SCALE + STELLARMAP_MARGIN_SIDES_WIDTH;
-	float down_border = -getSize().y / 2 + (m_map_content_area.top + m_map_content_area.height - m_current_hub->m_coordinates.y * STELLARMAP_SCALE) - STELLARMAP_MARGIN_SIDES_WIDTH;
+	float left_border = -getSize().x / 2 + STELLARMAP_MARGIN_SIDES_WIDTH + (m_current_hub->m_coordinates.x * STELLARMAP_SCALE - m_map_content_area.left);
+	float right_border = getSize().x / 2 - STELLARMAP_MARGIN_SIDES_WIDTH - (m_current_hub->m_coordinates.x * STELLARMAP_SCALE - (m_map_content_area.width - m_map_content_area.left));
+	float up_border = getSize().y / 2 - STELLARMAP_MARGIN_SIDES_HEIGHT - (m_map_content_area.top - m_map_content_area.height + m_current_hub->m_coordinates.y * STELLARMAP_SCALE);
+	float down_border = - getSize().y / 2 + STELLARMAP_MARGIN_SIDES_HEIGHT + (m_map_content_area.top - m_current_hub->m_coordinates.y * STELLARMAP_SCALE);
 
 	if (m_scroll_offset.x < left_border)
 		m_scroll_offset.x = left_border;

@@ -108,7 +108,7 @@ Ship::~Ship()
 	delete m_FX_death;
 
 	for (Bot* bot : m_bot_list)
-		delete bot;
+		bot->Death();
 
 	//game objects
 	delete m_combo_aura;
@@ -816,12 +816,16 @@ void Ship::ManageImmunity(sf::Time deltaTime)
 			if (m_fake_ship != NULL)
 				m_fake_ship->setColor(sf::Color(m_color.r, m_color.g, m_color.b, alpha));
 
+			SetBotsVisibility(false);
+
 			//death
 			if (m_armor <= 0)
-				m_visible = false;
+				SetVisibility(false);
 		}
-		else
+		else if (m_armor > 0)
 		{
+			SetVisibility(true);
+
 			setColor(sf::Color(255, 255, 255, 255));
 			if (m_fake_ship != NULL)
 				m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
@@ -1056,7 +1060,7 @@ void Ship::Respawn(bool no_save)
 	delete m_weapon;
 	m_weapon = Enemy::LoadWeapon("laser", -1);
 	for (Bot* bot : m_bot_list)
-		delete bot;
+		bot->Death();
 	m_bot_list.clear();
 
 	m_level = 1;
@@ -1357,10 +1361,6 @@ void Ship::GetDamageFrom(GameObject& object)
 
 	m_collision_timer = IMMUNE_DELAY_AFTER_HIT_TAKEN;
 
-	//bomb
-	(*CurrentGame).killGameObjectType(EnemyFire, false);
-	(*CurrentGame).killGameObjectType(EnemyObject, true);
-
 	int damage = 1;//object.m_damage
 	if (damage > m_shield)
 	{
@@ -1379,8 +1379,15 @@ void Ship::GetDamageFrom(GameObject& object)
 	//if (m_combo_aura != NULL)
 	//	m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
 
+	if (m_armor > 0)
+	{	
+		//bomb
+		(*CurrentGame).killGameObjectType(EnemyFire, false);
+		(*CurrentGame).killGameObjectType(EnemyObject, true);
+	}
+		
 	//if (m_armor <= 0)
-	//	Death();
+	//Death();
 }
 
 sf::Vector2f Ship::GetShipSize()
@@ -1614,10 +1621,7 @@ void Ship::GenerateBots(GameObject* target)
 void Ship::SetBotsVisibility(bool visible)
 {
 	for (Bot* bot : m_bot_list)
-	{
 		bot->m_visible = visible;
-		bot->setGhost(m_ghost);
-	}
 }
 
 void Ship::DestroyBots()
