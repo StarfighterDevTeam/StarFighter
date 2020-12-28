@@ -74,7 +74,7 @@ R_Gamma3_Zeta,200,0,,,0,,,0,0,0,0,0,0,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 V_Alpha1_Entry,200,V_Alpha1_laser,0,0,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,100,V_Alpha1_Routine,0,,,,0
 V_Alpha1_Routine,120,V_Alpha1_laser,0,0,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,600,V_Alpha1_Exit,0,,,,0
 V_Alpha1_Exit,150,0,0,0,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
-V_Alpha2_Entry,180,0,,,0,,0.5f,0,,,0,,,0,,,0,,,0,,,,,,0,ghost,0,0,0,0,positionV,greater,200,V_Alpha2_StrafeRandom,0,,,,0
+V_Alpha2_Entry,200,0,,,0,,0.5f,0,,,0,,,0,,,0,,,0,,,,,,0,ghost,0,0,0,0,positionV,greater,200,V_Alpha2_StrafeRandom,0,,,,0
 V_Alpha2_StrafeRandom,0,V_Alpha2_laserInt,0,0,V_Alpha2_laserExt,0,0.5f,0,,,0,,,0,,,0,,,line,100,0,,,,0,bouncing,0,0,0,0,enemyClock,greater,15,V_Alpha2_Exit,0,,,,0
 V_Alpha2_Exit,-100,V_Alpha2_laserInt,0,0,V_Alpha2_laserExt,0,0.5f,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 V_Alpha3_Entry,120,V_Alpha3_laser,0,0,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
@@ -85,7 +85,7 @@ V_Sigma2_Routine,-50,V_Sigma2_laser,0,0,V_Sigma2_laser90,0,0,V_Sigma2_laser180,0
 V_Sigma2_Exit,-50,V_Sigma2_laser,0,0,V_Sigma2_laser90,0,0,V_Sigma2_laser180,0,0,V_Sigma2_laser270,0,0,0,,,0,,,line,200,0,,,,250,bouncingH,0,0,0,0,0,,,,0,,,,0
 V_Sigma3_Entry,250,V_Sigma3_laser,0,0.5,V_Sigma3_laser180,0,0.5,V_Sigma3_laser_slow,0,0.5,V_Sigma3_laser180_slow,0,0.5,0,,,0,,,line,350,0,,,,250,bouncing,0,0,0,0,phaseClock,greater,15,V_Sigma3_Exit,0,,,,0
 V_Sigma3_Exit,250,V_Sigma3_laser,0,0.5,V_Sigma3_laser180,0,0.5,V_Sigma3_laser_slow,0,0.5,V_Sigma3_laser180_slow,0,0.5,0,,,0,,,line,350,0,,,,250,bouncing,0,0,0,0,0,,,,0,,,,0
-V_Beta1_Entry,250,0,0,0,0,0,0,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,230,V_Beta1_Routine,0,,,,0
+V_Beta1_Entry,300,0,0,0,0,0,0,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,positionV,greater,230,V_Beta1_Routine,0,,,,0
 V_Beta1_Routine,0,V_Beta1_dragonball,0,0,V_Beta1_laser_supportL,0,0,V_Beta1_laser_supportR,,,0,,,0,,,0,,,0,,,,,,150,face_target,0,0,0,0,shield,lesser,0,V_Beta1_Berserk,phaseClock,greater,8,V_Beta1_Exit,0
 V_Beta1_Berserk,150,V_Beta1_dragonballNoLock,0,1,V_Beta1_laser_supportL_exit,0,1,V_Beta1_laser_supportR_exit,1,,0,,,0,,,0,,,circle,100,0,0,100,0,150,reset_facing,0,0,0,0,0,,,,0,,,,0
 V_Beta1_Exit,-150,0,0,0,0,0,0,0,,,0,,,0,,,0,,,0,,,,,,150,reset_facing,0,0,0,0,0,greater,230,V_Beta1_Routine,0,,,,0

@@ -1,3 +1,6 @@
-Vanguard_Hub0 !
+Vanguard_Hub0
+Vanguard_Hub1 !
 Vanguard_HubIntro
+Vanguard_V1
+Vanguard_V2
 Vanguard_VIntro

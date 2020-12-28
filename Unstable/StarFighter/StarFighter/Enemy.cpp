@@ -350,11 +350,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//update timers
-	if (playership->m_collision_timer <= 0)
-	{
-		m_phaseTimer += deltaTime.asSeconds() * l_hyperspeedMultiplier;
-		m_enemyTimer += deltaTime.asSeconds() * l_hyperspeedMultiplier;
-	}
+	m_phaseTimer += deltaTime.asSeconds() * l_hyperspeedMultiplier;
+	m_enemyTimer += deltaTime.asSeconds() * l_hyperspeedMultiplier;
 	
 	//shield regen if not maximum
 	ShieldRegen(deltaTime, hyperspeedMultiplier);
