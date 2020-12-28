@@ -45,7 +45,7 @@ Phase* Phase::Clone()
 	phase->m_freeze_player = m_freeze_player;
 
 	for (ConditionTransition* condition : m_transitions_list)
-		phase->m_transitions_list.push_back(condition);
+		phase->m_transitions_list.push_back(condition->Clone());
 
 	phase->m_wake_up_name = m_wake_up_name;
 
@@ -53,7 +53,7 @@ Phase* Phase::Clone()
 		phase->m_welcomeWeapon = m_welcomeWeapon->Clone();
 	
 	for (Dialog* dialog : m_dialogs)
-		phase->m_dialogs.push_back(dialog);
+		phase->m_dialogs.push_back(dialog->Clone());
 
 	return phase;
 }
@@ -64,6 +64,11 @@ ConditionTransition::ConditionTransition(ConditionType condition, FloatCompare o
 	m_op = op;
 	m_value = value;
 	m_nextPhase_name = nextPhase_name;
+}
+
+ConditionTransition* ConditionTransition::Clone()
+{
+	return new ConditionTransition(m_condition, m_op, m_value, m_nextPhase_name);
 }
 
 ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)

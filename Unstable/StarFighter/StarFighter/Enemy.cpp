@@ -981,10 +981,8 @@ Enemy::~Enemy()
 	for (Weapon* weapon : m_weapons_list)
 		delete weapon;
 
-	//Destroyed in ~EnemyBase after Scene~; for optimization
-	//for (Phase* phase : m_phases)
-	//	delete phase;
-	//
+	for (Phase* phase : m_phases)
+		delete phase;
 	//delete m_FX_death;
 }
 

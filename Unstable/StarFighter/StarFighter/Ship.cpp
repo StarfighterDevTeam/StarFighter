@@ -624,7 +624,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
 				//jump
-				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_jump_cooldown <= 0)
+				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_jump_cooldown <= 0 && m_collision_timer <=0)
 					Jump();
 
 				if (m_jump_timer == 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
@@ -635,7 +635,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					}
 
 				//cloack
-				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_cloak_cooldown <= 0)
+				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_cloak_cooldown <= 0 && m_collision_timer <= 0)
 					Cloak();
 
 				//bomb

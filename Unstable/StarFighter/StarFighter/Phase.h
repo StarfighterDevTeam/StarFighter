@@ -103,7 +103,7 @@ class ConditionTransition
 {
 public:
 	ConditionTransition(ConditionType condition, FloatCompare op, float value, string nextPhase_name);
-
+	ConditionTransition* Clone();
 	ConditionType m_condition;
 	FloatCompare m_op;
 	float m_value;
