@@ -64,7 +64,7 @@ void Gameloop::Initialize(Player player)
 	(*CurrentGame).addToScene((*CurrentGame).m_playership, false);
 
 	//DEBUG
-	//SpawnInScene("Sandbox", (*CurrentGame).m_playership);
+	//SpawnInScene("Sandbox", (*CurrentGame).m_playership, false);
 }
 
 void Gameloop::Update(Time deltaTime)
@@ -286,13 +286,13 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 				//(*CurrentGame).m_playership->RegenHealthFast(deltaTime, false, true, false);
 				(*CurrentGame).m_playership->m_disableSlowmotion = true;
 
-				//if (m_hasDisplayedDestructionRatio == false)
-				//{
-				//	m_currentScene->DisplayScore();
-				//	m_hasDisplayedDestructionRatio = true;
-				//}
-
-				m_currentScene->m_bg->SetPortalsState(PortalOpen);
+				if (m_hasDisplayedDestructionRatio == false)
+				{
+					//m_currentScene->DisplayScore();
+					m_hasDisplayedDestructionRatio = true;
+					
+					m_currentScene->m_bg->SetPortalsState(PortalOpen);
+				}
 			}
 
 			//player takes exit?

@@ -1,9 +1,9 @@
 #,name,enemy_class,spawnX,spawnY,rotation
-boss,V_BetaGold_Intro,0,0.5,1.15,180
-boss,V_AlphaGold_Intro,0,0.6,1.2,180
-boss,V_AlphaGold_Intro,0,0.4,1.2,180
-boss,V_AlphaGold_Intro,0,0.5,1.3,180
-boss,V_AlphaGold_Intro,0,0.3,1.25,180
-boss,V_AlphaGold_Intro,0,0.7,1.25,180
+boss,V_BetaGold_Intro,10,0.5,1.15,180
+boss,V_AlphaGold_Intro,9,0.6,1.2,180
+boss,V_AlphaGold_Intro,9,0.4,1.2,180
+boss,V_AlphaGold_Intro,9,0.5,1.3,180
+boss,V_AlphaGold_Intro,9,0.3,1.25,180
+boss,V_AlphaGold_Intro,9,0.7,1.25,180
 #,portal_open_during_boss,,,,
 script,1,,,,

@@ -217,12 +217,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			if (newposition.x < size.x / 2)
 			{
-				m_pattern.m_speed *= -1;
+				m_pattern.m_clockwise *= -1;
 				setPosition(size.x / 2, newposition.y);
 			}
 			else if (newposition.x > SCENE_SIZE_X - size.x / 2)
 			{
-				m_pattern.m_speed *= -1;
+				m_pattern.m_clockwise *= -1;
 				setPosition(SCENE_SIZE_X - size.x / 2, newposition.y);
 			}
 		}
@@ -677,7 +677,7 @@ void Enemy::setPhase(Phase* phase)
 			}
 			case KillBullets:
 			{
-				(*CurrentGame).killGameObjectType(EnemyFire);
+				(*CurrentGame).killGameObjectType(EnemyFire, false);
 				break;
 			}
 			default:
@@ -994,6 +994,12 @@ void Enemy::GenerateLoot()
 		(*CurrentGame).addToScene((GameObject*)new_loot, true);
 	}
 }
+
+bool Enemy::IsBoss()
+{
+	return m_enemy_class == ENEMYPOOL_BOSS_MAIN || m_enemy_class == ENEMYPOOL_BOSS_SECONDARY;
+}
+
 Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 {
 	Weapon* weapon = new Weapon(Enemy::LoadAmmo((*CurrentGame).m_weaponsConfig[name][WEAPON_AMMO]));

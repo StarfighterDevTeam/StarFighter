@@ -86,7 +86,7 @@ public:
 	//void cleanGarbage();
 	//void collectGarbage();
 	void garbageLayer(LayerType layer, bool only_offscene, bool delete_DontGarbageMe);
-	void killGameObjectType(GameObjectType type);
+	void killGameObjectType(GameObjectType type, bool except_boss);
 	void damageGameObjectType(GameObjectType type, int damage);
 	void SetLayerSpeed(LayerType layer, sf::Vector2f speed);
 	void SetLayerRotation(LayerType layer, float angle);

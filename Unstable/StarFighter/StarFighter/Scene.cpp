@@ -53,15 +53,20 @@ Scene::Scene(string name)//, int hazard_level, bool reverse_scene, bool first_sc
 			m_bg->m_portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), m_bg->m_speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
 			sf::Vector2f bg_size = sf::Vector2f(w, h);// GameObject::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
 
-			if (i == (int)DIRECTION_UP)
-				m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (- bg_size.y / 2) + (PORTAL_HEIGHT / 2));
-			else if (i == (int)DIRECTION_DOWN)
-				m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (bg_size.y / 2) - (PORTAL_HEIGHT / 2));
-			else if (i == (int)DIRECTION_LEFT)
-				m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f((- bg_size.x / 2) + (PORTAL_WIDTH / 2), 0);
-			else if (i == (int)DIRECTION_RIGHT)
-				m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f((bg_size.x / 2) - (PORTAL_WIDTH / 2), 0);
-
+			if (m_is_hub == true)
+			{
+				if (i == (int)DIRECTION_UP)
+					m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+				else if (i == (int)DIRECTION_DOWN)
+					m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (bg_size.y / 2) - (PORTAL_HEIGHT / 2));
+				else if (i == (int)DIRECTION_LEFT)
+					m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f((-bg_size.x / 2) + (PORTAL_WIDTH / 2), 0);
+				else if (i == (int)DIRECTION_RIGHT)
+					m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f((bg_size.x / 2) - (PORTAL_WIDTH / 2), 0);
+			}
+			else
+				m_bg->m_portals[(Directions)i]->m_offset = sf::Vector2f(0, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+			
 			m_bg->m_portals[(Directions)i]->setPosition(m_bg->getPosition().x + m_bg->m_portals[(Directions)i]->m_offset.x, m_bg->getPosition().y + m_bg->m_portals[(Directions)i]->m_offset.y);
 
 			//direction

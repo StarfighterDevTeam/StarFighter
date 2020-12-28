@@ -1,5 +1,5 @@
-Money 28
-Health 4
+Money 100
+Health 3
 Shield 0
 Graze 0
-Level 3
+Level 2

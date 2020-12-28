@@ -79,7 +79,7 @@ V_Alpha2_StrafeRandom,0,V_Alpha2_laserInt,0,0,V_Alpha2_laserExt,0,0.5f,0,,,0,,,0
 V_Alpha2_Exit,-100,V_Alpha2_laserInt,0,0,V_Alpha2_laserExt,0,0.5f,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 V_Alpha3_Entry,120,V_Alpha3_laser,0,0,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,0,0,0,0,0,0,,,,0,,,,0
 V_Sigma1_Entry,120,V_Sigma1_laser,0,0,V_Sigma1_laser90,0,0,V_Sigma1_laser180,0,0,V_Sigma1_laser270,0,0,0,,,0,,,line,250,0,,,,150,bouncingH,0,0,0,0,positionV,greater,550,V_Sigma1_Exit,0,,,,0
-V_Sigma1_Exit,300,0,,,0,,,0,,,0,,,0,,,0,,,line,250,0,,,,150,bouncingH,0,0,0,0,0,,,,0,,,,0
+V_Sigma1_Exit,200,0,,,0,,,0,,,0,,,0,,,0,,,line,250,0,,,,150,bouncingH,0,0,0,0,0,,,,0,,,,0
 V_Sigma2_Entry,300,0,,,0,,,0,,,0,,,0,,,0,,,0,,,,,,150,ghost,0,0,0,0,positionV,greater,400,V_Sigma2_Routine,0,,,,0
 V_Sigma2_Routine,-50,V_Sigma2_laser,0,0,V_Sigma2_laser90,0,0,V_Sigma2_laser180,0,0,V_Sigma2_laser270,0,0,0,,,0,,,line,200,0,,,,250,bouncingH,0,0,0,0,phaseClock,greater,15,V_Sigma2_Exit,0,,,,0
 V_Sigma2_Exit,-50,V_Sigma2_laser,0,0,V_Sigma2_laser90,0,0,V_Sigma2_laser180,0,0,V_Sigma2_laser270,0,0,0,,,0,,,line,200,0,,,,250,bouncingH,0,0,0,0,0,,,,0,,,,0

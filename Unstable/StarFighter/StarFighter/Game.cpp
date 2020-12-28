@@ -381,22 +381,13 @@ void Game::updateScene(Time deltaTime)
 	ManageMusicTransitions(deltaTime);
 }
 
-void Game::killGameObjectType(GameObjectType type)
+void Game::killGameObjectType(GameObjectType type, bool except_boss)
 {
 	for (GameObject* object : m_sceneGameObjectsTyped[type])
 	{
 		if (object->m_isOnScene == true)
-		{
-			object->Death();
-
-			//Combo
-			//if (type == EnemyFire)
-			//{
-			//	GameObject* obj = (GameObject*)m_playership;
-			//	obj->AddComboCount(10);
-			//}
-		}
-		
+			if (except_boss == false || object->IsBoss() == false)
+				object->Death();
 	}
 }
 
@@ -629,7 +620,17 @@ void Game::SetLayerSpeed(LayerType layer, sf::Vector2f speed)
 
 bool Game::isLastEnemyDead()
 {
-	return m_sceneGameObjectsTyped[EnemyFire].empty() == true && m_sceneGameObjectsTyped[EnemyObject].empty() == true && m_sceneGameObjectsCreated.empty() == true;
+	if (m_sceneGameObjectsTyped[EnemyFire].empty() == false || m_sceneGameObjectsTyped[EnemyObject].empty() == false)
+		return false;
+
+	if (m_sceneGameObjectsCreated.empty() == true)
+		return true;
+
+	for (GameObject* object : m_sceneGameObjectsCreated)
+		if (object->m_collider_type == EnemyFire || object->m_collider_type == EnemyObject)
+			return false;
+
+	return true;
 }
 
 int Game::getHazard()

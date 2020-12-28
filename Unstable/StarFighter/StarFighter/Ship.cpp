@@ -467,7 +467,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		//Debug command
 		#ifndef NDEBUG
 			if (m_inputs_states[Action_DebugCommand] == Input_Tap || m_inputs_states[Action_DebugCommand] == Input_Hold)
-				(*CurrentGame).killGameObjectType(EnemyObject);
+				(*CurrentGame).killGameObjectType(EnemyObject, false);
 		#endif
 
 		//Update HUD state
@@ -634,7 +634,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						m_jump_timer -= deltaTime.asSeconds();
 					}
 
-				//cloack
+				//cloak
 				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_cloak_cooldown <= 0 && m_collision_timer <= 0)
 					Cloak();
 
@@ -895,8 +895,8 @@ void Ship::Recalling()
 
 void Ship::Bomb()
 {
-	(*CurrentGame).killGameObjectType(EnemyObject);
-	(*CurrentGame).killGameObjectType(EnemyFire);
+	(*CurrentGame).killGameObjectType(EnemyFire, false);
+	(*CurrentGame).killGameObjectType(EnemyObject, true);
 }
 
 void Ship::Jump()
@@ -969,28 +969,30 @@ void Ship::ScreenBorderConstraints()
 	if (m_is_asking_scene_transition == false)
 		offset = sf::Vector2i(SCREEN_BORDER_OFFSET_CONSTRAINT_X, SCREEN_BORDER_OFFSET_CONSTRAINT_Y);
 
+	sf::Vector2f size = m_fake_ship != NULL ? m_fake_ship->m_size : m_size;
+
 	//screen borders contraints	correction
-	if (getPosition().x < m_size.x / 2 + offset.x)
+	if (getPosition().x < size.x / 2 + offset.x)
 	{
-		setPosition(m_size.x / 2 + offset.x, getPosition().y);
+		setPosition(size.x / 2 + offset.x, getPosition().y);
 		m_speed.x = 0;
 	}
 
-	if (getPosition().x > SCENE_SIZE_X - (m_size.x / 2) - offset.x)
+	if (getPosition().x > SCENE_SIZE_X - (size.x / 2) - offset.x)
 	{
-		setPosition(SCENE_SIZE_X - (m_size.x / 2) - offset.x, getPosition().y);
+		setPosition(SCENE_SIZE_X - (size.x / 2) - offset.x, getPosition().y);
 		m_speed.x = 0;
 	}
 
-	if (getPosition().y < m_size.y / 2 + offset.y)
+	if (getPosition().y < size.y / 2 + offset.y)
 	{
-		setPosition(getPosition().x, m_size.y / 2 + offset.y);
+		setPosition(getPosition().x, size.y / 2 + offset.y);
 		m_speed.y = 0;
 	}
 
-	if (getPosition().y > SCENE_SIZE_Y - (m_size.y / 2) - offset.y)
+	if (getPosition().y > SCENE_SIZE_Y - (size.y / 2) - offset.y)
 	{
-		setPosition(getPosition().x, SCENE_SIZE_Y - (m_size.y / 2) - offset.y);
+		setPosition(getPosition().x, SCENE_SIZE_Y - (size.y / 2) - offset.y);
 		m_speed.y = 0;
 	}
 }
@@ -1354,9 +1356,10 @@ void Ship::GetDamageFrom(GameObject& object)
 	//m_damage_feedbackTimer = DAMAGE_FEEDBACK_TIME;
 
 	m_collision_timer = IMMUNE_DELAY_AFTER_HIT_TAKEN;
-	(*CurrentGame).killGameObjectType(EnemyFire);
-	if ((*CurrentGame).m_gameloop_state != BOSS_FIGHT)
-		(*CurrentGame).killGameObjectType(EnemyObject);
+
+	//bomb
+	(*CurrentGame).killGameObjectType(EnemyFire, false);
+	(*CurrentGame).killGameObjectType(EnemyObject, true);
 
 	int damage = 1;//object.m_damage
 	if (damage > m_shield)

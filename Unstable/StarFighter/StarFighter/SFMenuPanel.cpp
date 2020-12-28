@@ -52,12 +52,17 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playership) : SFMenu
 		//size and position of panel
 		setSize(size);
 		setOrigin(size.x / 2, size.y / 2);
-		sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
-		if (m_direction != NO_DIRECTION)
-		{
-			sf::Vector2f l_sizeNormalized = size;
-			position = sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y / 2 + INTERACTION_PANEL_OFFSET_Y);
-		}
+		sf::Vector2f position;
+
+		if (m_direction == DIRECTION_UP)
+			position = sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2);
+		else if (m_direction == DIRECTION_DOWN)
+			position = sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y - (PORTAL_HEIGHT + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2));
+		else if (m_direction == DIRECTION_LEFT)
+			position = sf::Vector2f(getSize().x / 2 + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2 - (PORTAL_HEIGHT / 2 + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2));
+		else if (m_direction == DIRECTION_RIGHT)
+			position = sf::Vector2f(SCENE_SIZE_X - (getSize().x / 2 + INTERACTION_PANEL_OFFSET_Y), SCENE_SIZE_Y / 2 - (PORTAL_HEIGHT / 2 + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2));
+
 		setPosition(position.x, position.y);
 
 		//positioning of panel's content
@@ -133,12 +138,16 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(
 		//size and position of panel
 		setSize(size);
 		setOrigin(size.x / 2, size.y / 2);
-		sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
-		if (m_direction != NO_DIRECTION)
-		{
-			sf::Vector2f l_sizeNormalized = size;
-			position = sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y/2 + INTERACTION_PANEL_OFFSET_Y);
-		}
+		sf::Vector2f position;
+		if (m_direction == DIRECTION_UP)
+			position = sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2);
+		else if (m_direction == DIRECTION_DOWN)
+			position = sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y - (PORTAL_HEIGHT + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2));
+		else if (m_direction == DIRECTION_LEFT)
+			position = sf::Vector2f(getSize().x / 2 + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2 - (PORTAL_HEIGHT / 2 + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2));
+		else if (m_direction == DIRECTION_RIGHT)
+			position = sf::Vector2f(SCENE_SIZE_X - (getSize().x / 2 + INTERACTION_PANEL_OFFSET_Y), SCENE_SIZE_Y / 2 - (PORTAL_HEIGHT / 2 + INTERACTION_PANEL_OFFSET_Y + getSize().y / 2));
+		
 		setPosition(position.x, position.y);
 
 		//positioning of panel's content

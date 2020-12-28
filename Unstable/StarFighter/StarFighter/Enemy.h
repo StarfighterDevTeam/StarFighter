@@ -40,6 +40,7 @@ public:
 	void GetDamageFrom(GameObject& object) override;
 	void GetDamage(int damage) override;
 	void GenerateLoot() override;
+	bool IsBoss() override;
 
 	EnemyClass m_enemy_class;
 

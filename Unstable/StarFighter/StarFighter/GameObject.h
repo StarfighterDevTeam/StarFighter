@@ -215,7 +215,9 @@ enum EnemyClass
 	ENEMYPOOL_KAPPA,//6
 	ENEMYPOOL_OMEGA,//7
 	ENEMYPOOL_ZETA,//8
-	NBVAL_EnemyClass,//9
+	ENEMYPOOL_BOSS_MAIN,//9
+	ENEMYPOOL_BOSS_SECONDARY,//10
+	NBVAL_EnemyClass,//11
 };
 
 enum EquipmentType {
@@ -268,6 +270,7 @@ public:
 	GameObject* Clone();
 	virtual void Death(bool give_money = false);
 	virtual void GenerateLoot();
+	virtual bool IsBoss();
 	void ShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 
 	void addMoney(int loot_value);

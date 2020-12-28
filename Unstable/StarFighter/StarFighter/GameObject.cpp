@@ -348,7 +348,13 @@ void GameObject::Death(bool give_money)
 
 void GameObject::GenerateLoot()
 {
+	//see override function in class Enemy
+}
 
+bool GameObject::IsBoss()
+{
+	//see override function in class Enemy
+	return false;
 }
 
 void GameObject::ShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
