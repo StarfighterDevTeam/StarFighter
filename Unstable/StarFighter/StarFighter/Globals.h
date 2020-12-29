@@ -99,6 +99,7 @@ const char* getSavesPath();
 #define NB_UPGRADE_CHOICES									3
 #define PLAYER_LEVELING_STATS_MULTIPLIER						0.04
 #define ENEMIES_LEVELING_STATS_MULTIPLIER					0.10
+#define MULTISEGMENT_RESPAWN									true
 
 //HUD
 #define ARMOR_BAR_SIZE_X								320

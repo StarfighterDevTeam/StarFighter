@@ -72,11 +72,26 @@ void Gameloop::Update(Time deltaTime)
 	//automatic respawn if dead
 	if ((*CurrentGame).m_playership->m_visible == false && (*CurrentGame).m_playership->m_collision_timer <= 0)
 	{
-		//resetting ship
-		(*CurrentGame).m_playership->Respawn(false);
+		//"Multi-segment mode": respawn at last checkpoint
+		if (MULTISEGMENT_RESPAWN == true && Ship::LoadPlayerScenes((*CurrentGame).m_playership).empty() == false)
+		{
+			//resetting ship (without saving because we're going to load the last player save)
+			(*CurrentGame).m_playership->Respawn(true);
 
-		//Loading starting scene
-		SpawnInScene(STARTING_SCENE, (*CurrentGame).m_playership, false);
+			Ship::LoadPlayerUpgrades((*CurrentGame).m_playership);
+			Ship::LoadPlayerMoneyAndHealth((*CurrentGame).m_playership);
+			(*CurrentGame).m_playership->m_armor = (*CurrentGame).m_playership->m_armor_max;
+			(*CurrentGame).m_playership->m_shield = 0;
+			
+			SpawnInScene(m_playership->m_respawnSceneName, m_playership, false);
+		}
+		else//"Single segment" or no save file found
+		{
+			//resetting ship
+			(*CurrentGame).m_playership->Respawn(false);
+
+			SpawnInScene(STARTING_SCENE, (*CurrentGame).m_playership, false);
+		}
 	}
 	if (!(*CurrentGame).m_playership->m_is_asking_teleportation.empty())
 	{
@@ -474,6 +489,9 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 	(*CurrentGame).m_playership->m_immune = false;
 	(*CurrentGame).m_playership->m_is_asking_scene_transition = false;
 	(*CurrentGame).m_playership->m_collision_timer = 0;
+	(*CurrentGame).m_playership->setColor(sf::Color(255, 255, 255, 255));
+	if ((*CurrentGame).m_playership->m_fake_ship != NULL)
+		(*CurrentGame).m_playership->m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
 
 	//Play scene title feedback if we come from a Hub or getting to a Hub
 	if (display_scene_name == true || m_currentScene->m_is_hub == true)

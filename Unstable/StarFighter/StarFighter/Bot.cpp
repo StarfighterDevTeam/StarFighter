@@ -39,43 +39,43 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//	return;
 	//}
 
-	if (m_visible == true)
+	if (m_visible == false)
+		return;
+	
+	static sf::Vector2f newposition, offset, newspeed;
+	newspeed = m_speed;
+
+	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	if (m_target != NULL)
 	{
-		static sf::Vector2f newposition, offset, newspeed;
-		newspeed = m_speed;
-
-		float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
-
-		if (m_target != NULL)
-		{
-			newposition.x = m_target->getPosition().x;
-			newposition.y = m_target->getPosition().y;
-			m_disable_fire = m_target->m_disable_fire;
-		}
-		else
-		{
-			//slowmotion
-			newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
-
-			newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-			newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
-		}
-
-		//pattern
-		offset = m_pattern.getOffset_v2(deltaTime.asSeconds() * l_hyperspeedMultiplier, m_target != NULL);
-
-		newposition.x += offset.x;
-		newposition.y += offset.y;
-
-		//bot spread value
-		newposition.x += m_spread.x;
-		newposition.y += m_spread.y;
-
-		setPosition(newposition.x, newposition.y);
-		rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-
-		AnimatedSprite::update(deltaTime);
+		newposition.x = m_target->getPosition().x;
+		newposition.y = m_target->getPosition().y;
+		m_disable_fire = m_target->m_disable_fire;
 	}
+	else
+	{
+		//slowmotion
+		newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
+
+		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	}
+
+	//pattern
+	offset = m_pattern.getOffset_v2(deltaTime.asSeconds() * l_hyperspeedMultiplier, m_target != NULL);
+
+	newposition.x += offset.x;
+	newposition.y += offset.y;
+
+	//bot spread value
+	newposition.x += m_spread.x;
+	newposition.y += m_spread.y;
+
+	setPosition(newposition.x, newposition.y);
+	rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+
+	AnimatedSprite::update(deltaTime);
 }
 
 void Bot::setGhost(bool ghost)

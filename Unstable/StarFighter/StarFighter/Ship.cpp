@@ -556,13 +556,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//}
 
 			//Center view
-			if (m_inputs_states[Action_Braking] == Input_Tap)
+			if (m_inputs_states[Action_Hyperspeeding] == Input_Tap)
 			{
 				CenterMapView();
 			}
 
 			//exit
-			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
+			if (m_inputs_states[Action_Braking] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
 				m_SFTargetPanel->SetCursorVisible_v2(true);
@@ -578,7 +578,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			}
 			
 			//exit
-			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
+			if (m_inputs_states[Action_Braking] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
 				m_SFTargetPanel->SetCursorVisible_v2(false);
@@ -653,6 +653,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					//Bots automatic fire option
 					if (m_inputs_states[Action_AutomaticFire] == Input_Tap)
 						m_automatic_fire = !m_automatic_fire;
+
 					for (Bot* bot : m_bot_list)
 						bot->m_automatic_fire = m_automatic_fire;
 				}
@@ -664,10 +665,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
 
 				//Bots firing
-				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
-				{
-					(*it)->Fire(deltaTime, hyperspeedMultiplier, firing);
-				}
+				for (Bot* bot : m_bot_list)
+					bot->Fire(deltaTime, hyperspeedMultiplier, firing);
 
 				//Braking and speed malus on firing
 				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
@@ -731,7 +730,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					m_HUD_state = HUD_Upgrades;
 				}
 				//X: Enter stellar map
-				else if (m_inputs_states[Action_Braking] == Input_Tap)
+				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap)
 				{
 					m_HUD_state = HUD_ShopStellarMap;
 				}
@@ -1070,7 +1069,8 @@ void Ship::Respawn(bool no_save)
 	m_can_jump = false;
 	m_can_cloak = false;
 	m_bombs = 0;
-	
+	m_automatic_fire = false;
+
 	//saving
 	if (no_save == false)
 	{
@@ -1384,6 +1384,26 @@ void Ship::GetDamageFrom(GameObject& object)
 		//bomb
 		(*CurrentGame).killGameObjectType(EnemyFire, false);
 		(*CurrentGame).killGameObjectType(EnemyObject, true);
+	}
+	else
+	{
+		//Death. Remove all existing beams fired by player
+		if (m_weapon != NULL && m_weapon->m_beams.empty() == false)
+		{
+			for (Ammo* beam : m_weapon->m_beams)
+				beam->Death();
+
+			m_weapon->m_beams.clear();
+		}
+
+		for (Bot* bot : m_bot_list)
+			if (bot->m_weapon != NULL && bot->m_weapon->m_beams.empty() == false)
+			{
+				for (Ammo* beam : bot->m_weapon->m_beams)
+					beam->Death();
+
+				bot->m_weapon->m_beams.clear();
+			}
 	}
 		
 	//if (m_armor <= 0)
@@ -1889,15 +1909,27 @@ void Ship::SetUpgrade(string upgrade_name)
 	else if (upgrade_name.compare("Upgrade_drone_laser_4") == 0)
 		SetDrone("bot_laser", 4);
 	else if (upgrade_name.compare("Upgrade_drone_laser_5") == 0)
+	{
+		SetDrone("bot_laser", 4);
 		SetDroneWeapon("laser1");
+	}
 	else if (upgrade_name.compare("Upgrade_drone_laserbeam_1") == 0)
 		SetDrone("bot_laserbeam", 1);
 	else if (upgrade_name.compare("Upgrade_drone_laserbeam_2") == 0)
+	{
+		SetDrone("bot_laserbeam", 1);
 		SetDroneWeapon("laserbeam1");
+	}
 	else if (upgrade_name.compare("Upgrade_drone_laserbeam_3") == 0)
+	{
+		SetDrone("bot_laserbeam", 1);
 		SetDroneWeapon("laserbeam2");
+	}
 	else if (upgrade_name.compare("Upgrade_drone_laserbeam_4") == 0)
+	{
+		SetDrone("bot_laserbeam", 1);
 		SetDroneWeapon("laserbeam3");
+	}
 	else if (upgrade_name.compare("Upgrade_drone_laserbeam_5") == 0)
 	{
 		SetDrone("bot_laserbeam", 2);
@@ -1906,16 +1938,25 @@ void Ship::SetUpgrade(string upgrade_name)
 	else if (upgrade_name.compare("Upgrade_drone_minirocket_1") == 0)
 		SetDrone("bot_minirocket", 1);
 	else if (upgrade_name.compare("Upgrade_drone_minirocket_2") == 0)
+	{
+		SetDrone("bot_minirocket", 1);
 		SetDroneWeapon("minirocket1");
+	}
 	else if (upgrade_name.compare("Upgrade_drone_minirocket_3") == 0)
 	{
 		SetDrone("bot_minirocket", 2);
 		SetDroneWeapon("minirocket1");
 	}
 	else if (upgrade_name.compare("Upgrade_drone_minirocket_4") == 0)
+	{
+		SetDrone("bot_minirocket", 2);
 		SetDroneWeapon("minirocket2");
+	}
 	else if (upgrade_name.compare("Upgrade_drone_minirocket_5") == 0)
+	{
+		SetDrone("bot_minirocket", 2);
 		SetDroneWeapon("minirocket3");
+	}
 	else if (upgrade_name.compare("Restores_hp_1") == 0)
 		m_armor++;
 	else if (upgrade_name.compare("Upgrade_jump_1") == 0)
@@ -1933,7 +1974,7 @@ void Ship::SetWeapon(string weapon_name)
 void Ship::SetDrone(string drone_name, int number)
 {
 	for (Bot* bot : m_bot_list)
-		delete bot;
+		bot->Death();
 
 	m_bot_list.clear();
 
@@ -1942,12 +1983,20 @@ void Ship::SetDrone(string drone_name, int number)
 
 	for (int i = 1; i < number; i++)
 	{
-		Bot* new_bot = bot->Clone();
+		Bot* new_bot = Enemy::LoadBot(drone_name);
 
 		//bots auto spreading based on number of bots
 		int s = i % 2 == 0 ? 1 : -1;
 		int x = i / 2;
 		new_bot->m_spread.x *= s * (1 + x);
+		if (new_bot->m_pattern.m_pattern_type == Circle_)
+		{
+			new_bot->m_pattern.m_starting_point += 6;
+			new_bot->m_pattern.m_starting_point = new_bot->m_pattern.m_starting_point % 12;
+			new_bot->m_pattern.resetPattern();
+		}
+		
+		m_bot_list.push_back(new_bot);
 	}
 
 	GenerateBots(this);

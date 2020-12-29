@@ -21,7 +21,7 @@ bool InputGuy::isFiring()
 
 bool InputGuy::isHyperspeeding()//special
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 		return true;
 
 	if (sf::Joystick::isConnected(0))
@@ -45,7 +45,7 @@ bool InputGuy::isSlowMotion()
 
 bool InputGuy::isBraking()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 		return true;
 
 	if (sf::Joystick::isConnected(0))

@@ -1100,7 +1100,7 @@ Bot* Enemy::LoadBot(string name)
 	((GameObject*)bot)->m_shield_max = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD]);
 	((GameObject*)bot)->m_shield_regen = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD_REGEN]);
 	((GameObject*)bot)->m_damage = stoi((*CurrentGame).m_botsConfig[name][BOT_DAMAGE]);
-	bot->m_spread = Vector2f(stoi((*CurrentGame).m_botsConfig[name][BOT_XSPREAD]), stoi((*CurrentGame).m_botsConfig[name][BOT_YSPREAD]));
+	bot->m_spread = Vector2f((float)stoi((*CurrentGame).m_botsConfig[name][BOT_XSPREAD]), (float)stoi((*CurrentGame).m_botsConfig[name][BOT_YSPREAD]));
 
 	GeometryPattern* pattern = GeometryPattern::LoadPattern((*CurrentGame).m_botsConfig[name], BOT_PATTERN);
 	bot->m_pattern.setPattern_v2(pattern);
