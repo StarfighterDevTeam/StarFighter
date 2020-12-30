@@ -38,9 +38,6 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//	AnimatedSprite::update(deltaTime);
 	//	return;
 	//}
-
-	if (m_visible == false)
-		return;
 	
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = m_speed;

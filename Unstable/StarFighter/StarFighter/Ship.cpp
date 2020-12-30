@@ -2032,12 +2032,9 @@ void Ship::SetDrone(string drone_name, int number)
 		int s = i % 2 == 0 ? 1 : -1;
 		int x = i / 2;
 		new_bot->m_spread.x *= s * (1 + x);
+
 		if (new_bot->m_pattern.m_pattern_type == Circle_)
-		{
-			new_bot->m_pattern.m_starting_point += 6;
-			new_bot->m_pattern.m_starting_point = new_bot->m_pattern.m_starting_point % 12;
-			new_bot->m_pattern.resetPattern();
-		}
+			new_bot->m_spread.x += new_bot->m_pattern.m_width * 2 * (i % 2);
 		
 		m_bot_list.push_back(new_bot);
 	}

@@ -192,7 +192,7 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 
 		m_crystals_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_crystals_text.setCharacterSize(15);
-		m_crystals_text.setColor(sf::Color::White);
+		m_crystals_text.setColor(_white);
 		m_crystals_text.setPosition(sf::Vector2f(m_crystal.getPosition().x + m_crystal.m_size.x * 0.5 + 8, m_crystal.getPosition().y));
 
 		//Create grids
