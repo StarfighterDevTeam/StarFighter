@@ -522,7 +522,7 @@ bool Enemy::CheckCondition()
 				result = playership->compare_posX_withTarget_for_Direction(DIRECTION_UP, sf::Vector2f(cond->m_value, cond->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				break;
 			}
-			case phaseClock:
+			case PhaseClock:
 			{
 				if (m_phaseTimer == cond->m_value)
 					result = EQUAL_TO;
@@ -530,7 +530,7 @@ bool Enemy::CheckCondition()
 					result = m_phaseTimer > cond->m_value ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
-			case enemyClock:
+			case EnemyClock:
 			{
 				if (m_enemyTimer == cond->m_value)
 					result = EQUAL_TO;
@@ -554,7 +554,7 @@ bool Enemy::CheckCondition()
 					result = 100.0f * m_shield / m_shield_max >= cond->m_value ? GREATER_THAN : LESSER_THAN;
 				break;
 			}
-			case wakeUp:
+			case WakeUp:
 			{
 				if (m_wake_up == true)
 					result = EQUAL_TO;
@@ -808,11 +808,9 @@ Dialog* Enemy::LoadDialog(string name)
 	dialog->m_enemy_speaking = (*CurrentGame).m_dialogsConfig[name][DIALOG_ENEMY_SPEAKING].compare("0") != 0;
 	dialog->m_duration = atof((*CurrentGame).m_dialogsConfig[name][DIALOG_DURATION].c_str());
 	dialog->m_title = (*CurrentGame).m_dialogsConfig[name][DIALOG_TITLE];
-	dialog->m_title = ReplaceAll(dialog->m_title, "_", " ");
-	dialog->m_title = ReplaceAll(dialog->m_title, "[COMA]", ",");
+	dialog->m_title = SFReplaceTexts(dialog->m_title, DIALOG_MAX_LENGTH);
 	dialog->m_body = (*CurrentGame).m_dialogsConfig[name][DIALOG_BODY];
-	dialog->m_body = ReplaceAll(dialog->m_body, "_", " ");
-	dialog->m_body = ReplaceAll(dialog->m_body, "[COMA]", ",");
+	dialog->m_body = SFReplaceTexts(dialog->m_body, DIALOG_MAX_LENGTH);
 	dialog->m_picture_name = (*CurrentGame).m_dialogsConfig[name][DIALOG_PICTURE];
 	dialog->m_next_dialog_name = (*CurrentGame).m_dialogsConfig[name][DIALOG_NEXT];
 

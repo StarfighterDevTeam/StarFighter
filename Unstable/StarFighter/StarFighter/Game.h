@@ -82,7 +82,7 @@ public:
 
 	void updateScene(Time deltaTime);
 	void drawScene();
-	void colisionChecksV2(Time deltaTime);
+	void collisionCheck_v2(Time deltaTime);
 	//void cleanGarbage();
 	//void collectGarbage();
 	void garbageLayer(LayerType layer, bool only_offscene, bool delete_DontGarbageMe);
@@ -162,9 +162,10 @@ public:
 	string m_next_music_name;
 	Music_Bank m_curMusic_type;
 
+	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
+	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+
 private:
-	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
-	
 	Clock m_sceneChronometer;
 
 	float m_movementClock;
@@ -177,8 +178,6 @@ private:
 
 	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsCreated;
-	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
-	vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
 	vector<GameObject*> m_sceneGuidedMissiles;
 };
 

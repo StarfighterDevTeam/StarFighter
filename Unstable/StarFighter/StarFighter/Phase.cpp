@@ -80,15 +80,15 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 	else if (line_data[index].compare("positionH") == 0)
 		cond = HorizontalPosition;
 	else if (line_data[index].compare("phaseClock") == 0)
-		cond = phaseClock;
+		cond = PhaseClock;
 	else if (line_data[index].compare("enemyClock") == 0)
-		cond = enemyClock;
+		cond = EnemyClock;
 	else if (line_data[index].compare("life") == 0)
 		cond = LifePourcentage;
 	else if (line_data[index].compare("shield") == 0)
 		cond = ShieldPourcentage;
 	else if (line_data[index].compare("wakeUp") == 0)
-		cond = wakeUp;
+		cond = WakeUp;
 	else if (line_data[index].compare("proximity") == 0)
 		cond = EnemyProximity;
 	else if (line_data[index].compare("shotsFired") == 0)
@@ -99,13 +99,17 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 		cond = PlayerVerticalPosition;
 	else if (line_data[index].compare("rotation") == 0)
 		cond = Rotation;
+	else if (line_data[index].compare("playerHit") == 0)
+		cond = PlayerHit;
+	else if (line_data[index].compare("playerUnhit") == 0)
+		cond = PlayerUnhit;
 	else
 		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Invalid condition found when loading condition of transition of enemy phase named 'EnemyPhases.csv'. Please check config file"));
 
 
 	//loading operator type
 	FloatCompare op = ERROR_COMPARE;
-	if (cond != wakeUp)
+	if (cond != WakeUp)
 		if (line_data[index + CONDITION_OPERATOR].compare("greater") == 0)
 			op = GREATER_THAN;
 		else if (line_data[index + CONDITION_OPERATOR].compare("lesser") == 0)
@@ -116,7 +120,7 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 			LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition of enemy phase named 'EnemyPhases.csv'. Please check config file"));
 
 	float value = 0;
-	if (cond != wakeUp)
+	if (cond != WakeUp)
 		value = stoi(line_data[index + CONDITION_VALUE]);
 
 	//and finally wrapping up all of this data in our list of transition conditions

@@ -73,11 +73,11 @@ void Gameloop::Update(Time deltaTime)
 	if ((*CurrentGame).m_playership->m_visible == false && (*CurrentGame).m_playership->m_collision_timer <= 0)
 	{
 		//"Multi-segment mode": respawn at last checkpoint
-		if (MULTISEGMENT_RESPAWN == true && Ship::LoadPlayerScenes((*CurrentGame).m_playership).empty() == false)
+		if (MULTISEGMENT_RESPAWN == true && (*CurrentGame).m_playership->m_respawnSceneName.empty() == false)
 		{
 			//resetting ship (without saving because we're going to load the last player save)
 			(*CurrentGame).m_playership->Respawn(true);
-
+			Ship::LoadPlayerScenes((*CurrentGame).m_playership);
 			Ship::LoadPlayerUpgrades((*CurrentGame).m_playership);
 			Ship::LoadPlayerMoneyAndHealth((*CurrentGame).m_playership);
 			(*CurrentGame).m_playership->m_armor = (*CurrentGame).m_playership->m_armor_max;

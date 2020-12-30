@@ -61,16 +61,18 @@ enum ConditionType
 	NoCondition,
 	VerticalPosition,
 	HorizontalPosition,
-	phaseClock,
-	enemyClock,
+	PhaseClock,
+	EnemyClock,
 	LifePourcentage,
 	ShieldPourcentage,
-	wakeUp,
+	WakeUp,
 	EnemyProximity,
 	ShotsFired,
 	PlayerVerticalPosition,
 	PlayerHorizontalPosition,
 	Rotation,
+	PlayerHit,
+	PlayerUnhit,
 };
 
 enum BouncingType

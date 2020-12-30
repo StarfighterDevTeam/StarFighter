@@ -9,7 +9,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_collider_type = PlayerShip;
 	m_layer = PlayerShipLayer;
 
-	m_transparent = true;
+	m_transparent = false;
 	m_automatic_fire = false;
 	m_display_name = "Wisteria";
 	m_weapon = NULL;
@@ -726,7 +726,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//A: Enter shop
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					//m_HUD_state = HUD_Trade;
 					m_HUD_state = HUD_Upgrades;
 				}
 				//X: Enter stellar map
@@ -828,6 +827,24 @@ void Ship::ManageImmunity(sf::Time deltaTime)
 			setColor(sf::Color(255, 255, 255, 255));
 			if (m_fake_ship != NULL)
 				m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
+
+			//enemy phase "player unhit" condition
+			for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[EnemyObject])
+			{
+				Enemy* enemy = (Enemy*)object;
+
+				if (enemy->m_currentPhase != NULL)
+				{
+					for (ConditionTransition* cond : enemy->m_currentPhase->m_transitions_list)
+					{
+						if (cond->m_condition == PlayerUnhit)
+						{
+							enemy->setPhase(enemy->getPhase(cond->m_nextPhase_name));
+							break;
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -1069,6 +1086,7 @@ void Ship::Respawn(bool no_save)
 	m_can_jump = false;
 	m_can_cloak = false;
 	m_bombs = 0;
+
 	m_automatic_fire = false;
 
 	//saving
@@ -1404,6 +1422,24 @@ void Ship::GetDamageFrom(GameObject& object)
 
 				bot->m_weapon->m_beams.clear();
 			}
+	}
+
+	//enemy phase "player hit" condition
+	for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[EnemyObject])
+	{
+		Enemy* enemy = (Enemy*)object;
+
+		if (enemy->m_currentPhase != NULL)
+		{
+			for (ConditionTransition* cond : enemy->m_currentPhase->m_transitions_list)
+			{
+				if (cond->m_condition == PlayerHit)
+				{
+					enemy->setPhase(enemy->getPhase(cond->m_nextPhase_name));
+					break;
+				}
+			}
+		}
 	}
 		
 	//if (m_armor <= 0)

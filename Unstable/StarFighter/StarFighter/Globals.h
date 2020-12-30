@@ -157,6 +157,7 @@ const char* getSavesPath();
 #define DIALOG_PANEL_FADE_IN_TIME				1.5f
 #define DIALOG_PANEL_FADE_OUT_TIME				0.5f
 #define DIALOG_PANEL_ARROW_OFFSET_X				20
+#define DIALOG_MAX_LENGTH						76
 
 //ENEMY LIFE BARS
 #define ENEMY_HP_BAR_CONTAINER_SIZE_X					90

@@ -324,7 +324,7 @@ void Game::updateScene(Time deltaTime)
 	}
 
 	//Checking colisions
-	colisionChecksV2(deltaTime);
+	collisionCheck_v2(deltaTime);
 
 	//HUD ELEMENTS
 	//SFRectangles
@@ -457,7 +457,7 @@ void Game::drawScene()
 	m_window->draw(temp);
 }
 
-void Game::colisionChecksV2(Time deltaTime)
+void Game::collisionCheck_v2(Time deltaTime)
 {
 	sf::Clock dt;
 	dt.restart();

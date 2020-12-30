@@ -5,9 +5,4 @@ enemy,V_Sigma1,2,2,4,6,0.1,0.3
 enemy,V_Sigma2,1,2,4,,,
 enemy,V_Gamma1,1,4,4,12,0.2,0.2
 #,name,enemy_class,spawnX,spawnY,rotation,,
-boss,V_BetaGold,9,0.5,-0.2,0,,
-boss,V_AlphaGold4,10,0.6,-0.1,0,,
-boss,V_AlphaGold2,10,0.4,-0.1,0,,
-boss,V_AlphaGold3,10,0.5,-0.05,0,,
-boss,V_AlphaGold1,10,0.3,-0.15,0,,
-boss,V_AlphaGold5,10,0.7,-0.15,0,,
+boss,V_DeltaGold,9,0.5,-0.2,0,,

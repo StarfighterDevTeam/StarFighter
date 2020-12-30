@@ -10,4 +10,3 @@ enemy,V_Zeta_06,1,0,1,0.25,0.2,0.7
 script,1,,,,,,
 #,dialog_name,time_of_trigger,,,,,
 dialog,Dial_VIntro_01,1,,,,,
-dialog,Dial_VIntro_03,20,,,,,
