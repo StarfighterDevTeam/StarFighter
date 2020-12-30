@@ -48,7 +48,6 @@ void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	AnimatedSprite::update(deltaTime);
 }
 
-
 Loot* Loot::Clone()
 {
 	Loot* new_loot = new Loot(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_display_name);

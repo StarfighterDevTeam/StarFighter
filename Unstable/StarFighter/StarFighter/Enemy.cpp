@@ -939,6 +939,18 @@ void Enemy::Death(bool give_money)
 	//	GenerateLoot();
 	//}
 
+	//Loot
+	if (m_enemy_class == ENEMYPOOL_BOSS_MAIN)
+	{
+		sf::Vector2f speed = sf::Vector2f(0, LOOT_SPEED_Y);
+
+		Loot* loot_hp = new Loot(getPosition(), speed, "2D/Equipment/life.png", sf::Vector2f(48, 48), "hp_1");
+		(*CurrentGame).addToScene((GameObject*)loot_hp, true);
+
+		Loot* loot_crystal = new Loot(getPosition(), sf::Vector2f(0, 0), "2D/Equipment/crystal.png", sf::Vector2f(48, 48), "crystal_1");
+		(*CurrentGame).addToScene((GameObject*)loot_crystal, true);
+	}
+
 	if (give_money == true)
 		playership->addMoney(m_money);
 

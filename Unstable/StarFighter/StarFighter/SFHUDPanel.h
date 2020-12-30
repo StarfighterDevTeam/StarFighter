@@ -45,6 +45,10 @@ public:
 
 	sf::Text m_equipment_title;
 	sf::Text m_inventory_title;
+
+	GameObject m_crystal;
+	sf::Text m_crystals_text;
+
 };
 
 #endif // SFHUDPANEL_H_INCLUDED

@@ -44,6 +44,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 
 	m_level = 1;
 	m_xp = 0;
+	m_crystals = 0;
 	
 	m_combo_count = 0;
 	m_combo_count_max = COMBO_COUNT_FIRST_LEVEL;
@@ -1081,6 +1082,7 @@ void Ship::Respawn(bool no_save)
 
 	m_level = 1;
 	m_money = 100;
+	m_crystals = 0;
 	m_knownScenes.clear();
 
 	m_can_jump = false;
@@ -1141,31 +1143,33 @@ void Ship::Death(bool give_money)
 
 bool Ship::GetLoot(GameObject& object)
 {
-	if (object.m_money > 0)
+	sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
+	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 18, _yellow, getPosition());
+	ostringstream ss;
+		
+	//+1 hp
+	if (object.m_display_name.compare("hp_1") == 0)
 	{
-		//feedback
-		sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
-		SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 18, _yellow, getPosition());
-		ostringstream ss;
-		ss << "$ " << object.m_money;
-		text_feedback->setString(ss.str());
-		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
-		text_feedback->setPosition(getPosition());
-		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, (- size.y / 2 - TEXT_POP_OFFSET_Y)));
-		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
-		delete text_feedback;
-		(*CurrentGame).addToTextPops(pop_feedback);
-
-		//transfer money
-		get_money_from(object);
-
-		(*CurrentGame).PlaySFX(SFX_MoneyLoot);
-
-		Ship::SavePlayerMoneyAndHealth(this);
-		return true;
+		if (m_armor < m_armor_max)
+			m_armor++;
+			
+		ss << "+1 hp";
 	}
-
-	return false;
+	else if (object.m_display_name.compare("crystal_1") == 0)
+	{
+		m_crystals++;
+		ss << "+1 crystal";
+	}
+		
+	text_feedback->setString(ss.str());
+	sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+	text_feedback->setPosition(getPosition());
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, (-size.y / 2 - TEXT_POP_OFFSET_Y)));
+	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
+	delete text_feedback;
+	(*CurrentGame).addToTextPops(pop_feedback);
+		
+	return true;
 }
 
 void Ship::GetPortal(GameObject* object)
@@ -1529,6 +1533,7 @@ int Ship::SavePlayerMoneyAndHealth(Ship* ship)
 		data << "Shield " << ship->m_shield << endl;
 		data << "Graze " << ship->m_graze_count << endl;
 		data << "Level " << ship->m_level << endl;
+		data << "Crystal " << ship->m_crystals << endl;
 
 		data.close();  // on ferme le fichier
 	}
@@ -1567,6 +1572,8 @@ bool Ship::LoadPlayerMoneyAndHealth(Ship* ship)
 				ship->m_graze_count = stoi(value);
 			else if (i == 4)
 				ship->m_level = stoi(value);
+			else if (i == 5)
+				ship->m_crystals = stoi(value);
 		
 			i++;
 		}

@@ -184,7 +184,7 @@ V_DeltaGold_Intro,120,0,,,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,immune,0,0,0,0,positionV,
 V_DeltaGold_Wait,0,0,,,0,,,0,,,0,,,0,,,0,,,0,,,,,,0,immune,0,0,0,0,phaseClock,greater,1,V_DeltaGold_Phase1,0,,,,Dial_Zeppelin_01
 V_DeltaGold_Phase1,0,V_Delta1_laser_extL,0,0,V_Delta1_laser_extR,0,0.2,V_Delta1_laser_intL,0,0.2,V_Delta1_laser_intR,0,0.2,V_Delta1_blast,0,0,0,,,0,,,,,,20,face_target,0,0,0,0,phaseClock,greater,8,V_DeltaGold_Phase2,playerHit,equal,0,V_DeltaGold_Phase1_Hit,0
 V_DeltaGold_Phase1_Hit,0,0,,,0,,,0,,,0,,,0,,,0,,,0,,,,,,20,face_target,0,0,0,0,0,,,,playerUnhit,equal,0,V_DeltaGold_Phase2,0
-V_DeltaGold_Phase2,0,V_DeltaGold_ring1L,0,1,V_DeltaGold_ring1M,0,1,V_DeltaGold_ring1R,0,1,V_DeltaGold_ring2L,0,1.4,V_DeltaGold_ring2M,0,1.4,V_DeltaGold_ring2R,0,1.4,0,,,,,,20,face_target,0,0,0,0,phaseClock,greater,6,V_DeltaGold_Phase3,playerHit,equal,0,V_DeltaGold_Phase2_Hit,0
+V_DeltaGold_Phase2,0,V_DeltaGold_ring1L,0,1,V_DeltaGold_ring1M,0,1,V_DeltaGold_ring1R,0,1,V_DeltaGold_ring2L,0,1.4,V_DeltaGold_ring2M,0,1.4,V_DeltaGold_ring2R,0,1.4,0,,,,,,20,face_target,0,0,0,0,phaseClock,greater,7,V_DeltaGold_Phase3,playerHit,equal,0,V_DeltaGold_Phase2_Hit,0
 V_DeltaGold_Phase2_Hit,0,0,,,0,,,0,,,0,,,0,,,0,,,0,,,,,,20,face_target,0,0,0,0,0,,,,playerUnhit,equal,0,V_DeltaGold_Phase3,0
 V_DeltaGold_Phase3,0,V_DeltaGold_ringFull,0,0,0,0,0,0,0,0,0,0,0.4,0,0,0.4,0,0,0.4,0,,,,,,20,face_target,0,0,0,0,phaseClock,greater,7,V_DeltaGold_Phase1,playerHit,equal,0,V_DeltaGold_Phase3_Hit,0
 V_DeltaGold_Phase3_Hit,0,0,,,0,,,0,,,0,,,0,,,0,,,0,,,,,,20,face_target,0,0,0,0,0,,,,playerUnhit,equal,0,V_DeltaGold_Phase1,0

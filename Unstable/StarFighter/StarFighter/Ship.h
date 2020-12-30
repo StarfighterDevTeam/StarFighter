@@ -208,6 +208,8 @@ public :
 	int m_xp;
 	int m_xp_max;
 
+	int m_crystals;
+
 	float m_max_speed;
 	float m_acceleration;
 	float m_deceleration;

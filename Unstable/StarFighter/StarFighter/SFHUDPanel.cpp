@@ -182,8 +182,18 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 		//text_height += INTERACTION_SHOP_INTERLINE + m_hitstaken_text.getCharacterSize();
 		//m_beastscore_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		text_height += INTERACTION_SHOP_INTERLINE + m_beastscore_text.getCharacterSize();
+		text_height += INTERACTION_INTERBLOCK + m_beastscore_text.getCharacterSize();
 		m_framerate_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+		text_height += INTERACTION_INTERBLOCK + m_framerate_text.getCharacterSize();
+
+		//crystals
+		m_crystal = GameObject(getPosition(), sf::Vector2f(0, 0), "2D/Equipment/crystal.png", sf::Vector2f(48, 48));
+		m_crystal.setPosition(sf::Vector2f(SCENE_SIZE_X + INTERACTION_PANEL_MARGIN_SIDES + m_crystal.m_size.x * 0.5, 370));
+
+		m_crystals_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+		m_crystals_text.setCharacterSize(15);
+		m_crystals_text.setColor(sf::Color::White);
+		m_crystals_text.setPosition(sf::Vector2f(m_crystal.getPosition().x + m_crystal.m_size.x * 0.5 + 8, m_crystal.getPosition().y));
 
 		//Create grids
 		//CreateGrids(this, position0, position1, sf::Vector2f(0, 0));
@@ -358,6 +368,9 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ss_m << m_playership->m_money;
 	m_money_text.setString("$ " + ss_m.str());
 
+	//crystals
+	m_crystals_text.setString(to_string(m_playership->m_crystals));
+
 	//graze (shield regen)
 	//if (m_playership->m_shield_max > 0)
 	//{
@@ -497,6 +510,8 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	//}
 
 	screen.draw(m_money_text);
+	screen.draw(m_crystal);
+	screen.draw(m_crystals_text);
 	//screen.draw(m_graze_text);
 	//screen.draw(m_hazardscore_text);
 	//screen.draw(m_hitstaken_text);
