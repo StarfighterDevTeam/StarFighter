@@ -80,6 +80,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
 	m_SFHudPanel = NULL;
+	m_is_asking_SFPanel_overwrite = SFPanel_None;
 
 	m_previouslyCollidingWithInteractiveObject = No_Interaction;
 	m_isCollidingWithInteractiveObject = No_Interaction;
@@ -444,7 +445,12 @@ void Ship::UpdateHUDStates()
 			m_HUD_state = HUD_PortalInteraction;
 		else if (m_targetShop != NULL)
 		{
-			if (m_HUD_state != HUD_ShopStellarMap && m_HUD_state != HUD_Trade && m_HUD_state != HUD_Upgrades)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
+			if (m_is_asking_SFPanel_overwrite == SFPanel_Upgrades)
+			{
+				m_HUD_state = HUD_Upgrades;
+				m_is_asking_SFPanel_overwrite = SFPanel_None;
+			}
+			else if (m_HUD_state != HUD_ShopStellarMap && m_HUD_state != HUD_Trade && m_HUD_state != HUD_Upgrades)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
 				m_HUD_state = HUD_ShopMainMenu;
 		}
 		else

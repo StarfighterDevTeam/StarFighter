@@ -167,6 +167,7 @@ public :
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 	SFPanel* m_SFHudPanel;
+	SFPanelTypes m_is_asking_SFPanel_overwrite;
 	string m_is_asking_teleportation;
 	sf::Clock m_brakingHoldingClock;
 

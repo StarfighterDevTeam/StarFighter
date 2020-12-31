@@ -742,6 +742,9 @@ void Gameloop::PlayerTakesExit()
 	string nextScene_filename = (*CurrentGame).m_playership->m_targetPortal->m_destination_name;
 
 	SpawnInScene(nextScene_filename, (*CurrentGame).m_playership, m_currentScene->m_is_hub);
+
+	if (m_currentScene->m_is_hub == true)
+		m_playership->m_is_asking_SFPanel_overwrite = SFPanel_Upgrades;
 }
 
 void Gameloop::CheckScriptedDialogs()
