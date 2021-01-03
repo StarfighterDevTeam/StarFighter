@@ -324,8 +324,6 @@ public:
 	sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle);
 	bool TurnToTargetAngle(float target_angle, float rotation_speed, sf::Time deltaTime, float hyperspeedMultiplier);//in degress
 
-	sf::Vector2f getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0, 0));
-
 	static sf::Vector2f ApplyScreenBordersConstraints(sf::Vector2f position, sf::Vector2f size);
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);

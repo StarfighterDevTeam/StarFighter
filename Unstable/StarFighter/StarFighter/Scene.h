@@ -43,7 +43,6 @@ public:
 	Scene(string name);//, int hazard_level, bool reverse_scene=false, bool first_scene=false);
 	//Scene(string name);
 	~Scene();
-	void GenerateEnemies(Time deltaTime);
 	void SpawnBoss();
 	void PlayTitleFeedback();
 
@@ -74,6 +73,7 @@ public:
 	void SpawnEnemy(int enemy_class);
 	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)NBVAL_EnemyClass);
 	void ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy);
+	float GetRandomXSpawnPosition(Enemy* enemy);
 
 	void DisplayDestructions();
 	void DisplayScore();

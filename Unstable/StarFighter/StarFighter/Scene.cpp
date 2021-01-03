@@ -449,11 +449,11 @@ void Scene::SpawnEnemy(int enemy_class)
 	//int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;
 	int dice_roll = RandomizeIntBetweenValues(0, m_total_class_probability[enemy_class]);
 	
-	for (std::vector<EnemyBase*>::iterator it = m_enemies_ranked_by_class[enemy_class].begin(); it != m_enemies_ranked_by_class[enemy_class].end(); ++it)
+	for (EnemyBase* enemy_base : m_enemies_ranked_by_class[enemy_class])
 	{
-		if (dice_roll >= (*it)->m_proba_min && dice_roll <= (*it)->m_proba_max)
+		if (dice_roll >= enemy_base->m_proba_min && dice_roll <= enemy_base->m_proba_max)
 		{
-			enemy = (*it)->m_enemy->Clone();
+			enemy = enemy_base->m_enemy->Clone();
 			ApplyHazardLevelModifiers(0, *enemy);
 			break;
 		}
@@ -461,7 +461,7 @@ void Scene::SpawnEnemy(int enemy_class)
 	assert(enemy != NULL);
 
 	//RANDOM POSITION
-	sf::Vector2f pos = enemy->getRandomXSpawnPosition(enemy->m_size);
+	sf::Vector2f pos = sf::Vector2f(GetRandomXSpawnPosition(enemy), - enemy->m_size.y * 0.5);
 	enemy->setPosition(pos);
 
 	if (enemy->m_phases.empty() == false)
@@ -517,69 +517,29 @@ void Scene::ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy)
 	}
 }
 
-void Scene::GenerateEnemies(Time deltaTime)
+float Scene::GetRandomXSpawnPosition(Enemy* enemy)
 {
-	if (m_spawnClock.getElapsedTime() > sf::seconds(4))
+	int tries = 0;
+	bool found = true;
+	float posX;
+
+	//avoid enemies overlap
+	while (tries == 0 || (tries < 10 && found == false))
 	{
-		m_spawnClock.restart();
-		double random_number = ((double)rand() / (RAND_MAX));
+		found = true;
+		tries++;
 
-		// A PASSER EN .CSV :
-		int nb_rows = 1;
-		int nb_lines = 1;
-		float xspread = 150;
-		float yspread = 200;
+		posX = RandomizeFloatBetweenValues(enemy->m_size.x * 0.5, SCENE_SIZE_X - enemy->m_size.x * 0.5);
 
-		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
-		// liste de patterns associés : 0, 0, 0, 0, 0, 
-
-		//chosing a random enemy within a class of enemies
-		//for each sceneEnemyClassesAvailable[i]
-		Enemy* random_enemy_within_class[NBVAL_EnemyClass];
-
-		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
-		int dice_roll = (rand() % (m_total_class_probability[ENEMYPOOL_ALPHA])) + 1;
-
-		for (int i = 0; i < NBVAL_EnemyClass; i++)
+		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[EnemyObject])
 		{
-			for (std::vector<EnemyBase*>::iterator it = m_enemies_ranked_by_class[i].begin(); it != m_enemies_ranked_by_class[i].end(); ++it)
+			if (object->getPosition().y < 200 && posX > object->getPosition().x - object->m_size.x * 0.5 && posX < object->getPosition().x + object->m_size.x * 0.5)
 			{
-				if (dice_roll >= (*it)->m_proba_min && dice_roll <= (*it)->m_proba_max)
-				{
-					random_enemy_within_class[i] = (*it)->m_enemy;
-				}
+				found = false;
+				break;
 			}
-		}
-
-		//preparing the list of enemies to put in the cluster
-		sf::Vector2f max_enemy_size = sf::Vector2f(0, 0);
-
-		vector<EnemyPoolElement*>* cluster = new vector<EnemyPoolElement*>;
-		for (int i = 0; i < nb_rows*nb_lines; i++)
-		{
-			//VALEURS A CONF EN .CSV
-			// arg0 = enemy class
-			// arg1 = move pattern
-			//if arg0 != VOID
-			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[ENEMYPOOL_ALPHA], ENEMYPOOL_ALPHA, NoMovePattern);
-			if (e->m_enemy->m_size.x > max_enemy_size.x)
-			{
-				max_enemy_size.x = e->m_enemy->m_size.x;
-			}
-			if (e->m_enemy->m_size.y > max_enemy_size.y)
-			{
-				max_enemy_size.y = e->m_enemy->m_size.y;
-
-				cluster->push_back(e);
-			}
-
-			sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y);
-
-			//RANDOM POSITION TO SPAWN THE CLUSTER
-			sf::Vector2f pos = cluster->front()->m_enemy->getRandomXSpawnPosition(max_enemy_size, size);
-
-			//generating the cluster at the given coordinates
-			EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 		}
 	}
+	
+	return posX;
 }

@@ -561,36 +561,6 @@ float GameObject::GetDeltaAngleToTargetAngle(float ref_rotation_in_deg, float ta
 	return delta_angle;
 }
 
-sf::Vector2f GameObject::getRandomXSpawnPosition(sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
-{
-	//default argument for cluster size
-	if (cluster_size == sf::Vector2f(0, 0))
-	{
-		cluster_size = max_enemy_size;
-	}
-
-	//now calculating the starting coordinate (left)
-	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
-	rand_coordinates_min.x += 200;//marging for movement patterns
-	cluster_size.x += 200;//marging for movement patterns
-
-	//length of the allowed spread
-	float allowed_spread = (SCENE_SIZE_X - cluster_size.x);
-
-	//cutting clusters bigger than the scene (+ debug message)
-	if (allowed_spread < 0)
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
-
-	//random value inside the allowed spread
-	float random_posX = RandomizeFloatBetweenValues(0, allowed_spread);
-
-	//getting position coordinates (min + random value)
-	float pos_x = rand_coordinates_min.x + random_posX;
-	float pos_y = rand_coordinates_min.y;
-
-	return sf::Vector2f(pos_x, pos_y);
-}
-
 sf::Vector2f GameObject::ApplyScreenBordersConstraints(sf::Vector2f position, sf::Vector2f size)
 {
 	sf::Vector2f new_position = position;
