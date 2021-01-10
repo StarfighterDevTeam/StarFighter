@@ -533,7 +533,7 @@ float Scene::GetRandomXSpawnPosition(Enemy* enemy)
 
 		for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[EnemyObject])
 		{
-			if (object->getPosition().y < 200 && posX > object->getPosition().x - object->m_size.x * 0.5 && posX < object->getPosition().x + object->m_size.x * 0.5)
+			if (object->getPosition().y < 200 && posX > object->getPosition().x - object->m_size.x * 0.5 - enemy->m_size.x * 0.5 && posX < object->getPosition().x + object->m_size.x * 0.5 + enemy->m_size.x * 0.5)
 			{
 				found = false;
 				break;
