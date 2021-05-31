@@ -11,13 +11,13 @@ Data::Data(Label label, double error_margin)
 {
 	int red, blue, green = 0;
 
-	if (label == IS_GREEN)
+	if (label == IS_ROMAIN)
 	{
 		red = RandomizeIntBetweenValues(0, (int)(error_margin * 255));
 		green = RandomizeIntBetweenValues((int)(255 * (1 - error_margin)), 255);
 		blue = RandomizeIntBetweenValues(0, (int)(error_margin * 255));
 	}
-	else if (label == NOT_GREEN)
+	else if (label == IS_NOT_ROMAIN)
 	{
 		red = RandomizeIntBetweenValues(0, 255);
 		green = RandomizeIntBetweenValues(0, (int)((1 - error_margin) * 255));

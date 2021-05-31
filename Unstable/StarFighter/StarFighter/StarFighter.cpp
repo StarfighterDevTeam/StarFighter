@@ -2,21 +2,26 @@
 
 int main()
 {
+	srand(time(NULL));
+
 	NeuralNetwork NeuralNetwork;
 
 	//NeuralNetwork.CreateDataset();
-	NeuralNetwork.LoadDatasetFromFile();
-	NeuralNetwork.BalanceDataset();//cutting examples so that we have a perfect parity between green examples and not green examples, mixed alternatively
+	//NeuralNetwork.LoadDatasetFromFile();
+	//NeuralNetwork.BalanceDataset();//cutting examples so that we have a perfect parity between green examples and not green examples, mixed alternatively
 	//NeuralNetwork.SaveDatasetIntoFile();
 
 	int mode = 0;
 	while (mode >= 0)
 	{
 		printf("\nChoose run mode for the Neural Network:\n\n");
-		printf("0 = perform from scratch with given parameters\n");
-		printf("1 = loop to find the best hyper parameters\n");
-		printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
-		printf("3 = input manual values to test the model\n\n");
+		//printf("0 = perform from scratch with given parameters\n");
+		//printf("1 = loop to find the best hyper parameters\n");
+		//printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
+		//printf("3 = input manual values to test the model\n\n");
+
+		printf("0 = create new dataset\n");
+		printf("1 = reset weights\n");
 
 		cin >> mode;
 		NeuralNetwork.Run((NeuralNetworkMode)mode);
@@ -53,7 +58,7 @@ NeuralNetwork::NeuralNetwork()
 	//AddLayer(2, HiddenLayer);
 
 	//Output layer
-	AddLayer(NB_LABELS, OutpuLayer);
+	AddLayer(1, OutpuLayer);
 }
 
 void NeuralNetwork::RestoreWeights()
@@ -94,6 +99,37 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 {
 	clock_t begin = clock();
 
+	//Mode 0 - create new dataset
+	if (mode == 0)
+	{
+		CreateDataset();
+		BalanceDataset();
+		SaveDatasetIntoFile();
+	}
+
+	//Mode 1 - reset weights
+	if (mode == 1)
+	{
+		//reset file
+		remove(RANDOM_WEIGHTS_FILE);
+		m_weightsStart.clear();
+
+		//reinit weights
+		for (int i = 0; i < m_nb_layers; i++)
+		{
+			for (int n = 0; n < m_layers[i].m_nb_neurons; n++)
+			{
+				double weight = RandomizeFloatBetweenValues(-1.f, 1.f);
+				m_weightsStart.push_back(weight);
+				if (n == m_layers[i].m_nb_neurons - 1)
+				{
+					SaveStartingWeightsIntoFile();
+				}
+			}
+		}			
+	}
+
+	/*
 	// ******* Mode 0 *******
 	if (mode == PerfFromScratch)
 	{
@@ -225,6 +261,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
 	}
+	*/
 
 	clock_t end = clock();
 	double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
@@ -465,11 +502,11 @@ Label NeuralNetwork::TestSample(Data &data)
 	Label label;
 	if (m_error < 0.5f)
 	{
-		label = IS_GREEN;
+		label = IS_ROMAIN;
 	}
 	else
 	{
-		label = NOT_GREEN;
+		label = IS_NOT_ROMAIN;
 	}
 	return label;
 
@@ -481,7 +518,7 @@ void NeuralNetwork::Creating()
 	printf("Enter 0 for green, 1 for NOT-green.\n");
 	int user_input;
 	cin >> user_input;
-	if (user_input == IS_GREEN)
+	if (user_input == IS_ROMAIN)
 	{
 
 	}
@@ -550,7 +587,7 @@ void NeuralNetwork::FeedForward()
 double NeuralNetwork::GetTargetValue(const Label label)
 {
 	double target_value;
-	if (label == IS_GREEN)
+	if (label == IS_ROMAIN)
 	{
 		target_value = 1.f;
 	}
@@ -867,20 +904,19 @@ void NeuralNetwork::CreateDataset()
 {
 	for (int d = 0; d < DATASET_SIZE; d++)
 	{
-		int r = RandomizeIntBetweenValues(0, 1);
-		if (r % 2 == 0)
-		{
-			m_dataset.push_back(Data(IS_GREEN, NN_ERROR_MARGIN));
-		}
+		int r = RandomizeIntBetweenValues(1, 26);
+		
+		double feature = (double)r;
+		vector<double> v;
+		v.push_back(feature);
+
+		if (r == 18 || r == 15 || r == 13 || r == 1 || r == 9 || r == 14)//R.O.M.A.I.N
+			m_dataset.push_back(Data(v, IS_ROMAIN));
 		else
-		{
-			m_dataset.push_back(Data(NOT_GREEN, NN_ERROR_MARGIN));
-		}
+			m_dataset.push_back(Data(v, IS_NOT_ROMAIN));
 
 		if (d == DATASET_SIZE - 1)
-		{
 			printf("Dataset created: %d data items.\n", d + 1);
-		}
 	}
 }
 
@@ -891,20 +927,20 @@ bool NeuralNetwork::SaveDatasetIntoFile()
 	if (data)
 	{
 		int nb_features = -1;
-		for (int d = 0; d < DATASET_SIZE; d++)
+		int datasetSize = m_dataset.size();
+		for (int d = 0; d < datasetSize; d++)
 		{
-			Data &current_data = m_dataset[d];
 			if (nb_features < 0)
 			{
-				nb_features = current_data.m_features.size();
+				nb_features = m_dataset[d].m_features.size();
 			}
 
 			data << d << " ";
 			for (int i = 0; i < nb_features; i++)
 			{
-				data << current_data.m_features[i] << " ";
+				data << m_dataset[d].m_features[i] << " ";
 			}
-			data << current_data.m_label;
+			data << m_dataset[d].m_label;
 			data << endl;
 		}
 		data.close();  // on ferme le fichier
@@ -961,44 +997,44 @@ bool NeuralNetwork::LoadDatasetFromFile()
 
 void NeuralNetwork::BalanceDataset()
 {
-	vector<Data> green_dataset;
-	vector<Data> not_green_dataset;
+	vector<Data> dataset_label_A;
+	vector<Data> dataset_label_B;
 
 	//sorting examples into 2 categories
 	int datasetSize = m_dataset.size();
 	for (int d = 0; d < datasetSize; d++)
 	{
-		if (m_dataset[d].m_label == IS_GREEN)
+		if (m_dataset[d].m_label == IS_ROMAIN)
 		{
-			green_dataset.push_back(m_dataset[d]);
+			dataset_label_A.push_back(m_dataset[d]);
 		}
 		else
 		{
-			not_green_dataset.push_back(m_dataset[d]);
+			dataset_label_B.push_back(m_dataset[d]);
 		}
 	}
 
 	m_dataset.clear();
 
 	//putting them back in the dataset alternatively, and cutting everything beyond examples parity
-	int greenDatasetSize = green_dataset.size();
-	int notgreenDatasetSize = not_green_dataset.size();
+	int dataset_label_A_size = dataset_label_A.size();
+	int dataset_label_B_size = dataset_label_B.size();
 
 	for (int d = 0; d < datasetSize; d++)
 	{
-		if (d >= greenDatasetSize || d >= notgreenDatasetSize)
+		if (d >= dataset_label_A_size || d >= dataset_label_B_size)
 		{
 			break;
 		}
 
-		if (d < greenDatasetSize)
+		if (d < dataset_label_A_size)
 		{
-			m_dataset.push_back(green_dataset[d]);
+			m_dataset.push_back(dataset_label_A[d]);
 		}
 
-		if (d < notgreenDatasetSize)
+		if (d < dataset_label_B_size)
 		{
-			m_dataset.push_back(not_green_dataset[d]);
+			m_dataset.push_back(dataset_label_B[d]);
 		}
 	}
 }

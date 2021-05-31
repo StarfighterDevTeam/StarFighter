@@ -24,10 +24,9 @@ using namespace std;
 
 enum Label
 {
-	IS_GREEN,		//0
-	NB_LABELS,		//1
-	NOT_GREEN,		//2
-	UNLABELLED,		//3
+	IS_NOT_ROMAIN,
+	IS_ROMAIN,
+	UNLABELLED,
 };
 
 enum Features

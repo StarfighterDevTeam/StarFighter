@@ -31,7 +31,7 @@ using namespace std;
 #define NN_MAX_ATTEMPTS					500
 #define NN_MAX_OVERALL_ATTEMPTS			200000
 
-#define DATASET_SIZE					300
+#define DATASET_SIZE					500
 #define DATASET_SUPERVISED_LOT			200
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
@@ -156,10 +156,10 @@ public:
 
 	static string GetLabelString(Label label)
 	{
-		if (label == IS_GREEN)
-			return "IS_GREEN";
-		if (label == NOT_GREEN)
-			return "NOT GREEN";
+		if (label == IS_ROMAIN)
+			return "IS_ROMAIN";
+		if (label == IS_NOT_ROMAIN)
+			return "IS NOT ROMAIN";
 		if (label == UNLABELLED)
 			return "UNLABELLED";
 	};
