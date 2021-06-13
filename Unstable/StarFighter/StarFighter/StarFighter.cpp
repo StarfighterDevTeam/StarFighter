@@ -14,19 +14,18 @@ int main()
 	int mode = 0;
 	while (mode >= 0)
 	{
-		printf("\nChoose run mode for the Neural Network:\n\n");
+		//printf("\nChoose run mode for the Neural Network:\n\n");
 		//printf("0 = perform from scratch with given parameters\n");
 		//printf("1 = loop to find the best hyper parameters\n");
 		//printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
 		//printf("3 = input manual values to test the model\n\n");
 
-		printf("0 = create new dataset\n");
-		printf("1 = reset weights\n");
+		//printf("0 = create new dataset\n");
+		//printf("1 = reset weights\n");
 
-		cin >> mode;
 		NeuralNetwork.Run((NeuralNetworkMode)mode);
+		NeuralNetwork.Display();
 	}
-	
 	
 	printf("Exit program?\n");
 	cin.get();
@@ -37,6 +36,15 @@ int main()
 //NEURAL NETWORK
 NeuralNetwork::NeuralNetwork()
 {
+	//display
+	m_renderWindow.create(sf::VideoMode(800, 600), "Neural Network");
+	m_renderWindow.setKeyRepeatEnabled(false);
+	m_renderWindow.setFramerateLimit(60);
+	m_backgroundTexture.create(800, 600, false);
+	m_backgroundTexture.setSmooth(true);
+	m_networkTexture.create(800, 600, false);
+	m_networkTexture.setSmooth(true);
+
 	m_nb_layers = 0;
 	m_success_rate = 0.f;
 	m_loops = 0;
@@ -49,31 +57,124 @@ NeuralNetwork::NeuralNetwork()
 	m_learning_rate = NN_LEARNING_RATE;
 	m_momentum = NN_MOMENTUM;
 	m_function = LEAKY_RELU;
+	m_use_bias = true;
 
 	//Input layer
 	AddLayer(NB_FEATURES, InputLayer);
 
 	//Hidden layers
-	AddLayer(1, HiddenLayer);
+	AddLayer(5, HiddenLayer);
 	//AddLayer(2, HiddenLayer);
 
 	//Output layer
 	AddLayer(1, OutpuLayer);
+
+	//UI
+	AdjustNeuronDisplayPositions();
+}
+
+NeuralNetwork::~NeuralNetwork()
+{
+	for (Layer* layer : m_layers)
+		delete layer;
+}
+
+void NeuralNetwork::Run(NeuralNetworkMode mode)
+{
+	clock_t begin = clock();
+
+	//Mode 0 - create new dataset
+	switch (mode)
+	{
+		case IdleMode:
+		{
+			break;
+		}
+		case CreateDataSet:
+		{
+			CreateDataset();
+			BalanceDataset();
+			SaveDatasetIntoFile();
+
+			//chrono
+			clock_t end = clock();
+			double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
+			printf("Time elpased: %fs.\n", elapsed);
+
+			break;
+		}
+		case RestoreRandomWeights:
+		{
+			//reset file
+			remove(RANDOM_WEIGHTS_FILE);
+			m_weightsStart.clear();
+
+			//reinit weights
+			for (Layer* layer : m_layers)
+			{
+				for (Neuron* neuron : layer->m_neurons)
+				{
+					double weight = RandomizeFloatBetweenValues(-1.f, 1.f);
+					m_weightsStart.push_back(weight);
+					if (neuron == layer->m_neurons.back())
+						SaveStartingWeightsIntoFile();
+				}
+			}
+
+			break;
+		}
+	}
+}
+
+void NeuralNetwork::Display()
+{
+	//background
+	sf::RectangleShape background;
+	background.setSize(sf::Vector2f(800, 600));
+	background.setFillColor(sf::Color(50, 50, 50, 255));
+	background.setOrigin(0, 0);
+	background.setPosition(0, 0);
+	m_backgroundTexture.draw(background);
+	
+	for (Layer* layer : m_layers)
+	{
+		for (Neuron* neuron : layer->m_neurons)
+		{
+			m_networkTexture.draw(neuron->m_circle);
+
+			for (sf::RectangleShape& line : neuron->m_lines)
+				m_networkTexture.draw(line);
+		}
+	}
+
+	//display
+	m_backgroundTexture.display();
+	m_networkTexture.display();
+
+	sf::Sprite temp_background(m_backgroundTexture.getTexture());//background
+	temp_background.setPosition(sf::Vector2f(0, 0));
+	m_renderWindow.draw(temp_background);
+
+	sf::Sprite temp_network(m_networkTexture.getTexture());//neural network
+	temp_network.setPosition(sf::Vector2f(100, 100));
+	m_renderWindow.draw(temp_network);
+
+	m_renderWindow.display();//final display
 }
 
 void NeuralNetwork::RestoreWeights()
 {
 	int index = 0;
 
-	for (int i = 0; i < m_nb_layers; i++)
+	for (Layer* layer : m_layers)
 	{
-		for (int n = 0; n < m_layers[i].m_nb_neurons; n++)
+		for (Neuron* neuron : layer->m_neurons)
 		{
-			int weightsSize = m_layers[i].m_neurons[n].m_weights.size();
+			int weightsSize = neuron->m_weights.size();
 			for (int w = 0; w < weightsSize; w++)
 			{
-				m_layers[i].m_neurons[n].m_weights[w] = m_weightsStart[index];
-				m_layers[i].m_neurons[n].m_deltaWeights[w] = 0;
+				neuron->m_weights[w] = m_weightsStart[index];
+				neuron->m_deltaWeights[w] = 0;
 				index++;
 			}
 		}
@@ -82,190 +183,15 @@ void NeuralNetwork::RestoreWeights()
 
 void NeuralNetwork::CopyWeightsInto(vector<double>& weights)
 {
-	for (int i = 0; i < m_nb_layers; i++)
+	for (Layer* layer : m_layers)
 	{
-		for (int n = 0; n < m_layers[i].m_nb_neurons; n++)
+		for (Neuron* neuron : layer->m_neurons)
 		{
-			int weightsSize = m_layers[i].m_neurons[n].m_weights.size();
+			int weightsSize = neuron->m_weights.size();
 			for (int w = 0; w < weightsSize; w++)
-			{
-				weights.push_back(m_layers[i].m_neurons[n].m_weights[w]);
-			}
+				weights.push_back(neuron->m_weights[w]);
 		}
 	}
-}
-
-void NeuralNetwork::Run(NeuralNetworkMode mode)
-{
-	clock_t begin = clock();
-
-	//Mode 0 - create new dataset
-	if (mode == 0)
-	{
-		CreateDataset();
-		BalanceDataset();
-		SaveDatasetIntoFile();
-	}
-
-	//Mode 1 - reset weights
-	if (mode == 1)
-	{
-		//reset file
-		remove(RANDOM_WEIGHTS_FILE);
-		m_weightsStart.clear();
-
-		//reinit weights
-		for (int i = 0; i < m_nb_layers; i++)
-		{
-			for (int n = 0; n < m_layers[i].m_nb_neurons; n++)
-			{
-				double weight = RandomizeFloatBetweenValues(-1.f, 1.f);
-				m_weightsStart.push_back(weight);
-				if (n == m_layers[i].m_nb_neurons - 1)
-				{
-					SaveStartingWeightsIntoFile();
-				}
-			}
-		}			
-	}
-
-	/*
-	// ******* Mode 0 *******
-	if (mode == PerfFromScratch)
-	{
-		m_function = NN_ACTIVATION_FUNCTION;
-		m_learning_rate = NN_LEARNING_RATE;
-		m_momentum = NN_MOMENTUM;
-
-		LoadWeightsFromFile(RANDOM_WEIGHTS_FILE);
-		RestoreWeights();
-
-		m_success_rate = 0.f;
-		m_average_error = 0.f;
-		m_loops = 0;
-		m_overall_attempts = 0;
-
-		while (m_success_rate < 100.f && m_overall_attempts < NN_MAX_OVERALL_ATTEMPTS)
-		{
-			m_loops++;
-
-			//Train on labelled data
-			Training();
-
-			//Test model on known data if training set successful or last attempt
-			if (m_success == DATASET_SUPERVISED_LOT || m_overall_attempts == NN_MAX_OVERALL_ATTEMPTS - 1)
-			{
-				Testing();
-			}
-		}
-
-		RecordPerf();
-
-		//while (this->DoNothing()){}// <<< put breakpoint here to read values
-	}
-
-	// ******* Mode 1 *******
-	if (mode == LearnHyperparameters)
-	{
-		m_function = NN_ACTIVATION_FUNCTION;
-		while (m_function < NB_FUNCTIONS)
-		{
-			m_momentum = 0.0f;
-			while (m_momentum < 0.6f)
-			{
-				m_learning_rate = 0.1f;
-
-				while (m_learning_rate < 1.1f)
-				{
-					LoadWeightsFromFile(RANDOM_WEIGHTS_FILE);
-					RestoreWeights();
-
-					m_success_rate = 0.f;
-					m_average_error = 0.f;
-					m_loops = 0;
-					m_overall_attempts = 0;
-
-					while (m_success_rate < 100.f && m_overall_attempts < NN_MAX_OVERALL_ATTEMPTS)
-					{
-						m_loops++;
-
-						//Train on labelled data
-						Training();
-
-						//Test model on known data
-						Testing();
-					}
-
-					RecordPerf();
-
-					m_learning_rate += 0.1;
-				}
-
-				m_momentum += 0.1;
-			}
-
-			m_function = (FunctionType)((int)(m_function) + 1);
-		}
-
-		//while (this->DoNothing()){}// <<< put breakpoint here to read values
-	}
-
-	// ******* Mode 2 *******
-	if (mode == ImproveWeights)
-	{
-		m_loops = 1;
-		m_function = NN_ACTIVATION_FUNCTION;
-		m_learning_rate = NN_LEARNING_RATE;
-		m_momentum = NN_MOMENTUM;
-
-		m_average_error = 0.f;
-		m_overall_attempts = 0;
-
-		Training();
-		Testing();
-
-		RecordPerf();
-
-		//while (this->DoNothing()){}// <<< put breakpoint here to read values
-	}
-
-	// ******* Mode 3 *******
-	if (mode == Prod)
-	{
-		m_function = NN_ACTIVATION_FUNCTION;
-		m_learning_rate = NN_LEARNING_RATE;
-		m_momentum = NN_MOMENTUM;
-
-		LoadWeightsFromFile(PERF_BEST_WEIGHTS_FILE);
-		RestoreWeights();
-
-		m_average_error = 0.f;
-		m_overall_attempts = 0;
-
-		
-		Data data = CreateDataWithManualInputs();
-		InitInputLayer(data);
-		FeedForward();
-		
-		Layer &outputLayer = m_layers.back();
-		if (outputLayer.m_neurons[0].m_value > 1.f - NN_ERROR_MARGIN)
-		{
-			data.m_label = IS_GREEN;
-			printf("GREEN detected (%f = %.2f%% certainty.)\n", outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
-		}
-		else
-		{
-			data.m_label = NOT_GREEN;
-			printf("NOT GREEN detected (%f = %.2f%% certainty.)\n", outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
-		}
-
-		//while (this->DoNothing()){}// <<< put breakpoint here to read values
-	}
-	*/
-
-	clock_t end = clock();
-	double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
-	printf("Time elpased: %fs.\n", elapsed);
 }
 
 bool NeuralNetwork::RecordPerf()
@@ -280,13 +206,11 @@ bool NeuralNetwork::RecordPerf()
 	perf.m_loops = m_loops;
 	perf.m_success_rate = m_success_rate;
 	perf.m_average_error = m_average_error;
-	for (int i = 0; i < m_nb_layers; i++)
-	{
-		if (i > 0 && i < m_nb_layers - 1)
-		{
-			perf.m_hidden_layers.push_back(m_layers[i].m_nb_neurons - 1);//-1 for the bias neuron
-		}
-	}
+
+	for (Layer* layer : m_layers)
+		if (layer != m_layers.front() && layer != m_layers.back())
+			perf.m_hidden_layers.push_back(layer->m_nb_neurons - 1);//-1 for the bias neuron
+
 	CopyWeightsInto(perf.m_weights);
 
 	//Save perf
@@ -365,37 +289,33 @@ void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
 	//Connnect previous layer's neurons
 	if (!m_layers.empty())
 	{
-		Layer &previousLayer = m_layers.back();
-		int previousLayerSize = previousLayer.m_neurons.size();
-		for (int i = 0; i < previousLayerSize; i++)
+		Layer* previousLayer = m_layers.back();
+		for (Neuron* neuron : previousLayer->m_neurons)
 		{
 			for (int j = 0; j < nb_neuron; j++)
 			{
 				double weight;
 				//Load values from file if they exist
 				if (m_weightLoadIndex < m_weightsStart.size())
-				{
 					weight = m_weightsStart[m_weightLoadIndex];
-				}
 				else
 				{
 					weight = RandomizeFloatBetweenValues(-1.f, 1.f);
 					m_weightsStart.push_back(weight);
+
 					if (j == nb_neuron - 1)
-					{
 						SaveStartingWeightsIntoFile();
-					}
 				}
 
 				m_weightLoadIndex++;
-				previousLayer.m_neurons[i].m_weights.push_back(weight);
-				previousLayer.m_neurons[i].m_deltaWeights.push_back(0.f);
+				neuron->m_weights.push_back(weight);
+				neuron->m_deltaWeights.push_back(0.f);
 			}
 		}
 	}
 
-	//Create the new layer
-	m_layers.push_back(Layer(nb_neuron, type));
+	Layer* layer = new Layer(nb_neuron, type, m_use_bias);
+	m_layers.push_back(layer);
 	m_nb_layers++;
 }
 
@@ -489,14 +409,14 @@ Label NeuralNetwork::TestSample(Data &data)
 	double target_value = 1.f;
 
 	m_error = 0.f;
-	Layer &outputLayer = m_layers.back();
 
-	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
+	Layer* outputLayer = m_layers.back();
+	for (Neuron* neuron : outputLayer->m_neurons)
 	{
-		double delta = target_value - outputLayer.m_neurons[n].m_value;
+		double delta = target_value - neuron->m_value;
 		m_error += delta * delta;
 	}
-	m_error *= 1.f / outputLayer.m_nb_neurons;
+	m_error *= 1.f / outputLayer->m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
 
 	Label label;
@@ -527,20 +447,23 @@ void NeuralNetwork::Creating()
 
 void NeuralNetwork::InitInputLayer(const Data &data)
 {
-	Layer &inputLayer = m_layers.front();
+	Layer* inputLayer = m_layers.front();
+	int index = 0;
 
-	for (int n = 0; n < inputLayer.m_nb_neurons; n++)
+	for (Neuron* neuron : inputLayer->m_neurons)
 	{
-		if (n < inputLayer.m_nb_neurons - 1)
+		if (neuron != inputLayer->m_neurons.back())
 		{
-			inputLayer.m_neurons[n].m_value = data.m_features[n];
-			inputLayer.m_neurons[n].m_input_value = inputLayer.m_neurons[n].m_value;
+			neuron->m_value = data.m_features[index];
+			neuron->m_input_value = neuron->m_value;
 		}
 		else
 		{
-			inputLayer.m_neurons[n].m_value = 1.f;//bias neuron
-			inputLayer.m_neurons[n].m_input_value = inputLayer.m_neurons[n].m_value;
+			neuron->m_value = 1.f;//bias neuron
+			neuron->m_input_value = neuron->m_value;
 		}
+
+		index++;
 	}
 }
 
@@ -548,37 +471,40 @@ void NeuralNetwork::FeedForward()
 {
 	//For display purposes
 	if (PRINT_FF){ printf("Feed forward.\n"); }
-	Layer &inputLayer = m_layers.front();
-	for (int n = 0; n < inputLayer.m_nb_neurons; n++)
+
+	Layer* inputLayer = m_layers.front();
+	int index = 0;
+	for (Neuron* neuron : inputLayer->m_neurons)
 	{
-		if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, n, inputLayer.m_neurons[n].m_value); }
+		if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, index, neuron->m_value); }
+		index++;
 	}
 	
 	//Feed forward
 	for (int i = 0; i < m_nb_layers - 1; i++)//output layer doesn't feed forward
 	{
-		Layer &currentLayer = m_layers[i];
-		Layer &nextLayer = m_layers[i +1];
+		Layer* currentLayer = m_layers[i];
+		Layer* nextLayer = m_layers[i +1];
 
-		for (int n = 0; n < nextLayer.m_nb_neurons; n++)
+		for (int n = 0; n < nextLayer->m_nb_neurons; n++)
 		{
-			if (n < nextLayer.m_nb_neurons - 1 || nextLayer.m_type == OutpuLayer)//Output layer doesn't have a bias neuron
+			if (n < nextLayer->m_nb_neurons - 1 || nextLayer->m_type == OutpuLayer)//Output layer doesn't have a bias neuron
 			{
 				if (PRINT_FF){ printf("\nSum calculation:\n");}
 				double sum = 0;
-				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
+				for (int w = 0; w < currentLayer->m_nb_neurons; w++)
 				{
-					sum += currentLayer.m_neurons[w].m_value * currentLayer.m_neurons[w].m_weights[n];
-					if (PRINT_FF){ printf("   value * weight : %f * %f = %f\n", currentLayer.m_neurons[w].m_value, currentLayer.m_neurons[w].m_weights[n], sum);}
+					sum += currentLayer->m_neurons[w]->m_value * currentLayer->m_neurons[w]->m_weights[n];
+					if (PRINT_FF){ printf("   value * weight : %f * %f = %f\n", currentLayer->m_neurons[w]->m_value, currentLayer->m_neurons[w]->m_weights[n], sum);}
 				}
-				nextLayer.m_neurons[n].m_input_value = sum;
-				nextLayer.m_neurons[n].m_value = TransferFunction(sum, m_function);
-				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f -> output value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value); }
+				nextLayer->m_neurons[n]->m_input_value = sum;
+				nextLayer->m_neurons[n]->m_value = TransferFunction(sum, m_function);
+				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f -> output value: %f\n", i + 1, n, nextLayer->m_neurons[n]->m_input_value, nextLayer->m_neurons[n]->m_value); }
 			}
 			else
 			{
-				nextLayer.m_neurons[n].m_value = 1.f;//bias neuron
-				nextLayer.m_neurons[n].m_input_value = nextLayer.m_neurons[n].m_value;
+				nextLayer->m_neurons[n]->m_value = 1.f;//bias neuron
+				nextLayer->m_neurons[n]->m_input_value = nextLayer->m_neurons[n]->m_value;
 			}
 		}
 	}
@@ -604,15 +530,15 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	if (PRINT_EC){ printf("Error calculation.\n"); }
 	double previous_error = m_attempts == 1 ? 0.f : m_error;
 	m_error = 0.f;
-	Layer &outputLayer = m_layers.back();
 
-	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
+	Layer* outputLayer = m_layers.back();
+	for (int n = 0; n < outputLayer->m_nb_neurons; n++)
 	{
-		double delta = GetTargetValue(data.m_label) - outputLayer.m_neurons[n].m_value;
+		double delta = GetTargetValue(data.m_label) - outputLayer->m_neurons[n]->m_value;
 		m_error += delta * delta;
-		if (PRINT_EC){ printf("Neuron: %d, output: %f, target: %f (delta: %f).\n", n, outputLayer.m_neurons[n].m_value, GetTargetValue(data.m_label), delta); }
+		if (PRINT_EC){ printf("Neuron: %d, output: %f, target: %f (delta: %f).\n", n, outputLayer->m_neurons[n]->m_value, GetTargetValue(data.m_label), delta); }
 	}
-	m_error *= 1.f / outputLayer.m_nb_neurons;
+	m_error *= 1.f / outputLayer->m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
 	
 	if (m_attempts <= 1)
@@ -630,39 +556,39 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 void NeuralNetwork::BackPropagationGradient(const Data &data)
 {
 	if (PRINT_BP){ printf("Back propagation.\n"); }
-	Layer &outputLayer = m_layers.back();
 
+	Layer* outputLayer = m_layers.back();
 	//Calcuation of the gradient in the output layer
-	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
+	for (int n = 0; n < outputLayer->m_nb_neurons; n++)
 	{
-		double delta = GetTargetValue(data.m_label) - outputLayer.m_neurons[n].m_value;
-		double derivative = TransferFunctionDerivative(outputLayer.m_neurons[n].m_value, m_function);
-		outputLayer.m_neurons[n].m_gradient = delta * derivative;
+		double delta = GetTargetValue(data.m_label) - outputLayer->m_neurons[n]->m_value;
+		double derivative = TransferFunctionDerivative(outputLayer->m_neurons[n]->m_value, m_function);
+		outputLayer->m_neurons[n]->m_gradient = delta * derivative;
 
-		if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f (delta: %f, derivative: %f)\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient, delta, derivative); }
+		if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f (delta: %f, derivative: %f)\n", m_nb_layers - 1, n, outputLayer->m_neurons[n]->m_gradient, delta, derivative); }
 	}
 
 	//Propagation of the gradient
 	for (int i = m_nb_layers - 2; i >= 0; i--)
 	{
-		Layer &currentLayer = m_layers[i];
-		Layer &nextLayer = m_layers[i + 1];
+		Layer* currentLayer = m_layers[i];
+		Layer* nextLayer = m_layers[i + 1];
 
 		double sum = 0;
-		for (int n = 0; n < currentLayer.m_nb_neurons; n++)
+		for (int n = 0; n < currentLayer->m_nb_neurons; n++)
 		{
 				double delta = 0.f;
-				for (int w = 0; w < nextLayer.m_nb_neurons; w++)//sum of the derivatives of the weighted errors
+				for (int w = 0; w < nextLayer->m_nb_neurons; w++)//sum of the derivatives of the weighted errors
 				{
-					if (w < nextLayer.m_nb_neurons - 1 || nextLayer.m_type == OutpuLayer)
+					if (w < nextLayer->m_nb_neurons - 1 || nextLayer->m_type == OutpuLayer)
 					{
-						delta += currentLayer.m_neurons[n].m_weights[w] * nextLayer.m_neurons[w].m_gradient;
+						delta += currentLayer->m_neurons[n]->m_weights[w] * nextLayer->m_neurons[w]->m_gradient;
 					}
 				}
 
-				double derivative = TransferFunctionDerivative(currentLayer.m_neurons[n].m_value, m_function);
-				currentLayer.m_neurons[n].m_gradient = delta * derivative;
-				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f (delta: %f, derivative: %f)\n", i, n, currentLayer.m_neurons[n].m_gradient, delta, derivative); }
+				double derivative = TransferFunctionDerivative(currentLayer->m_neurons[n]->m_value, m_function);
+				currentLayer->m_neurons[n]->m_gradient = delta * derivative;
+				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f (delta: %f, derivative: %f)\n", i, n, currentLayer->m_neurons[n]->m_gradient, delta, derivative); }
 		}
 	}
 }
@@ -673,26 +599,26 @@ void NeuralNetwork::WeightsUpdate()
 	if (PRINT_WU){ printf("Weights update.\n"); }
 	for (int i = m_nb_layers - 2; i >= 0; i--)
 	{
-		Layer &currentLayer = m_layers[i];
-		Layer &nextLayer = m_layers[i + 1];
+		Layer* currentLayer = m_layers[i];
+		Layer* nextLayer = m_layers[i + 1];
 
-		for (int n = 0; n < currentLayer.m_nb_neurons; n++)
+		for (int n = 0; n < currentLayer->m_nb_neurons; n++)
 		{
 			//update each weight towards the next layer's neurons
-			for (int w = 0; w < nextLayer.m_nb_neurons; w++)
+			for (int w = 0; w < nextLayer->m_nb_neurons; w++)
 			{
-				if (w < nextLayer.m_nb_neurons - 1 || nextLayer.m_type == OutpuLayer)
+				if (w < nextLayer->m_nb_neurons - 1 || nextLayer->m_type == OutpuLayer)
 				{
-					Neuron &currentNeuron = currentLayer.m_neurons[n];
-					Neuron &connectedNeuron = nextLayer.m_neurons[w];
+					Neuron* currentNeuron = currentLayer->m_neurons[n];
+					Neuron* connectedNeuron = nextLayer->m_neurons[w];
 
-					double newDeltaWeight = currentNeuron.m_value * connectedNeuron.m_gradient * m_learning_rate;
-					newDeltaWeight += currentNeuron.m_deltaWeights[w] * m_momentum;
+					double newDeltaWeight = currentNeuron->m_value * connectedNeuron->m_gradient * m_learning_rate;
+					newDeltaWeight += currentNeuron->m_deltaWeights[w] * m_momentum;
 
-					currentNeuron.m_deltaWeights[w] = newDeltaWeight;
-					currentNeuron.m_weights[w] += newDeltaWeight;
+					currentNeuron->m_deltaWeights[w] = newDeltaWeight;
+					currentNeuron->m_weights[w] += newDeltaWeight;
 
-					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight); }
+					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron->m_weights[w] - newDeltaWeight, currentNeuron->m_weights[w], newDeltaWeight); }
 				}
 			}
 		}
@@ -706,32 +632,32 @@ void NeuralNetwork::FeedBackward(Label label)
 	double output_value = GetTargetValue(label);
 
 	//Output layer
-	Layer &outputLayer = m_layers.back();
-	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
+	Layer* outputLayer = m_layers.back();
+	for (int n = 0; n < outputLayer->m_nb_neurons; n++)
 	{
-		outputLayer.m_neurons[n].m_input_value = output_value;
-		if (PRINT_FB){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, n, outputLayer.m_neurons[n].m_input_value); }
+		outputLayer->m_neurons[n]->m_input_value = output_value;
+		if (PRINT_FB){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, n, outputLayer->m_neurons[n]->m_input_value); }
 	}
 	
 	//Feed Backward
 	for (int i = 0; i < m_nb_layers - 1; i++)//output layer doesn't feed forward
 	{
-		Layer &currentLayer = m_layers[i];
-		Layer &nextLayer = m_layers[i + 1];
+		Layer* currentLayer = m_layers[i];
+		Layer* nextLayer = m_layers[i + 1];
 
-		for (int n = 0; n < nextLayer.m_nb_neurons; n++)
+		for (int n = 0; n < nextLayer->m_nb_neurons; n++)
 		{
-			double preactivation_value = TransferFunctionInverse(nextLayer.m_neurons[n].m_input_value, m_function);
-			if (n < currentLayer.m_nb_neurons - 1 || currentLayer.m_type == OutpuLayer)//No need to feed bias neuron backward
+			double preactivation_value = TransferFunctionInverse(nextLayer->m_neurons[n]->m_input_value, m_function);
+			if (n < currentLayer->m_nb_neurons - 1 || currentLayer->m_type == OutpuLayer)//No need to feed bias neuron backward
 			{
 				double sum_weights = 0;
-				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
+				for (int w = 0; w < currentLayer->m_nb_neurons; w++)
 				{
-					sum_weights += currentLayer.m_neurons[w].m_weights[n];
+					sum_weights += currentLayer->m_neurons[w]->m_weights[n];
 				}
-				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
+				for (int w = 0; w < currentLayer->m_nb_neurons; w++)
 				{
-					currentLayer.m_neurons[w].m_value = currentLayer.m_neurons[w].m_weights[n] / sum_weights * preactivation_value;
+					currentLayer->m_neurons[w]->m_value = currentLayer->m_neurons[w]->m_weights[n] / sum_weights * preactivation_value;
 				}
 			}
 		}
@@ -1264,5 +1190,82 @@ bool NeuralNetwork::IsBetterPerfThanSaveFile(Performance &perf)
 	{
 		cerr << "DEBUG: No BEST PERF FILE found. A new file is going to be created.\n" << endl;
 		return true;
+	}
+}
+
+#define LAYER_MAX_SIZE_X	600
+#define LAYER_MAX_SIZE_Y    400
+#define NEURON_RADIUS		10
+
+void NeuralNetwork::AdjustNeuronDisplayPositions()
+{
+	int max_nb_neurons = 0;
+	for (Layer* layer : m_layers)
+	{
+		if (layer->m_nb_neurons > max_nb_neurons)
+			max_nb_neurons = layer->m_nb_neurons;
+	}
+
+	float step_x = LAYER_MAX_SIZE_X / (m_nb_layers == 0 ? 1 : m_nb_layers);
+	float step_y = LAYER_MAX_SIZE_Y / (max_nb_neurons - 1);
+	float current_step_x = 0;
+	float current_step_y = 0;
+
+	Layer* previousLayer = m_layers.front();
+	for (Layer* layer : m_layers)
+	{
+		int layer_nb_neurons = layer->m_type != OutpuLayer && m_use_bias == true ? layer->m_nb_neurons - 1 : layer->m_nb_neurons;
+		int max_nb_neurons_ = m_use_bias == true ? max_nb_neurons - 1 : max_nb_neurons;
+
+		if ((max_nb_neurons_ % 2 == 0 && layer_nb_neurons % 2 == 0) || (max_nb_neurons_ % 2 != 0 && layer_nb_neurons % 2 != 0))
+			current_step_y = (max_nb_neurons_ - layer_nb_neurons) / 2 * step_y;
+		else
+			current_step_y = step_y * 0.5 + (max_nb_neurons_ - 1 - layer_nb_neurons) / 2 * step_y;
+
+		for (Neuron* neuron : layer->m_neurons)
+		{
+			neuron->m_circle.setRadius(NEURON_RADIUS);
+			neuron->m_circle.setPosition(current_step_x, current_step_y);
+			if (neuron->m_is_bias == true)
+				neuron->m_circle.setFillColor(sf::Color::Magenta);
+
+			//weights
+			if (layer->m_type != InputLayer)
+			{
+				for (Neuron* prev_neuron : previousLayer->m_neurons)
+				{
+					if (neuron->m_is_bias == false)
+					{
+						float x = neuron->m_circle.getPosition().x - prev_neuron->m_circle.getPosition().x - NEURON_RADIUS * 2;
+						float y = neuron->m_circle.getPosition().y - prev_neuron->m_circle.getPosition().y;
+
+						sf::RectangleShape line;
+						line.setOrigin(sf::Vector2f(0, 0));
+						line.setFillColor(sf::Color::Black);
+						line.setOutlineThickness(0);
+						
+						line.setPosition(sf::Vector2f(prev_neuron->m_circle.getPosition().x + NEURON_RADIUS * 2, prev_neuron->m_circle.getPosition().y + NEURON_RADIUS));
+						line.setSize(sf::Vector2f(sqrt(x*x + y*y), 4));
+						
+						float angle = atan2(y, x);
+						angle *= 180.0 / M_PI;
+						if (angle < 0)
+							angle += 360;
+						
+						line.setRotation(angle);
+						
+						neuron->m_lines.push_back(line);
+					}
+				}
+			}
+
+			current_step_y += step_y;
+		}
+
+		current_step_x += step_x;
+		current_step_y = 0;
+
+		if (layer->m_type != InputLayer)
+			previousLayer = layer;
 	}
 }

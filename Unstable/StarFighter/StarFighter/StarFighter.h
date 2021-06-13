@@ -65,10 +65,11 @@ enum FunctionType
 
 enum NeuralNetworkMode
 {
-	PerfFromScratch,		//0: run one time with given hyperparameters and default weights
-	LearnHyperparameters,	//1: run in loop with default weights, tuning hyperparameters every time
-	ImproveWeights,			//2: load best-known weights and hyperparameters and iterate to improve weights
-	Prod,					//3: load best-known weights and hyperparameters and get ready to produce results
+	IdleMode,				//0: wait input
+	CreateDataSet,			//1: run one time with given hyperparameters and default weights
+	RestoreRandomWeights,	//2: run in loop with default weights, tuning hyperparameters every time
+	ImproveWeights,			//3: load best-known weights and hyperparameters and iterate to improve weights
+	Prod,					//4: load best-known weights and hyperparameters and get ready to produce results
 };
 
 struct Performance
@@ -90,10 +91,11 @@ class NeuralNetwork
 {
 public:
 	NeuralNetwork();
+	~NeuralNetwork();
 
 	void AddLayer(int nb_neuron, LayerType type);
 	double GetTargetValue(const Label label);
-	vector<Layer> m_layers;
+	vector<Layer*> m_layers;
 	int m_nb_layers;
 	vector<Data> m_dataset;
 	struct tm timer;
@@ -105,6 +107,7 @@ public:
 	void Creating();
 	Label TestSample(Data &data);
 	bool DoNothing(){ return true; };
+	void Display();
 
 	void InitInputLayer(const Data &data);
 	void FeedForward();
@@ -124,6 +127,7 @@ public:
 	int m_success;
 	double m_success_rate;
 	int m_loops;
+	bool m_use_bias;
 
 	//Record perfs
 	vector<Performance> m_perf_records;
@@ -163,6 +167,13 @@ public:
 		if (label == UNLABELLED)
 			return "UNLABELLED";
 	};
+
+	//display
+	sf::RenderWindow m_renderWindow;
+	sf::RenderTexture m_backgroundTexture;
+	sf::RenderTexture m_networkTexture;
+
+	void AdjustNeuronDisplayPositions();
 };
 
 #endif // STARFIGHTER_H_INCLUDED

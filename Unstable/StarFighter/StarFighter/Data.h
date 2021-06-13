@@ -31,10 +31,8 @@ enum Label
 
 enum Features
 {
-	RED,			//0
-	GREEN,			//1
-	BLUE,			//2
-	NB_FEATURES,	//3
+	ALPHABET_INDEX, //0
+	NB_FEATURES,	//1
 };
 
 class Data
