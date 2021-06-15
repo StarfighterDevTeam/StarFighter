@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "Resources.h"
+
 #define _USE_MATH_DEFINES
 //#include <assert.h>
 //#include <math.h>
@@ -36,6 +38,12 @@ public:
 
 	sf::CircleShape m_circle;
 	vector <sf::RectangleShape> m_lines;
+
+	sf::Text m_input_text;
+	sf::Text m_output_text;
+	vector <sf::Text> m_weight_texts;
+
+	bool IsHovered(sf::Vector2f mouse_position);
 };
 
 enum LayerType

@@ -170,8 +170,6 @@ public:
 
 	//display
 	sf::RenderWindow m_renderWindow;
-	sf::RenderTexture m_backgroundTexture;
-	sf::RenderTexture m_networkTexture;
 
 	void AdjustNeuronDisplayPositions();
 };

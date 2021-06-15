@@ -1,8 +1,11 @@
 #include "StarFighter.h"
 
+Resources* GlobalResources;
+
 int main()
 {
 	srand(time(NULL));
+	GlobalResources = new Resources();
 
 	NeuralNetwork NeuralNetwork;
 
@@ -29,6 +32,8 @@ int main()
 	
 	printf("Exit program?\n");
 	cin.get();
+
+	delete GlobalResources;
 	return 0;
 }
 
@@ -37,13 +42,9 @@ int main()
 NeuralNetwork::NeuralNetwork()
 {
 	//display
-	m_renderWindow.create(sf::VideoMode(800, 600), "Neural Network");
+	m_renderWindow.create(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Neural Network");
 	m_renderWindow.setKeyRepeatEnabled(false);
 	m_renderWindow.setFramerateLimit(60);
-	m_backgroundTexture.create(800, 600, false);
-	m_backgroundTexture.setSmooth(true);
-	m_networkTexture.create(800, 600, false);
-	m_networkTexture.setSmooth(true);
 
 	m_nb_layers = 0;
 	m_success_rate = 0.f;
@@ -128,38 +129,42 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 void NeuralNetwork::Display()
 {
+	m_renderWindow.clear();
+
+	//mouse pointer
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(m_renderWindow);
+	sf::Vector2f mousepos = m_renderWindow.mapPixelToCoords(mousepos2i, GlobalResources->m_view);
+
 	//background
 	sf::RectangleShape background;
-	background.setSize(sf::Vector2f(800, 600));
+	background.setSize(sf::Vector2f(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y));
 	background.setFillColor(sf::Color(50, 50, 50, 255));
 	background.setOrigin(0, 0);
 	background.setPosition(0, 0);
-	m_backgroundTexture.draw(background);
+	m_renderWindow.draw(background);
+
+	printf("mouse pos: %f\n", mousepos.x);
 	
 	for (Layer* layer : m_layers)
 	{
 		for (Neuron* neuron : layer->m_neurons)
 		{
-			m_networkTexture.draw(neuron->m_circle);
+			m_renderWindow.draw(neuron->m_circle);
 
 			for (sf::RectangleShape& line : neuron->m_lines)
-				m_networkTexture.draw(line);
+				m_renderWindow.draw(line);
+
+			//weights display if neuron is hovered
+			if (neuron->IsHovered(mousepos) == true)
+			{
+				for (sf::Text text : neuron->m_weight_texts)
+					m_renderWindow.draw(text);
+			}
 		}
 	}
 
 	//display
-	m_backgroundTexture.display();
-	m_networkTexture.display();
-
-	sf::Sprite temp_background(m_backgroundTexture.getTexture());//background
-	temp_background.setPosition(sf::Vector2f(0, 0));
-	m_renderWindow.draw(temp_background);
-
-	sf::Sprite temp_network(m_networkTexture.getTexture());//neural network
-	temp_network.setPosition(sf::Vector2f(100, 100));
-	m_renderWindow.draw(temp_network);
-
-	m_renderWindow.display();//final display
+	m_renderWindow.display();
 }
 
 void NeuralNetwork::RestoreWeights()
@@ -1193,9 +1198,13 @@ bool NeuralNetwork::IsBetterPerfThanSaveFile(Performance &perf)
 	}
 }
 
-#define LAYER_MAX_SIZE_X	600
-#define LAYER_MAX_SIZE_Y    400
-#define NEURON_RADIUS		10
+#define LAYER_MAX_SIZE_X			(WINDOW_RESOLUTION_X - 100)
+#define LAYER_MAX_SIZE_Y			(WINDOW_RESOLUTION_Y - 200)
+#define NEURON_RADIUS				10
+#define WEIGHTS_LINE_THICKNESS		1
+#define NETWORK_DISPLAY_OFFSET_X	100
+#define NETWORK_DISPLAY_OFFSET_Y	100
+
 
 void NeuralNetwork::AdjustNeuronDisplayPositions()
 {
@@ -1208,7 +1217,7 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 
 	float step_x = LAYER_MAX_SIZE_X / (m_nb_layers == 0 ? 1 : m_nb_layers);
 	float step_y = LAYER_MAX_SIZE_Y / (max_nb_neurons - 1);
-	float current_step_x = 0;
+	float current_step_x = NETWORK_DISPLAY_OFFSET_X;
 	float current_step_y = 0;
 
 	Layer* previousLayer = m_layers.front();
@@ -1218,16 +1227,18 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 		int max_nb_neurons_ = m_use_bias == true ? max_nb_neurons - 1 : max_nb_neurons;
 
 		if ((max_nb_neurons_ % 2 == 0 && layer_nb_neurons % 2 == 0) || (max_nb_neurons_ % 2 != 0 && layer_nb_neurons % 2 != 0))
-			current_step_y = (max_nb_neurons_ - layer_nb_neurons) / 2 * step_y;
+			current_step_y = NETWORK_DISPLAY_OFFSET_Y + (max_nb_neurons_ - layer_nb_neurons) / 2 * step_y;
 		else
-			current_step_y = step_y * 0.5 + (max_nb_neurons_ - 1 - layer_nb_neurons) / 2 * step_y;
+			current_step_y = NETWORK_DISPLAY_OFFSET_Y + step_y * 0.5 + (max_nb_neurons_ - 1 - layer_nb_neurons) / 2 * step_y;
 
+		int n = 0;
 		for (Neuron* neuron : layer->m_neurons)
 		{
 			neuron->m_circle.setRadius(NEURON_RADIUS);
 			neuron->m_circle.setPosition(current_step_x, current_step_y);
 			if (neuron->m_is_bias == true)
 				neuron->m_circle.setFillColor(sf::Color::Magenta);
+				//neuron->m_circle.setOutlineColor(sf::Color::Magenta);
 
 			//weights
 			if (layer->m_type != InputLayer)
@@ -1236,16 +1247,17 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 				{
 					if (neuron->m_is_bias == false)
 					{
+						//weight lines
 						float x = neuron->m_circle.getPosition().x - prev_neuron->m_circle.getPosition().x - NEURON_RADIUS * 2;
 						float y = neuron->m_circle.getPosition().y - prev_neuron->m_circle.getPosition().y;
 
 						sf::RectangleShape line;
 						line.setOrigin(sf::Vector2f(0, 0));
-						line.setFillColor(sf::Color::Black);
+						line.setFillColor(sf::Color(0, 0, 0, 100));
 						line.setOutlineThickness(0);
 						
 						line.setPosition(sf::Vector2f(prev_neuron->m_circle.getPosition().x + NEURON_RADIUS * 2, prev_neuron->m_circle.getPosition().y + NEURON_RADIUS));
-						line.setSize(sf::Vector2f(sqrt(x*x + y*y), 4));
+						line.setSize(sf::Vector2f(sqrt(x*x + y*y), WEIGHTS_LINE_THICKNESS));
 						
 						float angle = atan2(y, x);
 						angle *= 180.0 / M_PI;
@@ -1255,11 +1267,25 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 						line.setRotation(angle);
 						
 						neuron->m_lines.push_back(line);
+
+						//weight texts
+						sf::Text text;
+						text.setCharacterSize(16);
+						text.setStyle(sf::Text::Style::Regular);
+						text.setColor(sf::Color::Black);
+						text.setOrigin(sf::Vector2f(0, 0));
+						text.setFont(*GlobalResources->m_font);
+						string str = to_string(prev_neuron->m_weights[n]);
+						text.setString(str.substr(0, 5));
+						text.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x - x * 0.5, neuron->m_circle.getPosition().y - y * 0.5));
+
+						neuron->m_weight_texts.push_back(text);
 					}
 				}
 			}
 
 			current_step_y += step_y;
+			n++;
 		}
 
 		current_step_x += step_x;
