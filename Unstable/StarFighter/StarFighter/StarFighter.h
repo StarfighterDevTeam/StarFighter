@@ -23,9 +23,9 @@ using namespace std;
 #include "Globals.h"
 #include "Neuron.h"
 
-#define NN_LEARNING_RATE				0.7
-#define NN_MOMENTUM						0.6
-#define NN_ACTIVATION_FUNCTION			TANH
+#define NN_LEARNING_RATE				0.1
+#define NN_MOMENTUM						0.0
+#define NN_ACTIVATION_FUNCTION			SIGMOID
 
 #define NN_ERROR_MARGIN					0.02f
 #define NN_MAX_ATTEMPTS					500
@@ -68,8 +68,7 @@ enum NeuralNetworkMode
 	IdleMode,				//0: wait input
 	CreateDataSet,			//1: run one time with given hyperparameters and default weights
 	RestoreRandomWeights,	//2: run in loop with default weights, tuning hyperparameters every time
-	ImproveWeights,			//3: load best-known weights and hyperparameters and iterate to improve weights
-	Prod,					//4: load best-known weights and hyperparameters and get ready to produce results
+	Learn,					//3
 };
 
 struct Performance
@@ -100,6 +99,7 @@ public:
 	vector<Data> m_dataset;
 	struct tm timer;
 	Data CreateDataWithManualInputs();
+	string DecodingData(Data& data);
 
 	void Run(NeuralNetworkMode mode);
 	void Training();
@@ -111,7 +111,7 @@ public:
 
 	void InitInputLayer(const Data &data);
 	void FeedForward();
-	void ErrorCalculation(const Data &data);
+	float ErrorCalculation(const Data &data);
 	void BackPropagationGradient(const Data &data);
 	void WeightsUpdate();
 	void FeedBackward(Label label);
@@ -170,8 +170,11 @@ public:
 
 	//display
 	sf::RenderWindow m_renderWindow;
-
 	void AdjustNeuronDisplayPositions();
+
+	sf::Clock m_display_timer;
+	sf::Text m_general_info_text;
+	int m_current_data_index;
 };
 
 #endif // STARFIGHTER_H_INCLUDED

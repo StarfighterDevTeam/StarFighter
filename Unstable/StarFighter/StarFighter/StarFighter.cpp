@@ -9,12 +9,16 @@ int main()
 
 	NeuralNetwork NeuralNetwork;
 
-	//NeuralNetwork.CreateDataset();
 	//NeuralNetwork.LoadDatasetFromFile();
-	//NeuralNetwork.BalanceDataset();//cutting examples so that we have a perfect parity between green examples and not green examples, mixed alternatively
-	//NeuralNetwork.SaveDatasetIntoFile();
+	NeuralNetwork.CreateDataset();
+	NeuralNetwork.BalanceDataset();//cutting examples so that we have a perfect parity between green examples and not green examples, mixed alternatively
+	NeuralNetwork.SaveDatasetIntoFile();
 
-	int mode = 0;
+	//NeuralNetwork.Run(Learn);
+
+	int mode = Learn;
+	NeuralNetwork.m_current_data_index = 0;
+
 	while (mode >= 0)
 	{
 		//printf("\nChoose run mode for the Neural Network:\n\n");
@@ -46,6 +50,7 @@ NeuralNetwork::NeuralNetwork()
 	m_renderWindow.setKeyRepeatEnabled(false);
 	m_renderWindow.setFramerateLimit(60);
 
+	//hyper parameters
 	m_nb_layers = 0;
 	m_success_rate = 0.f;
 	m_loops = 0;
@@ -57,7 +62,7 @@ NeuralNetwork::NeuralNetwork()
 
 	m_learning_rate = NN_LEARNING_RATE;
 	m_momentum = NN_MOMENTUM;
-	m_function = LEAKY_RELU;
+	m_function = NN_ACTIVATION_FUNCTION;
 	m_use_bias = true;
 
 	//Input layer
@@ -124,6 +129,31 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 			break;
 		}
+
+		case Learn:
+		{
+			if (m_display_timer.getElapsedTime().asSeconds() > 0.1)
+			{
+				int d = m_current_data_index;
+				//for (int n = 0; n < m_dataset.size(); n++)
+				InitInputLayer(m_dataset[d]);
+				FeedForward();
+				ErrorCalculation(m_dataset[d]);
+				BackPropagationGradient(m_dataset[d]);
+				WeightsUpdate();
+
+				m_display_timer.restart();
+
+				float val = m_layers.back()->m_neurons.front()->m_value;
+				string str_info = "Dataset size: " + to_string(m_dataset.size()) + ", current item: " + to_string(int(trunc(m_dataset[d].m_features.front()))) + " (" + DecodingData(m_dataset[d]) + "), label: " + to_string(m_dataset[d].m_label) + ", estimated label: " + (val > 0.5 ? "ROMAIN" : "NOT_ROMAIN") + " (confidence : " + to_string(abs(val - 0.5)) + "), error : " + to_string(m_error);
+				m_general_info_text.setString(str_info);
+
+				m_current_data_index++;
+				if (m_current_data_index == m_dataset.size())
+					m_current_data_index = 0;
+			}
+			break;
+		}
 	}
 }
 
@@ -142,13 +172,19 @@ void NeuralNetwork::Display()
 	background.setOrigin(0, 0);
 	background.setPosition(0, 0);
 	m_renderWindow.draw(background);
-
-	printf("mouse pos: %f\n", mousepos.x);
 	
+	Layer* previousLayer = m_layers.front();
 	for (Layer* layer : m_layers)
 	{
+		int n = 0;
 		for (Neuron* neuron : layer->m_neurons)
 		{
+			//circle
+			//if (neuron->m_value == 0 && neuron->m_circle.getFillColor() != sf::Color::Black)
+			//	neuron->m_circle.setFillColor(sf::Color::Black);
+			//else
+			neuron->m_circle.setFillColor(neuron->m_is_bias == false ? sf::Color::Red : sf::Color::Magenta);
+
 			m_renderWindow.draw(neuron->m_circle);
 
 			for (sf::RectangleShape& line : neuron->m_lines)
@@ -157,11 +193,45 @@ void NeuralNetwork::Display()
 			//weights display if neuron is hovered
 			if (neuron->IsHovered(mousepos) == true)
 			{
+				if (layer->m_type != InputLayer)
+				{
+					for (Neuron* prev_neuron : previousLayer->m_neurons)
+					{
+						if (neuron->m_is_bias == false)
+						{
+							string str = to_string(prev_neuron->m_weights[n]);
+							neuron->m_weight_texts[n].setString(str.substr(0, 5));
+						}
+					}
+				}
+
 				for (sf::Text text : neuron->m_weight_texts)
 					m_renderWindow.draw(text);
 			}
+
+			//input value display
+			string str;
+			if (layer->m_type != InputLayer && neuron->m_is_bias == false)
+			{
+				str = to_string(neuron->m_input_value);
+				neuron->m_input_text.setString(str.substr(0, 5));
+				m_renderWindow.draw(neuron->m_input_text);
+			}
+
+			//ouput value display
+			str = to_string(neuron->m_value);
+			neuron->m_output_text.setString(str.substr(0, 5));
+			m_renderWindow.draw(neuron->m_output_text);
+
+			n++;
 		}
+
+		if (layer->m_type != InputLayer)
+			previousLayer = layer;
 	}
+
+	//general info
+	m_renderWindow.draw(m_general_info_text);
 
 	//display
 	m_renderWindow.display();
@@ -287,6 +357,73 @@ Data NeuralNetwork::CreateDataWithManualInputs()
 
 	Data data(features, label);
 	return data;
+}
+
+string NeuralNetwork::DecodingData(Data& data)
+{
+	int index = (int)data.m_features[0];
+
+	switch (index)
+	{
+		case 1:
+			return "A";
+		case 2:
+			return "B";
+		case 3:
+			return "C";
+		case 4:
+			return "D";
+		case 5:
+			return "E";
+		case 6:
+			return "F";
+		case 7:
+			return "G";
+		case 8:
+			return "H";
+		case 9:
+			return "I";
+		case 10:
+			return "J";
+		case 11:
+			return "K";
+		case 12:
+			return "L";
+		case 13:
+			return "M";
+		case 14:
+			return "N";
+		case 15:
+			return "O";
+		case 16:
+			return "P";
+		case 17:
+			return "Q";
+		case 18:
+			return "R";
+		case 19:
+			return "S";
+		case 20:
+			return "T";
+		case 21:
+			return "U";
+		case 22:
+			return "V";
+		case 23:
+			return "W";
+		case 24:
+			return "X";
+		case 25:
+			return "Y";
+		case 26:
+			return "Z";
+
+		default:
+			return "";
+			
+	}
+
+	return "";
 }
 
 void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
@@ -529,7 +666,7 @@ double NeuralNetwork::GetTargetValue(const Label label)
 	return target_value;
 }
 
-void NeuralNetwork::ErrorCalculation(const Data &data)
+float NeuralNetwork::ErrorCalculation(const Data &data)
 {
 	//Error
 	if (PRINT_EC){ printf("Error calculation.\n"); }
@@ -556,6 +693,8 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	}
 
 	m_average_error += m_error;
+
+	return m_error;
 }
 
 void NeuralNetwork::BackPropagationGradient(const Data &data)
@@ -853,6 +992,8 @@ void NeuralNetwork::CreateDataset()
 
 bool NeuralNetwork::SaveDatasetIntoFile()
 {
+	remove(DATASET_FILE);
+
 	ofstream data(DATASET_FILE, ios::in | ios::trunc);
 
 	if (data)
@@ -1236,10 +1377,8 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 		{
 			neuron->m_circle.setRadius(NEURON_RADIUS);
 			neuron->m_circle.setPosition(current_step_x, current_step_y);
-			if (neuron->m_is_bias == true)
-				neuron->m_circle.setFillColor(sf::Color::Magenta);
-				//neuron->m_circle.setOutlineColor(sf::Color::Magenta);
 
+			string str;
 			//weights
 			if (layer->m_type != InputLayer)
 			{
@@ -1275,7 +1414,7 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 						text.setColor(sf::Color::Black);
 						text.setOrigin(sf::Vector2f(0, 0));
 						text.setFont(*GlobalResources->m_font);
-						string str = to_string(prev_neuron->m_weights[n]);
+						str = to_string(prev_neuron->m_weights[n]);
 						text.setString(str.substr(0, 5));
 						text.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x - x * 0.5, neuron->m_circle.getPosition().y - y * 0.5));
 
@@ -1283,6 +1422,29 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 					}
 				}
 			}
+
+			//input value
+			if (neuron->m_is_bias == false)
+			{
+				neuron->m_input_text.setCharacterSize(16);
+				neuron->m_input_text.setStyle(sf::Text::Style::Regular);
+				neuron->m_input_text.setColor(sf::Color::Green);
+				neuron->m_input_text.setOrigin(sf::Vector2f(0, 0));
+				neuron->m_input_text.setFont(*GlobalResources->m_font);
+				str = to_string(neuron->m_input_value);
+				neuron->m_input_text.setString(str.substr(0, 5));
+				neuron->m_input_text.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x + neuron->m_circle.getRadius() * 0.5 - neuron->m_input_text.getGlobalBounds().width * 0.5, neuron->m_circle.getPosition().y - neuron->m_input_text.getGlobalBounds().height - 10));
+			}
+			
+			//ouput value
+			neuron->m_output_text.setCharacterSize(16);
+			neuron->m_output_text.setStyle(sf::Text::Style::Regular);
+			neuron->m_output_text.setColor(sf::Color::Red);
+			neuron->m_output_text.setOrigin(sf::Vector2f(0, 0));
+			neuron->m_output_text.setFont(*GlobalResources->m_font);
+			str = to_string(neuron->m_value);
+			neuron->m_output_text.setString(str.substr(0, 5));
+			neuron->m_output_text.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x + neuron->m_circle.getRadius() * 0.5 - neuron->m_output_text.getGlobalBounds().width * 0.5, neuron->m_circle.getPosition().y + neuron->m_circle.getRadius() * 2 + neuron->m_output_text.getGlobalBounds().height));
 
 			current_step_y += step_y;
 			n++;
@@ -1294,4 +1456,13 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 		if (layer->m_type != InputLayer)
 			previousLayer = layer;
 	}
+
+	//general info
+	m_general_info_text.setCharacterSize(20);
+	m_general_info_text.setStyle(sf::Text::Style::Regular);
+	m_general_info_text.setColor(sf::Color::White);
+	m_general_info_text.setOrigin(sf::Vector2f(0, 0));
+	m_general_info_text.setFont(*GlobalResources->m_font);
+	m_general_info_text.setPosition(sf::Vector2f(10, 10));
+
 }

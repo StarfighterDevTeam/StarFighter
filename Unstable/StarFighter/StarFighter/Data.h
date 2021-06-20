@@ -24,8 +24,8 @@ using namespace std;
 
 enum Label
 {
-	IS_NOT_ROMAIN,
-	IS_ROMAIN,
+	IS_NOT_ROMAIN,//0
+	IS_ROMAIN,//1
 	UNLABELLED,
 };
 
