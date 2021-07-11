@@ -173,45 +173,65 @@ void NeuralNetwork::Display()
 	background.setPosition(0, 0);
 	m_renderWindow.draw(background);
 	
-	Layer* previousLayer = m_layers.front();
-	for (Layer* layer : m_layers)
-	{
-		int n = 0;
-		for (Neuron* neuron : layer->m_neurons)
-		{
-			//circle
-			//if (neuron->m_value == 0 && neuron->m_circle.getFillColor() != sf::Color::Black)
-			//	neuron->m_circle.setFillColor(sf::Color::Black);
-			//else
-			neuron->m_circle.setFillColor(neuron->m_is_bias == false ? sf::Color::Red : sf::Color::Magenta);
 
+	//neurons
+	for (int i = 0; i < m_nb_layers; i++)
+	{
+		Layer* currentLayer = m_layers[i];
+		for (Neuron* neuron : currentLayer->m_neurons)
+		{
+			//dot
+			neuron->m_circle.setFillColor(neuron->m_is_bias == false ? sf::Color::Red : sf::Color::Magenta);
 			m_renderWindow.draw(neuron->m_circle);
 
+			//lines
 			for (sf::RectangleShape& line : neuron->m_lines)
 				m_renderWindow.draw(line);
 
-			//weights display if neuron is hovered
+			//weight texts' value update
+			if (currentLayer->m_type != OutpuLayer)
+			{
+				Layer* nextLayer = m_layers[i + 1];
+				int n = 0;
+				for (Neuron* next_neuron : nextLayer->m_neurons)
+				{
+					if (next_neuron->m_is_bias == false && currentLayer->m_type != OutpuLayer)
+					{
+						sf::Text text;
+						string str = to_string(neuron->m_weights[n]);
+						neuron->m_weight_texts[n].setString(str.substr(0, 5));
+					}
+
+					n++;
+				}
+			}
+
+			//weights text display if neuron is hovered
 			if (neuron->IsHovered(mousepos) == true)
 			{
-				if (layer->m_type != InputLayer)
+				if (m_layers[i]->m_type != InputLayer)
 				{
-					for (Neuron* prev_neuron : previousLayer->m_neurons)
+					int n = 0;
+					for (Neuron* prev_neuron : m_layers[i - 1]->m_neurons)
 					{
-						if (neuron->m_is_bias == false)
-						{
-							string str = to_string(prev_neuron->m_weights[n]);
-							neuron->m_weight_texts[n].setString(str.substr(0, 5));
-						}
+						m_renderWindow.draw(prev_neuron->m_weight_texts[n]);
+						n++;
 					}
 				}
-
-				for (sf::Text text : neuron->m_weight_texts)
-					m_renderWindow.draw(text);
 			}
+		}
+	}
+
+	for (int i = 0; i < m_nb_layers; i++)
+	{
+		int n = 0;
+		for (Neuron* neuron : m_layers[i]->m_neurons)
+		{
+			
 
 			//input value display
 			string str;
-			if (layer->m_type != InputLayer && neuron->m_is_bias == false)
+			if (m_layers[i]->m_type != InputLayer && neuron->m_is_bias == false)
 			{
 				str = to_string(neuron->m_input_value);
 				neuron->m_input_text.setString(str.substr(0, 5));
@@ -225,9 +245,6 @@ void NeuralNetwork::Display()
 
 			n++;
 		}
-
-		if (layer->m_type != InputLayer)
-			previousLayer = layer;
 	}
 
 	//general info
@@ -1361,10 +1378,12 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 	float current_step_x = NETWORK_DISPLAY_OFFSET_X;
 	float current_step_y = 0;
 
-	Layer* previousLayer = m_layers.front();
-	for (Layer* layer : m_layers)
+	string str;
+	for (int i = 0; i < m_nb_layers; i++)
 	{
-		int layer_nb_neurons = layer->m_type != OutpuLayer && m_use_bias == true ? layer->m_nb_neurons - 1 : layer->m_nb_neurons;
+		Layer* currentLayer = m_layers[i];
+
+		int layer_nb_neurons = currentLayer->m_type != OutpuLayer && m_use_bias == true ? currentLayer->m_nb_neurons - 1 : currentLayer->m_nb_neurons;
 		int max_nb_neurons_ = m_use_bias == true ? max_nb_neurons - 1 : max_nb_neurons;
 
 		if ((max_nb_neurons_ % 2 == 0 && layer_nb_neurons % 2 == 0) || (max_nb_neurons_ % 2 != 0 && layer_nb_neurons % 2 != 0))
@@ -1372,57 +1391,11 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 		else
 			current_step_y = NETWORK_DISPLAY_OFFSET_Y + step_y * 0.5 + (max_nb_neurons_ - 1 - layer_nb_neurons) / 2 * step_y;
 
-		int n = 0;
-		for (Neuron* neuron : layer->m_neurons)
+		for (Neuron* neuron : currentLayer->m_neurons)
 		{
 			neuron->m_circle.setRadius(NEURON_RADIUS);
 			neuron->m_circle.setPosition(current_step_x, current_step_y);
-
-			string str;
-			//weights
-			if (layer->m_type != InputLayer)
-			{
-				for (Neuron* prev_neuron : previousLayer->m_neurons)
-				{
-					if (neuron->m_is_bias == false)
-					{
-						//weight lines
-						float x = neuron->m_circle.getPosition().x - prev_neuron->m_circle.getPosition().x - NEURON_RADIUS * 2;
-						float y = neuron->m_circle.getPosition().y - prev_neuron->m_circle.getPosition().y;
-
-						sf::RectangleShape line;
-						line.setOrigin(sf::Vector2f(0, 0));
-						line.setFillColor(sf::Color(0, 0, 0, 100));
-						line.setOutlineThickness(0);
-						
-						line.setPosition(sf::Vector2f(prev_neuron->m_circle.getPosition().x + NEURON_RADIUS * 2, prev_neuron->m_circle.getPosition().y + NEURON_RADIUS));
-						line.setSize(sf::Vector2f(sqrt(x*x + y*y), WEIGHTS_LINE_THICKNESS));
-						
-						float angle = atan2(y, x);
-						angle *= 180.0 / M_PI;
-						if (angle < 0)
-							angle += 360;
-						
-						line.setRotation(angle);
-						
-						neuron->m_lines.push_back(line);
-
-						//weight texts
-						sf::Text text;
-						text.setCharacterSize(16);
-						text.setStyle(sf::Text::Style::Regular);
-						text.setColor(sf::Color::Black);
-						text.setOrigin(sf::Vector2f(0, 0));
-						text.setFont(*GlobalResources->m_font);
-						str = to_string(prev_neuron->m_weights[n]);
-						text.setString(str.substr(0, 5));
-						text.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x - x * 0.5, neuron->m_circle.getPosition().y - y * 0.5));
-
-						neuron->m_weight_texts.push_back(text);
-					}
-				}
-			}
-
+			
 			//input value
 			if (neuron->m_is_bias == false)
 			{
@@ -1447,14 +1420,68 @@ void NeuralNetwork::AdjustNeuronDisplayPositions()
 			neuron->m_output_text.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x + neuron->m_circle.getRadius() * 0.5 - neuron->m_output_text.getGlobalBounds().width * 0.5, neuron->m_circle.getPosition().y + neuron->m_circle.getRadius() * 2 + neuron->m_output_text.getGlobalBounds().height));
 
 			current_step_y += step_y;
-			n++;
 		}
 
 		current_step_x += step_x;
 		current_step_y = 0;
+	}
 
-		if (layer->m_type != InputLayer)
-			previousLayer = layer;
+	//weights
+	for (int i = 0; i < m_nb_layers; i++)
+	{
+		Layer* currentLayer = m_layers[i];
+		for (Neuron* neuron : currentLayer->m_neurons)
+		{
+			neuron->m_weight_texts.clear();
+			neuron->m_lines.clear();
+
+			int n = 0;
+			if (currentLayer->m_type != OutpuLayer)
+			{
+				Layer* nextLayer = m_layers[i + 1];
+				for (Neuron* next_neuron : nextLayer->m_neurons)
+				{
+					if (next_neuron->m_is_bias == false && currentLayer->m_type != OutpuLayer)
+					{
+						float x = next_neuron->m_circle.getPosition().x - (neuron->m_circle.getPosition().x + NEURON_RADIUS * 2);
+						float y = next_neuron->m_circle.getPosition().y - neuron->m_circle.getPosition().y;
+
+						//weight lines
+						sf::RectangleShape line;
+						line.setOrigin(sf::Vector2f(0, 0));
+						line.setFillColor(sf::Color(0, 0, 0, 100));
+						line.setOutlineThickness(0);
+
+						line.setPosition(sf::Vector2f(neuron->m_circle.getPosition().x + NEURON_RADIUS * 2, neuron->m_circle.getPosition().y + NEURON_RADIUS));
+						line.setSize(sf::Vector2f(sqrt(x*x + y*y), WEIGHTS_LINE_THICKNESS));
+
+						float angle = atan2(y, x);
+						angle *= 180.0 / M_PI;
+						if (angle < 0)
+							angle += 360;
+
+						line.setRotation(angle);
+
+						neuron->m_lines.push_back(line);
+
+						//weight texts
+						sf::Text text;
+						text.setCharacterSize(16);
+						text.setStyle(sf::Text::Style::Regular);
+						text.setColor(sf::Color::Black);
+						text.setOrigin(sf::Vector2f(0, 0));
+						text.setFont(*GlobalResources->m_font);
+						str = to_string(neuron->m_weights[n]);
+						text.setString(str.substr(0, 5));
+						text.setPosition(sf::Vector2f(next_neuron->m_circle.getPosition().x, next_neuron->m_circle.getPosition().y));
+
+						neuron->m_weight_texts.push_back(text);
+					}
+
+					n++;
+				}
+			}
+		}
 	}
 
 	//general info
