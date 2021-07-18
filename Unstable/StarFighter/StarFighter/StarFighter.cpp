@@ -15,24 +15,39 @@ int main()
 	NeuralNetwork.SaveDatasetIntoFile();
 
 	//NeuralNetwork.Run(Learn);
-
 	int mode = Learn;
 	NeuralNetwork.m_current_data_index = 0;
 
-	while (mode >= 0)
+	while ((*GlobalResources).m_renderWindow.isOpen())
 	{
-		//printf("\nChoose run mode for the Neural Network:\n\n");
-		//printf("0 = perform from scratch with given parameters\n");
-		//printf("1 = loop to find the best hyper parameters\n");
-		//printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
-		//printf("3 = input manual values to test the model\n\n");
+		sf::Event event;
+		while ((*GlobalResources).m_renderWindow.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+			{
+				(*GlobalResources).m_renderWindow.close();
+			}
 
-		//printf("0 = create new dataset\n");
-		//printf("1 = reset weights\n");
-
-		NeuralNetwork.Run((NeuralNetworkMode)mode);
-		NeuralNetwork.Display();
+			//run
+			NeuralNetwork.Run((NeuralNetworkMode)mode);
+			NeuralNetwork.Display();
+		}
 	}
+
+	//while (mode >= 0)
+	//{
+	//	//printf("\nChoose run mode for the Neural Network:\n\n");
+	//	//printf("0 = perform from scratch with given parameters\n");
+	//	//printf("1 = loop to find the best hyper parameters\n");
+	//	//printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
+	//	//printf("3 = input manual values to test the model\n\n");
+	//
+	//	//printf("0 = create new dataset\n");
+	//	//printf("1 = reset weights\n");
+	//
+	//	NeuralNetwork.Run((NeuralNetworkMode)mode);
+	//	NeuralNetwork.Display();
+	//}
 	
 	printf("Exit program?\n");
 	cin.get();
@@ -45,11 +60,6 @@ int main()
 //NEURAL NETWORK
 NeuralNetwork::NeuralNetwork()
 {
-	//display
-	m_renderWindow.create(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Neural Network");
-	m_renderWindow.setKeyRepeatEnabled(false);
-	m_renderWindow.setFramerateLimit(60);
-
 	//hyper parameters
 	m_nb_layers = 0;
 	m_success_rate = 0.f;
@@ -159,11 +169,11 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 void NeuralNetwork::Display()
 {
-	m_renderWindow.clear();
+	(*GlobalResources).m_renderWindow.clear();
 
 	//mouse pointer
-	sf::Vector2i mousepos2i = sf::Mouse::getPosition(m_renderWindow);
-	sf::Vector2f mousepos = m_renderWindow.mapPixelToCoords(mousepos2i, GlobalResources->m_view);
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition((*GlobalResources).m_renderWindow);
+	sf::Vector2f mousepos = (*GlobalResources).m_renderWindow.mapPixelToCoords(mousepos2i, GlobalResources->m_view);
 
 	//background
 	sf::RectangleShape background;
@@ -171,7 +181,7 @@ void NeuralNetwork::Display()
 	background.setFillColor(sf::Color(50, 50, 50, 255));
 	background.setOrigin(0, 0);
 	background.setPosition(0, 0);
-	m_renderWindow.draw(background);
+	(*GlobalResources).m_renderWindow.draw(background);
 	
 
 	//neurons
@@ -182,11 +192,11 @@ void NeuralNetwork::Display()
 		{
 			//dot
 			neuron->m_circle.setFillColor(neuron->m_is_bias == false ? sf::Color::Red : sf::Color::Magenta);
-			m_renderWindow.draw(neuron->m_circle);
+			(*GlobalResources).m_renderWindow.draw(neuron->m_circle);
 
 			//lines
 			for (sf::RectangleShape& line : neuron->m_lines)
-				m_renderWindow.draw(line);
+				(*GlobalResources).m_renderWindow.draw(line);
 
 			//weight texts' value update
 			if (currentLayer->m_type != OutpuLayer)
@@ -214,7 +224,7 @@ void NeuralNetwork::Display()
 					int n = 0;
 					for (Neuron* prev_neuron : m_layers[i - 1]->m_neurons)
 					{
-						m_renderWindow.draw(prev_neuron->m_weight_texts[n]);
+						(*GlobalResources).m_renderWindow.draw(prev_neuron->m_weight_texts[n]);
 						n++;
 					}
 				}
@@ -235,23 +245,23 @@ void NeuralNetwork::Display()
 			{
 				str = to_string(neuron->m_input_value);
 				neuron->m_input_text.setString(str.substr(0, 5));
-				m_renderWindow.draw(neuron->m_input_text);
+				(*GlobalResources).m_renderWindow.draw(neuron->m_input_text);
 			}
 
 			//ouput value display
 			str = to_string(neuron->m_value);
 			neuron->m_output_text.setString(str.substr(0, 5));
-			m_renderWindow.draw(neuron->m_output_text);
+			(*GlobalResources).m_renderWindow.draw(neuron->m_output_text);
 
 			n++;
 		}
 	}
 
 	//general info
-	m_renderWindow.draw(m_general_info_text);
+	(*GlobalResources).m_renderWindow.draw(m_general_info_text);
 
 	//display
-	m_renderWindow.display();
+	(*GlobalResources).m_renderWindow.display();
 }
 
 void NeuralNetwork::RestoreWeights()

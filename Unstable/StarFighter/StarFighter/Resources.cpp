@@ -8,6 +8,10 @@ Resources::Resources()
 
 	m_view.setCenter(sf::Vector2f(WINDOW_RESOLUTION_X / 2, WINDOW_RESOLUTION_Y / 2));
 	m_view.setSize(sf::Vector2f(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y));
+
+	m_renderWindow.create(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Neural Network");
+	m_renderWindow.setKeyRepeatEnabled(false);
+	m_renderWindow.setFramerateLimit(60);
 }
 
 Resources::~Resources()

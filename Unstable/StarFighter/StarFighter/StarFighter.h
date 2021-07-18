@@ -169,7 +169,6 @@ public:
 	};
 
 	//display
-	sf::RenderWindow m_renderWindow;
 	void AdjustNeuronDisplayPositions();
 
 	sf::Clock m_display_timer;

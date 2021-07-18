@@ -10,9 +10,11 @@ class Resources
 {
 public:
 	Resources();
+
 	~Resources();
 	sf::Font* m_font;
 	sf::View m_view;
+	sf::RenderWindow m_renderWindow;
 };
 
 #endif // RESOURCES_H_INCLUDED
