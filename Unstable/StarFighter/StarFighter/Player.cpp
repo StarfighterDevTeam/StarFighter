@@ -45,7 +45,7 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_energy_max = 100;
 	m_energy_regen = 10;
 
-	m_gravitation_range = 300;
+	m_gravitation_range = 0;//300
 	m_gravitation_strength = 70;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
 
 	InitShip();
