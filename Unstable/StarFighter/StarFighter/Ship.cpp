@@ -17,33 +17,41 @@ void Ship::Init()
 	m_movingX = m_movingY = false;
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
+
 	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
-	{
 		m_actions_states[i] = false;
-	}
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
 
 	//MICRO BOATS
-	m_thrust = 0.f;
-	m_orientation = 0.f;
+	m_acceleration = 0.f;
 	m_reverse_move = false;
+
+	m_debug_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_debug_text.setCharacterSize(20);
+	m_debug_text.setColor(sf::Color::Black);
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	this->Init();
+	Init();
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size)
 {
-	this->Init();
+	Init();
 }
 
 Ship::~Ship()
 {
 
+}
+
+void Ship::Draw(sf::RenderTexture* screen)
+{
+	screen->draw(*this);
+	screen->draw(m_debug_text);
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -65,51 +73,56 @@ void Ship::update(sf::Time deltaTime)
 
 	//MICRO BOATS
 
-	//Get thurst
+	//Get acceleration
+	m_acceleration = 0;
+	float movement_angle = GetAngleRadForSpeed(m_speed);
+	float delta_angle = movement_angle - getRotation() * M_PI / 180;
+	delta_angle = fmod((delta_angle + 180), 360) - 180;
+	m_reverse_move = abs(delta_angle) > M_PI_2;
+	float current_speed = GetAbsoluteSpeed() * (m_reverse_move == false ? 1 : -1);
+	printf("delta angle : %d\n", (int)m_reverse_move);
+
+	//Acceleration
 	if (inputs_direction.y < 0)//------------------------------------------> up
 	{
-		m_thrust -= deltaTime.asSeconds() * SHIP_ACCELERATION_FORWARD;
-		if (m_thrust < -SHIP_MAX_SPEED_FORWARD)
-		{
-			m_thrust = -SHIP_MAX_SPEED_FORWARD;
-		}
+		m_acceleration = SHIP_ACCELERATION_FORWARD;
+		current_speed += m_acceleration * deltaTime.asSeconds();
 	}
 	else if (inputs_direction.y > 0)//-------------------------------------> down
 	{
-		if (m_thrust >= 0)
-		{
-			m_thrust += deltaTime.asSeconds() * SHIP_ACCELERATION_BACKWARD;
-		}
-		else 
-		{
-			m_thrust -= deltaTime.asSeconds() * SHIP_BRAKE_SPEED;
-		}
-
-		if (m_thrust > SHIP_MAX_SPEED_BACKWARD)
-		{
-			m_thrust = SHIP_MAX_SPEED_BACKWARD;
-		}
+		m_acceleration = current_speed > 0 ? - SHIP_BRAKE_SPEED : - SHIP_MAX_SPEED_BACKWARD;
+		current_speed += m_acceleration * deltaTime.asSeconds();
 	}
 	else//-----------------------------------------------------------------> idle = deceleration
 	{
-		if (m_thrust > 0)
+		if (abs(current_speed) < SHIP_MIN_SPEED)
+			current_speed = 0;
+		else
 		{
-			if (m_thrust > SHIP_MIN_SPEED)
-				m_thrust -= deltaTime.asSeconds() * SHIP_DECELERATION;
-			else
-				m_thrust = 0;
-		}
-		else if (m_thrust < 0)
-		{
-			if (m_thrust < -SHIP_MIN_SPEED)
-				m_thrust += deltaTime.asSeconds() * SHIP_DECELERATION;
-			else
-				m_thrust = 0;
+			m_acceleration = m_reverse_move == false ? -SHIP_DECELERATION : SHIP_DECELERATION;
+			current_speed += m_acceleration * deltaTime.asSeconds();
 		}
 	}
+
+	//Turn
+	if (inputs_direction.x > 0)//------------------------------------------> right
+	{
+		setRotation(getRotation() + SHIP_TURN_RATE * deltaTime.asSeconds());
+	}
+	else if (inputs_direction.x < 0)//------------------------------------------> left
+	{
+		setRotation(getRotation() - SHIP_TURN_RATE * deltaTime.asSeconds());
+	}
+
 	
 	//Thrust and orientation converted into speed
-	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_thrust, m_orientation * M_PI / 180);
+	if (current_speed > SHIP_MAX_SPEED_FORWARD)
+		current_speed = SHIP_MAX_SPEED_FORWARD;
+
+	if (current_speed < -SHIP_MAX_SPEED_BACKWARD)
+		current_speed = -SHIP_MAX_SPEED_BACKWARD;
+
+	SetSpeedVectorFromAbsoluteSpeedAndAngle(current_speed, (getRotation() + 180) * M_PI / 180);
 
 	//Min speed
 	//if (GetAbsoluteSpeed() < SHIP_MIN_SPEED)
@@ -117,11 +130,10 @@ void Ship::update(sf::Time deltaTime)
 	//	m_speed = sf::Vector2f(0, 0);
 	//}
 
-	//Update
-	setRotation(m_orientation);
-
 	//Feedback
-	printf("thrust: %f, orientation: %f\n", m_thrust, m_orientation);
+	string ss = "speed: " + to_string((int)current_speed) + "\nrotation: " + to_string((int)getRotation());
+	m_debug_text.setString(ss);
+	m_debug_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + 50));
 	
 	//Action input
 	//UpdateInputStates();

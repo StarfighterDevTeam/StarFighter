@@ -12,10 +12,11 @@
 #define SHIP_ACCELERATION_FORWARD		200.0f
 #define SHIP_BRAKE_SPEED				400.0f
 #define SHIP_ACCELERATION_BACKWARD		100.0f
-#define SHIP_DECELERATION				100.0f
+#define SHIP_DECELERATION				50.0f
 #define SHIP_MAX_SPEED_FORWARD			350.0f
 #define SHIP_MAX_SPEED_BACKWARD			150.0f
 #define SHIP_MIN_SPEED					20.0f
+#define SHIP_TURN_RATE					100.0f
 #define SHIP_SPRITE_RATE_SEC			0.2f
 
 enum PlayerActions
@@ -45,7 +46,7 @@ public :
 	void update(sf::Time deltaTime) override;
 	bool ScreenBorderContraints();
 	void UpdateRotation();
-
+	void Draw(sf::RenderTexture* screen) override;
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
@@ -66,9 +67,10 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	//MICRO BOATS
-	float m_thrust;
-	float m_orientation;
+	float m_acceleration;
 	bool m_reverse_move;
+
+	sf::Text m_debug_text;
 
 private:
 	bool m_moving;

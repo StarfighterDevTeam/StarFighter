@@ -66,6 +66,7 @@ public:
 
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
+	virtual void Draw(sf::RenderTexture* screen);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
 
 	bool m_visible;

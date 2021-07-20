@@ -178,6 +178,11 @@ void GameObject::setGhost(bool ghost)
 	}
 }
 
+void GameObject::Draw(sf::RenderTexture* screen)
+{
+	screen->draw(*this);
+}
+
 GameObject* GameObject::Clone()
 {
 	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x/2, this->m_size.y/2), this->m_frameNumber, this->m_animationNumber);
