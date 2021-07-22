@@ -119,6 +119,21 @@ void Player::Update(sf::Time deltaTime)
 
 	//updating mission objectives and status
 	UpdateMissions();
+
+	//network, send packets
+	//char data[1] = { 7 };
+	//if ((*CurrentGame).m_sender.send(data, 1) != sf::Socket::Done)
+	//{
+	//	// erreur...
+	//}
+	//
+	////network, receive packets
+	//std::size_t received;
+	//if ((*CurrentGame).m_receiver.receive(data, 1, received) != sf::Socket::Done)
+	//{
+	//	// erreur...
+	//}
+	//std::cout << "Received " << received << " bytes" << std::endl;
 }
 
 void Player::UpdateMissions()

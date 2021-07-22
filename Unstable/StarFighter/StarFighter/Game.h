@@ -6,6 +6,7 @@
 #include <vector>
 #include "TextUtils.h"
 #include <SFML/Audio.hpp>
+#include <SFML/Network.hpp>
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -161,6 +162,13 @@ public:
 	//DEBUG
 	GameObject* m_sector_debug_current;
 	GameObject* m_sector_debug_onscreen;
+
+	//Network - client
+	sf::TcpSocket* m_receiver;
+	//
+	////Network - server
+	sf::TcpSocket* m_sender;
+	sf::TcpListener* m_listener;
 
 private:
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);

@@ -67,6 +67,32 @@ Game::Game(RenderWindow* window)
 	//DEBUG
 	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
 	m_sector_debug_onscreen = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Green, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
+
+	//Network client
+	//sf::IpAddress ip = "127.0.0.0";
+	//Uint8 port = 53000;
+
+	m_sender = new TcpSocket();
+	//sf::Socket::Status status = m_sender->connect("127.0.0.0", 53000);
+	//if (status != sf::Socket::Done)
+	//{
+	//	// erreur...
+	//}
+
+	//Network server
+	//lie l'écouteur à un port
+	m_listener = new TcpListener();
+	//if (m_listener->listen(53000) != sf::Socket::Done)
+	//{
+	//	// erreur...
+	//}
+	
+	// accepte une nouvelle connexion
+	m_receiver = new TcpSocket();
+	//if (m_listener->accept(*m_receiver) != sf::Socket::Done)
+	//{
+	//	// erreur...
+	//}
 }
 
 void Game::SetSectorsNbSectorsManaged()
@@ -91,6 +117,10 @@ Game::~Game()
 
 	for (AsteroidField* field : m_asteroidFields)
 		delete field;
+
+	delete m_sender;
+	delete m_receiver;
+	delete m_listener;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
