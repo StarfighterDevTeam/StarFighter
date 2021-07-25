@@ -71,8 +71,8 @@ Game::Game(RenderWindow* window)
 	//Network
 	m_is_server = false;
 	m_network_status = Network_Disconnected;
-	m_ip = "127.0.0.1";
-	m_port = 53000;
+	//m_ip = "93.2.208.150";
+	//m_port = 53000;
 	m_sender.setBlocking(false);
 	m_receiver.setBlocking(false);
 	m_listener.setBlocking(false);
@@ -831,7 +831,7 @@ void Game::DebugDrawGameObjectsStats()
 			if (object->m_layer != StarLayer && object != m_playerShip && object != m_background)
 				c++;
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		sf::Text text;
 		text.setFont(*m_font[Font_Arial]);
@@ -851,6 +851,12 @@ void Game::DebugDrawGameObjectsStats()
 
 		if (i == 3)
 			text.setString("Zoom level: " + to_string(m_zoom));
+
+		if (i == 4)
+			if (m_is_server == true)
+				text.setString("Server | Port: " + to_string(m_port));
+			else
+				text.setString("Client | IP: " + m_ip.toString() + " | Port: " + to_string(m_port));
 
 		m_mainScreen.draw(text);
 	}

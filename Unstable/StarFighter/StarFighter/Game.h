@@ -205,7 +205,7 @@ public:
 	bool m_is_server;
 	NetworkStatus m_network_status;
 	sf::IpAddress m_ip;
-	Uint8 m_port;
+	int m_port;
 
 	NetworkStatus UpdateNetworkServerStatus();
 	NetworkStatus UpdateNetworkClientStatus();

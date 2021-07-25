@@ -32,8 +32,23 @@ int main(int argc, char* argv[])
 
 	//Server?
 	int a = RandomizeIntBetweenValues(0, 100);
-	if (argc > 1 && strcmp(argv[1], "-server") == 0)
-		(*CurrentGame).m_is_server = true;
+	if (argc > 1)
+	{
+		if (strcmp(argv[1], "-server") == 0)
+		{
+			(*CurrentGame).m_is_server = true;
+
+			if (argc > 2)
+				(*CurrentGame).m_port = atoi(argv[2]);
+		}
+		else
+		{
+			(*CurrentGame).m_ip = argv[1];
+
+			if (argc > 2)
+				(*CurrentGame).m_port = atoi(argv[2]);
+		}
+	}
 
 	//Elapsed time
 	sf::Time dt;
