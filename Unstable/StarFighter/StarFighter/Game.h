@@ -42,6 +42,45 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
+enum NetworkStatus
+{
+	Network_Disconnected,
+	Network_Connected,
+};
+
+enum NetworkPacketType
+{
+	NP_Ship,
+	NP_SpatialObject,
+};
+struct NetworkPacketDataShip
+{
+	float m_position_x;
+	float m_position_y;
+	float m_heading;
+};
+
+struct NetworkPacketDataSpatialObject
+{
+	float m_asteroid_position_x;
+};
+
+//struct NetworkPacket
+//{
+//	NetworkPacketType m_type;
+//	union
+//	{
+//		NetworkPacketDataShip m_data_ship;
+//		NetworkPacketDataSpatialObject m_data_objects;
+//	};
+//};
+
+union NetworkPacketShip
+{
+	NetworkPacketDataShip m_data;
+	char m_buffer[sizeof(NetworkPacketDataShip)];
+};
+
 struct StarSector
 {
 public:
@@ -53,8 +92,6 @@ public:
 	int m_hazard_level;
 	int m_id;
 };
-
-using namespace sf;
 
 struct Game
 {
@@ -86,6 +123,7 @@ public:
 	float m_zoom;
 
 	GameObject* m_playerShip;
+	vector<GameObject*> m_onlineShips;
 	bool m_pause;
 	bool m_window_has_focus;
 
@@ -163,12 +201,26 @@ public:
 	GameObject* m_sector_debug_current;
 	GameObject* m_sector_debug_onscreen;
 
+	//Network
+	bool m_is_server;
+	NetworkStatus m_network_status;
+	sf::IpAddress m_ip;
+	Uint8 m_port;
+
+	NetworkStatus UpdateNetworkServerStatus();
+	NetworkStatus UpdateNetworkClientStatus();
+	void UpdateNetworkPacketShip(NetworkPacketShip& packet);
+	void UpdateNetworkServer();
+	void UpdateNetworkClient();
+	void SendNetworkPacket();
+	void ReceiveNetworkPacket();
+
 	//Network - client
-	sf::TcpSocket* m_receiver;
+	sf::TcpSocket m_receiver;
 	//
 	////Network - server
-	sf::TcpSocket* m_sender;
-	sf::TcpListener* m_listener;
+	sf::TcpSocket m_sender;
+	sf::TcpListener m_listener;
 
 private:
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);

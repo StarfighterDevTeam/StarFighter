@@ -68,31 +68,14 @@ Game::Game(RenderWindow* window)
 	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
 	m_sector_debug_onscreen = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Green, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
 
-	//Network client
-	//sf::IpAddress ip = "127.0.0.0";
-	//Uint8 port = 53000;
-
-	m_sender = new TcpSocket();
-	//sf::Socket::Status status = m_sender->connect("127.0.0.0", 53000);
-	//if (status != sf::Socket::Done)
-	//{
-	//	// erreur...
-	//}
-
-	//Network server
-	//lie l'écouteur à un port
-	m_listener = new TcpListener();
-	//if (m_listener->listen(53000) != sf::Socket::Done)
-	//{
-	//	// erreur...
-	//}
-	
-	// accepte une nouvelle connexion
-	m_receiver = new TcpSocket();
-	//if (m_listener->accept(*m_receiver) != sf::Socket::Done)
-	//{
-	//	// erreur...
-	//}
+	//Network
+	m_is_server = false;
+	m_network_status = Network_Disconnected;
+	m_ip = "127.0.0.1";
+	m_port = 53000;
+	m_sender.setBlocking(false);
+	m_receiver.setBlocking(false);
+	m_listener.setBlocking(false);
 }
 
 void Game::SetSectorsNbSectorsManaged()
@@ -118,9 +101,10 @@ Game::~Game()
 	for (AsteroidField* field : m_asteroidFields)
 		delete field;
 
-	delete m_sender;
-	delete m_receiver;
-	delete m_listener;
+	delete m_playerShip;
+
+	for (GameObject* ship : m_onlineShips)
+		delete ship;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -292,6 +276,40 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 	m_sceneFeedbackSFPanels.remove(panel);
 }
 
+NetworkStatus Game::UpdateNetworkServerStatus()
+{
+	if (m_network_status != Network_Connected)
+	{
+		//lie l'écouteur à un port
+		if (m_listener.listen(m_port) != sf::Socket::Done)
+		{
+			//erreur...
+		}
+
+		// accepte une nouvelle connexion
+		if (m_listener.accept(m_receiver) != sf::Socket::Done)
+			m_network_status = Network_Disconnected;
+		else
+			m_network_status = Network_Connected;
+	}
+
+	return m_network_status;
+}
+
+NetworkStatus Game::UpdateNetworkClientStatus()
+{
+	if (m_network_status != Network_Connected)
+	{
+		sf::Socket::Status status = m_sender.connect(m_ip, m_port);
+		if (status != sf::Socket::Done)
+			m_network_status = Network_Disconnected;
+		else
+			m_network_status = Network_Connected;
+	}
+
+	return m_network_status;
+}
+
 void Game::UpdateScene(Time deltaTime)
 {
 	//TODO: Updating screen resolution
@@ -309,6 +327,14 @@ void Game::UpdateScene(Time deltaTime)
 		m_zoom -= 0.1;
 		printf("zoom: %f\n", m_zoom);
 	}
+
+	//Network
+	//Connexion
+	if (m_is_server == true)
+		UpdateNetworkServer();
+	else
+		UpdateNetworkClient();
+
 
 	//we need an odd number of sectors on X and Y axis
 	SetSectorsNbSectorsManaged();
@@ -890,4 +916,67 @@ SpatialObject* Game::GetTargetableEnemyShip(GameObject* const shooter, float dis
 	}
 
 	return target;
+}
+
+void Game::SendNetworkPacket()
+{
+	//network, send packets
+	NetworkPacketShip packet;
+	UpdateNetworkPacketShip(packet);
+
+	sf::TcpSocket& socket = m_is_server ? m_receiver : m_sender;
+
+	if (socket.send(packet.m_buffer, sizeof(packet.m_buffer)) != sf::Socket::Done)
+	{
+		// erreur...
+	}
+	else
+	{
+		
+	}
+}
+
+void Game::ReceiveNetworkPacket()
+{
+	//network, receive packets
+	std::size_t received;
+
+	NetworkPacketShip packet;
+
+	sf::TcpSocket& socket = m_is_server ? m_receiver : m_sender;
+
+	if (socket.receive(packet.m_buffer, sizeof(packet.m_buffer), received) != sf::Socket::Done)
+	{
+		// erreur...
+	}
+	else
+	{
+		m_onlineShips.front()->m_position = sf::Vector2f(packet.m_data.m_position_x, packet.m_data.m_position_y);
+		m_onlineShips.front()->m_heading = packet.m_data.m_heading;
+	}
+}
+
+void Game::UpdateNetworkServer()
+{
+	if (UpdateNetworkServerStatus() == Network_Connected)
+	{
+		SendNetworkPacket();
+		ReceiveNetworkPacket();
+	}
+}
+
+void Game::UpdateNetworkClient()
+{
+	if (UpdateNetworkClientStatus() == Network_Connected)
+	{
+		SendNetworkPacket();
+		ReceiveNetworkPacket();
+	}
+}
+
+void Game::UpdateNetworkPacketShip(NetworkPacketShip& packet)
+{
+	packet.m_data.m_position_x = m_playerShip->m_position.x;
+	packet.m_data.m_position_y = m_playerShip->m_position.y;
+	packet.m_data.m_heading = m_playerShip->m_heading;
 }

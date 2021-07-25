@@ -6,7 +6,7 @@
 
 Game* CurrentGame;
 
-int main()
+int main(int argc, char* argv[])
 {
 	//Init SFML Window
 	printf("Initializing SFML Window");
@@ -26,9 +26,14 @@ int main()
 
 	//Random seed
 	srand(time(NULL));
-
+		
 	//Game initialization
 	CurrentGame = new Game(&renderWindow);
+
+	//Server?
+	int a = RandomizeIntBetweenValues(0, 100);
+	if (argc > 1 && strcmp(argv[1], "-server") == 0)
+		(*CurrentGame).m_is_server = true;
 
 	//Elapsed time
 	sf::Time dt;

@@ -223,7 +223,7 @@ void Ship::GetHitByAmmo(GameObject* ammo)
 void Ship::GetHitByObject(GameObject* object)
 {
 	//Apply damage
-	int damage = ((Destructible*)object)->m_collision_damage;
+	int damage = 0;// ((Destructible*)object)->m_collision_damage;
 
 	if (m_shield > 0)
 		//shield absorbing damage
