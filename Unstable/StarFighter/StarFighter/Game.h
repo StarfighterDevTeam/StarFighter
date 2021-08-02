@@ -205,22 +205,25 @@ public:
 	bool m_is_server;
 	NetworkStatus m_network_status;
 	sf::IpAddress m_ip;
-	int m_port;
+	int m_port_receive;
+	int m_port_send;
 
-	NetworkStatus UpdateNetworkServerStatus();
+	//NetworkStatus UpdateNetworkServerStatus();
 	NetworkStatus UpdateNetworkClientStatus();
 	void UpdateNetworkPacketShip(NetworkPacketShip& packet);
-	void UpdateNetworkServer();
+	//void UpdateNetworkServer();
 	void UpdateNetworkClient();
 	void SendNetworkPacket();
 	void ReceiveNetworkPacket();
 
 	//Network - client
-	sf::TcpSocket m_receiver;
+	//sf::TcpSocket m_receiver;
 	//
 	////Network - server
-	sf::TcpSocket m_sender;
-	sf::TcpListener m_listener;
+	//sf::TcpSocket m_sender;
+	//sf::TcpListener m_listener;
+
+	sf::UdpSocket m_socket;
 
 private:
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);

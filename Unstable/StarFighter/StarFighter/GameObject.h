@@ -28,6 +28,8 @@ enum LayerType
 	AllyFireLayer,
 	AIShipFireLayer,
 	PlayerStroboscopicLayer,
+	AsteroidLayer,
+	LootLayer,
 	AIShipLayer,
 	PlayerShipLayer,
 	MarkerLayer,

@@ -31,22 +31,27 @@ int main(int argc, char* argv[])
 	CurrentGame = new Game(&renderWindow);
 
 	//Server?
-	int a = RandomizeIntBetweenValues(0, 100);
 	if (argc > 1)
 	{
 		if (strcmp(argv[1], "-server") == 0)
 		{
 			(*CurrentGame).m_is_server = true;
 
-			if (argc > 2)
-				(*CurrentGame).m_port = atoi(argv[2]);
+			//if (argc > 2)
+			//	(*CurrentGame).m_port = atoi(argv[2]);
+			//
+			//if (argc > 3)
+			//	(*CurrentGame).m_ip = argv[3];
 		}
 		else
 		{
-			(*CurrentGame).m_ip = argv[1];
+			(*CurrentGame).m_port_receive = atoi(argv[1]);
 
 			if (argc > 2)
-				(*CurrentGame).m_port = atoi(argv[2]);
+				(*CurrentGame).m_ip = argv[2];
+
+			if (argc > 3)
+				(*CurrentGame).m_port_send = atoi(argv[3]);
 		}
 	}
 

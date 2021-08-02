@@ -7,7 +7,7 @@ using namespace sf;
 Loot::Loot(int money) : SpatialObject()
 {
 	m_money = money;
-	m_layer = AIShipLayer;
+	m_layer = LootLayer;
 	m_collider = LootObject;
 	m_speed_max = 200;
 

@@ -73,9 +73,8 @@ Game::Game(RenderWindow* window)
 	m_network_status = Network_Disconnected;
 	//m_ip = "93.2.208.150";
 	//m_port = 53000;
-	m_sender.setBlocking(false);
-	m_receiver.setBlocking(false);
-	m_listener.setBlocking(false);
+
+	m_socket.setBlocking(false);
 }
 
 void Game::SetSectorsNbSectorsManaged()
@@ -276,7 +275,7 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 	m_sceneFeedbackSFPanels.remove(panel);
 }
 
-NetworkStatus Game::UpdateNetworkServerStatus()
+/*NetworkStatus Game::UpdateNetworkServerStatus()
 {
 	if (m_network_status != Network_Connected)
 	{
@@ -295,16 +294,20 @@ NetworkStatus Game::UpdateNetworkServerStatus()
 
 	return m_network_status;
 }
+*/
+
 
 NetworkStatus Game::UpdateNetworkClientStatus()
 {
-	if (m_network_status != Network_Connected)
+	// bind the socket to a port
+	if (m_socket.bind(m_port_receive) != sf::Socket::Done)
 	{
-		sf::Socket::Status status = m_sender.connect(m_ip, m_port);
-		if (status != sf::Socket::Done)
-			m_network_status = Network_Disconnected;
-		else
-			m_network_status = Network_Connected;
+		m_network_status = Network_Disconnected;
+	}
+	else
+	{
+		m_network_status = Network_Connected;
+		m_port_receive = m_socket.getLocalPort();
 	}
 
 	return m_network_status;
@@ -330,11 +333,10 @@ void Game::UpdateScene(Time deltaTime)
 
 	//Network
 	//Connexion
-	if (m_is_server == true)
-		UpdateNetworkServer();
-	else
-		UpdateNetworkClient();
-
+	//if (m_is_server == true)
+	//	UpdateNetworkServer();
+	//else
+	UpdateNetworkClient();
 
 	//we need an odd number of sectors on X and Y axis
 	SetSectorsNbSectorsManaged();
@@ -509,21 +511,6 @@ void Game::CollisionChecks()
 		for (GameObject* beacon : m_sceneGameObjectsTyped[BeaconObject])
 			if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, beacon->m_position) <= 200 * 200)
 				beacon->TryTrigger(ally_ship);
-
-		//Collision with objects
-		for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
-		{
-			if (AreColliding(ally_ship, object, true) == true)
-			{
-				object->GetHitByObject(ally_ship);
-				ally_ship->GetHitByObject(object);
-			}
-
-			//Objects hit by our gravitational range
-			if (ally_ship->GetGravitationRange() > 0)
-				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, object->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
-					ally_ship->HitWithGravitation(object);
-		}
 					
 		//Collision with enemies
 		for (GameObject* enemy_ship : m_sceneGameObjectsTyped[EnemyShipObject])
@@ -551,16 +538,33 @@ void Game::CollisionChecks()
 					if (AreColliding(ally_ship, ally_ammo, true) == true)
 						ally_ship->GetHitByAmmo(ally_ammo);
 		}
-		else
-		//Player loot
-		for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
+		else//Player
 		{
-			if (AreColliding(ally_ship, loot, false) == true)
-				ally_ship->GetHitByLoot(loot);
-			//Loots hit by our gravitational range
-			else if (ally_ship->GetGravitationRange() > 0)
-				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, loot->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
-					ally_ship->HitWithGravitation(loot);
+			//Getting loots
+			for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
+			{
+				if (AreColliding(ally_ship, loot, false) == true)
+					ally_ship->GetHitByLoot(loot);
+				//Loots hit by our gravitational range
+				else if (ally_ship->GetGravitationRange() > 0)
+					if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, loot->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
+						ally_ship->HitWithGravitation(loot);
+			}
+
+			//Collision with objects
+			for (GameObject* object : m_sceneGameObjectsTyped[DestructibleObject])
+			{
+				if (AreColliding(ally_ship, object, true) == true)
+				{
+					object->GetHitByObject(ally_ship);
+					ally_ship->GetHitByObject(object);
+				}
+
+				//Objects hit by our gravitational range
+				if (ally_ship->GetGravitationRange() > 0)
+					if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, object->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
+						ally_ship->HitWithGravitation(object);
+			}
 		}
 	}
 
@@ -854,9 +858,11 @@ void Game::DebugDrawGameObjectsStats()
 
 		if (i == 4)
 			if (m_is_server == true)
-				text.setString("Server | Port: " + to_string(m_port));
+				//text.setString("Server | Port: " + to_string(m_port));
+				text.setString("Server | Port receive: " + to_string(m_port_receive) + " | IP send: " + m_ip.toString() + " | Port send : " + to_string(m_port_send));
 			else
-				text.setString("Client | IP: " + m_ip.toString() + " | Port: " + to_string(m_port));
+				//text.setString("Client | IP: " + m_ip.toString() + " | Port: " + to_string(m_port));
+				text.setString("Client | Port receive: " + to_string(m_port_receive) + " | IP send: " + m_ip.toString() + " | Port send : " + to_string(m_port_send));
 
 		m_mainScreen.draw(text);
 	}
@@ -930,9 +936,7 @@ void Game::SendNetworkPacket()
 	NetworkPacketShip packet;
 	UpdateNetworkPacketShip(packet);
 
-	sf::TcpSocket& socket = m_is_server ? m_receiver : m_sender;
-
-	if (socket.send(packet.m_buffer, sizeof(packet.m_buffer)) != sf::Socket::Done)
+	if (m_socket.send(packet.m_buffer, sizeof(packet.m_buffer), m_ip, m_port_send) != sf::Socket::Done)
 	{
 		// erreur...
 	}
@@ -949,9 +953,11 @@ void Game::ReceiveNetworkPacket()
 
 	NetworkPacketShip packet;
 
-	sf::TcpSocket& socket = m_is_server ? m_receiver : m_sender;
+	//Status receive(void* data, std::size_t size, std::size_t& received, IpAddress& remoteAddress, unsigned short& remotePort);
+	sf::IpAddress sender;
+	unsigned short port;
 
-	if (socket.receive(packet.m_buffer, sizeof(packet.m_buffer), received) != sf::Socket::Done)
+	if (m_socket.receive(packet.m_buffer, sizeof(packet.m_buffer), received, sender, port) != sf::Socket::Done)
 	{
 		// erreur...
 	}
@@ -962,6 +968,7 @@ void Game::ReceiveNetworkPacket()
 	}
 }
 
+/*
 void Game::UpdateNetworkServer()
 {
 	if (UpdateNetworkServerStatus() == Network_Connected)
@@ -970,10 +977,14 @@ void Game::UpdateNetworkServer()
 		ReceiveNetworkPacket();
 	}
 }
+*/
 
 void Game::UpdateNetworkClient()
 {
-	if (UpdateNetworkClientStatus() == Network_Connected)
+	if (m_network_status != Network_Connected)
+		UpdateNetworkClientStatus();
+
+	if (m_network_status == Network_Connected)
 	{
 		SendNetworkPacket();
 		ReceiveNetworkPacket();

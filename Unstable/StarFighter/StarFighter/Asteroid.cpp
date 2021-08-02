@@ -7,7 +7,7 @@ using namespace sf;
 Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Destructible()
 {	
 	m_hostility = Hostility_Enemy;
-	m_layer = AIShipLayer;
+	m_layer = AsteroidLayer;
 	m_collider = DestructibleObject;
 	m_asteroid_type = asteroid_type;
 
