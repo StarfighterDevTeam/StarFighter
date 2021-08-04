@@ -393,3 +393,10 @@ void Ship::HitWithGravitation(GameObject* object)
 		target->GetHitByGravitation();
 	}
 }
+
+void Ship::Replenish()
+{
+	m_health = m_health_max;
+	m_shield = m_shield_max;
+	m_energy = m_energy_max;
+}

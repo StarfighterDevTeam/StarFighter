@@ -27,7 +27,7 @@ Game::Game(RenderWindow* window)
 	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	m_view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
-	m_zoom = 1.3;
+	m_zoom = 1;
 
 	//default value
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
@@ -296,23 +296,6 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 }
 */
 
-
-NetworkStatus Game::UpdateNetworkClientStatus()
-{
-	// bind the socket to a port
-	if (m_socket.bind(m_port_receive) != sf::Socket::Done)
-	{
-		m_network_status = Network_Disconnected;
-	}
-	else
-	{
-		m_network_status = Network_Connected;
-		m_port_receive = m_socket.getLocalPort();
-	}
-
-	return m_network_status;
-}
-
 void Game::UpdateScene(Time deltaTime)
 {
 	//TODO: Updating screen resolution
@@ -323,20 +306,13 @@ void Game::UpdateScene(Time deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
 	{
 		m_zoom += 0.1;
-		printf("zoom: %f\n", m_zoom);
+		//printf("zoom: %f\n", m_zoom);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
 	{
 		m_zoom -= 0.1;
-		printf("zoom: %f\n", m_zoom);
+		//printf("zoom: %f\n", m_zoom);
 	}
-
-	//Network
-	//Connexion
-	//if (m_is_server == true)
-	//	UpdateNetworkServer();
-	//else
-	UpdateNetworkClient();
 
 	//we need an odd number of sectors on X and Y axis
 	SetSectorsNbSectorsManaged();
@@ -862,7 +838,7 @@ void Game::DebugDrawGameObjectsStats()
 				text.setString("Server | Port receive: " + to_string(m_port_receive) + " | IP send: " + m_ip.toString() + " | Port send : " + to_string(m_port_send));
 			else
 				//text.setString("Client | IP: " + m_ip.toString() + " | Port: " + to_string(m_port));
-				text.setString("Client | Port receive: " + to_string(m_port_receive) + " | IP send: " + m_ip.toString() + " | Port send : " + to_string(m_port_send));
+				text.setString("Port receive: " + to_string(m_port_receive) + " | IP send: " + m_ip.toString() + " | Port send : " + to_string(m_port_send));
 
 		m_mainScreen.draw(text);
 	}
@@ -930,70 +906,19 @@ SpatialObject* Game::GetTargetableEnemyShip(GameObject* const shooter, float dis
 	return target;
 }
 
-void Game::SendNetworkPacket()
+//NETWORK
+NetworkStatus Game::UpdateNetworkConnexion()
 {
-	//network, send packets
-	NetworkPacketShip packet;
-	UpdateNetworkPacketShip(packet);
-
-	if (m_socket.send(packet.m_buffer, sizeof(packet.m_buffer), m_ip, m_port_send) != sf::Socket::Done)
+	// bind the socket to a port
+	if (m_socket.bind(m_port_receive) != sf::Socket::Done)
 	{
-		// erreur...
+		m_network_status = Network_Disconnected;
 	}
 	else
 	{
-		
+		m_network_status = Network_Connected;
+		m_port_receive = m_socket.getLocalPort();
 	}
-}
 
-void Game::ReceiveNetworkPacket()
-{
-	//network, receive packets
-	std::size_t received;
-
-	NetworkPacketShip packet;
-
-	//Status receive(void* data, std::size_t size, std::size_t& received, IpAddress& remoteAddress, unsigned short& remotePort);
-	sf::IpAddress sender;
-	unsigned short port;
-
-	if (m_socket.receive(packet.m_buffer, sizeof(packet.m_buffer), received, sender, port) != sf::Socket::Done)
-	{
-		// erreur...
-	}
-	else
-	{
-		m_onlineShips.front()->m_position = sf::Vector2f(packet.m_data.m_position_x, packet.m_data.m_position_y);
-		m_onlineShips.front()->m_heading = packet.m_data.m_heading;
-	}
-}
-
-/*
-void Game::UpdateNetworkServer()
-{
-	if (UpdateNetworkServerStatus() == Network_Connected)
-	{
-		SendNetworkPacket();
-		ReceiveNetworkPacket();
-	}
-}
-*/
-
-void Game::UpdateNetworkClient()
-{
-	if (m_network_status != Network_Connected)
-		UpdateNetworkClientStatus();
-
-	if (m_network_status == Network_Connected)
-	{
-		SendNetworkPacket();
-		ReceiveNetworkPacket();
-	}
-}
-
-void Game::UpdateNetworkPacketShip(NetworkPacketShip& packet)
-{
-	packet.m_data.m_position_x = m_playerShip->m_position.x;
-	packet.m_data.m_position_y = m_playerShip->m_position.y;
-	packet.m_data.m_heading = m_playerShip->m_heading;
+	return m_network_status;
 }

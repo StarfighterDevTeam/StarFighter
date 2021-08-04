@@ -17,7 +17,7 @@ public:
 	Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type, ColliderType collider, LayerType layer, sf::Vector2f weapon_offset, float heading_offset = 0);
 	~Weapon();
 
-	void Fire();
+	Ammo* Fire();
 	void Update(sf::Time deltaTime, float aim_heading);
 	bool IsReadyToFire();
 	bool IsTargetAligned(SpatialObject* target, float angle_tolerance);

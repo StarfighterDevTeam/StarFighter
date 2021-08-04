@@ -48,9 +48,9 @@ Weapon::~Weapon()
 
 }
 
-void Weapon::Fire()
+Ammo* Weapon::Fire()
 {
-	Ammo* ammo = new Ammo(m_owner, m_ammo_type, m_position, m_heading + m_heading_offset, m_range, m_damage, m_collider);
+	Ammo* ammo = new Ammo(m_owner, m_ammo_type, m_position, m_heading + m_heading_offset, m_range, m_damage);
 	(*CurrentGame).addToScene(ammo, m_layer, m_collider, true);
 
 	m_rate_of_fire_timer = m_rate_of_fire;
@@ -58,6 +58,8 @@ void Weapon::Fire()
 	//position offset
 	ammo->m_position.x += ammo->m_size.y * 0.5 * cos((m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
 	ammo->m_position.y -= ammo->m_size.y * 0.5 * sin((m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
+
+	return ammo;
 }
 
 void Weapon::Update(sf::Time deltaTime, float aim_heading)

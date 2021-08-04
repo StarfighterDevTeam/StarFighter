@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage, ColliderType collider)
+Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, float heading, float range, int damage)
 {
 	m_owner = owner;
 	m_ammo_type = ammo_type;
@@ -68,7 +68,7 @@ Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, floa
 
 Ammo::~Ammo()
 {
-
+	
 }
 
 void Ammo::Update(sf::Time deltaTime)

@@ -60,6 +60,8 @@ public :
 	CircleDisplay* m_shield_circle;
 	CircleDisplay* m_gravitation_circle;
 
+	void Replenish();
+
 	sf::RectangleShape m_health_rect;
 	sf::RectangleShape m_health_container_rect;
 	sf::RectangleShape m_shield_rect;

@@ -107,6 +107,7 @@
     <ClCompile Include="Loot.cpp" />
     <ClCompile Include="Marker.cpp" />
     <ClCompile Include="Mission.cpp" />
+    <ClCompile Include="HumanShip.cpp" />
     <ClCompile Include="Planet.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SFPanel.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Loot.h" />
     <ClInclude Include="Marker.h" />
     <ClInclude Include="Mission.h" />
+    <ClInclude Include="HumanShip.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />

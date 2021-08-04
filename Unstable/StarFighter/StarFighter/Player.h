@@ -57,7 +57,6 @@ public :
 	void UpdateMissions();
 	void Death() override;
 	void GetHitByLoot(GameObject* loot) override;
-	void Replenish();
 
 	void DebugDrawMissions();
 	void DebugDrawMoney();
@@ -65,6 +64,13 @@ public :
 	vector<SpatialObject*> m_marked_objects;
 	vector<Mission*> m_missions;
 	int m_money;
+
+	//Network
+	void UpdateNetwork();
+	void SendNetworkPacket(NetworkPacketType type, Ammo* ammo = NULL);
+	void SendNetworkPacket(Ammo* ammo);
+	void ReceiveNetworkPacket();
+	GameObject* GetOnlinePlayer();
 };
 
 #endif // PLAYER_H_INCLUDED

@@ -48,7 +48,7 @@ bool SpatialObject::IsMarked()
 bool SpatialObject::CheckMarkingConditions()
 {
 	return false;
-	//see override function in class Planet and AIShip
+	//see override function in class Planet and AIShip and HumanShip
 }
 
 AIShip* SpatialObject::GetEscortedShip()

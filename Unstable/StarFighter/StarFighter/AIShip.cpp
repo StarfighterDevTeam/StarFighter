@@ -38,7 +38,7 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_range = 50;
 			m_shield_regen = 1.5;
 
-			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_blue.png" : "2D/ship_alpha_red.png";
+			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_green.png" : "2D/ship_alpha_red.png";
 			textureSize = sf::Vector2f(68, 84);
 			frameNumber = 3;
 

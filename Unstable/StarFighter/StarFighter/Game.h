@@ -46,39 +46,13 @@ enum NetworkStatus
 {
 	Network_Disconnected,
 	Network_Connected,
+	Network_Communicating,
 };
 
 enum NetworkPacketType
 {
-	NP_Ship,
-	NP_SpatialObject,
-};
-struct NetworkPacketDataShip
-{
-	float m_position_x;
-	float m_position_y;
-	float m_heading;
-};
-
-struct NetworkPacketDataSpatialObject
-{
-	float m_asteroid_position_x;
-};
-
-//struct NetworkPacket
-//{
-//	NetworkPacketType m_type;
-//	union
-//	{
-//		NetworkPacketDataShip m_data_ship;
-//		NetworkPacketDataSpatialObject m_data_objects;
-//	};
-//};
-
-union NetworkPacketShip
-{
-	NetworkPacketDataShip m_data;
-	char m_buffer[sizeof(NetworkPacketDataShip)];
+	Packet_PlayerShipUpdate,
+	Packet_AmmoCreation,
 };
 
 struct StarSector
@@ -208,13 +182,7 @@ public:
 	int m_port_receive;
 	int m_port_send;
 
-	//NetworkStatus UpdateNetworkServerStatus();
-	NetworkStatus UpdateNetworkClientStatus();
-	void UpdateNetworkPacketShip(NetworkPacketShip& packet);
-	//void UpdateNetworkServer();
-	void UpdateNetworkClient();
-	void SendNetworkPacket();
-	void ReceiveNetworkPacket();
+	NetworkStatus UpdateNetworkConnexion();
 
 	//Network - client
 	//sf::TcpSocket m_receiver;
