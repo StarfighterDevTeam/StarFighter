@@ -541,6 +541,12 @@ void Game::CollisionChecks()
 					if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, object->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
 						ally_ship->HitWithGravitation(object);
 			}
+
+			//Collateral damage by allied shots on player
+			for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
+				if (ally_ammo->IsAmmoOwnedByPlayer() == true)
+					if (AreColliding(ally_ship, ally_ammo, true) == true)
+						ally_ship->GetHitByAmmo(ally_ammo);
 		}
 	}
 
