@@ -502,19 +502,20 @@ void Game::CollisionChecks()
 				if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, enemy_ship->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
 					ally_ship->HitWithGravitation(enemy_ship);
 		}
-		
+
+		//Collateral damage by allied shots on player
+		for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
+			if (ally_ammo->IsOwnedAmmo(ally_ship) == false)
+				if (AreColliding(ally_ship, ally_ammo, true) == true)
+					ally_ship->GetHitByAmmo(ally_ammo);
+	
+		//Ally AI grouping
 		if (ally_ship != m_playerShip)
 		{
-			//Ally AI grouping
 			ally_ship->UpdateAlliedShips();
-
-			//Collateral damage by player shots on allies
-			for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
-				if (ally_ammo->IsAmmoOwnedByPlayer() == true)
-					if (AreColliding(ally_ship, ally_ammo, true) == true)
-						ally_ship->GetHitByAmmo(ally_ammo);
 		}
-		else//Player
+		//Player
+		else
 		{
 			//Getting loots
 			for (GameObject* loot : m_sceneGameObjectsTyped[LootObject])
@@ -541,12 +542,6 @@ void Game::CollisionChecks()
 					if (GetDistanceSquaredBetweenPositions(ally_ship->m_position, object->m_position) <= ally_ship->GetGravitationRange() * ally_ship->GetGravitationRange())
 						ally_ship->HitWithGravitation(object);
 			}
-
-			//Collateral damage by allied shots on player
-			for (GameObject* ally_ammo : m_sceneGameObjectsTyped[AllyFire])
-				if (ally_ammo->IsAmmoOwnedByPlayer() == true)
-					if (AreColliding(ally_ship, ally_ammo, true) == true)
-						ally_ship->GetHitByAmmo(ally_ammo);
 		}
 	}
 

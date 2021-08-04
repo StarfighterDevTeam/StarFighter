@@ -170,7 +170,7 @@ void Ammo::Bounce(GameObject* target)
 	setRotation(m_heading);
 }
 
-bool Ammo::IsAmmoOwnedByPlayer()
+bool Ammo::IsOwnedAmmo(GameObject* shooter)
 {
-	return m_owner == (*CurrentGame).m_playerShip;
+	return m_owner == shooter;
 }

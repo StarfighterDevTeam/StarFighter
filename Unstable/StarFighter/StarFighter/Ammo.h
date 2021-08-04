@@ -35,7 +35,7 @@ public:
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void Bounce(GameObject* target);
-	bool IsAmmoOwnedByPlayer() override;
+	bool IsOwnedAmmo(GameObject* shooter) override;
 };
 
 #endif // AMMO_H_INCLUDED
