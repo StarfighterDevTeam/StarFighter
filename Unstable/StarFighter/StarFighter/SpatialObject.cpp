@@ -11,6 +11,7 @@ SpatialObject::SpatialObject()
 	m_removeMe = false;
 	m_garbageMe = false;
 	m_visible = true;
+	m_hostility = Hostility_Ally;
 }
 
 SpatialObject::~SpatialObject()

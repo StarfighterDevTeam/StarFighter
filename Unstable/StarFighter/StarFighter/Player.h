@@ -24,7 +24,7 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
-class Player : public Ship
+class Player : public HumanShip
 {
 public :
 	Player(sf::Vector2i sector_index);
@@ -57,6 +57,7 @@ public :
 	void UpdateMissions();
 	void Death() override;
 	void GetHitByLoot(GameObject* loot) override;
+	bool CheckMarkingConditions() override;
 
 	void DebugDrawMissions();
 	void DebugDrawMoney();

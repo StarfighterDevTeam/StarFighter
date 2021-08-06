@@ -3,10 +3,10 @@
 
 #include "EscortShip.h";
 
-class HumanShip : public AIShip
+class HumanShip : public Ship
 {
 public :
-	HumanShip(ShipType ship_type, sf::Vector2i sector_index, float heading);
+	HumanShip(sf::Vector2i sector_index, bool is_local_player);
 	virtual ~HumanShip();
 	void Death() override;
 	bool CheckMarkingConditions() override;

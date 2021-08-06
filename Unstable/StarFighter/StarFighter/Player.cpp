@@ -4,23 +4,17 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Player::Player(sf::Vector2i sector_index) : Ship()
+Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 {
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
 	m_money = 0;
 
 	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
-	{
 		m_actions_states[i] = false;
-	}
 
 	//Star Hunter
 	(*CurrentGame).m_playerShip = this;
-
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/ship_alpha_blue.png", sf::Vector2f(68, 84), 3, 1);
-
-	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
@@ -28,25 +22,6 @@ Player::Player(sf::Vector2i sector_index) : Ship()
 	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, AllyFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
-
-	//Flight model
-	m_speed_max = 800;
-	m_acceleration_max = 3000;
-	m_turn_speed = 240;
-	m_braking_max = 3000;
-	m_idle_decelleration = 1000;
-
-	//combat
-	m_health_max = 50;
-	m_shield_max = 20;
-	m_shield_range = 100;
-	m_shield_regen = 1.5;
-	m_isReflectingShots = false;
-	m_energy_max = 100;
-	m_energy_regen = 10;
-
-	m_gravitation_range = 0;//300
-	m_gravitation_strength = 70;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
 
 	InitShip();
 }
@@ -722,13 +697,17 @@ void Player::GetHitByLoot(GameObject* loot)
 	this_loot->m_money = 0;
 }
 
+bool Player::CheckMarkingConditions()
+{
+	return false;
+}
 
 //NETWORK
 GameObject* Player::GetOnlinePlayer()
 {
 	if ((*CurrentGame).m_onlineShips.empty() == true)
 	{
-		HumanShip* onlinePlayer = new HumanShip(Ship_Alpha, sf::Vector2i(0, 0), 0);
+		HumanShip* onlinePlayer = new HumanShip(sf::Vector2i(0, 0), false);
 		(*CurrentGame).m_onlineShips.push_back(onlinePlayer);
 		(*CurrentGame).addToScene(onlinePlayer, AIShipLayer, AllyShipObject, false);
 		MarkThis(onlinePlayer, false);
@@ -783,6 +762,10 @@ void Player::ReceiveNetworkPacket()
 
 	while (packet.getDataSize() > 0)//throw empty packets (= no packet received)
 	{
+		GameObject* onlinePlayer = GetOnlinePlayer();
+		if (onlinePlayer == NULL)
+			break;
+
 		int type;
 		packet >> type;
 
@@ -798,13 +781,9 @@ void Player::ReceiveNetworkPacket()
 
 				packet >> position_x >> position_y >> heading >> speed_x >> speed_y;
 
-				GameObject* onlinePlayer = GetOnlinePlayer();
-				if (onlinePlayer != NULL)
-				{
-					onlinePlayer->m_position = sf::Vector2f(position_x, position_y);
-					onlinePlayer->m_heading = heading;
-					onlinePlayer->m_speed = sf::Vector2f(speed_x, speed_y);
-				}
+				onlinePlayer->m_position = sf::Vector2f(position_x, position_y);
+				onlinePlayer->m_heading = heading;
+				onlinePlayer->m_speed = sf::Vector2f(speed_x, speed_y);
 
 				break;
 			}
@@ -820,19 +799,15 @@ void Player::ReceiveNetworkPacket()
 				float speed_x;
 				float speed_y;
 
-				packet /*>> *owner*/ >> ammo_type >> position_x >> position_y >> heading >> lifespan >> damage >> collider >> speed_x >> speed_y;
+				packet >> ammo_type >> position_x >> position_y >> heading >> lifespan >> damage >> collider >> speed_x >> speed_y;
 
-				GameObject* onlinePlayer = GetOnlinePlayer();
-				if (onlinePlayer != NULL)
-				{
-					SpatialObject* owner = (SpatialObject*)onlinePlayer;
+				SpatialObject* owner = (SpatialObject*)onlinePlayer;
 
-					Ammo* ammo = new Ammo(owner, (AmmoType)ammo_type, sf::Vector2f(position_x, position_y), heading, 0, damage);
-					ammo->m_lifespan = lifespan;
-					ammo->m_speed = sf::Vector2f(speed_x, speed_y);
+				Ammo* ammo = new Ammo(owner, (AmmoType)ammo_type, sf::Vector2f(position_x, position_y), heading, 0, damage);
+				ammo->m_lifespan = lifespan;
+				ammo->m_speed = sf::Vector2f(speed_x, speed_y);
 
-					(*CurrentGame).addToScene(ammo, AllyFireLayer, (ColliderType)collider, true);
-				}
+				(*CurrentGame).addToScene(ammo, AllyFireLayer, (ColliderType)collider, true);
 
 				break;
 			}
@@ -845,8 +820,10 @@ void Player::ReceiveNetworkPacket()
 void Player::UpdateNetwork()
 {
 	if ((*CurrentGame).m_network_status != Network_Connected)
+	{
 		(*CurrentGame).UpdateNetworkConnexion();
-
+	}
+		
 	if ((*CurrentGame).m_network_status == Network_Connected)
 	{
 		SendNetworkPacket(Packet_PlayerShipUpdate);
