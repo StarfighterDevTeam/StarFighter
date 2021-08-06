@@ -82,8 +82,8 @@ void Marker::Update(sf::Time deltaTime)
 	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 
 	//update target's position respect to the player, as it may not be set because of the far distance (m_removeMe == true)
-	m_marker_target->setPosition(sf::Vector2f(m_marker_target->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_marker_target->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
-
+	m_marker_target->setPosition(sf::Vector2f((m_marker_target->m_position.x - player->m_position.x) / (*CurrentGame).m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(m_marker_target->m_position.y - player->m_position.y) / (*CurrentGame).m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+	
 	//is target on screen? if yes, marker doesn't need to be visible
 	m_onScreen = IsInsideArea(m_marker_target->m_size, m_marker_target->getPosition(), sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y)) == true;
 

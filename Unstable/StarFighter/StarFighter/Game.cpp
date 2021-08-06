@@ -27,7 +27,7 @@ Game::Game(RenderWindow* window)
 	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	m_view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
-	m_zoom = 1;
+	m_zoom = 1.3;
 
 	//default value
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
@@ -317,7 +317,7 @@ void Game::UpdateScene(Time deltaTime)
 	//we need an odd number of sectors on X and Y axis
 	SetSectorsNbSectorsManaged();
 
-	Bound(m_zoom, 1, 10);
+	Bound(m_zoom, 1, 5);
 	
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
 	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
