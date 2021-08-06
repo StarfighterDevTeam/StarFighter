@@ -27,7 +27,7 @@ public :
 	void Update(sf::Time deltaTime) override;
 	void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
-	void GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByAmmo(GameObject* ammo, bool send_network_packet = true) override;
 	void GetHitByObject(GameObject* object) override;
 	void HitWithGravitation(GameObject* object) override;
 	void UpdateOrbit(sf::Time deltaTime);

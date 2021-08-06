@@ -280,9 +280,9 @@ float GameObject::GetRadius(bool include_shield) const
 }
 //Star Hunter
 
-void GameObject::GetHitByAmmo(GameObject* ammo)
+void GameObject::GetHitByAmmo(GameObject* ammo, bool send_network_packet)
 {
-	//see override function in class Ship and AIShip
+	//see override function in class Destructible and Ship and AIShip and HumanShip
 }
 
 void GameObject::GetHitByObject(GameObject* object)

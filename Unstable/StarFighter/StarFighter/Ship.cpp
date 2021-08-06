@@ -182,7 +182,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 	}
 }
 
-void Ship::GetHitByAmmo(GameObject* ammo)
+void Ship::GetHitByAmmo(GameObject* ammo, bool send_network_packet)
 {
 	//Apply damage
 	int damage = ((Ammo*)ammo)->m_damage;

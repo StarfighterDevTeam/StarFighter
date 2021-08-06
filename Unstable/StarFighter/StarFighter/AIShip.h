@@ -30,7 +30,7 @@ public :
 	void Draw(RenderTarget& screen) override;
 	void SetHostility(Hostility hostility) override;
 	bool CheckMarkingConditions() override;
-	void GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByAmmo(GameObject* ammo, bool send_network_packet = true) override;
 	void GetHitByObject(GameObject* object) override;
 	void GetHitByGravitation() override;
 	void GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& inputs_direction);

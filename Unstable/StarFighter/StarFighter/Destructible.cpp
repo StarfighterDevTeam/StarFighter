@@ -34,7 +34,7 @@ void Destructible::Update(sf::Time deltaTime)
 	SpatialObject::Update(deltaTime);
 }
 
-void Destructible::GetHitByAmmo(GameObject* ammo)
+void Destructible::GetHitByAmmo(GameObject* ammo, bool send_network_packet)
 {
 	int damage = ((Ammo*)ammo)->m_damage;
 

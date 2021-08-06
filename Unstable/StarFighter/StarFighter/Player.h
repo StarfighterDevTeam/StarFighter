@@ -58,6 +58,7 @@ public :
 	void Death() override;
 	void GetHitByLoot(GameObject* loot) override;
 	bool CheckMarkingConditions() override;
+	void GetHitByAmmo(GameObject* ammo, bool send_network_packet = true) override;
 
 	void DebugDrawMissions();
 	void DebugDrawMoney();
@@ -68,8 +69,6 @@ public :
 
 	//Network
 	void UpdateNetwork();
-	void SendNetworkPacket(NetworkPacketType type, Ammo* ammo = NULL);
-	void SendNetworkPacket(Ammo* ammo);
 	void ReceiveNetworkPacket();
 	GameObject* GetOnlinePlayer();
 };

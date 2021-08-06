@@ -36,6 +36,9 @@ public:
 	void Draw(RenderTarget& screen) override;
 	void Bounce(GameObject* target);
 	bool IsOwnedAmmo(GameObject* shooter) override;
+
+	//network
+	int m_online_id;
 };
 
 #endif // AMMO_H_INCLUDED

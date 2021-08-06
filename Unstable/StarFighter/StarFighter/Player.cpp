@@ -18,10 +18,10 @@ Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, AllyFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, AllyFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, AllyFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
 
 	InitShip();
 }
@@ -702,6 +702,15 @@ bool Player::CheckMarkingConditions()
 	return false;
 }
 
+void Player::GetHitByAmmo(GameObject* ammo, bool send_network_packet)
+{
+	Ship::GetHitByAmmo(ammo, send_network_packet);
+
+	Ammo* ammo_ = (Ammo*)ammo;
+	if (send_network_packet == true)
+		SendNetworkPacket(ammo_, true);
+}
+
 //NETWORK
 GameObject* Player::GetOnlinePlayer()
 {
@@ -718,38 +727,6 @@ GameObject* Player::GetOnlinePlayer()
 	{
 		return (*CurrentGame).m_onlineShips.front();
 	}	
-}
-
-void Player::SendNetworkPacket(Ammo* ammo)
-{
-	SendNetworkPacket(Packet_AmmoCreation, ammo);
-}
-
-void Player::SendNetworkPacket(NetworkPacketType type, Ammo* ammo)
-{
-	sf::Packet packet;
-	packet << (int)type;
-
-	switch (type)
-	{
-		case Packet_PlayerShipUpdate:
-		{
-			GameObject* ship = (*CurrentGame).m_playerShip;
-			packet << ship->m_position.x << ship->m_position.y << ship->m_heading << ship->m_speed.x << ship->m_speed.y;
-
-			break;
-		}
-		case Packet_AmmoCreation:
-		{
-			if (ammo != NULL)
-				packet << (int)ammo->m_ammo_type << ammo->m_position.x << ammo->m_position.y << ammo->m_heading << ammo->m_lifespan << ammo->m_damage << (int)ammo->m_collider << ammo->m_speed.x << ammo->m_speed.y;
-
-			break;
-		}
-	}
-
-	(*CurrentGame).m_socket.send(packet, (*CurrentGame).m_ip, (*CurrentGame).m_port_send);
-	//(*CurrentGame).m_socket.send(packet, "127.0.0.1", (*CurrentGame).m_port_receive);//Local test
 }
 
 void Player::ReceiveNetworkPacket()
@@ -789,6 +766,7 @@ void Player::ReceiveNetworkPacket()
 			}
 			case Packet_AmmoCreation:
 			{
+				int online_id;
 				int ammo_type;
 				float position_x;
 				float position_y;
@@ -799,15 +777,37 @@ void Player::ReceiveNetworkPacket()
 				float speed_x;
 				float speed_y;
 
-				packet >> ammo_type >> position_x >> position_y >> heading >> lifespan >> damage >> collider >> speed_x >> speed_y;
+				packet >> online_id >> ammo_type >> position_x >> position_y >> heading >> lifespan >> damage >> collider >> speed_x >> speed_y;
 
 				SpatialObject* owner = (SpatialObject*)onlinePlayer;
 
 				Ammo* ammo = new Ammo(owner, (AmmoType)ammo_type, sf::Vector2f(position_x, position_y), heading, 0, damage);
 				ammo->m_lifespan = lifespan;
 				ammo->m_speed = sf::Vector2f(speed_x, speed_y);
+				ammo->m_online_id = online_id;
 
-				(*CurrentGame).addToScene(ammo, AllyFireLayer, (ColliderType)collider, true);
+				(*CurrentGame).addToScene(ammo, PlayerFireLayer, (ColliderType)collider, true);
+
+				break;
+			}
+			case Packet_AmmoImpact:
+			{
+				bool is_local_player;
+				int online_id;
+
+				packet >> is_local_player >> online_id;
+
+				for (GameObject* object : (*CurrentGame).m_sceneGameObjectsTyped[AllyFire])
+				{
+					Ammo* ammo = (Ammo*)object;
+					if (ammo->m_online_id == online_id)
+					{
+						HumanShip* ship = is_local_player == false ? (HumanShip*)(*CurrentGame).m_playerShip : (HumanShip*)onlinePlayer;
+						ship->GetHitByAmmo(ammo, false);
+
+						break;
+					}
+				}
 
 				break;
 			}

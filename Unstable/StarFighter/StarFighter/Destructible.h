@@ -9,7 +9,7 @@ public :
 	Destructible();
 	virtual ~Destructible();
 	void Update(sf::Time deltaTime) override;
-	void GetHitByAmmo(GameObject* ammo) override;
+	void GetHitByAmmo(GameObject* ammo, bool send_network_packet = true) override;
 	void GetHitByObject(GameObject* object) override;
 	virtual void Death();
 

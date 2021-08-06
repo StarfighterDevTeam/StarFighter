@@ -273,7 +273,7 @@ bool AIShip::CheckMarkingConditions()
 	return m_roe == ROE_FireAtWill;
 }
 
-void AIShip::GetHitByAmmo(GameObject* ammo)
+void AIShip::GetHitByAmmo(GameObject* ammo, bool send_network_packet)
 {
 	if (m_roe == ROE_ReturnFire || m_roe == ROE_Ambush)
 		SetROE(ROE_FireAtWill);

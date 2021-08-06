@@ -53,6 +53,7 @@ enum NetworkPacketType
 {
 	Packet_PlayerShipUpdate,
 	Packet_AmmoCreation,
+	Packet_AmmoImpact,
 };
 
 struct StarSector

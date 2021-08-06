@@ -25,7 +25,7 @@ enum LayerType
 	Planet_Layer,
 	FX_Layer,
 	BeaconLayer,
-	AllyFireLayer,
+	PlayerFireLayer,
 	AIShipFireLayer,
 	PlayerStroboscopicLayer,
 	AsteroidLayer,
@@ -107,7 +107,7 @@ public:
 	static sf::Vector2i GetStarSectorIndexAtPosition(sf::Vector2f position);
 	virtual void MarkThis(SpatialObject* target, bool isMission);
 	virtual void UnmarkThis(SpatialObject* target, bool isMission);
-	virtual void GetHitByAmmo(GameObject* ammo);
+	virtual void GetHitByAmmo(GameObject* ammo, bool send_network_packet = true);
 	virtual void GetHitByObject(GameObject* object);
 	virtual void GetHitByLoot(GameObject* loot);
 	virtual void HitWithGravitation(GameObject* attractor);
