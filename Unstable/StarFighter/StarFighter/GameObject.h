@@ -14,6 +14,7 @@ using namespace sf;
 
 class SpatialObject;
 class AIShip;
+class Ammo;
 
 enum LayerType
 {
@@ -117,6 +118,7 @@ public:
 	virtual int GetMarkedObjectsCount();
 	virtual float GetGravitationRange();
 	virtual void UpdateAlliedShips();
+	virtual void SendNetworkPacket(Ammo* ammo, bool is_local_player);
 
 	sf::Vector2i m_sector_index;
 };

@@ -354,3 +354,8 @@ bool GameObject::IsOwnedAmmo(GameObject* shooter)
 	return false;
 	//see override function in class Ammo
 }
+
+void GameObject::SendNetworkPacket(Ammo* ammo, bool is_local_player)
+{
+	//see override function in class Player
+}

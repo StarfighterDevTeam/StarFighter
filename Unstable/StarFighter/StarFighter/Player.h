@@ -69,6 +69,9 @@ public :
 
 	//Network
 	void UpdateNetwork();
+	void SendNetworkPacket(NetworkPacketType type, Ammo* ammo = NULL, bool is_local_player = false);
+	void SendNetworkPacket(Ammo* ammo, bool is_local_player) override;
+	void SendNetworkPacket(Ammo* ammo);
 	void ReceiveNetworkPacket();
 	GameObject* GetOnlinePlayer();
 };

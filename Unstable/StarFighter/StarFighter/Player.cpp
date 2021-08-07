@@ -729,6 +729,55 @@ GameObject* Player::GetOnlinePlayer()
 	}	
 }
 
+void Player::SendNetworkPacket(Ammo* ammo, bool is_local_player)
+{
+	SendNetworkPacket(Packet_AmmoImpact, ammo, is_local_player);
+}
+
+void Player::SendNetworkPacket(Ammo* ammo)
+{
+	SendNetworkPacket(Packet_AmmoCreation, ammo);
+}
+
+void Player::SendNetworkPacket(NetworkPacketType type, Ammo* ammo, bool is_local_player)
+{
+	sf::Packet packet;
+	packet << (int)type;
+
+	switch (type)
+	{
+		case Packet_PlayerShipUpdate:
+		{
+			GameObject* ship = (*CurrentGame).m_playerShip;
+			packet << ship->m_position.x << ship->m_position.y << ship->m_heading << ship->m_speed.x << ship->m_speed.y;
+
+			break;
+		}
+		case Packet_AmmoCreation:
+		{
+			if (ammo != NULL)
+			{
+				ammo->m_online_id = RandomizeIntBetweenValues(1, 1000);//unique identifier of the object across online network
+				packet << ammo->m_online_id << (int)ammo->m_ammo_type << ammo->m_position.x << ammo->m_position.y << ammo->m_heading << ammo->m_lifespan << ammo->m_damage << (int)ammo->m_collider;
+			}
+
+			break;
+		}
+		case Packet_AmmoImpact:
+		{
+			if (ammo != NULL)
+			{
+				packet << is_local_player << ammo->m_online_id;
+			}
+
+			break;
+		}
+	}
+
+	(*CurrentGame).m_socket.send(packet, (*CurrentGame).m_ip, (*CurrentGame).m_port_send);
+	//(*CurrentGame).m_socket.send(packet, "127.0.0.1", (*CurrentGame).m_port_receive);//Local test
+}
+
 void Player::ReceiveNetworkPacket()
 {
 	sf::Packet packet;
@@ -774,16 +823,13 @@ void Player::ReceiveNetworkPacket()
 				float lifespan;
 				int damage;
 				int collider;
-				float speed_x;
-				float speed_y;
 
-				packet >> online_id >> ammo_type >> position_x >> position_y >> heading >> lifespan >> damage >> collider >> speed_x >> speed_y;
+				packet >> online_id >> ammo_type >> position_x >> position_y >> heading >> lifespan >> damage >> collider;
 
 				SpatialObject* owner = (SpatialObject*)onlinePlayer;
 
 				Ammo* ammo = new Ammo(owner, (AmmoType)ammo_type, sf::Vector2f(position_x, position_y), heading, 0, damage);
 				ammo->m_lifespan = lifespan;
-				ammo->m_speed = sf::Vector2f(speed_x, speed_y);
 				ammo->m_online_id = online_id;
 
 				(*CurrentGame).addToScene(ammo, PlayerFireLayer, (ColliderType)collider, true);
