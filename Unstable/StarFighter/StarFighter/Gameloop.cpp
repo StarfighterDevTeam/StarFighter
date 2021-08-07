@@ -43,6 +43,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			Asteroid* asteroid = AsteroidField::CreateAsteroid(sector_index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
 			asteroid->m_speed = sf::Vector2f(RandomizeFloatBetweenValues(-1, 1), RandomizeFloatBetweenValues(-1, 1));
 			ScaleVector(&asteroid->m_speed, asteroid->m_speed_max);
+
+			//network
+			Player* playership = (Player*)(*CurrentGame).m_playerShip;
+			playership->SendNetworkPacket(asteroid);
 		}
 	}
 		
@@ -115,6 +119,7 @@ void Gameloop::PopulateSector(sf::Vector2i sector_index)
 		if (condition_ok == true)
 		{
 			CreatePlanet(sector_index, Hostility_Ally, 2, 3);
+
 			return;
 		}
 	}
@@ -151,12 +156,23 @@ Planet* Gameloop::CreatePlanet(sf::Vector2i sector_index, Hostility hostility, i
 
 	(*CurrentGame).m_planets.push_back(planet);
 
+	//network
+	Player* playership = (Player*)(*CurrentGame).m_playerShip;
+	playership->SendNetworkPacket(planet);
+
 	return planet;
 }
 
-AsteroidField* Gameloop::CreateAsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y)
+AsteroidField* Gameloop::CreateAsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y, int nb_asteroids_max)
 {
-	AsteroidField* field = new AsteroidField(sector_index_bottom, sector_index_left, sector_index_size_x, sector_index_size_y);
+	AsteroidField* field = new AsteroidField(sector_index_bottom, sector_index_left, sector_index_size_x, sector_index_size_y, nb_asteroids_max);
+
+	(*CurrentGame).m_asteroidFields.push_back(field);
+
+	//network
+	Player* playership = (Player*)(*CurrentGame).m_playerShip;
+	playership->SendNetworkPacket(field);
+
 	return field;
 }
 

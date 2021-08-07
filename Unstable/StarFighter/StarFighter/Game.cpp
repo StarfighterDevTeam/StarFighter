@@ -812,7 +812,7 @@ void Game::DebugDrawGameObjectsStats()
 			if (object->m_layer != StarLayer && object != m_playerShip && object != m_background)
 				c++;
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		sf::Text text;
 		text.setFont(*m_font[Font_Arial]);
@@ -840,6 +840,9 @@ void Game::DebugDrawGameObjectsStats()
 			else
 				//text.setString("Client | IP: " + m_ip.toString() + " | Port: " + to_string(m_port));
 				text.setString("Port receive: " + to_string(m_port_receive) + " | IP send: " + m_ip.toString() + " | Port send : " + to_string(m_port_send));
+
+		if (i == 5)
+			text.setString("Current sector: " + to_string(m_playerShip->m_sector_index.x) + ", " + to_string(m_playerShip->m_sector_index.y));
 
 		m_mainScreen.draw(text);
 	}

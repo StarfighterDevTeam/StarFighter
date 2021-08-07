@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create)
+Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_to_create, int planet_id)
 {
 	m_collider = PlanetObject;
 	m_layer = Planet_Layer;
@@ -13,10 +13,16 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_t
 	m_nb_missions_to_create = nb_missions_to_create;
 
 	//set a unique planet id
-	do
+	if (planet_id == -1)
 	{
-		m_planet_id = RandomizeIntBetweenValues(1001, 9999);
-	} while ((*CurrentGame).m_planet_ids[m_planet_id] != NULL);
+		do
+		{
+			m_planet_id = RandomizeIntBetweenValues(1001, 9999);
+		} while ((*CurrentGame).m_planet_ids[m_planet_id] != NULL);
+	}
+	else
+		m_planet_id = planet_id;
+	
 	(*CurrentGame).m_planet_ids[m_planet_id] = this;
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(PLANET_RADIUS * 2, PLANET_RADIUS * 2), 1, NB_PLANET_TYPES);

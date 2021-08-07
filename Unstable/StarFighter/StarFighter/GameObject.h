@@ -15,6 +15,7 @@ using namespace sf;
 class SpatialObject;
 class AIShip;
 class Ammo;
+class Asteroid;
 
 enum LayerType
 {
@@ -74,7 +75,7 @@ public:
 	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(RenderTarget& screen);
 	virtual void UpdateAnimation(sf::Time deltaTime);
-	void SetAnimationLine(int animation, bool keep_frame_index = false);
+	void SetAnimationLine(int animation_index, bool keep_frame_index = false);
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static int GaussianBlurDistribution(int x);
 	virtual float GetRadius(bool include_shield) const;
@@ -118,7 +119,8 @@ public:
 	virtual int GetMarkedObjectsCount();
 	virtual float GetGravitationRange();
 	virtual void UpdateAlliedShips();
-	virtual void SendNetworkPacket(Ammo* ammo, bool is_local_player);
+	virtual bool SendNetworkPacket(Ammo* ammo, bool is_local_player);
+	virtual bool SendNetworkPacket(Asteroid* asteroid);
 
 	sf::Vector2i m_sector_index;
 };

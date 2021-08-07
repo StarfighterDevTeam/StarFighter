@@ -69,10 +69,14 @@ public :
 
 	//Network
 	void UpdateNetwork();
-	void SendNetworkPacket(NetworkPacketType type, Ammo* ammo = NULL, bool is_local_player = false);
-	void SendNetworkPacket(Ammo* ammo, bool is_local_player) override;
-	void SendNetworkPacket(Ammo* ammo);
-	void ReceiveNetworkPacket();
+	bool SendNetworkPacket(NetworkPacketType type, Ammo* ammo = NULL, bool is_local_player = false, Asteroid* asteroid = NULL, AsteroidField* field = NULL, Planet* planet = NULL);
+	bool SendNetworkPacket(Ammo* ammo, bool is_local_player) override;
+	bool SendNetworkPacket(Ammo* ammo);
+	bool SendNetworkPacket(Asteroid* asteroid) override;
+	bool SendNetworkPacket(AsteroidField* field);
+	bool SendNetworkPacket(Planet* planet);
+	bool SendNetworkPacket(sf::Vector2i sector_index);
+	bool ReceiveNetworkPacket();
 	GameObject* GetOnlinePlayer();
 };
 

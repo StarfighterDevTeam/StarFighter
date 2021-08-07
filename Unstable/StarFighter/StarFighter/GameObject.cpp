@@ -31,22 +31,22 @@ GameObject::GameObject()
 
 }
 
-void GameObject::SetAnimationLine(int animation, bool keep_frame_index)
+void GameObject::SetAnimationLine(int animation_index, bool keep_frame_index)
 {
 	//are we already playing this animation?
-	if (m_currentAnimationIndex == animation && (keep_frame_index || (m_currentAnimation && m_currentAnimation->getSize() == 1)))
+	if (m_currentAnimationIndex == animation_index && (keep_frame_index || (m_currentAnimation && m_currentAnimation->getSize() == 1)))
 	{
 		return;
 	}
 
 	//bulletproof verifications
-	if (animation >= m_animationNumber)
+	if (animation_index >= m_animationNumber)
 	{
-		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
-		animation = m_animationNumber - 1;
-		if (animation < 0)
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation_index, m_animationNumber);
+		animation_index = m_animationNumber - 1;
+		if (animation_index < 0)
 		{
-			animation = 0;
+			animation_index = 0;
 		}
 	}
 
@@ -57,7 +57,7 @@ void GameObject::SetAnimationLine(int animation, bool keep_frame_index)
 	{
 		size_t n = j / m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
-		if (n == animation)
+		if (n == animation_index)
 		{
 			anim->addFrame(m_defaultAnimation.getFrame(j));
 		}
@@ -69,7 +69,7 @@ void GameObject::SetAnimationLine(int animation, bool keep_frame_index)
 	m_currentAnimation = anim;
 	anim = NULL;
 	play(*m_currentAnimation, keep_frame_index);
-	m_currentAnimationIndex = animation;
+	m_currentAnimationIndex = animation_index;
 	m_heading = 0;
 }
 
@@ -355,7 +355,14 @@ bool GameObject::IsOwnedAmmo(GameObject* shooter)
 	//see override function in class Ammo
 }
 
-void GameObject::SendNetworkPacket(Ammo* ammo, bool is_local_player)
+bool GameObject::SendNetworkPacket(Ammo* ammo, bool is_local_player)
 {
+	return false;
+	//see override function in class Player
+}
+
+bool GameObject::SendNetworkPacket(Asteroid* asteroid)
+{
+	return false;
 	//see override function in class Player
 }

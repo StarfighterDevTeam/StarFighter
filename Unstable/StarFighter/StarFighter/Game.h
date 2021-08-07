@@ -54,6 +54,9 @@ enum NetworkPacketType
 	Packet_PlayerShipUpdate,
 	Packet_AmmoCreation,
 	Packet_AmmoImpact,
+	Packet_AsteroidCreation,
+	Packet_AsteroidFieldCreation,
+	Packet_PlanetCreation,
 };
 
 struct StarSector

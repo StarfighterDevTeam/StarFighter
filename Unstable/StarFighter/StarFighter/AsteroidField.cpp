@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-AsteroidField::AsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y)
+AsteroidField::AsteroidField(int sector_index_bottom, int sector_index_left, int sector_index_size_x, int sector_index_size_y, int nb_asteroids_max)
 {	
 	m_sector_index_bottom = sector_index_bottom;
 	m_sector_index_left = sector_index_left;
@@ -17,6 +17,9 @@ AsteroidField::AsteroidField(int sector_index_bottom, int sector_index_left, int
 	//create asteroids
 	for (int i = 0; i < sector_index_size_x * sector_index_size_y; i++)
 	{
+		if (m_asteroids.size() == nb_asteroids_max)
+			break;
+
 		sf::Vector2i index = sf::Vector2i(sector_index_left + (i % sector_index_size_y), sector_index_bottom + (i / sector_index_size_y));
 		if (index != m_free_space && RandomizeFloatBetweenValues(0, 1) < 0.6)
 		{
@@ -42,6 +45,9 @@ Asteroid* AsteroidField::CreateAsteroid(sf::Vector2i sector_index, AsteroidType 
 
 	if ((*CurrentGame).StoreObjectIfNecessary(asteroid) == false)
 		(*CurrentGame).addToScene(asteroid, asteroid->m_layer, asteroid->m_collider, false);
+
+	//network
+	(*CurrentGame).m_playerShip->SendNetworkPacket(asteroid);
 
 	return asteroid;
 }

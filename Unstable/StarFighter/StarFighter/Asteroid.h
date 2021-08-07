@@ -27,6 +27,9 @@ public :
 	AsteroidType m_asteroid_type;
 	float m_rotation_speed;
 	float m_chance_of_loot;
+	
+	//network
+	int m_online_id;
 };
 
 #endif // ASTEROID_H_INCLUDED

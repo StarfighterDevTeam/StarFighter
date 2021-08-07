@@ -104,6 +104,9 @@ void Player::Update(sf::Time deltaTime)
 
 	//network
 	UpdateNetwork();
+
+	SendNetworkPacket(Packet_PlayerShipUpdate);
+	ReceiveNetworkPacket();
 }
 
 void Player::UpdateMissions()
@@ -729,18 +732,36 @@ GameObject* Player::GetOnlinePlayer()
 	}	
 }
 
-void Player::SendNetworkPacket(Ammo* ammo, bool is_local_player)
+bool Player::SendNetworkPacket(Ammo* ammo, bool is_local_player)
 {
-	SendNetworkPacket(Packet_AmmoImpact, ammo, is_local_player);
+	return SendNetworkPacket(Packet_AmmoImpact, ammo, is_local_player);
 }
 
-void Player::SendNetworkPacket(Ammo* ammo)
+bool Player::SendNetworkPacket(Ammo* ammo)
 {
-	SendNetworkPacket(Packet_AmmoCreation, ammo);
+	return SendNetworkPacket(Packet_AmmoCreation, ammo);
 }
 
-void Player::SendNetworkPacket(NetworkPacketType type, Ammo* ammo, bool is_local_player)
+bool Player::SendNetworkPacket(Asteroid* asteroid)
 {
+	return SendNetworkPacket(Packet_AsteroidCreation, NULL, false, asteroid);
+}
+
+bool Player::SendNetworkPacket(Planet* planet)
+{
+	return SendNetworkPacket(Packet_PlanetCreation, NULL, false, NULL, NULL, planet);
+}
+
+bool Player::SendNetworkPacket(AsteroidField* field)
+{
+	return SendNetworkPacket(Packet_PlanetCreation, NULL, false, NULL, field, NULL);
+}
+
+bool Player::SendNetworkPacket(NetworkPacketType type, Ammo* ammo, bool is_local_player, Asteroid* asteroid, AsteroidField* field, Planet* planet)
+{
+	if ((*CurrentGame).m_network_status != Network_Connected)
+		return false;
+
 	sf::Packet packet;
 	packet << (int)type;
 
@@ -757,7 +778,7 @@ void Player::SendNetworkPacket(NetworkPacketType type, Ammo* ammo, bool is_local
 		{
 			if (ammo != NULL)
 			{
-				ammo->m_online_id = RandomizeIntBetweenValues(1, 1000);//unique identifier of the object across online network
+				ammo->m_online_id = RandomizeIntBetweenValues(int(AllyFire) * 1000, int(AllyFire) * 1000 + 1000);//unique identifier of the object across online network
 				packet << ammo->m_online_id << (int)ammo->m_ammo_type << ammo->m_position.x << ammo->m_position.y << ammo->m_heading << ammo->m_lifespan << ammo->m_damage << (int)ammo->m_collider;
 			}
 
@@ -772,25 +793,76 @@ void Player::SendNetworkPacket(NetworkPacketType type, Ammo* ammo, bool is_local
 
 			break;
 		}
+		case Packet_AsteroidCreation:
+		{
+			//if (asteroid != NULL)
+			//{
+			//	asteroid->m_online_id = RandomizeIntBetweenValues(int(DestructibleObject) * 1000, int(DestructibleObject) * 1000 + 1000);//unique identifier of the object across online network
+			//	packet << asteroid->m_online_id << asteroid->m_sector_index.x << asteroid->m_sector_index.y << (int)asteroid->m_asteroid_type;
+			//	packet << asteroid->m_speed.x << asteroid->m_speed.y << asteroid->m_rotation_speed << asteroid->m_heading;
+			//}
+			//
+			//printf("Packet sent: asteroid %d (speed: %d, %d)\n", asteroid->m_online_id, (int)asteroid->m_speed.x, (int)asteroid->m_speed.y);
+
+			break;
+		}
+
+		case Packet_AsteroidFieldCreation:
+		{
+			//if (field != NULL)
+			//{
+			//	field->m_online_id = RandomizeIntBetweenValues(int(DestructibleObject) * 1000, int(DestructibleObject) * 1000 + 1000);//unique identifier of the object across online network
+			//	
+			//	packet << field->m_online_id << field->m_asteroids.size() << field->m_sector_index_bottom << field->m_sector_index_left << field->m_sector_index_size_x << field->m_sector_index_size_y;
+			//
+			//	for (Asteroid* asteroid_ : field->m_asteroids)
+			//	{
+			//		asteroid->m_online_id = RandomizeIntBetweenValues(int(DestructibleObject) * 1000, int(DestructibleObject) * 1000 + 1000);//unique identifier of the object across online network
+			//		packet << asteroid->m_online_id << asteroid->m_sector_index.x << asteroid->m_sector_index.y << (int)asteroid->m_asteroid_type;
+			//		packet << asteroid->m_speed.x << asteroid->m_speed.y << asteroid->m_rotation_speed << asteroid->m_heading;
+			//	}	
+			//}
+
+			printf("Packet sent: field %d\n", field->m_online_id);
+
+			break;
+		}
+		case Packet_PlanetCreation:
+		{
+			if (planet != NULL)
+			{
+				packet << planet->m_sector_index.x << planet->m_sector_index.y << (int)planet->m_hostility << planet->m_planet_id << planet->m_currentAnimationIndex;
+			}
+
+			break;
+		}
 	}
 
 	(*CurrentGame).m_socket.send(packet, (*CurrentGame).m_ip, (*CurrentGame).m_port_send);
 	//(*CurrentGame).m_socket.send(packet, "127.0.0.1", (*CurrentGame).m_port_receive);//Local test
+
+	return true;
 }
 
-void Player::ReceiveNetworkPacket()
+bool Player::ReceiveNetworkPacket()
 {
+	if ((*CurrentGame).m_network_status != Network_Connected)
+		return false;
+
 	sf::Packet packet;
 	sf::IpAddress ip;
 	unsigned short port;
 
 	(*CurrentGame).m_socket.receive(packet, ip, port);
 
+	if (packet.getDataSize() == 0)
+		return false;
+
 	while (packet.getDataSize() > 0)//throw empty packets (= no packet received)
 	{
 		GameObject* onlinePlayer = GetOnlinePlayer();
 		if (onlinePlayer == NULL)
-			break;
+			return false;
 
 		int type;
 		packet >> type;
@@ -857,10 +929,103 @@ void Player::ReceiveNetworkPacket()
 
 				break;
 			}
+			case Packet_AsteroidCreation:
+			{
+				int sector_index_x;
+				int sector_index_y;
+				int asteroid_type;
+				int online_id;
+				float speed_x;
+				float speed_y;
+				float rotation_speed;
+				float heading;
+
+				packet >> online_id >> sector_index_x >> sector_index_y >> asteroid_type >> speed_x >> speed_y >> rotation_speed >> heading;
+
+				Asteroid* asteroid = new Asteroid(sf::Vector2i(sector_index_x, sector_index_y), (AsteroidType)asteroid_type);
+				asteroid->m_online_id = online_id;
+				asteroid->m_speed = sf::Vector2f(speed_x, speed_y);
+				asteroid->m_rotation_speed = rotation_speed;
+				asteroid->m_heading = heading;
+				
+				if ((*CurrentGame).StoreObjectIfNecessary(asteroid) == false)
+					(*CurrentGame).addToScene(asteroid, asteroid->m_layer, asteroid->m_collider, false);
+
+				printf("Received: asteroid %d (speed: %d, %d)\n", asteroid->m_online_id, (int)asteroid->m_speed.x, (int)asteroid->m_speed.y);
+
+				break;
+			}
+			case Packet_AsteroidFieldCreation:
+			{
+				int nb_asteroids;
+				int online_id;
+				int sector_index_bottom;
+				int sector_index_left;
+				int sector_index_size_x;
+				int sector_index_size_y;
+
+				packet >> online_id >> nb_asteroids >> sector_index_bottom >> sector_index_left >> sector_index_size_x >> sector_index_size_y;
+
+				AsteroidField* field = new AsteroidField(sector_index_bottom, sector_index_left, sector_index_size_x, sector_index_size_y, 0);
+				field->m_online_id = online_id;
+
+				for (int i = 0; i < nb_asteroids; i++)
+				{
+					int sector_index_x;
+					int sector_index_y;
+					int asteroid_type;
+					int online_id;
+					float speed_x;
+					float speed_y;
+					float rotation_speed;
+					float heading;
+
+					packet >> online_id >> sector_index_x >> sector_index_y >> asteroid_type >> speed_x >> speed_y >> rotation_speed >> heading;
+
+					Asteroid* asteroid = new Asteroid(sf::Vector2i(sector_index_x, sector_index_y), (AsteroidType)asteroid_type);
+					asteroid->m_online_id = online_id;
+					asteroid->m_speed = sf::Vector2f(speed_x, speed_y);
+					asteroid->m_rotation_speed = rotation_speed;
+					asteroid->m_heading = heading;
+					
+					field->m_asteroids.push_back(asteroid);
+
+					if ((*CurrentGame).StoreObjectIfNecessary(asteroid) == false)
+						(*CurrentGame).addToScene(asteroid, asteroid->m_layer, asteroid->m_collider, false);
+				}
+
+				(*CurrentGame).m_asteroidFields.push_back(field);
+
+				printf("received: field %d\n", field->m_online_id);
+
+				break;
+			}
+			case Packet_PlanetCreation:
+			{
+				int sector_index_x;
+				int sector_index_y;
+				int hostility;
+				int planet_id;
+				int animationNumber;
+
+				packet >> sector_index_x >> sector_index_y >> hostility >> planet_id >> animationNumber;
+
+				Planet* planet = new Planet(sf::Vector2i(sector_index_x, sector_index_y), (Hostility)hostility, 0, planet_id);
+				planet->SetAnimationLine(animationNumber);
+
+				if ((*CurrentGame).StoreObjectIfNecessary(planet) == false)
+					(*CurrentGame).addToScene(planet, planet->m_layer, planet->m_collider, false);
+
+				(*CurrentGame).m_planets.push_back(planet);
+
+				break;
+			}
 		}
 
 		(*CurrentGame).m_socket.receive(packet, ip, port);//check for another packet to be received in the same update = overwrite the previous packet
 	}
+
+	return true;
 }
 
 void Player::UpdateNetwork()
@@ -868,11 +1033,5 @@ void Player::UpdateNetwork()
 	if ((*CurrentGame).m_network_status != Network_Connected)
 	{
 		(*CurrentGame).UpdateNetworkConnexion();
-	}
-		
-	if ((*CurrentGame).m_network_status == Network_Connected)
-	{
-		SendNetworkPacket(Packet_PlayerShipUpdate);
-		ReceiveNetworkPacket();
 	}
 }
