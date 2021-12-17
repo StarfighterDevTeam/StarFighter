@@ -10,7 +10,7 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_map_size = m_background->m_size;
 
 	//ship
-	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3, 1);
+	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(400, 540), sf::Vector2f(0, 0), "2D/marlin.png", sf::Vector2f(348, 150), sf::Vector2f(174, 75), 1, 1);
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 }
 

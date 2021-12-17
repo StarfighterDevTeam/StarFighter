@@ -121,6 +121,9 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
+	//Marlin
+	GameObject* m_lane;
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);

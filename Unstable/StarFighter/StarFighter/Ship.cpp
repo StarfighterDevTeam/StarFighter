@@ -49,6 +49,12 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	//automatic scrolling
+	m_speed.x = 200;
+	if (getPosition().x > 1400)
+		setPosition(sf::Vector2f(400, getPosition().y));
+
+
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
 	{
@@ -62,7 +68,7 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	ManageAcceleration(inputs_direction);
+	//ManageAcceleration(inputs_direction);
 	
 	//Action input
 	UpdateInputStates();
@@ -72,9 +78,9 @@ void Ship::update(sf::Time deltaTime)
 		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
-	UpdateRotation();
+	//MaxSpeedConstraints();
+	//IdleDecelleration(deltaTime);
+	//UpdateRotation();
 
 	GameObject::update(deltaTime);
 
@@ -85,7 +91,7 @@ void Ship::update(sf::Time deltaTime)
 		m_SFTargetPanel->Update(deltaTime);
 	}
 
-	ScreenBorderContraints();	
+	//ScreenBorderContraints();	
 }
 
 bool Ship::ScreenBorderContraints()

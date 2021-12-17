@@ -55,6 +55,10 @@ Game::Game(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
+
+	m_lane = new GameObject();
+	m_lane->Init(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color(sf::Color::Blue), sf::Vector2f(1600, 2), 0);
+	addToScene(m_lane, PortalLayer, PortalObject);
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
