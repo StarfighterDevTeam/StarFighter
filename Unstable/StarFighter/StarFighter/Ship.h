@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+#include "SFPanelSpecific.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -18,7 +19,7 @@
 enum PlayerActions
 {
 	Action_Idle,
-	Action_Firing,
+	Action_Jumping,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,
@@ -31,13 +32,20 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
+enum MarlinStates
+{
+	State_Air,
+	State_Surface,
+	State_Deep,
+};
+
 class Ship : public GameObject
 {
 public :
 	Ship();
 	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
-	void Init();
+	void Init() override;
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
 	
@@ -66,6 +74,12 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	MarlinStates m_state;
+	float m_altitude;
+
+	SFText* m_debug_text;
+	vector<string> m_debug_forces;
 
 private:
 	bool m_moving;

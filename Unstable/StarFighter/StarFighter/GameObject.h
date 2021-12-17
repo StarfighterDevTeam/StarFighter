@@ -59,6 +59,7 @@ public:
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber = 1, int animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size = 0);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size = 0);
+	virtual void Init(){};
 
 	~GameObject();
 

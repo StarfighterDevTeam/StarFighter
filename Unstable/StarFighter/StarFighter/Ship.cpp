@@ -25,6 +25,14 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	m_debug_text = new SFText(*(*CurrentGame).m_font, 20, sf::Color::White, sf::Vector2f(200, 200), PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_debug_text);
+
+	m_state = State_Surface;
+	m_speed = sf::Vector2f(0, 0);
+	float lane_y = (*CurrentGame).m_lane->getPosition().y;
+	setPosition(sf::Vector2f(400, lane_y));
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -39,7 +47,7 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	
+	delete m_SFTargetPanel;
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -47,40 +55,87 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
+#define HORIZONTAL_SPEED	200
+#define JUMP_SPEED			5000
+#define ARCHIMEDE_SPEED		200
+#define SPLASH_FACTOR		0.1
+
 void Ship::update(sf::Time deltaTime)
 {
+	m_debug_forces.clear();
+
+	//altitude calculation
+	m_altitude = - getPosition().y - (-(*CurrentGame).m_lane->getPosition().y);
+
+	//state change
+	if (m_altitude > m_size.y / 2)
+		m_state = State_Air;
+
+	if (m_altitude < - m_size.y / 2)
+		m_state = State_Deep;
+
+	//splash
+	if (m_altitude < m_size.y * 0.1 && m_state == State_Air)
+	{
+		m_speed.y *= SPLASH_FACTOR;
+		m_state = State_Surface;
+		m_debug_forces.push_back("splash");
+	}
+
+	//gravity
+	if (m_state == State_Air)
+	{
+		m_speed.y += JUMP_SPEED * deltaTime.asSeconds();
+		m_debug_forces.push_back("gravity");
+	}
+		
+
+	//archimede
+	if (m_state == State_Deep)
+	{
+		m_speed.y -= ARCHIMEDE_SPEED * deltaTime.asSeconds();
+		m_debug_forces.push_back("archimede");
+	}
+		
+
 	//automatic scrolling
-	m_speed.x = 200;
-	if (getPosition().x > 1400)
+	m_speed.x = HORIZONTAL_SPEED;
+	if (getPosition().x > 1500)
 		setPosition(sf::Vector2f(400, getPosition().y));
 
-
-	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
-	if ((*CurrentGame).m_window_has_focus)
-	{
-		inputs_direction = InputGuy::getDirections();
-	}
-
-	if (!m_disable_inputs)
-	{
-		m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
-		m_movingX = inputs_direction.x != 0;
-		m_movingY = inputs_direction.y != 0;
-	}
+	//sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+	//if ((*CurrentGame).m_window_has_focus)
+	//{
+	//	inputs_direction = InputGuy::getDirections();
+	//}
+	//
+	//if (!m_disable_inputs)
+	//{
+	//	m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
+	//	m_movingX = inputs_direction.x != 0;
+	//	m_movingY = inputs_direction.y != 0;
+	//}
 
 	//ManageAcceleration(inputs_direction);
 	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
+	if (m_inputs_states[Action_Jumping] == Input_Tap && m_state == State_Surface)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		(*CurrentGame).CreateSFTextPop("Jump", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+
+		m_speed.y = -2000;
 	}
+
+
+	printf("altitude %f\n", m_altitude);
 
 	//MaxSpeedConstraints();
 	//IdleDecelleration(deltaTime);
 	//UpdateRotation();
+
+	//Physics
 
 	GameObject::update(deltaTime);
 
@@ -92,6 +147,38 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	//ScreenBorderContraints();	
+
+	//debug texts
+	ostringstream ss;
+	ss << "ASL : " + to_string((int)m_altitude) + "\n";
+	ss << "Vz :	" + to_string((int)-m_speed.y) + "\n";;
+
+	ostringstream state;
+	if (m_state == State_Air)
+		state << "Air";
+	else if (m_state == State_Surface)
+		state << "Surface";
+	else if (m_state == State_Deep)
+		state << "Deep";
+
+	ss << "State : " << state.str() << "\n";
+	
+	if (m_debug_forces.empty() == false)
+	{
+		ss << "Forces : ";
+		int i = 0;
+		for (string force : m_debug_forces)
+		{
+			if (i > 0)
+				ss << "+ ";
+
+			ss << force << " ";
+			i++;
+		}
+		ss << "\n";
+	}
+
+	m_debug_text->setString(ss.str());
 }
 
 bool Ship::ScreenBorderContraints()
@@ -217,11 +304,11 @@ void Ship::UpdateInputStates()
 {
 	if ((*CurrentGame).m_window_has_focus)
 	{
-		GetInputState(InputGuy::isFiring(), Action_Firing);
+		GetInputState(InputGuy::isFiring(), Action_Jumping);
 	}
 	else
 	{
-		GetInputState(false, Action_Firing);
+		GetInputState(false, Action_Jumping);
 	}
 }
 

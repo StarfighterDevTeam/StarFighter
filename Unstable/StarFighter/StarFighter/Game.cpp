@@ -57,7 +57,7 @@ Game::Game(RenderWindow* window)
 	PlayMusic(Music_Main);
 
 	m_lane = new GameObject();
-	m_lane->Init(sf::Vector2f(960, 540), sf::Vector2f(0, 0), sf::Color(sf::Color::Blue), sf::Vector2f(1600, 2), 0);
+	m_lane->Init(sf::Vector2f(960, 800), sf::Vector2f(0, 0), sf::Color(sf::Color::Blue), sf::Vector2f(1400, 2), 0);
 	addToScene(m_lane, PortalLayer, PortalObject);
 }
 
@@ -688,7 +688,8 @@ void Game::collectGarbage()
 			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > m_map_size.x
 				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > m_map_size.y)
 			{
-				m_garbage.push_back(*it);
+				//m_garbage.push_back(*it);
+				(*it)->Init();
 				continue;
 			}
 		}

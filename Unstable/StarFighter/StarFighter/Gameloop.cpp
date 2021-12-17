@@ -10,7 +10,8 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_map_size = m_background->m_size;
 
 	//ship
-	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(400, 540), sf::Vector2f(0, 0), "2D/marlin.png", sf::Vector2f(348, 150), sf::Vector2f(174, 75), 1, 1);
+	float lane_y = (*CurrentGame).m_lane->getPosition().y;
+	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(400, lane_y), sf::Vector2f(0, 0), "2D/marlin.png", sf::Vector2f(348, 150), sf::Vector2f(174, 75), 1, 1);
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 }
 
