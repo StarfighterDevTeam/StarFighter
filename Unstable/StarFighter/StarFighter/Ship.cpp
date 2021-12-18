@@ -7,10 +7,16 @@ using namespace sf;
 #define MARLIN_SIZE_X			250
 #define MARLIN_SIZE_Y			80
 
+#define HORIZONTAL_SPEED	200
+#define JUMP_SPEED			20000
+#define GRAVITY_SPEED		2000
+#define SPLASH_FACTOR		0.1
+#define RESISTANCE_SPEED	12
+
 // ----------------SHIP ---------------
 Ship::Ship()
 {
-	
+
 }
 
 void Ship::Init()
@@ -79,12 +85,6 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
-#define HORIZONTAL_SPEED	200
-#define JUMP_SPEED			40000
-#define GRAVITY_SPEED		4000
-#define SPLASH_FACTOR		0.1
-#define RESISTANCE_SPEED	10.0
-
 void Ship::update(sf::Time deltaTime)
 {
 	//horizontal scrolling
@@ -104,16 +104,19 @@ void Ship::update(sf::Time deltaTime)
 	//archimede
 	float archimede = GRAVITY_SPEED * deltaTime.asSeconds() * immersion * 2;
 	m_speed.y -= archimede;
-		
+
 	//Action input
 	UpdateInputStates();
 	float jump = 0;
-	if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
+	if ((*CurrentGame).m_window_has_focus == true)
 	{
-		jump = JUMP_SPEED * immersion * deltaTime.asSeconds();
-		m_speed.y -= jump;
+		if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
+		{
+			jump = JUMP_SPEED * immersion * deltaTime.asSeconds();
+			m_speed.y -= jump;
+		}
 	}
-
+	
 	//resistance
 	float resistance = RESISTANCE_SPEED * immersion * m_speed.y * deltaTime.asSeconds();
 	m_speed.y -= resistance;
@@ -146,10 +149,13 @@ void Ship::update(sf::Time deltaTime)
 	m_archimede_rect->setPosition(getPosition());
 	m_archimede_rect->setOrigin(sf::Vector2f(0, m_archimede_rect->getSize().y));
 	m_resistance_rect->setPosition(sf::Vector2f(getPosition().x - 10, getPosition().y));
-	m_resistance_rect->setOrigin(sf::Vector2f(0, m_jump_rect->getSize().y));
+	m_resistance_rect->setOrigin(sf::Vector2f(0, m_resistance_rect->getSize().y));
 	m_jump_rect->setPosition(sf::Vector2f(getPosition().x + 10, getPosition().y));
 	m_jump_rect->setOrigin(sf::Vector2f(0, m_jump_rect->getSize().y));
 
+	//PlayStroboscopicEffect(sf::seconds(3), sf::seconds(0.05));
+
+	//display/hide debug displays
 	if (m_inputs_states[Action_Debug] == Input_Tap)
 	{
 		m_display_debug_rect = !m_display_debug_rect;
@@ -175,6 +181,8 @@ void Ship::update(sf::Time deltaTime)
 			m_rect_mid->setOutlineColor(sf::Color::Red);
 		}
 	}
+
+
 }
 
 bool Ship::ScreenBorderContraints()

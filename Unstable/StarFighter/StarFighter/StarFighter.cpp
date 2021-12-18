@@ -73,7 +73,7 @@ int main()
 			}
 		}
 
-		if ((*CurrentGame).m_window_has_focus == true)
+		if (1)//(*CurrentGame).m_window_has_focus == true)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			{
