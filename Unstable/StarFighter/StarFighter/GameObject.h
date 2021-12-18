@@ -19,7 +19,6 @@ enum LayerType {
 	ExplosionLayer,
 	EnemyObjectLayer,
 	AuraLayer,
-	FeedbacksLayer,
 	FriendlyFireLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
@@ -27,6 +26,8 @@ enum LayerType {
 	PanelLayer,
 	HudObject,
 	HudCursor,
+
+	FeedbacksLayer,
 	NBVAL_Layer
 };
 

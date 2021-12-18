@@ -689,7 +689,7 @@ void Game::collectGarbage()
 				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > m_map_size.y)
 			{
 				//m_garbage.push_back(*it);
-				(*it)->Init();
+				(*it)->setPosition(sf::Vector2f(400, m_lane->getPosition().y));
 				continue;
 			}
 		}

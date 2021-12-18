@@ -75,11 +75,10 @@ public :
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 
-	MarlinStates m_state;
-	float m_altitude;
-
 	SFText* m_debug_text;
 	vector<string> m_debug_forces;
+	SFRectangle* m_rect;
+	SFRectangle* m_rect_mid;
 
 private:
 	bool m_moving;

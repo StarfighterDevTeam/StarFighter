@@ -4,6 +4,9 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
+#define MARLIN_SIZE_X		250
+#define MARLIN_SIZE_Y		80
+
 // ----------------SHIP ---------------
 Ship::Ship()
 {
@@ -26,13 +29,18 @@ void Ship::Init()
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
 
-	m_debug_text = new SFText(*(*CurrentGame).m_font, 20, sf::Color::White, sf::Vector2f(200, 200), PlayerBlue);
-	(*CurrentGame).addToFeedbacks(m_debug_text);
-
-	m_state = State_Surface;
 	m_speed = sf::Vector2f(0, 0);
 	float lane_y = (*CurrentGame).m_lane->getPosition().y;
 	setPosition(sf::Vector2f(400, lane_y));
+
+	m_debug_text = new SFText(*(*CurrentGame).m_font, 20, sf::Color::White, sf::Vector2f(200, 200), PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_debug_text);
+
+	m_rect = new SFRectangle(getPosition(), sf::Vector2f(MARLIN_SIZE_X, MARLIN_SIZE_Y), sf::Color::Transparent, 2, sf::Color::Red, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_rect);
+
+	m_rect_mid = new SFRectangle(getPosition(), sf::Vector2f(MARLIN_SIZE_X, 0), sf::Color::Transparent, 1, sf::Color::Red, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_rect_mid);
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -47,7 +55,9 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	delete m_SFTargetPanel;
+	delete m_debug_text;
+	delete m_rect;
+	delete m_rect_mid;
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -56,86 +66,44 @@ void Ship::SetControllerType(ControlerType contoller)
 }
 
 #define HORIZONTAL_SPEED	200
-#define JUMP_SPEED			5000
-#define ARCHIMEDE_SPEED		200
+#define JUMP_SPEED			100000
+#define GRAVITY_SPEED		4000
 #define SPLASH_FACTOR		0.1
+#define RESISTANCE_SPEED	10.0
 
 void Ship::update(sf::Time deltaTime)
 {
 	m_debug_forces.clear();
 
 	//altitude calculation
-	m_altitude = - getPosition().y - (-(*CurrentGame).m_lane->getPosition().y);
+	float altitude = -getPosition().y - (-(*CurrentGame).m_lane->getPosition().y);
 
-	//state change
-	if (m_altitude > m_size.y / 2)
-		m_state = State_Air;
-
-	if (m_altitude < - m_size.y / 2)
-		m_state = State_Deep;
-
-	//splash
-	if (m_altitude < m_size.y * 0.1 && m_state == State_Air)
-	{
-		m_speed.y *= SPLASH_FACTOR;
-		m_state = State_Surface;
-		m_debug_forces.push_back("splash");
-	}
+	//immersion calculation: convert to a value betweent 0 (no archimede applied) to 1 (full archimede applied)
+	float immersion = -(altitude / (MARLIN_SIZE_Y * 0.5));
+	immersion = Lerp(immersion, -1, 1, 0, 1);
 
 	//gravity
-	if (m_state == State_Air)
-	{
-		m_speed.y += JUMP_SPEED * deltaTime.asSeconds();
-		m_debug_forces.push_back("gravity");
-	}
-		
+	m_speed.y += GRAVITY_SPEED * deltaTime.asSeconds();
 
 	//archimede
-	if (m_state == State_Deep)
-	{
-		m_speed.y -= ARCHIMEDE_SPEED * deltaTime.asSeconds();
-		m_debug_forces.push_back("archimede");
-	}
-		
+	m_speed.y -= GRAVITY_SPEED * deltaTime.asSeconds() * immersion * 2;
 
+	m_speed.y -= RESISTANCE_SPEED * immersion * m_speed.y * deltaTime.asSeconds();
+		
 	//automatic scrolling
 	m_speed.x = HORIZONTAL_SPEED;
 	if (getPosition().x > 1500)
 		setPosition(sf::Vector2f(400, getPosition().y));
-
-	//sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
-	//if ((*CurrentGame).m_window_has_focus)
-	//{
-	//	inputs_direction = InputGuy::getDirections();
-	//}
-	//
-	//if (!m_disable_inputs)
-	//{
-	//	m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
-	//	m_movingX = inputs_direction.x != 0;
-	//	m_movingY = inputs_direction.y != 0;
-	//}
-
-	//ManageAcceleration(inputs_direction);
 	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Jumping] == Input_Tap && m_state == State_Surface)
+	if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("Jump", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		//(*CurrentGame).CreateSFTextPop("Jump", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -MARLIN_SIZE_Y/2 - 20);
 
-		m_speed.y = -2000;
+		m_speed.y -= JUMP_SPEED * immersion * deltaTime.asSeconds();
 	}
-
-
-	printf("altitude %f\n", m_altitude);
-
-	//MaxSpeedConstraints();
-	//IdleDecelleration(deltaTime);
-	//UpdateRotation();
-
-	//Physics
 
 	GameObject::update(deltaTime);
 
@@ -146,22 +114,11 @@ void Ship::update(sf::Time deltaTime)
 		m_SFTargetPanel->Update(deltaTime);
 	}
 
-	//ScreenBorderContraints();	
-
 	//debug texts
 	ostringstream ss;
-	ss << "ASL : " + to_string((int)m_altitude) + "\n";
-	ss << "Vz :	" + to_string((int)-m_speed.y) + "\n";;
-
-	ostringstream state;
-	if (m_state == State_Air)
-		state << "Air";
-	else if (m_state == State_Surface)
-		state << "Surface";
-	else if (m_state == State_Deep)
-		state << "Deep";
-
-	ss << "State : " << state.str() << "\n";
+	ss << "ASL : " + to_string((int)altitude) + "\n";
+	ss << "Vz : " + to_string((int)-m_speed.y) + "\n";
+	ss << "Imm : " + to_string(immersion) + "\n";
 	
 	if (m_debug_forces.empty() == false)
 	{
@@ -179,6 +136,9 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	m_debug_text->setString(ss.str());
+
+	m_rect->setPosition(getPosition());
+	m_rect_mid->setPosition(getPosition());
 }
 
 bool Ship::ScreenBorderContraints()
