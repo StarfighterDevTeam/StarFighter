@@ -84,7 +84,7 @@ public :
 	SFRectangle* m_archimede_rect;
 	SFRectangle* m_resistance_rect;
 	SFRectangle* m_jump_rect;
-	bool m_display_debug_vectors;
+	bool m_display_debug_rect;
 
 private:
 	bool m_moving;

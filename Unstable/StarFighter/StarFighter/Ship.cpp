@@ -54,7 +54,7 @@ void Ship::Init()
 	m_jump_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Green, 0, sf::Color::Transparent, PlayerBlue);
 	(*CurrentGame).addToFeedbacks(m_jump_rect);
 
-	m_display_debug_vectors = true;
+	m_display_debug_rect = true;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -152,14 +152,17 @@ void Ship::update(sf::Time deltaTime)
 
 	if (m_inputs_states[Action_Debug] == Input_Tap)
 	{
-		m_display_debug_vectors = !m_display_debug_vectors;
+		m_display_debug_rect = !m_display_debug_rect;
 
-		if (m_display_debug_vectors == false)
+		if (m_display_debug_rect == false)
 		{
 			m_gravity_rect->setFillColor(sf::Color::Transparent);
 			m_archimede_rect->setFillColor(sf::Color::Transparent);
 			m_resistance_rect->setFillColor(sf::Color::Transparent);
 			m_jump_rect->setFillColor(sf::Color::Transparent);
+
+			m_rect->setOutlineColor(sf::Color::Transparent);
+			m_rect_mid->setOutlineColor(sf::Color::Transparent);
 		}
 		else
 		{
@@ -167,6 +170,9 @@ void Ship::update(sf::Time deltaTime)
 			m_archimede_rect->setFillColor(sf::Color::Cyan);
 			m_resistance_rect->setFillColor(sf::Color::Black);
 			m_jump_rect->setFillColor(sf::Color::Green);
+
+			m_rect->setOutlineColor(sf::Color::Red);
+			m_rect_mid->setOutlineColor(sf::Color::Red);
 		}
 	}
 }
