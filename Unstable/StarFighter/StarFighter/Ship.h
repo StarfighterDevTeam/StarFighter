@@ -76,7 +76,6 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	SFText* m_debug_text;
-	vector<string> m_debug_forces;
 	SFRectangle* m_rect;
 	SFRectangle* m_rect_mid;
 

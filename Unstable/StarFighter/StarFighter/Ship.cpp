@@ -66,15 +66,13 @@ void Ship::SetControllerType(ControlerType contoller)
 }
 
 #define HORIZONTAL_SPEED	200
-#define JUMP_SPEED			100000
+#define JUMP_SPEED			40000
 #define GRAVITY_SPEED		4000
 #define SPLASH_FACTOR		0.1
 #define RESISTANCE_SPEED	10.0
 
 void Ship::update(sf::Time deltaTime)
 {
-	m_debug_forces.clear();
-
 	//altitude calculation
 	float altitude = -getPosition().y - (-(*CurrentGame).m_lane->getPosition().y);
 
@@ -83,12 +81,12 @@ void Ship::update(sf::Time deltaTime)
 	immersion = Lerp(immersion, -1, 1, 0, 1);
 
 	//gravity
-	m_speed.y += GRAVITY_SPEED * deltaTime.asSeconds();
+	float gravity = GRAVITY_SPEED * deltaTime.asSeconds();
+	m_speed.y += gravity;
 
 	//archimede
-	m_speed.y -= GRAVITY_SPEED * deltaTime.asSeconds() * immersion * 2;
-
-	m_speed.y -= RESISTANCE_SPEED * immersion * m_speed.y * deltaTime.asSeconds();
+	float archimede = GRAVITY_SPEED * deltaTime.asSeconds() * immersion * 2;
+	m_speed.y -= archimede;
 		
 	//automatic scrolling
 	m_speed.x = HORIZONTAL_SPEED;
@@ -96,14 +94,20 @@ void Ship::update(sf::Time deltaTime)
 		setPosition(sf::Vector2f(400, getPosition().y));
 	
 	//Action input
+	float jump = 0;
 	UpdateInputStates();
 	if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
 	{
 		//do some action
 		//(*CurrentGame).CreateSFTextPop("Jump", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -MARLIN_SIZE_Y/2 - 20);
 
-		m_speed.y -= JUMP_SPEED * immersion * deltaTime.asSeconds();
+		jump = JUMP_SPEED * immersion * deltaTime.asSeconds();
+		m_speed.y -= jump;
 	}
+
+	//resistance
+	float resistance = RESISTANCE_SPEED * immersion * m_speed.y * deltaTime.asSeconds();
+	m_speed.y -= resistance;
 
 	GameObject::update(deltaTime);
 
@@ -118,22 +122,13 @@ void Ship::update(sf::Time deltaTime)
 	ostringstream ss;
 	ss << "ASL : " + to_string((int)altitude) + "\n";
 	ss << "Vz : " + to_string((int)-m_speed.y) + "\n";
-	ss << "Imm : " + to_string(immersion) + "\n";
-	
-	if (m_debug_forces.empty() == false)
-	{
-		ss << "Forces : ";
-		int i = 0;
-		for (string force : m_debug_forces)
-		{
-			if (i > 0)
-				ss << "+ ";
-
-			ss << force << " ";
-			i++;
-		}
-		ss << "\n";
-	}
+	ss << "Imm : " + to_string((int)(immersion * 100)) + "%\n";
+	ss << "\n";
+	ss << "G : " + to_string((int)gravity) + "\n";
+	ss << "Archi : " + to_string((int)archimede) + "\n";
+	ss << "Jump : " + to_string((int)jump) + "\n";
+	ss << "Res : " + to_string((int)resistance) + "\n";
+	ss << "Net : " + to_string((int)(-gravity + archimede + jump + resistance)) + "\n";
 
 	m_debug_text->setString(ss.str());
 
