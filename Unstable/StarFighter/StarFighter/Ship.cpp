@@ -7,11 +7,12 @@ using namespace sf;
 #define MARLIN_SIZE_X			250
 #define MARLIN_SIZE_Y			80
 
-#define HORIZONTAL_SPEED	200.0f
+#define HORIZONTAL_SPEED		200.0f
 #define JUMP_SPEED			30000.0f
+#define DIVE_SPEED			5000.0f
+#define DIVE_MAX				-100.f
 #define GRAVITY_SPEED		2500.0f
-#define SPLASH_FACTOR		0.1f
-#define RESISTANCE_SPEED	16.0f
+#define RESISTANCE_SPEED		16.0f
 #define MARLIN_DENSITY		1.4f	//between 0 and 2
 
 // ----------------SHIP ---------------
@@ -112,9 +113,14 @@ void Ship::update(sf::Time deltaTime)
 	float jump = 0;
 	if ((*CurrentGame).m_window_has_focus == true)
 	{
-		if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
+		//if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
+		if (InputGuy::getDirections().y < 0)
 		{
 			jump = JUMP_SPEED * immersion * deltaTime.asSeconds();
+		}
+		else if (InputGuy::getDirections().y > 0 && altitude > DIVE_MAX)
+		{
+			jump = - DIVE_SPEED * immersion * deltaTime.asSeconds();
 		}
 	}
 	
