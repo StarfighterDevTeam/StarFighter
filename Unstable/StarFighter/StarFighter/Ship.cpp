@@ -12,7 +12,7 @@ using namespace sf;
 #define GRAVITY_SPEED		2500.0f
 #define SPLASH_FACTOR		0.1f
 #define RESISTANCE_SPEED	16.0f
-#define MARLIN_DENSITY		1.3f	//between 0 and 2
+#define MARLIN_DENSITY		1.4f	//between 0 and 2
 
 // ----------------SHIP ---------------
 Ship::Ship()
@@ -103,11 +103,9 @@ void Ship::update(sf::Time deltaTime)
 
 	//gravity
 	float gravity = GRAVITY_SPEED * MARLIN_DENSITY * deltaTime.asSeconds();
-	m_speed.y += gravity;
 
 	//archimede
 	float archimede = GRAVITY_SPEED * deltaTime.asSeconds() * immersion * 2;
-	m_speed.y -= archimede;
 
 	//Action input
 	UpdateInputStates();
@@ -117,13 +115,14 @@ void Ship::update(sf::Time deltaTime)
 		if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
 		{
 			jump = JUMP_SPEED * immersion * deltaTime.asSeconds();
-			m_speed.y -= jump;
 		}
 	}
 	
 	//resistance
 	float resistance = RESISTANCE_SPEED * immersion * m_speed.y * deltaTime.asSeconds();
-	m_speed.y -= resistance;
+
+	//apply forces
+	m_speed.y -= jump + archimede - gravity + resistance;
 
 	GameObject::update(deltaTime);
 
