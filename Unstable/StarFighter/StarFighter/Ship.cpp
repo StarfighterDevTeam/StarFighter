@@ -4,8 +4,8 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-#define MARLIN_SIZE_X		250
-#define MARLIN_SIZE_Y		80
+#define MARLIN_SIZE_X			250
+#define MARLIN_SIZE_Y			80
 
 // ----------------SHIP ---------------
 Ship::Ship()
@@ -41,6 +41,20 @@ void Ship::Init()
 
 	m_rect_mid = new SFRectangle(getPosition(), sf::Vector2f(MARLIN_SIZE_X, 0), sf::Color::Transparent, 1, sf::Color::Red, PlayerBlue);
 	(*CurrentGame).addToFeedbacks(m_rect_mid);
+
+	m_gravity_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Magenta, 0, sf::Color::Transparent, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_gravity_rect);
+
+	m_archimede_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Cyan, 0, sf::Color::Transparent, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_archimede_rect);
+
+	m_resistance_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Black, 0, sf::Color::Transparent, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_resistance_rect);
+
+	m_jump_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Green, 0, sf::Color::Transparent, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_jump_rect);
+
+	m_display_debug_vectors = true;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -73,10 +87,13 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	//altitude calculation
-	float altitude = -getPosition().y - (-(*CurrentGame).m_lane->getPosition().y);
+	//horizontal scrolling
+	m_speed.x = HORIZONTAL_SPEED;
+	if (getPosition().x > 1500)
+		setPosition(sf::Vector2f(400, getPosition().y));
 
 	//immersion calculation: convert to a value betweent 0 (no archimede applied) to 1 (full archimede applied)
+	float altitude = -getPosition().y - (-(*CurrentGame).m_lane->getPosition().y);
 	float immersion = -(altitude / (MARLIN_SIZE_Y * 0.5));
 	immersion = Lerp(immersion, -1, 1, 0, 1);
 
@@ -88,19 +105,11 @@ void Ship::update(sf::Time deltaTime)
 	float archimede = GRAVITY_SPEED * deltaTime.asSeconds() * immersion * 2;
 	m_speed.y -= archimede;
 		
-	//automatic scrolling
-	m_speed.x = HORIZONTAL_SPEED;
-	if (getPosition().x > 1500)
-		setPosition(sf::Vector2f(400, getPosition().y));
-	
 	//Action input
-	float jump = 0;
 	UpdateInputStates();
+	float jump = 0;
 	if (m_inputs_states[Action_Jumping] == Input_Tap || m_inputs_states[Action_Jumping] == Input_Hold)
 	{
-		//do some action
-		//(*CurrentGame).CreateSFTextPop("Jump", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -MARLIN_SIZE_Y/2 - 20);
-
 		jump = JUMP_SPEED * immersion * deltaTime.asSeconds();
 		m_speed.y -= jump;
 	}
@@ -111,14 +120,7 @@ void Ship::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
-	//HUD
-	m_is_asking_SFPanel = SFPanel_None;
-	if (m_SFTargetPanel)
-	{
-		m_SFTargetPanel->Update(deltaTime);
-	}
-
-	//debug texts
+	//DEBUG TOOLS
 	ostringstream ss;
 	ss << "ASL : " + to_string((int)altitude) + "\n";
 	ss << "Vz : " + to_string((int)-m_speed.y) + "\n";
@@ -129,11 +131,44 @@ void Ship::update(sf::Time deltaTime)
 	ss << "Jump : " + to_string((int)jump) + "\n";
 	ss << "Res : " + to_string((int)resistance) + "\n";
 	ss << "Net : " + to_string((int)(-gravity + archimede + jump + resistance)) + "\n";
+	ss << "\n" << "F4: hide vectors";
 
 	m_debug_text->setString(ss.str());
 
+	m_gravity_rect->setSize(sf::Vector2f(2, gravity * deltaTime.asSeconds() * 100));
+	m_archimede_rect->setSize(sf::Vector2f(2, archimede * deltaTime.asSeconds() * 100));
+	m_resistance_rect->setSize(sf::Vector2f(2, resistance * deltaTime.asSeconds() * 100));
+	m_jump_rect->setSize(sf::Vector2f(2, jump * deltaTime.asSeconds() * 100));
+
 	m_rect->setPosition(getPosition());
 	m_rect_mid->setPosition(getPosition());
+	m_gravity_rect->setPosition(getPosition());
+	m_archimede_rect->setPosition(getPosition());
+	m_archimede_rect->setOrigin(sf::Vector2f(0, m_archimede_rect->getSize().y));
+	m_resistance_rect->setPosition(sf::Vector2f(getPosition().x - 10, getPosition().y));
+	m_resistance_rect->setOrigin(sf::Vector2f(0, m_jump_rect->getSize().y));
+	m_jump_rect->setPosition(sf::Vector2f(getPosition().x + 10, getPosition().y));
+	m_jump_rect->setOrigin(sf::Vector2f(0, m_jump_rect->getSize().y));
+
+	if (m_inputs_states[Action_Debug] == Input_Tap)
+	{
+		m_display_debug_vectors = !m_display_debug_vectors;
+
+		if (m_display_debug_vectors == false)
+		{
+			m_gravity_rect->setFillColor(sf::Color::Transparent);
+			m_archimede_rect->setFillColor(sf::Color::Transparent);
+			m_resistance_rect->setFillColor(sf::Color::Transparent);
+			m_jump_rect->setFillColor(sf::Color::Transparent);
+		}
+		else
+		{
+			m_gravity_rect->setFillColor(sf::Color::Magenta);
+			m_archimede_rect->setFillColor(sf::Color::Cyan);
+			m_resistance_rect->setFillColor(sf::Color::Black);
+			m_jump_rect->setFillColor(sf::Color::Green);
+		}
+	}
 }
 
 bool Ship::ScreenBorderContraints()
@@ -260,10 +295,13 @@ void Ship::UpdateInputStates()
 	if ((*CurrentGame).m_window_has_focus)
 	{
 		GetInputState(InputGuy::isFiring(), Action_Jumping);
+		GetInputState(InputGuy::isUsingDebugCommand(), Action_Debug);
+		
 	}
 	else
 	{
 		GetInputState(false, Action_Jumping);
+		GetInputState(false, Action_Debug);
 	}
 }
 

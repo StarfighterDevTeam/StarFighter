@@ -53,7 +53,7 @@ bool InputGuy::isRestartingScript()
 
 bool InputGuy::isUsingDebugCommand()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F4))
 	{
 		return true;
 	}

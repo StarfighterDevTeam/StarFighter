@@ -22,6 +22,7 @@ enum PlayerActions
 	Action_Jumping,
 	Action_Muting,
 	Action_Pausing,
+	Action_Debug,
 	NBVAL_PlayerActions,
 };
 
@@ -78,6 +79,12 @@ public :
 	SFText* m_debug_text;
 	SFRectangle* m_rect;
 	SFRectangle* m_rect_mid;
+
+	SFRectangle* m_gravity_rect;
+	SFRectangle* m_archimede_rect;
+	SFRectangle* m_resistance_rect;
+	SFRectangle* m_jump_rect;
+	bool m_display_debug_vectors;
 
 private:
 	bool m_moving;
