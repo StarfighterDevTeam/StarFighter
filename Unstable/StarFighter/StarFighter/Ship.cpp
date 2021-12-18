@@ -11,7 +11,7 @@ using namespace sf;
 #define JUMP_SPEED			20000
 #define GRAVITY_SPEED		2000
 #define SPLASH_FACTOR		0.1
-#define RESISTANCE_SPEED	12
+#define RESISTANCE_SPEED	13
 
 // ----------------SHIP ---------------
 Ship::Ship()
@@ -59,6 +59,9 @@ void Ship::Init()
 
 	m_jump_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Green, 0, sf::Color::Transparent, PlayerBlue);
 	(*CurrentGame).addToFeedbacks(m_jump_rect);
+
+	m_net_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Red, 0, sf::Color::Transparent, PlayerBlue);
+	(*CurrentGame).addToFeedbacks(m_net_rect);
 
 	m_display_debug_rect = true;
 }
@@ -142,6 +145,7 @@ void Ship::update(sf::Time deltaTime)
 	m_archimede_rect->setSize(sf::Vector2f(2, archimede * deltaTime.asSeconds() * 100));
 	m_resistance_rect->setSize(sf::Vector2f(2, resistance * deltaTime.asSeconds() * 100));
 	m_jump_rect->setSize(sf::Vector2f(2, jump * deltaTime.asSeconds() * 100));
+	m_net_rect->setSize(sf::Vector2f(2, (-gravity + archimede + resistance + jump)  * deltaTime.asSeconds() * 100));
 
 	m_rect->setPosition(getPosition());
 	m_rect_mid->setPosition(getPosition());
@@ -152,6 +156,8 @@ void Ship::update(sf::Time deltaTime)
 	m_resistance_rect->setOrigin(sf::Vector2f(0, m_resistance_rect->getSize().y));
 	m_jump_rect->setPosition(sf::Vector2f(getPosition().x + 10, getPosition().y));
 	m_jump_rect->setOrigin(sf::Vector2f(0, m_jump_rect->getSize().y));
+	m_net_rect->setPosition(sf::Vector2f(getPosition().x + 20, getPosition().y));
+	m_net_rect->setOrigin(sf::Vector2f(0, m_net_rect->getSize().y));
 
 	//PlayStroboscopicEffect(sf::seconds(3), sf::seconds(0.05));
 
@@ -166,6 +172,7 @@ void Ship::update(sf::Time deltaTime)
 			m_archimede_rect->setFillColor(sf::Color::Transparent);
 			m_resistance_rect->setFillColor(sf::Color::Transparent);
 			m_jump_rect->setFillColor(sf::Color::Transparent);
+			m_net_rect->setFillColor(sf::Color::Transparent);
 
 			m_rect->setOutlineColor(sf::Color::Transparent);
 			m_rect_mid->setOutlineColor(sf::Color::Transparent);
@@ -176,6 +183,7 @@ void Ship::update(sf::Time deltaTime)
 			m_archimede_rect->setFillColor(sf::Color::Cyan);
 			m_resistance_rect->setFillColor(sf::Color::Black);
 			m_jump_rect->setFillColor(sf::Color::Green);
+			m_net_rect->setFillColor(sf::Color::Red);
 
 			m_rect->setOutlineColor(sf::Color::Red);
 			m_rect_mid->setOutlineColor(sf::Color::Red);
