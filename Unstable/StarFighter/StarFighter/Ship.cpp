@@ -7,11 +7,12 @@ using namespace sf;
 #define MARLIN_SIZE_X			250
 #define MARLIN_SIZE_Y			80
 
-#define HORIZONTAL_SPEED	200
-#define JUMP_SPEED			20000
-#define GRAVITY_SPEED		2000
-#define SPLASH_FACTOR		0.1
-#define RESISTANCE_SPEED	13
+#define HORIZONTAL_SPEED	200.0f
+#define JUMP_SPEED			30000.0f
+#define GRAVITY_SPEED		2500.0f
+#define SPLASH_FACTOR		0.1f
+#define RESISTANCE_SPEED	16.0f
+#define MARLIN_DENSITY		1.3f	//between 0 and 2
 
 // ----------------SHIP ---------------
 Ship::Ship()
@@ -45,7 +46,7 @@ void Ship::Init()
 	m_rect = new SFRectangle(getPosition(), sf::Vector2f(MARLIN_SIZE_X, MARLIN_SIZE_Y), sf::Color::Transparent, 2, sf::Color::Red, PlayerBlue);
 	(*CurrentGame).addToFeedbacks(m_rect);
 
-	m_rect_mid = new SFRectangle(getPosition(), sf::Vector2f(MARLIN_SIZE_X, 0), sf::Color::Transparent, 1, sf::Color::Red, PlayerBlue);
+	m_rect_mid = new SFRectangle(getPosition(), sf::Vector2f(MARLIN_SIZE_X + 20, 0), sf::Color::Transparent, 1, sf::Color::Red, PlayerBlue);
 	(*CurrentGame).addToFeedbacks(m_rect_mid);
 
 	m_gravity_rect = new SFRectangle(getPosition(), sf::Vector2f(4, 0), sf::Color::Magenta, 0, sf::Color::Transparent, PlayerBlue);
@@ -101,7 +102,7 @@ void Ship::update(sf::Time deltaTime)
 	immersion = Lerp(immersion, -1, 1, 0, 1);
 
 	//gravity
-	float gravity = GRAVITY_SPEED * deltaTime.asSeconds();
+	float gravity = GRAVITY_SPEED * MARLIN_DENSITY * deltaTime.asSeconds();
 	m_speed.y += gravity;
 
 	//archimede
@@ -148,7 +149,9 @@ void Ship::update(sf::Time deltaTime)
 	m_net_rect->setSize(sf::Vector2f(2, (-gravity + archimede + resistance + jump)  * deltaTime.asSeconds() * 100));
 
 	m_rect->setPosition(getPosition());
-	m_rect_mid->setPosition(getPosition());
+	m_rect_mid->setPosition(sf::Vector2f(getPosition().x, getPosition().y - (MARLIN_DENSITY - 1) * MARLIN_SIZE_Y * 0.5));
+	
+
 	m_gravity_rect->setPosition(getPosition());
 	m_archimede_rect->setPosition(getPosition());
 	m_archimede_rect->setOrigin(sf::Vector2f(0, m_archimede_rect->getSize().y));
@@ -189,8 +192,6 @@ void Ship::update(sf::Time deltaTime)
 			m_rect_mid->setOutlineColor(sf::Color::Red);
 		}
 	}
-
-
 }
 
 bool Ship::ScreenBorderContraints()
