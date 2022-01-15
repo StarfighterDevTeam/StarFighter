@@ -102,6 +102,11 @@ void Ship::update(sf::Time deltaTime)
 	float immersion = -(altitude / (MARLIN_SIZE_Y * 0.5));
 	immersion = Lerp(immersion, -1, 1, 0, 1);
 
+	//swim factor
+	float neutral_buoyancy_depth = 1 - (MARLIN_DENSITY * 0.5f);
+	float swim_factor = immersion + neutral_buoyancy_depth;
+	swim_factor = Lerp(swim_factor, neutral_buoyancy_depth, 1, 0, 1);
+
 	//gravity
 	float gravity = GRAVITY_SPEED * MARLIN_DENSITY * deltaTime.asSeconds();
 
@@ -132,11 +137,20 @@ void Ship::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
+	//Mouse control
+#if 0
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+	sf::Vector2f mousepos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
+	setPosition(mousepos);
+#endif
+
 	//DEBUG TOOLS
 	ostringstream ss;
 	ss << "ASL : " + to_string((int)altitude) + "\n";
 	ss << "Vz : " + to_string((int)-m_speed.y) + "\n";
 	ss << "Imm : " + to_string((int)(immersion * 100)) + "%\n";
+	ss << "Neutral : " + to_string((int)(neutral_buoyancy_depth * 100)) + "%\n";
+	ss << "Swim : " + to_string((int)(swim_factor * 100)) + "%\n";
 	ss << "\n";
 	ss << "G : " + to_string((int)gravity) + "\n";
 	ss << "Archi : " + to_string((int)archimede) + "\n";
