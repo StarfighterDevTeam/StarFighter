@@ -8,12 +8,12 @@ using namespace sf;
 #define MARLIN_SIZE_Y			80
 
 #define HORIZONTAL_SPEED		200.0f
-#define JUMP_SPEED			30000.0f
-#define DIVE_SPEED			5000.0f
+#define JUMP_SPEED				30000.0f
+#define DIVE_SPEED				5000.0f
 #define DIVE_MAX				-100.f
-#define GRAVITY_SPEED		2500.0f
+#define GRAVITY_SPEED			2500.0f
 #define RESISTANCE_SPEED		16.0f
-#define MARLIN_DENSITY		1.4f	//between 0 and 2
+#define MARLIN_DENSITY			1.4f	//between 0 and 2
 
 // ----------------SHIP ---------------
 Ship::Ship()
@@ -105,8 +105,8 @@ void Ship::update(sf::Time deltaTime)
 	//swim factor
 	float neutral_buoyancy_depth = 1 - (MARLIN_DENSITY * 0.5f);
 	float swim_factor = immersion + neutral_buoyancy_depth;
-	swim_factor = Lerp(swim_factor, neutral_buoyancy_depth, 1, 0, 1);
-
+	swim_factor = Lerp(swim_factor, neutral_buoyancy_depth, 1 - neutral_buoyancy_depth, 0, 1);
+	
 	//gravity
 	float gravity = GRAVITY_SPEED * MARLIN_DENSITY * deltaTime.asSeconds();
 
