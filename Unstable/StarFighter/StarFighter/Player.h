@@ -1,22 +1,92 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
-#include <string.h>
 #include "Globals.h"
+#include "GameObject.h"
+#include "InputGuy.h"
+#include "Game.h"
+#include "SFTextPop.h"
+#include "Starship.h"
+#include "Location.h"
 
-class Player
+#define SHIP_START_X                990
+#define SHIP_START_Y                540
+#define SHIP_ACCELERATION	        2000.0f
+#define SHIP_DECCELERATION_COEF		5000.0f
+#define SHIP_MAX_SPEED				800.0f
+#define SHIP_MIN_SPEED				50.0f
+#define SHIP_SPRITE_RATE_SEC        0.2f
+
+enum PlayerActions
 {
-
-public:
-
-	void Init(sf::RenderWindow* mainWindow);
-
-	sf::RenderWindow* m_playerWindow;
-	std::string m_save_file;
-	
-	bool reverse_scene;
-
+	Action_Idle,
+	Action_Select,
+	Action_Assigning,
+	Action_Muting,
+	Action_Pausing,
+	Action_Produce_1,
+	Action_Produce_2,
+	Action_Produce_3,
+	NBVAL_PlayerActions,
 };
 
-#endif //PLAYER_H_INCLUDED
+enum PlayerInputStates
+{
+	Input_Release,//0
+	Input_Tap,//1
+	Input_Hold,//2
+};
+
+class Player : public GameObject
+{
+public :
+	Player();
+	Player(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Player(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	void Init();
+	virtual ~Player();
+	void update(sf::Time deltaTime) override;
+	
+	void ManageHudControls(sf::Vector2f inputs_directions);
+	void ManageAcceleration(sf::Vector2f inputs_direction);
+	void IdleDecelleration(sf::Time deltaTime);
+	bool ScreenBorderContraints();
+	void MaxSpeedConstraints();
+	void UpdateRotation();
+	void ManageHud(sf::Time deltaTime);
+
+	bool m_disable_inputs;
+	ControlerType m_controllerType;
+	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
+	bool m_actions_states[NBVAL_PlayerActions];
+
+	void SetControllerType(ControlerType contoller);
+	void GetInputState(bool input_guy_boolean, PlayerActions action);
+	void UpdateInputStates();
+	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
+	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
+
+	static int SavePlayer(Player* player);
+	static bool LoadPlayer(Player* player);
+
+	sf::Clock m_stroboscopic_effect_clock;
+
+	SFPanel* m_SFUnitInfoPanel;
+	bool m_is_asking_SFUnitPanel;
+	SFPanel* m_SFContextInfoPanel;
+	string m_is_asking_SFContextPanel_string;
+	sf::Vector2f m_mouse_pos;
+
+	GameObject* m_hovered_object;
+	GameObject* m_selected_object;
+
+	void HoverObject(GameObject* object) override;
+	void SelectObject(GameObject* object);
+
+private:
+	bool m_moving;
+	bool m_movingX;
+	bool m_movingY;
+};
+
+#endif // PLAYER_H_INCLUDED

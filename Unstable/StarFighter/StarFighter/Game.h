@@ -19,7 +19,7 @@
 
 #include "StellarMapVirtual.h"
 
-class Ship;
+class Player;
 class StellarMap;
 
 #define MAP_SIZE			4000
@@ -48,7 +48,7 @@ using namespace sf;
 struct Game
 {
 public:
-	void init(RenderWindow* window);
+	Game(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
@@ -71,7 +71,7 @@ public:
 	float m_vspeed;
 	sf::Vector2f m_scale_factor;
 
-	Ship* m_playerShip;
+	Player* m_player;
 	bool m_pause;
 
 	sf::View m_view;

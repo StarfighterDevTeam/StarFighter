@@ -2,12 +2,12 @@
 #define SFUNITINFOPANEL_H_INCLUDED
 
 #include "Game.h"
-#include "Ship.h"
+#include "Player.h"
 
 class SFUnitInfoPanel : public SFPanel
 {
 public:
-	SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip);
+	SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Player* player);
 	~SFUnitInfoPanel();
 	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(sf::RenderTexture& screen);

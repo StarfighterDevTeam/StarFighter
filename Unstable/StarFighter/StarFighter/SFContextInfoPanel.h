@@ -2,12 +2,12 @@
 #define SFCONTEXTINFOPANEL_H_INCLUDED
 
 #include "Game.h"
-#include "Ship.h"
+#include "Player.h"
 
 class SFContextInfoPanel : public SFPanel
 {
 public:
-	SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip);
+	SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Player* player);
 	~SFContextInfoPanel();
 	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(sf::RenderTexture& screen);

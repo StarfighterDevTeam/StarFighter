@@ -2,9 +2,9 @@
 
 extern Game* CurrentGame;
 
-SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip) : SFPanel(size, panel_type)
+SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Player* player) : SFPanel(size, panel_type)
 {
-	m_playerShip = playerShip;
+	m_player = player;
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -12,9 +12,9 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	//texts strings
 	ostringstream ss_title;
 	StockEntity* entity = NULL;
-	if (playerShip->m_hovered_object)
+	if (player->m_hovered_object)
 	{
-		entity = (StockEntity*)playerShip->m_hovered_object;
+		entity = (StockEntity*)player->m_hovered_object;
 		if (entity->m_identified)
 		{
 			ss_title << entity->m_display_name;
@@ -25,9 +25,9 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 		}
 		
 	}
-	else if (playerShip->m_selected_object)
+	else if (player->m_selected_object)
 	{
-		entity = (StockEntity*)playerShip->m_selected_object;
+		entity = (StockEntity*)player->m_selected_object;
 		if (entity->m_identified)
 		{
 			ss_title << entity->m_display_name;

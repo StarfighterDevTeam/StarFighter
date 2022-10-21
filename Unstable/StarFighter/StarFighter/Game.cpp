@@ -4,15 +4,15 @@
 const char* GameObjectTypeValues[] =
 {
 	stringify(BackgroundObject),
-	stringify(PlayerShip),
+	stringify(PlayerObject),
 	stringify(FriendlyFire),
 	stringify(EnemyFire),
 	stringify(EnemyObject)
 };
 
-void Game::init(RenderWindow* window)
+Game::Game(RenderWindow* window)
 {
-	m_playerShip = NULL;
+	m_player = NULL;
 	m_pause = false;
 
 	m_window = window;
@@ -325,7 +325,7 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerObject].begin(); it1 != m_sceneGameObjectsTyped[PlayerObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;

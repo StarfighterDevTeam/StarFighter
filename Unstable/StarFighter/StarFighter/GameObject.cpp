@@ -462,7 +462,7 @@ int GameObject::GaussianBlurDistribution(int x)
 
 void GameObject::HoverObject(GameObject* object)
 {
-	//see override function in class Ship
+	//see override function in class Player
 }
 
 bool GameObject::CanSupplyFuel()

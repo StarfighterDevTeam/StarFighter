@@ -12,7 +12,6 @@ int main()
 
 	//Load Configuration
 	LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
-	PREFS = new PrefsManager();
 
 	//Init SFML Window
 	LOGGER_WRITE(Logger::DEBUG, "Initializing SFML Window");
@@ -20,7 +19,7 @@ int main()
 	renderWindow.setKeyRepeatEnabled(false);
 
 	//Refresh rate
-	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+	renderWindow.setFramerateLimit(60.f);
 
 	//Icon
 	sf::Image icon = sf::Image();
@@ -31,7 +30,7 @@ int main()
 	renderWindow.setTitle("StarFighter Engine");
 
 	//Game initialization
-	CurrentGame = new Game();
+	CurrentGame = new Game(&renderWindow);
 
 	//Random seed
 	srand(time(NULL));
@@ -42,14 +41,10 @@ int main()
 
 	//Initializing player
 	LOGGER_WRITE(Logger::DEBUG, "Initializing player");
-	Player player;
-	player.Init(&renderWindow);
 
 	//Loading InGame state
 	LOGGER_WRITE(Logger::DEBUG, "Starting game");
-	GameManager gameManager;
-	InGameState inGameState;
-	gameManager.PushState(inGameState, player);
+	Gameloop gameloop;
 
 	//Handling various window resolutions
 	enum WindowResolutions
@@ -119,28 +114,28 @@ int main()
 
 			//setting parameters again, because they are lost on calling renderWindow.create
 			renderWindow.setKeyRepeatEnabled(false);
-			renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+			renderWindow.setFramerateLimit(60.f);
 			sf::Image icon = sf::Image();
 			icon.loadFromFile(makePath(ICON_SHIP_PNG));
 			renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 			renderWindow.setTitle("StarFighter Engine");
 		}
 
-		if ((*CurrentGame).m_playerShip)
+		if ((*CurrentGame).m_player)
 		{
 			//Muting
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
+			(*CurrentGame).m_player->GetInputState(InputGuy::isMuting(), Action_Muting);
+			if ((*CurrentGame).m_player->UpdateAction(Action_Muting, Input_Tap, true))
 			{
-				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
+				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_player->m_actions_states[Action_Muting]);
+				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_player->m_actions_states[Action_Muting]);
 			}
 
 			//Pausing
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
+			(*CurrentGame).m_player->GetInputState(InputGuy::isPausing(), Action_Pausing);
+			if ((*CurrentGame).m_player->UpdateAction(Action_Pausing, Input_Tap, true))
 			{
-				(*CurrentGame).m_pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
+				(*CurrentGame).m_pause = (*CurrentGame).m_player->m_actions_states[Action_Pausing];
 
 				if ((*CurrentGame).m_pause)
 				{
@@ -158,13 +153,10 @@ int main()
 		if (!(*CurrentGame).m_pause)
 		{
 			//Update
-			gameManager.GetCurrentState()->Update(dt);
-
-			//Draw
-			gameManager.GetCurrentState()->Draw();
-			//sfgui.Display(renderWindow);
+			gameloop.Update(dt);
 
 			//Diplay
+			gameloop.Draw();
 			renderWindow.display();
 		}
 	}

@@ -137,7 +137,7 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	setSize(size);
 	m_visible = true;
 	m_panel_type = panel_type;
-	m_playerShip = NULL;
+	m_player = NULL;
 	m_actions = NULL;
 
 	sf::Color _darkblue = sf::Color::Color(6, 87, 94, 255);//dark blue-green

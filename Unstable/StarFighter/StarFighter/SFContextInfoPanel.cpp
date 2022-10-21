@@ -2,9 +2,9 @@
 
 extern Game* CurrentGame;
 
-SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip) : SFPanel(size, panel_type)
+SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Player* player) : SFPanel(size, panel_type)
 {
-	m_playerShip = playerShip;
+	m_player = player;
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -12,9 +12,9 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 	//texts strings
 	ostringstream ss_title;
 	StockEntity* entity = NULL;
-	if (playerShip->m_hovered_object)
+	if (player->m_hovered_object)
 	{
-		entity = (StockEntity*)playerShip->m_hovered_object;
+		entity = (StockEntity*)player->m_hovered_object;
 		if (entity->m_identified)
 		{
 			ss_title << entity->m_display_name;
@@ -29,9 +29,9 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 
 	if (!m_unit)
 	{
-		if (playerShip->m_is_asking_SFContextPanel_string.compare("Scout") == 0)
+		if (player->m_is_asking_SFContextPanel_string.compare("Scout") == 0)
 		{
-			sf::Vector2u zone_index = (*CurrentGame).m_stellarmap->GetZoneIndex(playerShip->m_mouse_pos);
+			sf::Vector2u zone_index = (*CurrentGame).m_stellarmap->GetZoneIndex(player->m_mouse_pos);
 			ss_title << "Zone " << zone_index.x << "_" << zone_index.y;
 		}
 		else
@@ -44,22 +44,22 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 
 	//text
 	ostringstream ss_text;
-	ss_text << playerShip->m_is_asking_SFContextPanel_string;
+	ss_text << player->m_is_asking_SFContextPanel_string;
 
-	if (playerShip->m_selected_object->m_collider_type == StarshipObject)
+	if (player->m_selected_object->m_collider_type == StarshipObject)
 	{
-		Starship* starship = (Starship*)playerShip->m_selected_object;
+		Starship* starship = (Starship*)player->m_selected_object;
 
 		if (!entity)
 		{
-			if (!starship->CheckIfEnoughFuelToDestination(playerShip->m_mouse_pos))
+			if (!starship->CheckIfEnoughFuelToDestination(player->m_mouse_pos))
 			{
-				ss_text << " (insufficient fuel: " << starship->GetPropulsionAvailable() << " / " << starship->GetFuelCostToDestination(playerShip->m_mouse_pos) << " required)";
+				ss_text << " (insufficient fuel: " << starship->GetPropulsionAvailable() << " / " << starship->GetFuelCostToDestination(player->m_mouse_pos) << " required)";
 				m_text.setColor(sf::Color(255, 0, 0, 255));
 			}
 			else
 			{
-				size_t fuel_cost = starship->GetFuelCostToDestination(playerShip->m_mouse_pos);
+				size_t fuel_cost = starship->GetFuelCostToDestination(player->m_mouse_pos);
 				if (fuel_cost > 0)
 					ss_text << " (fuel cost: )" << fuel_cost;
 			}
@@ -98,7 +98,7 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 	//	m_actions_with_selection->AddOption(ss.str(), (*CurrentGame).m_font[Font_Arial]);
 	//}
 
-	sf::Vector2f position = sf::Vector2f(size.x / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + playerShip->getPosition().x, size.y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + playerShip->getPosition().y);
+	sf::Vector2f position = sf::Vector2f(size.x / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + player->getPosition().x, size.y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + player->getPosition().y);
 	setPosition(position.x, position.y);
 
 	//positioning of panel's content
@@ -115,7 +115,7 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 	//m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 	//dynamic size
-	sf::Vector2f target_position = (m_unit ? m_unit->getPosition() : playerShip->m_mouse_pos) - sf::Vector2f(0, 120.f);
+	sf::Vector2f target_position = (m_unit ? m_unit->getPosition() : player->m_mouse_pos) - sf::Vector2f(0, 120.f);
 	text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
 	setSize(sf::Vector2f(getSize().x, text_height));
 	setOrigin(sf::Vector2f(getOrigin().x, text_height / 2));

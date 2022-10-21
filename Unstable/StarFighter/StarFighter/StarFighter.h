@@ -6,16 +6,13 @@
 #include <cmath>
 #include <SFML/Audio.hpp>
 #include "Globals.h"
-#include "PrefsManager.h"
 #include "TextureLoader.h"
 #include "Assets.h"
 #include "GameObject.h"
 #include "Game.h"
 #include "Logger.h"
-#include "InGameState.h"
-#include "GameManager.h"
+#include "Gameloop.h"
 #include "Player.h"
-#include "Ship.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();
