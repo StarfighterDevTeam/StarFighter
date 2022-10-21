@@ -65,7 +65,7 @@ bool InputGuy::isAssigning(ControlerType device)
 
 bool InputGuy::isProducing1()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		return true;
 	}
@@ -75,7 +75,7 @@ bool InputGuy::isProducing1()
 
 bool InputGuy::isProducing2()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2) || sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 	{
 		return true;
 	}
@@ -85,7 +85,7 @@ bool InputGuy::isProducing2()
 
 bool InputGuy::isProducing3()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3) || sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 	{
 		return true;
 	}

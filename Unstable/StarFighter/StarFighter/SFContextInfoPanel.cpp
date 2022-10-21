@@ -115,7 +115,7 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 	//m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 	//dynamic size
-	sf::Vector2f target_position = m_unit ? m_unit->getPosition() : playerShip->m_mouse_pos;
+	sf::Vector2f target_position = (m_unit ? m_unit->getPosition() : playerShip->m_mouse_pos) - sf::Vector2f(0, 120.f);
 	text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
 	setSize(sf::Vector2f(getSize().x, text_height));
 	setOrigin(sf::Vector2f(getOrigin().x, text_height / 2));

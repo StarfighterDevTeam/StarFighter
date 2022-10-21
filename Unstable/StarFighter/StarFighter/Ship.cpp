@@ -275,20 +275,6 @@ void Ship::ManageHud(sf::Time deltaTime)
 			m_is_asking_SFUnitPanel = true;
 		}
 	}
-
-	if (m_SFUnitInfoPanel)
-	{
-		sf::Vector2f position = sf::Vector2f(m_SFUnitInfoPanel->getSize().x / 2 + m_SFUnitInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + getPosition().x, m_SFUnitInfoPanel->getSize().y / 2 + m_SFUnitInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + getPosition().y);
-		m_SFUnitInfoPanel->setPosition(position);
-		m_SFUnitInfoPanel->Update(deltaTime);
-	}
-
-	if (m_SFContextInfoPanel)
-	{
-		sf::Vector2f position = sf::Vector2f(m_SFContextInfoPanel->getSize().x / 2 + m_SFContextInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + getPosition().x, m_SFContextInfoPanel->getSize().y / 2 + m_SFContextInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + getPosition().y);
-		m_SFContextInfoPanel->setPosition(position);
-		m_SFContextInfoPanel->Update(deltaTime);
-	}
 }
 
 bool Ship::ScreenBorderContraints()
