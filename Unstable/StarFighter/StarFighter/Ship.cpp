@@ -764,7 +764,6 @@ void Ship::BuildShip()
 {
 	//ROOMS
 	//left
-	//left
 	Room* weapon_room = AddRoom(0, 1, 3, 4, Room_Weapon);
 	AddRoom(0, 5, 3, 4, Room_Weapon);
 
@@ -881,11 +880,9 @@ void Ship::BuildShip()
 		AddCrewMember(crew, possible_rooms[r]);
 	}
 
+	//prisoners
 	CrewMember* prisoner = new CrewMember(Crew_Civilian, m_alliance);
 	ImprisonCrew(prisoner);
-
-	//CHEAT DEBUG
-	m_health = /*m_health_max * 0.2 +*/ 8;
 }
 
 void Ship::CenterRoomPositions(bool is_enemy)
