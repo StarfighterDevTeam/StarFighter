@@ -33,7 +33,6 @@ public:
 	vector<CrewMember*> m_crew_unboarding;
 	vector<Commodity*> m_holds;
 	int m_holds_capacity;
-	int m_sonarRange;
 
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;
@@ -52,6 +51,9 @@ public:
 	void UpdateRooms();
 
 	int GetSonarRange() override { return m_sonarRange; };
+
+private:
+	int m_sonarRange;
 };
 
 #endif //WARSHIP_H_INCLUDED

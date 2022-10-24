@@ -142,9 +142,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 	//estimated combat strength
 	UpdateEstimatedCombatStrength();
-
-	//combat interface (displaying hp, etc.)
-	m_combat_interface.Init(this, m_alliance, m_display_name, m_type);
 }
 
 void Warship::Init()

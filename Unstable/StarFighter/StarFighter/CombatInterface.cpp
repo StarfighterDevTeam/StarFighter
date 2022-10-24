@@ -67,7 +67,7 @@ void CombatInterface::Destroy()
 	m_ship = NULL;
 }
 
-void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, ShipType ship_type)
+void CombatInterface::Init(Ship* ship)
 {
 	m_ship = ship;
 	
@@ -75,14 +75,14 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 	Texture* texture_sonar = TextureLoader::getInstance()->loadTexture("2D/icon_sonar.png", 30, 30);
 	Texture* texture_combat = TextureLoader::getInstance()->loadTexture("2D/icon_combat.png", 30, 30);
 
-	float offset = alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
+	float offset = ship->m_alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
 
 	//ship name & info
 	m_ship_name = new GameEntity(UI_None);
 	m_ship_name->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_ship_name->m_text.setCharacterSize(20);
 	m_ship_name->m_text.setColor(sf::Color::Black);
-	m_ship_name->m_text.setString(ship_name);
+	m_ship_name->m_text.setString(ship->m_display_name);
 	m_ship_name->m_text.setPosition(sf::Vector2f(offset - m_ship_name->m_text.getGlobalBounds().width * 0.5f, COMBAT_INTERFACE_OFFSET_Y));
 
 	m_ship_info = new GameEntity(UI_None);
@@ -90,7 +90,7 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 	m_ship_info->m_text.setCharacterSize(18);
 	m_ship_info->m_text.setStyle(sf::Text::Italic);
 	m_ship_info->m_text.setColor(sf::Color::Black);
-	m_ship_info->m_text.setString((*CurrentGame).m_dico_ship_class[ship_type]);
+	m_ship_info->m_text.setString((*CurrentGame).m_dico_ship_class[ship->m_type]);
 	m_ship_info->m_text.setPosition(sf::Vector2f(offset - m_ship_info->m_text.getGlobalBounds().width * 0.5f, COMBAT_INTERFACE_OFFSET_Y + m_ship_info->m_text.getCharacterSize() + 8.f));
 	
 	//life bar
@@ -209,19 +209,17 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 	//}
 }
 
-void CombatInterface::Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max, int sonar, int estimatedCombatStrength)
+void CombatInterface::Update()
 {
 	if (m_ship == NULL)
-	{
 		return;
-	}
 
 	float threshold[3] = { 0.7, 0.5, 0.3 };
 
 	//size of life bar
-	Bound(health, 0, health_max);
+	Bound(m_ship->m_health, 0, m_ship->m_health_max);
 
-	float life_ratio = 1.0f * health / health_max;
+	float life_ratio = 1.0f * m_ship->m_health / m_ship->m_health_max;
 
 	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * COMBAT_LIFEBAR_SIZE_X, COMBAT_LIFEBAR_SIZE_Y));
 
@@ -240,32 +238,31 @@ void CombatInterface::Update(int health, int health_max, int flood, int flood_ma
 	}
 
 	ostringstream ss_life;
-	ss_life << health << "/" << health_max;
+	ss_life << m_ship->m_health << "/" << m_ship->m_health_max;
 	m_lifebar->m_text.setString(ss_life.str());
 	m_lifebar->m_text.SetPosition(sf::Vector2f(m_lifebar->m_position.x, m_lifebar->m_position.y - 3.f));
 
 	//size of flood bar
-	Bound(flood, 0, flood_max);
-	float flood_ratio = 1.0f * flood / flood_max;
+	Bound(m_ship->m_flood, 0, m_ship->m_flood_max);
+	float flood_ratio = 1.0f * m_ship->m_flood / m_ship->m_flood_max;
 	m_floodbar->m_shape.setSize(sf::Vector2f(flood_ratio * COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
 
 	//crew
 	ostringstream ss_crew;
-	ss_crew << nb_crew << "/" << nb_crew_max;
+	ss_crew << m_ship->m_nb_crew << "/" << m_ship->m_nb_crew_max;
 	m_crewbar->m_text.setString(ss_crew.str());
 
 	//sonar
-	if (sonar >= 0)
 	{
 		ostringstream ss_sonar;
-		ss_sonar << sonar << "m";
+		ss_sonar << m_ship->GetSonarRange() << "m";
 		m_sonar->m_text.setString(ss_sonar.str());
 	}
 
 	//esimated combat strength
 	{
 		ostringstream ss_combat_strenth;
-		ss_combat_strenth << estimatedCombatStrength;
+		ss_combat_strenth << m_ship->GetEstimatedCombatStrength();
 		m_combatStrength->m_text.setString(ss_combat_strenth.str());
 	}
 	
@@ -292,7 +289,8 @@ void CombatInterface::Draw(sf::RenderTexture& screen)
 	//other infos
 	m_crewbar->Draw(screen);
 	m_combatStrength->Draw(screen);
-	m_sonar->Draw(screen);
+	if (m_ship && m_ship->GetSonarRange() > 0)
+		m_sonar->Draw(screen);
 	
 	//distance
 	//m_distance_line->Draw(screen);

@@ -4,8 +4,7 @@
 #include "Game.h"
 
 #include "GameEntity.h"
-
-class Ship;//forward declaration
+#include "Warship.h"
 
 #define COMBAT_LIFEBAR_SIZE_X			400.f
 #define COMBAT_LIFEBAR_SIZE_Y			20.f
@@ -21,12 +20,14 @@ class Ship;//forward declaration
 
 struct CombatInterface
 {
+public:
 	CombatInterface();
 	~CombatInterface();
 
-	void Init(Ship* ship, ShipAlliance alliance, string ship_name, ShipType ship_type);
+	void Init(Ship* ship);
+	Ship* GetShip() const { return m_ship; }
 	void Destroy();
-	Ship* m_ship;
+
 	GameEntity* m_lifebar;
 	GameEntity* m_floodbar;
 	GameEntity* m_crewbar;
@@ -38,8 +39,11 @@ struct CombatInterface
 	GameEntity* m_ship_name;
 	GameEntity* m_ship_info;
 
-	void Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max, int sonar, int estimatedCombatStrength);
+	void Update();
 	void Draw(sf::RenderTexture& screen);
+
+private:
+	Ship* m_ship;
 };
 
 #endif //COMBATINTERFACE_H_INCLUDED

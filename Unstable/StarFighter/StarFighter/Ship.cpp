@@ -143,8 +143,6 @@ Ship::~Ship()
 
 	delete m_rudder;
 
-	m_combat_interface.Destroy();
-
 	for (vector<Upgrade*>::iterator it = m_upgrades.begin(); it != m_upgrades.end(); it++)
 	{
 		delete *it;

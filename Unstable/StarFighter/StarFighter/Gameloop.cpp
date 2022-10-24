@@ -18,6 +18,7 @@ Gameloop::Gameloop()
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
 	m_ships.push_back(m_warship);
 	m_resources_interface.Init(m_warship);
+	m_combat_interface[0].Init(m_warship);
 
 	if (LoadPlayerData(m_warship) == 0)
 	{
@@ -66,6 +67,9 @@ Gameloop::~Gameloop()
 	delete m_contextual_order;
 
 	m_resources_interface.Destroy();
+
+	m_combat_interface[0].Destroy();
+	m_combat_interface[1].Destroy();
 
 	for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 	{
@@ -717,9 +721,6 @@ void Gameloop::Update(sf::Time deltaTime)
 					ship->m_rudder->UpdatePosition();
 				}
 			}
-
-			//Combat interface
-			ship->m_combat_interface.Update(ship->m_health, ship->m_health_max, ship->m_flood, ship->m_flood_max, ship->m_nb_crew, ship->m_nb_crew_max, ship->GetSonarRange(), (int)ship->GetEstimatedCombatStrength());
 		}
 
 		ship->UpdateTactical(deltaTime);
@@ -940,6 +941,11 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//HUD resources
 	m_resources_interface.Update();
+	m_combat_interface[0].Update();
+	if (m_tactical_ship)
+		m_combat_interface[1].Update();
+	else if (m_combat_interface[1].GetShip())
+		m_combat_interface[1].Destroy();
 
 	//MENUS
 	Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
@@ -960,7 +966,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			m_warship->m_crew_unboard_interface.Init(m_warship, NULL, ship_in_combat_range);
 			m_warship->m_can_open_new_menu = false;
 		}
-		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->m_sonarRange >= location->m_depth)
+		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->GetSonarRange() >= location->m_depth)
 		{
 			m_menu = Menu_CrewUnboard;
 			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
@@ -1410,7 +1416,10 @@ void Gameloop::Draw()
 			//combat interface
 			if (ship->m_is_fleeing == false && ship->m_sinking_timer < SHIP_SINKING_TIME)
 			{
-				ship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
+				if (ship == m_warship)
+					m_combat_interface[0].Draw((*CurrentGame).m_mainScreen);
+				else
+					m_combat_interface[1].Draw((*CurrentGame).m_mainScreen);
 			}
 		}
 
@@ -1610,7 +1619,7 @@ void Gameloop::StartCombatWithShip(Ship* enemy_ship)
 	m_warship->InitCombat();//init cooldowns
 	enemy_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
 	enemy_ship->InitCombat();//init cooldowns
-	enemy_ship->m_combat_interface.Init(enemy_ship, enemy_ship->m_alliance, enemy_ship->m_display_name, enemy_ship->m_type);//init enemy interface
+	m_combat_interface[1].Init(enemy_ship);//init enemy interface
 
 	//fill enemy ship room tiles for pathfind
 	(*CurrentGame).m_enemy_tiles.clear();

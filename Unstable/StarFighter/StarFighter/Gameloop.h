@@ -11,6 +11,7 @@
 #include "ContextualOrder.h"
 #include "ResourcesInterface.h"
 #include "HelpInterface.h"
+#include "CombatInterface.h"
 
 enum Scale
 {
@@ -57,6 +58,7 @@ public:
 	ContextualOrder* m_contextual_order;
 
 	struct ResourcesInterface m_resources_interface;
+	struct CombatInterface m_combat_interface[2];//0=player 1=enemy
 	struct HelpInterface m_help_interface;
 
 	Ship* IsDMSInCombatRange(DMS_Coord DMS_hovered, bool ally_included);

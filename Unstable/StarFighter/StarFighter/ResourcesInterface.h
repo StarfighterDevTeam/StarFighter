@@ -8,10 +8,9 @@
 
 struct ResourcesInterface
 {
+public:
 	ResourcesInterface();
 	~ResourcesInterface();
-
-	Warship* m_warship;
 
 	GameEntity* m_panel;
 	Resource* m_resources[NB_RESOURCES_TYPES];
@@ -32,6 +31,9 @@ struct ResourcesInterface
 
 	void Update();
 	void Draw(sf::RenderTexture& screen);
+
+private:
+	Warship* m_warship;
 };
 
 #endif //RESOURCES_H_INCLUDED
