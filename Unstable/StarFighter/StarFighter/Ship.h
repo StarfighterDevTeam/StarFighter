@@ -13,7 +13,7 @@
 #define ANGLE_SPEED						30.f
 
 #define NB_UPKEEP_COSTS					(Resource_Fish + 1)
-#define NB_MOVES_PER_DAY					NB_WATERTILE_VIEW_RANGE //5
+#define NB_MOVES_PER_DAY				NB_WATERTILE_VIEW_RANGE //5
 
 class Ship : public GameEntity
 {

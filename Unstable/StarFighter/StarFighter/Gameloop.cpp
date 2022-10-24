@@ -350,9 +350,12 @@ void Gameloop::Update(sf::Time deltaTime)
 				ship->UpdatePosition(warship_DMS);
 
 				//AI strategical movement
-				if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE + m_warship->m_moves_max)
+				if (ship->m_has_played == false)
 				{
-					SetAIStrategicalDestination(ship, warship_DMS);
+					if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE + m_warship->m_moves_max)
+					{
+						SetAIStrategicalDestination(ship, warship_DMS);
+					}
 				}
 
 				ship->AnimatedSprite::update(deltaTime);
