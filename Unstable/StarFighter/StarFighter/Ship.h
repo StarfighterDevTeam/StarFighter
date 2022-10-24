@@ -8,6 +8,7 @@
 #include "WaterZone.h"
 #include "Seaport.h"
 #include "Upgrade.h"
+#include "Weather.h"
 
 #define	CRUISE_SPEED					100.f
 #define ANGLE_SPEED						30.f

@@ -50,6 +50,7 @@ public:
 	Scale m_scale;
 	sf::Text m_pause_text;
 	ContextualMenu m_menu;
+	Weather m_weather;
 
 	void InitWaterZones();
 	bool UpdateTacticalScale();

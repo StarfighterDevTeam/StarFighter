@@ -2248,10 +2248,9 @@ void Gameloop::UpdateAITargetRoom(Weapon* weapon)
 void Gameloop::SpendDays(int days, bool skip_time)
 {
 	if (days == 0)
-	{
 		return;
-	}
 
+	//ship upkeep
 	m_warship->PayUpkeepCost(days);
 
 	//refresh seaports resources
@@ -2267,6 +2266,10 @@ void Gameloop::SpendDays(int days, bool skip_time)
 			}
 		}
 	}
+
+	//weather
+	for (int i = 1; i <= days; i++)
+		m_weather.Update();
 }
 
 void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
