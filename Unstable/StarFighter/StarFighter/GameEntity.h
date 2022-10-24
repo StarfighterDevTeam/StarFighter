@@ -6,6 +6,7 @@
 enum UI_Type
 {
 	UI_None,
+	UI_Combat,
 	UI_Commodity,
 	UI_Compass,
 	UI_Connexion,

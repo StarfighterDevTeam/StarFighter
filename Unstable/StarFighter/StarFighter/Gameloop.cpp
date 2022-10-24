@@ -141,6 +141,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	
 	//UPDATING GAME ENTITIES
 	m_warship->UpdateUpkeepCosts();
+	m_warship->UpdateEstimatedCombatStrength();
 
 	//change of scale?
 	UpdateTacticalScale();
@@ -718,12 +719,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Combat interface
-			int sonar = -1;
-			if (ship == m_warship)
-			{
-				sonar = m_warship->m_sonar;
-			}
-			ship->m_combat_interface.Update(ship->m_health, ship->m_health_max, ship->m_flood, ship->m_flood_max, ship->m_nb_crew, ship->m_nb_crew_max, sonar);
+			ship->m_combat_interface.Update(ship->m_health, ship->m_health_max, ship->m_flood, ship->m_flood_max, ship->m_nb_crew, ship->m_nb_crew_max, ship->GetSonarRange(), (int)ship->GetEstimatedCombatStrength());
 		}
 
 		ship->UpdateTactical(deltaTime);
@@ -964,7 +960,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			m_warship->m_crew_unboard_interface.Init(m_warship, NULL, ship_in_combat_range);
 			m_warship->m_can_open_new_menu = false;
 		}
-		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->m_sonar >= location->m_depth)
+		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->m_sonarRange >= location->m_depth)
 		{
 			m_menu = Menu_CrewUnboard;
 			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);

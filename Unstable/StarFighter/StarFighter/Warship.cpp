@@ -13,7 +13,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 	m_can_be_seen = true;
 	m_can_open_new_menu = false;
-	m_sonar = 50;
+	m_sonarRange = 50;
 	m_holds_capacity = 4;
 
 	m_flee_timer = 0.f;
@@ -139,6 +139,9 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
 		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
+
+	//estimated combat strength
+	UpdateEstimatedCombatStrength();
 
 	//combat interface (displaying hp, etc.)
 	m_combat_interface.Init(this, m_alliance, m_display_name, m_type);
@@ -350,7 +353,7 @@ bool Warship::ApplyUpgrade(string upgrade_type)
 
 			if ((*it)[Upgrade_Stat].compare("sonar") == 0)
 			{
-				m_sonar = value;
+				m_sonarRange = value;
 			}
 			else if ((*it)[Upgrade_Stat].compare("lifeboat") == 0)
 			{

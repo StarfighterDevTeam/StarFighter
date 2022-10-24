@@ -119,6 +119,8 @@ public:
 
 	void UpdateFlooding(Time deltaTime);
 	void UpdateShipOffset();
+	void UpdateEstimatedCombatStrength();
+	float GetEstimatedCombatStrength() { return m_estimatedCombatStrength; }
 
 	void InitCombat();
 	void RestoreHealth();
@@ -142,6 +144,7 @@ public:
 	virtual bool HasCommodity(CommodityType commodity);
 	bool HasUpgradeRequiredFor(string upgrade_type);
 	bool HasUpgrade(string upgrade_type);
+	virtual int GetSonarRange() { return 0; };//see override in class Warship
 
 	//AI
 	void UpdateAITilesCanBeSeen();
@@ -151,6 +154,8 @@ private:
 	int m_rooms_min_upcorner_y;
 	int m_rooms_max_offset_x;
 	int m_rooms_max_offset_y;
+
+	float m_estimatedCombatStrength;
 
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
 	void FindShortestPathWithoutDiagonals(WaterTile* tileA, WaterTile* tileB);

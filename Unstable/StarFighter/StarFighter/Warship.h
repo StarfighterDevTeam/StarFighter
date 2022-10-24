@@ -30,10 +30,10 @@ public:
 	float m_angle_speed;
 	int m_upkeep_costs[NB_UPKEEP_COSTS];
 	bool m_can_open_new_menu;
-	int m_sonar;
 	vector<CrewMember*> m_crew_unboarding;
 	vector<Commodity*> m_holds;
 	int m_holds_capacity;
+	int m_sonarRange;
 
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;
@@ -50,6 +50,8 @@ public:
 
 	bool ApplyUpgrade(string upgrade_type);
 	void UpdateRooms();
+
+	int GetSonarRange() override { return m_sonarRange; };
 };
 
 #endif //WARSHIP_H_INCLUDED

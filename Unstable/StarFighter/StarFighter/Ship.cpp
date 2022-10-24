@@ -186,6 +186,7 @@ void Ship::UpdatePosition(DMS_Coord warship_DMS)
 
 void Ship::UpdateTactical(Time deltaTime)
 {
+	UpdateEstimatedCombatStrength();
 	UpdateFlooding(deltaTime);
 
 	if (m_is_charging_flee_count == true)
@@ -883,6 +884,9 @@ void Ship::BuildShip()
 	//prisoners
 	CrewMember* prisoner = new CrewMember(Crew_Civilian, m_alliance);
 	ImprisonCrew(prisoner);
+
+	//estimated combat strength
+	UpdateEstimatedCombatStrength();
 }
 
 void Ship::CenterRoomPositions(bool is_enemy)
@@ -2378,4 +2382,25 @@ bool Ship::HasUpgrade(string upgrade_type)
 	}
 
 	return false;
+}
+
+void Ship::UpdateEstimatedCombatStrength()
+{
+	float combatStrength = 0.f;
+
+	//weapons
+	for (Weapon* weapon : m_weapons)
+	{
+		if (weapon->m_health > 0)
+			combatStrength += 50;//subjective value
+	}
+
+	//crew
+	for (CrewMember* crew : m_crew[0])
+	{
+		combatStrength += crew->m_skills[Skill_Combat];
+	}
+
+	//total
+	m_esimatedCombatStrength = combatStrength;
 }
