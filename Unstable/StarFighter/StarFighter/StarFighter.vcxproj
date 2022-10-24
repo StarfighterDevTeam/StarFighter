@@ -132,6 +132,7 @@
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponInterface.cpp" />
     <ClCompile Include="Weather.cpp" />
+    <ClCompile Include="WeatherInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ammo.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="WeaponInterface.h" />
     <ClInclude Include="Weather.h" />
+    <ClInclude Include="WeatherInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />

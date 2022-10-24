@@ -27,6 +27,8 @@ enum UI_Type
 	UI_Warship,
 	UI_WaterTile,
 	UI_Weapon,
+	UI_WeatherCondition,
+	UI_WeatherWind,
 };
 
 enum ShipAlliance

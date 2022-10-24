@@ -39,7 +39,7 @@ struct WeatherForecast
 
 	WeatherCondition condition;
 	float hygrometry;//0% to 100%
-	float windStrength;//in km/h
+	float windStrength;//in knots
 	float windDirection;//in degrees
 	int seaState;//Douglas scale, from 0 to 9
 };

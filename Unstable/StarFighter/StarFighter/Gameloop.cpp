@@ -19,6 +19,7 @@ Gameloop::Gameloop()
 	m_ships.push_back(m_warship);
 	m_resources_interface.Init(m_warship);
 	m_combat_interface[0].Init(m_warship);
+	m_weather_interface.Init(&m_weather);
 
 	if (LoadPlayerData(m_warship) == 0)
 	{
@@ -32,6 +33,7 @@ Gameloop::Gameloop()
 		//create a new save file
 		SavePlayerData(m_warship);
 	}
+	
 
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
@@ -67,9 +69,9 @@ Gameloop::~Gameloop()
 	delete m_contextual_order;
 
 	m_resources_interface.Destroy();
-
 	m_combat_interface[0].Destroy();
 	m_combat_interface[1].Destroy();
+	m_weather_interface.Destroy();
 
 	for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 	{
@@ -78,7 +80,6 @@ Gameloop::~Gameloop()
 			delete (*it);
 		}
 	}
-	
 }
 
 void Gameloop::InitWaterZones()
@@ -944,6 +945,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//HUD resources
 	m_resources_interface.Update();
+	m_weather_interface.Update();
 	m_combat_interface[0].Update();
 	if (m_tactical_ship)
 		m_combat_interface[1].Update();
@@ -1481,6 +1483,9 @@ void Gameloop::Draw()
 
 	//HUD - resources interface
 	m_resources_interface.Draw((*CurrentGame).m_mainScreen);
+
+	//HUD - weather interface
+	m_weather_interface.Draw((*CurrentGame).m_mainScreen);
 
 	//HUD - contextual order
 	if (m_contextual_order->m_type != Order_None && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer <= 0)
@@ -2269,7 +2274,11 @@ void Gameloop::SpendDays(int days, bool skip_time)
 
 	//weather
 	for (int i = 1; i <= days; i++)
+	{
 		m_weather.Update();
+	}
+	m_weather_interface.Destroy();
+	m_weather_interface.Init(&m_weather);
 }
 
 void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)

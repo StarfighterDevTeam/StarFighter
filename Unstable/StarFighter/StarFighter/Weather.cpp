@@ -3,11 +3,12 @@
 
 extern Game* CurrentGame;
 
-#define MAX_WIND_STRENGTH					180.f
+#define MAX_WIND_STRENGTH					100.f
 #define MIN_HYGROMETRY_INCREMENTATION		0.f
 #define MAX_HYGROMETRY_INCREMENTATION		0.1f
-#define MIN_HYGROMETRY_LOSS_AFTER_RAIN		0.05f
-#define MAX_HYGROMETRY_LOSS_AFTER_RAIN		0.3f
+#define MIN_HYGROMETRY_LOSS_AFTER_RAIN		0.1f
+#define MAX_HYGROMETRY_LOSS_AFTER_RAIN		1.f
+#define NB_WEATHER_CYCLES_PER_DAY			4
 
 Weather::Weather()
 {
@@ -32,14 +33,17 @@ WeatherForecast Weather::ComputeNextForecast(WeatherForecast previousForecast)
 	int seaState = (int)Lerp(windStrength, 0, MAX_WIND_STRENGTH, 0, 9);
 
 	//hygrometry
-	WeatherCondition condition = WeatherCondition::Sunny;
-	float hygrometry = previousForecast.hygrometry + RandomizeFloatBetweenValues(MIN_HYGROMETRY_INCREMENTATION, MAX_HYGROMETRY_INCREMENTATION);
-	if (previousForecast.condition == Tempest || previousForecast.condition == Foggy)
-		hygrometry -= RandomizeFloatBetweenValues(MIN_HYGROMETRY_LOSS_AFTER_RAIN, MAX_HYGROMETRY_LOSS_AFTER_RAIN);
-	else if (previousForecast.condition == Rainy)
-		hygrometry -= MIN_HYGROMETRY_LOSS_AFTER_RAIN;
+	WeatherCondition condition;
+	float hygrometry = previousForecast.hygrometry;
+	
+	for (int i = 0; i < NB_WEATHER_CYCLES_PER_DAY; i++)
+	{
+		hygrometry += RandomizeFloatBetweenValues(MIN_HYGROMETRY_INCREMENTATION, MAX_HYGROMETRY_INCREMENTATION);
+		if (previousForecast.condition == Rainy || previousForecast.condition == Tempest || previousForecast.condition == Foggy)
+			hygrometry -= RandomizeFloatBetweenValues(MIN_HYGROMETRY_LOSS_AFTER_RAIN, MAX_HYGROMETRY_LOSS_AFTER_RAIN);
 
-	Boundf(hygrometry, 0.f, 1.f);
+		Boundf(hygrometry, 0.f, 1.f);
+	}
 
 	//weather condition
 	if (hygrometry < 0.3f)
@@ -50,7 +54,7 @@ WeatherForecast Weather::ComputeNextForecast(WeatherForecast previousForecast)
 		condition = WeatherCondition::Cloudy;
 	else if (hygrometry < 0.9f)
 		condition = WeatherCondition::Rainy;
-	else if (windStrength < 50.f)
+	else if (windStrength < 20.f)
 		condition = WeatherCondition::Foggy;
 	else
 		condition = WeatherCondition::Tempest;

@@ -12,6 +12,7 @@
 #include "ResourcesInterface.h"
 #include "HelpInterface.h"
 #include "CombatInterface.h"
+#include "WeatherInterface.h"
 
 enum Scale
 {
@@ -61,6 +62,7 @@ public:
 	struct ResourcesInterface m_resources_interface;
 	struct CombatInterface m_combat_interface[2];//0=player 1=enemy
 	struct HelpInterface m_help_interface;
+	struct WeatherInterface m_weather_interface;
 
 	Ship* IsDMSInCombatRange(DMS_Coord DMS_hovered, bool ally_included);
 	void StartCombatWithShip(Ship* enemy_ship);
