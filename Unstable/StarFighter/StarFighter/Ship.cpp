@@ -2402,5 +2402,5 @@ void Ship::UpdateEstimatedCombatStrength()
 	}
 
 	//total
-	m_esimatedCombatStrength = combatStrength;
+	m_estimatedCombatStrength = combatStrength;
 }
