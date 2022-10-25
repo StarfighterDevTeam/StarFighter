@@ -151,6 +151,16 @@ Game::Game(RenderWindow& window)
 		m_dico_ships_names[Ship_SecondClass].push_back(StringReplace((*it).front(), "_", " "));
 	}
 
+	for (vector<vector< string> >::iterator it = ship_names_second_class.begin(); it != ship_names_second_class.end(); it++)
+	{
+		m_dico_ships_names[Ship_CommercialLarge].push_back(StringReplace((*it).front(), "_", " "));
+	}
+
+	for (vector<vector< string> >::iterator it = ship_names_second_class.begin(); it != ship_names_second_class.end(); it++)
+	{
+		m_dico_ships_names[Ship_CommercialSmall].push_back(StringReplace((*it).front(), "_", " "));
+	}
+
 	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
 	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";
 	m_dico_resources_textures[Resource_Mech] = "2D/icon_mech.png";

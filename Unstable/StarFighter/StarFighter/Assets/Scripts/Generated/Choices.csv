@@ -8,7 +8,7 @@ dive_monster,Send_divers_to_investigate,2D/choice_prisoner_1.png,0,0,0,0,1,0,5,1
 fish,Go_fishing.,2D/choice_prisoner_1.png,0,0,0,0,1,0,1,100,0,fish,100,0,0,0,0
 ignore_fish,Lets_not_waste_time_and_leave.,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 fight,Fight,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,start_combat,100,0,0,0,0
-flee,Flee,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+leave,Leave,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 trade,Trade,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 leave_trade,Ignore_the_ship_and_leave.,2D/choice_leave_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 leave_island,Leave,2D/choice_leave_1.png,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

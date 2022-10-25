@@ -25,13 +25,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		m_upkeep_costs[i] = 0;
 	}
 
-	//shape for water tiles
-	m_textureName = "2D/warship_icon.png";
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(m_textureName, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
-	setAnimation(texture, 1, 2);
-
 	//water tile outline
 	m_default_color = sf::Color(0, 0, 0, 0);
 
@@ -76,7 +69,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_health = m_health_max;
 	m_lifeboats = 4;
 	m_diving_suits = 4;
-	m_nb_crew_max = 8;
+	m_nb_crew_max = 12;
 
 	//center position of each room & room tiles
 	CenterRoomPositions(false);
@@ -133,6 +126,31 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		AddEngineToTile(m_engines[i], engine_room->m_tiles[x + engine_room->m_width]);
 	}
 
+	//captain
+	AddNewCrewMember(new CrewMember(Crew_Pirate, m_alliance));
+
+	//crew
+	vector<Room*> possible_rooms;
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		if ((*it)->m_type != Room_PrisonCell)
+		{
+			possible_rooms.push_back(*it);
+		}
+	}
+	for (int i = 0; i < m_nb_crew; i++)
+	{
+		int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
+		AddCrewMemberToRoom(m_crew[0][i], possible_rooms[r]);
+	}
+
+	//prisoners
+	AddNewPrisoner(new CrewMember(Crew_Pirate, m_alliance));
+
+	int nb_prisoners = (int)m_crew[1].size();
+	for (int i = 0; i < nb_prisoners; i++)
+		AddCrewToPrisonCells(m_crew[1][i]);
+
 	//estimated combat strength
 	ComputeEstimatedCombatStrength();
 }
@@ -145,14 +163,6 @@ void Warship::Init()
 	m_resources[Resource_Mech] = 100;
 	m_resources[Resource_Fidelity] = 50;
 	m_resources[Resource_Days] = 10;
-
-	//crew
-	m_nb_crew = 0;
-
-	for (int i = 0; i < 1; i++)
-	{
-		AddNewCrewMember(new CrewMember(Crew_Pirate, m_alliance));
-	}
 }
 
 Warship::~Warship()

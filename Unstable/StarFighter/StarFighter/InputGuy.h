@@ -33,5 +33,4 @@ public:
 	static bool isEntering();
 };
 
-
 #endif // INPUTGUY_H_INCLUDED

@@ -114,10 +114,10 @@ bool Gameloop::GetSaveOrLoadInputs()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
-	GameEntity* selection = (*CurrentGame).m_selected_ui;
-	GameEntity* previous_selection = selection;
-	GameEntity* hovered = (*CurrentGame).m_hovered_ui;
-	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+	const GameEntity* selection = (*CurrentGame).m_selected_ui;
+	const GameEntity* previous_selection = selection;
+	const GameEntity* hovered = (*CurrentGame).m_hovered_ui;
+	const MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
 
 	m_contextual_order->SetContextualOrder(Order_None, m_contextual_order->m_position, true);
 
@@ -152,79 +152,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Water tiles
 	if (m_scale == Scale_Strategic)
 	{
-		//reset previous list
-		for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
-		{
-			(*it)->m_can_be_seen = false;
-		}
-		m_warship->m_tiles_can_be_seen.clear();
-
-		//reduce the range of tiles that are likely to be the right candidates for being seen
-		int min_x = m_warship->m_DMS.m_minute_x - (NB_WATERTILE_VIEW_RANGE + 1);
-		int max_x = m_warship->m_DMS.m_minute_x + (NB_WATERTILE_VIEW_RANGE + 1);
-		Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
-		Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
-
-		int min_y = m_warship->m_DMS.m_minute_y - (NB_WATERTILE_VIEW_RANGE + 1);
-		int max_y = m_warship->m_DMS.m_minute_y + (NB_WATERTILE_VIEW_RANGE + 1);
-		Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-		Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
-		
-		for (int i = min_x; i < max_x; i++)
-		{
-			for (int j = min_y; j < max_y; j++)
-			{
-				WaterTile* tile = m_warship->m_tile->m_zone->m_watertiles[i][j];
-
-				//can be seen? no need to update other tiles because they won't be drawn anyway
-				if (m_warship->CanViewWaterTile(tile))
-				{
-					tile->m_can_be_seen = true;
-					m_warship->m_tiles_can_be_seen.push_back(tile);
-
-					//position on "radar"
-					tile->UpdatePosition(m_warship->m_DMS);
-					if (tile->m_location != NULL)
-					{
-						tile->m_location->m_position = tile->m_position;
-						tile->m_location->UpdatePosition();
-
-						if (tile->m_location->m_type == Location_Seaport)
-						{
-							Seaport* seaport = (Seaport*)tile->m_location;
-							seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
-						}
-					}
-
-					//selection
-					if (selection == m_warship && tile->m_type == Water_Empty)// && m_warship->m_destination == NULL
-					{
-						//display tile coords
-						//ostringstream ss;
-						//ss << tile->m_coord_x << ", " << tile->m_coord_y;
-						//tile->m_text.setString(ss.str());
-						tile->GameEntity::Update(deltaTime);
-					}
-					else
-					{
-						tile->GameEntity::UpdatePosition();
-
-						if (tile->m_type == Water_Empty)
-						{
-							tile->m_text.setString("");
-
-							//selection of water tiles is forbidden
-							if (tile->m_selected == true)
-							{
-								tile->m_selected = false;
-								tile->m_shape_container.setOutlineColor(tile->m_default_color);
-								(*CurrentGame).m_selected_ui = NULL;
-							}
-						}
-					}
-				}
-			}
-		}
+		UpdateMap(deltaTime);
 	}
 
 	////Islands
@@ -246,1013 +174,14 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Ships update
-	DMS_Coord warship_DMS = m_warship->m_DMS;
-	int shipsVectorSize = m_ships.size();
-	bool ship_moving = false;
-	for (int i = 0; i < shipsVectorSize; i++)
-	{
-		if (m_ships[i]->m_speed != sf::Vector2f(0, 0))
-		{
-			ship_moving = true;
-			break;
-		}
-	}
-
-	if (m_scale == Scale_Strategic && ship_moving == false && (*CurrentGame).m_pause == false && m_menu == Menu_None)
-	{
-		for (int i = 0; i < shipsVectorSize; i++)
-		{
-			m_ships[i]->m_has_played = false;
-		}
-	}
-
-	for (int i = 0; i < shipsVectorSize; i++)
-	{
-		Ship* ship = m_ships[i];
-
-		//Strategical scale update
-		if (m_scale == Scale_Strategic)
-		{
-			if (ship == m_warship)
-			{
-				//Orders
-				if (ship->m_selected == true && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
-				{
-					WaterTile* tile_hovered = (WaterTile*)hovered;
-
-					//Hovering a water tile that is not our current tile?
-					if (WaterTile::SameDMS(warship_DMS, tile_hovered->m_DMS) == false)
-					{
-						//Scan all enemy ships to see if we're in range for combat with anyone
-						Ship* ship_in_combat_range = NULL;
-						for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
-						{
-							ship_in_combat_range = IsDMSInCombatRange(tile_hovered->m_DMS, true);
-							if (ship_in_combat_range != NULL)
-							{
-								break;
-							}
-						}
-
-						//Sail orders
-						if (m_menu == Menu_None && ship_moving == false)// m_warship->m_speed == sf::Vector2f(0, 0))
-						{
-							int cost = m_warship->GetShortestPathLength(m_warship->m_tile, tile_hovered);
-							
-							//Contextual orders' feedback
-							if (ship_in_combat_range == NULL)
-							{
-								if (tile_hovered->m_location == NULL || tile_hovered->m_location->m_type != Location_Seaport)
-								{
-									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
-								}
-								else
-								{
-									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
-								}
-							}
-							else if (ship_in_combat_range->m_alliance == Alliance_Enemy)
-							{
-								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost, ship_in_combat_range->GetEstimatedCombatStrength());
-							}
-							else if (ship_in_combat_range->m_alliance == Alliance_Ally)
-							{
-								m_contextual_order->SetContextualOrder(Order_Interact, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
-							}
-
-							//Sail order
-							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty && cost <= m_warship->m_moves_max)
-							{
-								if (m_warship->SetSailsToWaterTile(tile_hovered, warship_DMS) == true)
-								{
-									SpendDays(cost, false);
-									m_warship->m_can_open_new_menu = true;
-								}
-							}
-						}
-					}
-				}
-
-				ship->GameEntity::Update(deltaTime);
-
-				//Rooms
-				m_warship->UpdateRooms();
-			}
-			else//AI
-			{
-				//other ships update their position and visibility respect to player ship
-				//TODO: finalize round up/down for visibility
-				int x = ship->m_tile->m_DMS.m_minute_x;//+ (ship->m_speed.x < 0 && ship->m_DMS.m_second_x > 0 ? 0 : 0);
-				int y = ship->m_tile->m_DMS.m_minute_y + (ship->m_speed.y > 0 && ship->m_DMS.m_second_y > 0 ? 1 : 0);
-				ship->m_can_be_seen = ship->m_tile->m_zone->m_watertiles[x][y]->m_can_be_seen;
-				ship->UpdatePosition(warship_DMS);
-
-				//AI strategical movement
-				if (ship->m_has_played == false)
-				{
-					if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE + m_warship->m_moves_max)
-					{
-						SetAIStrategicalDestination(ship, warship_DMS);
-					}
-				}
-
-				ship->AnimatedSprite::update(deltaTime);
-			}
-
-			//apply orders (pathfind, speed...)
-			if ((*CurrentGame).m_pause == false && m_menu == Menu_None)
-			{
-				ship->UpdateStrategical(deltaTime, warship_DMS);
-			}
-
-			//Player ship UI
-			if (ship == m_warship)
-			{
-				ostringstream ss;
-				ss << "\n\n\n";
-				ss << ship->m_DMS.m_degree_y << "°" << ship->m_DMS.m_minute_y << "' " << (int)ship->m_DMS.m_second_y << "\"\N";
-				ss << "\n";
-				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"\E";
-				ship->m_text.setString(ss.str());
-			}
-		}
-
-		//Tactical scale update (and player)
-		if (ship != m_warship && ship != m_tactical_ship)
-		{
-			continue;
-		}
-
-		if (ship->m_sinking_timer <= 0)
-		{
-			//Rooms
-			Room* room_hovered = NULL;
-			for (vector<Room*>::iterator it = ship->m_rooms.begin(); it != ship->m_rooms.end(); it++)
-			{
-				int flood = 0;
-				(*it)->UpdatePosition();
-
-				//weapon selected and hovering enemy room? highlight targeted room
-				if (selection != NULL && selection->m_UI_type == UI_Weapon && (hovered == NULL || hovered->m_UI_type != UI_Connexion) && (*it)->m_alliance == Alliance_Enemy && (*it)->IsHoveredByMouse() == true && (*it)->m_type != Room_PrisonCell)//prison cells can't be targeted
-				{
-					room_hovered = *it;
-				}
-
-				//Room tiles
-				for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-				{
-					if ((*it2)->m_flood > 0)
-					{
-						flood++;
-					}
-
-					UpdateRoomTileFeedback(*it2, deltaTime, ship);
-
-					//crew move order feedback (hovering tile)
-					if (ship == m_warship && m_warship->m_is_fleeing == false)
-					{
-						if (selection != NULL && selection->m_UI_type == UI_CrewMember)
-						{
-							(*it2)->Update(deltaTime);
-
-							//contextuel order feedback
-							CrewMember* crew = (CrewMember*)selection;
-							if ((*it2)->IsHoveredByMouse() == true && crew->m_alliance == (*it2)->m_room->m_alliance)
-							{
-								UpdateContextualOrderFeedback(crew, *it2);
-							}
-						}
-						else
-						{
-							(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
-							(*it2)->m_shape_container.setOutlineThickness(-1.f);
-							(*it2)->UpdatePosition();
-						}
-					}
-					else
-					{
-						(*it2)->UpdatePosition();
-					}
-				}
-
-				(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
-			}
-
-			//Update weapon's target room and feedbacks
-			if (selection != NULL && selection->m_UI_type == UI_Weapon)
-			{
-				Weapon* weapon = (Weapon*)selection;
-				UpdateTargetRoom(weapon, room_hovered);
-			}
-
-			//Room connexions
-			for (vector<RoomConnexion*>::iterator it = ship->m_connexions.begin(); it != ship->m_connexions.end(); it++)
-			{
-				if (ship == m_warship && m_warship->m_is_fleeing == false)
-				{
-					(*it)->Update(deltaTime);
-					if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false && (*it)->m_tiles.first->m_room->m_alliance == Alliance_Player)
-					{
-						m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition(), true);
-					}
-				}
-				else
-				{
-					(*it)->UpdatePosition();
-				}
-			}
-
-			//Close/open connexion
-			if (ship == m_warship && mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion && ship->m_is_fleeing == false)
-			{
-				RoomConnexion* connexion = (RoomConnexion*)hovered;
-				if (connexion->m_ship == ship)
-				{
-					connexion->SetLock(!connexion->m_is_locked);
-				}
-			}
-
-			//Crew update (and reomving the dead)
-			for (int j = 0; j < 2; j++)
-			{
-				vector<CrewMember*> old_crew;
-				for (vector<CrewMember*>::iterator it = ship->m_crew[j].begin(); it != ship->m_crew[j].end(); it++)
-				{
-					old_crew.push_back(*it);
-				}
-				ship->m_crew[j].clear();
-
-				int fidelity = 0;
-				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-				{
-					//prisoners vs non-prisoners opponent?
-					if ((*it)->m_melee_opponent == NULL)
-					{
-						for (vector<CrewMember*>::iterator it2 = ship->m_crew[(j + 1) % 2].begin(); it2 != ship->m_crew[(j + 1) % 2].end(); it2++)
-						{
-							if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
-							{
-								(*it)->m_melee_opponent = *it2;
-								if ((*it2)->m_melee_opponent == NULL)
-								{
-									(*it2)->m_melee_opponent = *it;
-								}
-								break;
-							}
-						}
-					}
-
-					//opponent catch us on melee?
-					if ((*it)->m_melee_opponent != NULL)
-					{
-						//cancel movement
-						if ((*it)->m_destination != NULL)
-						{
-							(*it)->m_destination->m_crew = NULL;
-						}
-						(*it)->m_destination = NULL;
-						(*it)->m_speed = sf::Vector2f(0, 0);
-
-						//fight
-						(*it)->UpdateMelee(deltaTime);
-
-						//update feedbacks and life bar
-						(*it)->GameEntity::Update(deltaTime);
-						(*it)->UpdateLifeBar();
-					}
-					else
-					{
-						//update: crew movement/heal/repair
-						if (ship->m_is_fleeing == false)
-						{
-							(*it)->Update(deltaTime);
-							if (j == 1)
-							{
-								//prisoners only: escape and roam if the prison cell is open
-								ship->UpdatePrisonerEscape(*it, deltaTime);
-							}
-						}
-						else
-						{
-							(*it)->UpdatePosition();
-						}
-					}
-
-					if (ship->m_is_fleeing == false)
-					{
-						if (ship == m_warship)
-						{
-							//create or update HUD for crew details
-							if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
-							{
-								m_warship->m_crew_interface.Destroy();
-								m_warship->m_crew_interface.Init(*it);
-							}
-							else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
-							{
-								m_warship->m_crew_interface.Destroy();
-								m_warship->m_crew_interface.Init(*it);
-							}
-							else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
-							{
-								m_warship->m_crew_interface.Destroy();
-							}
-
-							if (m_warship->m_crew_interface.m_crew == *it)
-							{
-								m_warship->m_crew_interface.Update();
-							}
-						}
-						else
-						{
-							//Enemy AI
-							UpdateAICrew(*it);
-						}
-					}
-
-					if ((*it)->m_health > 0)
-					{
-						ship->m_crew[j].push_back(*it);
-						if (j == 0)
-						{
-							fidelity += (*it)->m_fidelity;
-						}
-					}
-					else
-					{
-						ship->m_nb_crew--;
-						if ((*CurrentGame).m_selected_ui == *it)
-						{
-							(*CurrentGame).m_selected_ui = NULL;
-						}
-						if ((*CurrentGame).m_hovered_ui == *it)
-						{
-							(*CurrentGame).m_hovered_ui = NULL;
-						}
-
-						if (ship == m_warship)
-						{
-							Warship* warship = (Warship*)ship;
-							if (warship->m_crew_interface.m_crew == *it)
-							{
-								m_warship->m_crew_interface.Destroy();
-							}
-						}
-
-						delete *it;
-					}
-				}
-
-				if (j == 0)
-				{
-					ship->m_resources[Resource_Fidelity] = ship->m_crew[j].empty() == true ? 50 : fidelity / ship->m_crew[j].size();
-				}
-			}
-
-			//Move order for player's crew
-			if (ship == m_warship && mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile && ship->m_is_fleeing == false)
-			{
-				CrewMember* crew = (CrewMember*)selection;
-				RoomTile* destination = (RoomTile*)hovered;
-
-				//tile is free?
-				if (destination->m_crew == NULL && destination->m_weapon == NULL)
-				{
-					//free previous destination's booking (if any)
-					if (crew->m_destination != NULL)
-					{
-						crew->m_destination->m_crew = NULL;
-					}
-
-					//book new destination
-					destination->m_crew = crew;
-
-					//assign destination for pathfind
-					crew->m_destination = destination;
-				}
-			}
-
-			//Weapons
-			if (m_scale == Scale_Tactical)
-			{
-				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
-				{
-					if (ship->m_is_fleeing == false)
-					{
-						(*it)->Update(deltaTime);
-
-						Ship* enemy_ship = ship == m_warship ? m_tactical_ship : m_warship;
-						if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
-						{
-							if ((*it)->m_target_room == NULL && ship != m_warship)
-							{
-								//AI choosing a target for each weapon
-								UpdateAITargetRoom(*it);
-							}
-
-							if ((*it)->CanFire() == true && (*it)->m_target_room != NULL && (*CurrentGame).m_pause == false)
-							{
-								if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && ship != m_warship)
-								{
-									//After firing, it's the AI, randomly reset the target at random to change target next frame
-									if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
-									{
-										(*it)->m_target_room = NULL;
-									}
-								}
-							}
-						}
-					}
-					else
-					{
-						(*it)->UpdatePosition();
-					}
-				}
-			}
-			else
-			{
-				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
-				{
-					(*it)->GameEntity::Update(deltaTime);
-				}
-			}
-
-			//Engines
-			for (vector<Engine*>::iterator it = ship->m_engines.begin(); it != ship->m_engines.end(); it++)
-			{
-				if (ship->m_is_fleeing == false)
-				{
-					(*it)->Update(deltaTime);
-
-					//Fleeing order for human
-					if (ship == m_warship && (*it)->IsHoveredByMouse() == true && m_scale == Scale_Tactical)
-					{
-						bool can_flee = ship->m_flee_count == ENGINE_FLEE_COUNT && ship->IsSystemOperational(System_Engine, (*it)->m_tile);
-						m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition(), can_flee == true);
-						if (mouse_click == Mouse_RightClick && can_flee == true)
-						{
-							ship->m_is_fleeing = true;
-
-							//remove hovering feedback
-							(*it)->m_shape_container.setOutlineColor((*it)->m_default_color);
-							(*it)->m_shape_container.setOutlineThickness(-1.f);
-						}
-					}
-					else if (ship != m_warship)
-					{
-						//IA fleeing (todo)
-					}
-				}
-				else
-				{
-					(*it)->UpdatePosition();
-					(*it)->m_systembar->UpdatePosition();
-				}
-			}
-
-			//Rudder
-			if (ship->m_rudder != NULL)
-			{
-				if (ship->m_is_fleeing == false)
-				{
-					ship->m_rudder->Update(deltaTime);
-				}
-				else
-				{
-					ship->m_rudder->UpdatePosition();
-				}
-			}
-		}
-
-		ship->UpdateTactical(deltaTime);
-	}
-
-	//Bullets + cleaning old bullets
-	if ((*CurrentGame).m_pause == false)
-	{
-		vector<Ammo*> old_bullets;
-		for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
-		{
-			old_bullets.push_back(*it);
-		}
-		(*CurrentGame).m_bullets.clear();
-		for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
-		{
-			if ((*it)->m_can_be_seen == true && (*it)->m_target_ship->m_is_fleeing == false && m_scale == Scale_Tactical)
-			{
-				(*CurrentGame).m_bullets.push_back(*it);
-				(*it)->Update(deltaTime);
-
-				//Hit effects
-				if ((*it)->m_phase == Shoot_Hit)
-				{
-					//compute hit tiles
-					int x = (*it)->m_target_tile->m_coord_x;
-					int y = (*it)->m_target_tile->m_coord_y;
-
-					int radius = (*it)->m_radius - 1;
-
-					int a = x - radius;
-					int b = x + radius;
-
-					vector<RoomTile*> tiles_hit;
-					for (int i = x - radius; i < x + radius + 1; i++)
-					{
-						for (int j = y - radius; j < y + radius + 1; j++)
-						{
-							if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
-							{
-								//"boom": apply bullet damage and side effects
-								RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
-
-								if (tile == NULL)
-								{
-									continue;
-								}
-
-								//walls block splash damage
-								if ((*it)->m_radius > 1 && tile->m_room != (*it)->m_target_tile->m_room)
-								{
-									continue;
-								}
-
-								tiles_hit.push_back(tile);
-
-								//damage to ship
-								int damage_ship = Min((*it)->m_damage, (*it)->m_target_ship->m_health);
-								if (damage_ship > 0)
-								{
-									(*it)->m_target_ship->m_health -= damage_ship;
-
-									//pop feedback
-									ostringstream ss;
-									ss << damage_ship;
-									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Red, ss.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_OFFSET_2);
-
-									//damage to weapon
-									if (tile->m_weapon != NULL)
-									{
-										Weapon* weapon = tile->m_weapon;
-										weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
-										if (weapon->m_health == 0)
-										{
-											weapon->setColor(sf::Color::Red);
-										}
-									}
-
-									//destroying door
-									if (tile->m_connexion != NULL)
-									{
-										tile->m_connexion->Destroy();
-									}
-								}
-
-								//hull damage
-								int damage_hull = Min((*it)->m_hull_damage, tile->m_health);
-								if (damage_hull > 0)
-								{
-									tile->m_health -= damage_hull;
-								}
-
-								//piercing hull
-								if (tile->m_hull != Hull_None && tile->m_is_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
-								{
-									tile->m_is_pierced = true;
-									if (tile->m_crew != NULL)
-									{
-										tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
-									}
-
-									//pop feedback
-									ostringstream ss_hull;
-									ss_hull << "Pierced";
-									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Blue, ss_hull.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_OFFSET_2_BIS);
-								}
-
-								//shrapnel damage
-								if ((*it)->m_shrapnel_damage > 0)
-								{
-									for (int j = 0; j < 2; j++)
-									{
-										for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew[j].begin(); it2 != (*it)->m_target_ship->m_crew[j].end(); it2++)
-										{
-											if (GameEntity::IsColliding(tile, (*it2)) == true)
-											{
-												if ((*it2)->m_health > 0)
-												{
-													int damage_crew = Min((*it)->m_shrapnel_damage, (*it2)->m_health);
-													(*it2)->m_health -= damage_crew;
-
-													//pop feedback
-													ostringstream ss_crew;
-													ss_crew << damage_crew;
-													SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_1, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_SIZE_1);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-
-					//FX of the explosion
-					int nb_hits = tiles_hit.size();
-					//shuffle possible fx hits for a "random" carpet bombing
-					if (nb_hits > 1)
-					{
-						vector<int> hits_order;
-						for (int h = 0; h < nb_hits; h++)
-						{
-							hits_order.push_back(h);
-						}
-						for (int h = 0; h < nb_hits; h++)
-						{
-							int k = hits_order[h];
-							int r = RandomizeIntBetweenValues(0, nb_hits - 1);
-							hits_order[h] = hits_order[r];
-							hits_order[r] = k;
-						}
-
-						for (int h = 0; h < nb_hits; h++)
-						{
-							RoomTile* k = tiles_hit[h];
-							tiles_hit[h] = tiles_hit[hits_order[h]];
-							tiles_hit[hits_order[h]] = k;
-						}
-					}
-
-					//set FX positions
-					for (int h = 0; h < nb_hits; h++)
-					{
-						FX* FX_hit = (*it)->m_FX_hit->Clone();
-						FX_hit->m_position = tiles_hit[h]->m_position;
-						FX_hit->UpdatePosition();
-						FX_hit->m_delay_timer = h * SHRAPNEL_DELAY;
-						(*CurrentGame).m_FX.push_back(FX_hit);
-					}
-				}
-			}
-			else
-			{
-				delete *it;
-			}
-		}
-
-		//FX + clean old FX
-		vector<FX*> old_FX;
-		for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
-		{
-			old_FX.push_back(*it);
-		}
-		(*CurrentGame).m_FX.clear();
-		for (vector<FX*>::iterator it = old_FX.begin(); it != old_FX.end(); it++)
-		{
-			if ((*it)->m_can_be_seen == true)
-			{
-				(*CurrentGame).m_FX.push_back(*it);
-				(*it)->Update(deltaTime);
-			}
-			else
-			{
-				delete *it;
-			}
-		}
-
-		//SFTextPop + clean old
-		vector<SFTextPop*> old_texts_pop;
-		for (vector<SFTextPop*>::iterator it = (*CurrentGame).m_texts_pop.begin(); it != (*CurrentGame).m_texts_pop.end(); it++)
-		{
-			old_texts_pop.push_back(*it);
-		}
-		(*CurrentGame).m_texts_pop.clear();
-		for (vector<SFTextPop*>::iterator it = old_texts_pop.begin(); it != old_texts_pop.end(); it++)
-		{
-			if ((*it)->m_alpha > 0)
-			{
-				(*CurrentGame).m_texts_pop.push_back(*it);
-				(*it)->Update(deltaTime);
-			}
-			else
-			{
-				delete *it;
-			}
-		}
-	}
-
-	//HUD resources
-	m_resources_interface.Update();
-	m_weather_interface.Update();
-	m_combat_interface[0].Update();
-	if (m_tactical_ship)
-		m_combat_interface[1].Update();
-	else if (m_combat_interface[1].GetShip())
-		m_combat_interface[1].Destroy();
+	//Ships update (including player's Warship)
+	UpdateShips(deltaTime);
+
+	//Bullets, damage and detonations
+	UpdateBullets(deltaTime);
 
 	//MENUS
-	Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
-	//Open a new contextual menu?
-	if (m_warship->m_can_open_new_menu == true && m_warship->m_has_played == false)
-	{
-		Location* location = m_warship->m_tile->m_location;
-		//Arriving on a special location?
-		if (location != NULL && location->m_type == Location_Seaport)
-		{
-			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
-			m_warship->m_can_open_new_menu = false;
-		}
-		else if (ship_in_combat_range != NULL)
-		{
-			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, NULL, ship_in_combat_range);
-			m_warship->m_can_open_new_menu = false;
-		}
-		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->GetSonarRange() >= location->m_depth)
-		{
-			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
-			m_warship->m_can_open_new_menu = false;
-		}
-	}
-
-	//Help interface
-	if (hovered != NULL && hovered->m_UI_type == UI_Commodity)
-	{
-		Commodity* commodity = (Commodity*)hovered;
-		m_help_interface.Init(commodity->m_display_name, commodity->m_description, sf::Vector2f(commodity->m_position.x - RESOURCES_ICON_SIZE * 0.5, commodity->m_position.y + RESOURCES_ICON_SIZE * 0.5));
-	}
-	else if (hovered != NULL && hovered->m_UI_type == UI_Resource)
-	{
-		Resource* resource = (Resource*)hovered;
-		
-		if (resource->m_type == Resource_Fidelity)
-		{
-			string description = "Crew fidelity is important, as low fidelity will sometimes occasion mutiny.";
-			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
-		}
-		else if (resource->m_type == Resource_Days)
-		{
-			string description = "Days are passing, and the Royal Navy might just be closing on you very soon.";
-			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
-		}
-		else
-		{
-			string description = "Your holds of resources.";
-			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
-		}
-	}
-	else if (hovered != NULL && hovered->m_UI_type == UI_Rudder)
-	{
-		Rudder* rudder = (Rudder*)hovered;
-		string display_name = (*CurrentGame).m_dico_ship_systems[rudder->m_tile->m_system];
-		string activated = m_warship->IsSystemOperational(System_Navigation, rudder->m_tile) == true ? "operated" : "not operated";
-		string description = "Status: " + activated + "\n+" + std::to_string((int)(100 * NAVIGATION_DODGE_CHANCE)) + "% dodge chance (if operated by a crew member).\nThe operating crew also adds his Nagivation skill % to dodge chances.";
-		m_help_interface.Init(display_name, description, sf::Vector2f(rudder->m_position.x - ROOMTILE_SIZE * 0.5, rudder->m_position.y + ROOMTILE_SIZE * 0.5));
-	}
-	else if (hovered != NULL && hovered->m_UI_type == UI_Engine)
-	{
-		Engine* engine = (Engine*)hovered;
-		string display_name = (*CurrentGame).m_dico_ship_systems[engine->m_tile->m_system];
-		string activated = m_warship->IsSystemOperational(System_Engine, engine->m_tile) == true ? "operated" : "not operated";
-		string description = "Status: " + activated + "\nCharges the Flee thrusters (if operated by a crew member).\nWhen fully charged, right-click on the Engine to flee an ungoing combat.\n\n+" + std::to_string((int)(100 * ENGINE_DODGE_CHANCE)) + "% dodge chance per engine (if operated by a crew member).\nThe operating crew also adds his Engine skill % to dodge chances.";
-		m_help_interface.Init(display_name, description, sf::Vector2f(engine->m_position.x - ROOMTILE_SIZE * 0.5, engine->m_position.y + ROOMTILE_SIZE * 0.5));
-	}
-	else if (hovered != NULL && hovered->m_UI_type == UI_Weapon)
-	{
-		Weapon* weapon = (Weapon*)hovered;
-		string display_name = (*CurrentGame).m_dico_ship_weapons[weapon->m_type];
-		string activated = m_warship->IsSystemOperational(System_Weapon, weapon->m_tile) == true ? "operated" : "not operated";
-		string description = "Status: " + activated + "\nLoads and fire on enemy ships during combat (as long as operated by a crew member).\nSelect it with left-click and right-click to assign a target during combat.";
-		if (weapon->m_type == Weapon_Cannon)
-		{
-			description += "\n\nCannons aims at random into a target room, dealing great damage to the hull and crew members.";
-		}
-		else if (weapon->m_type == Weapon_Torpedo)
-		{
-			description += "\n\nTorpedo aims at random onto a target hull, piercing it and causing flooding into the enemy ship.";
-		}
-		else if (weapon->m_type == Weapon_Shrapnel)
-		{
-			description += "\n\nShrapnel aims at random into a target room, dealing spread damage to crew members, but not to the hull.";
-		}
-
-		m_help_interface.Init(display_name, description, sf::Vector2f(weapon->m_position.x - ROOMTILE_SIZE * 0.5, weapon->m_position.y + ROOMTILE_SIZE * 0.5));
-	}
-	else if (hovered != NULL && hovered->m_UI_type == UI_ResourceUpkeep)
-	{
-		Resource* resource = (Resource*)hovered;
-		string description = "Crew upkeep costs resources every day.\nEach day passed with the upkeep paid increase crew fidelity.\nUpkeep costs unpaid decrease crew fidelity.";
-		m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
-	}
-	else if (m_help_interface.m_panel != NULL)
-	{
-		m_help_interface.Destroy();
-	}
-
-	//Crew overboard menu
-	if (m_menu == Menu_CrewOverboard)
-	{
-		if (m_warship->m_crew_overboard_interface.Update(deltaTime) == true)
-		{
-			m_menu = Menu_None;
-		}
-	}
-	else if (m_menu == Menu_PrisonersChoice)
-	{
-		m_warship->m_prisoners_choice_interface.Update(deltaTime);
-
-		if (m_warship->m_prisoners_choice_interface.m_crew.empty() == true)
-		{
-			m_warship->m_prisoners_choice_interface.Destroy();
-			m_menu = Menu_None;
-		}
-	}
-	else if (m_menu == Menu_CrewUnboard)
-	{
-		CrewMember* crew = NULL;
-		if (hovered != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_window_has_focus == true)
-		{
-			//add crew to interface
-			if (hovered->m_UI_type == UI_CrewMember)
-			{
-				CrewMember* crew = (CrewMember*)hovered;
-				m_warship->m_crew_unboarding.push_back(crew);
-				m_warship->m_crew_unboard_interface.AddCrewToInterface(crew);
-			}
-			//remove crew from interface
-			else if (hovered->m_UI_type == UI_CrewMemberUnboarding)
-			{
-				CrewMember* crew = (CrewMember*)hovered;
-				m_warship->m_crew_unboard_interface.RemoveCrewFromInterface(crew);
-
-				vector<CrewMember*> old_crew;
-				for (vector<CrewMember*>::iterator it = m_warship->m_crew_unboarding.begin(); it != m_warship->m_crew_unboarding.end(); it++)
-				{
-					old_crew.push_back(*it);
-				}
-				m_warship->m_crew_unboarding.clear();
-				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-				{
-					if ((*it) != crew)
-					{
-						m_warship->m_crew_unboarding.push_back(*it);
-					}
-				}
-			}
-		}
-
-		Choice* choice = m_warship->m_crew_unboard_interface.Update(deltaTime);
-
-		//choice made?
-		if (choice != NULL)
-		{
-			//pay costs
-			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
-			{
-				if (j != Resource_Days && j != Resource_Fidelity)
-				{
-					m_warship->AddResource(ResourceType(j), - choice->m_cost[j]);
-				}
-				else if (j == Resource_Days)
-				{
-					SpendDays(choice->m_cost[j], true);
-				}
-			}
-
-			if (choice->m_cost_commodity != Commodity_None)
-			{
-				RemoveCommodity(choice->m_cost_commodity);
-			}
-
-			//get reward
-			string rewardID = choice->RandomizeRewardID();
-			Reward* reward = GenerateReward(rewardID, m_warship->m_crew_unboard_interface.m_location, m_warship->m_crew_unboard_interface.m_other_ship, choice->m_gauge_value, choice->m_gauge_value_max);
-
-			//reward is not empty? open the reward interface.
-			if (reward != NULL && reward->m_string.compare("0") != 0)
-			{
-				//crew killed or recruited?
-				int size = reward->m_resources.size();
-				for (int i = 0; i < size; i++)
-				{
-					if (reward->m_resources[i].first == Resource_Crew)
-					{
-						//crew killed
-						if (reward->m_resources[i].second < 0)
-						{
-							//cannot kill more than unboarded
-							for (int k = 0; k < -reward->m_resources[i].second; k++)
-							{
-								if (m_warship->m_crew_unboarding.size() > k)
-								{
-									m_warship->m_reward_interface.m_crew_killed.push_back(m_warship->m_crew_unboarding[k]);
-								}
-							}
-							reward->m_resources[i].second = -m_warship->m_reward_interface.m_crew_killed.size();
-						}
-						else//crew recruited
-						{
-							for (int k = 0; k < reward->m_resources[i].second; k++)
-							{
-								m_warship->m_reward_interface.m_crew_recruited.push_back(new CrewMember(Crew_Civilian, m_warship->m_alliance));
-							}
-						}
-					}
-				}
-
-				m_warship->m_reward_interface.Init(m_warship, reward);
-				m_menu = Menu_Reward;
-			}
-			else//no reward interface
-			{
-				//set next menu
-				SetNextMenuFromReward(reward);
-			}
-		}
-	}
-	else if (m_menu == Menu_Reward)
-	{
-		if (m_warship->m_reward_interface.Update() == true)
-		{
-			//give reward
-			for (vector<pair<ResourceType, int> >::iterator it = m_warship->m_reward_interface.m_reward->m_resources.begin(); it != m_warship->m_reward_interface.m_reward->m_resources.end(); it++)
-			{
-				m_warship->AddResource((*it).first, (*it).second);
-			}
-
-			//secret location revealed
-			if (m_warship->m_reward_interface.m_reward->m_DMS_location != NULL)
-			{
-				DMS_Coord& dms = *m_warship->m_reward_interface.m_reward->m_DMS_location;
-				(*CurrentGame).m_waterzones[dms.m_degree_x][dms.m_degree_y]->m_watertiles[dms.m_minute_x][dms.m_minute_y]->m_location->m_known = true;
-				printf("");
-			}
-
-			//commodity
-			if (m_warship->m_reward_interface.m_reward->m_commodity != Commodity_None)
-			{
-				AddCommodityToHolds(m_warship->m_reward_interface.m_reward->m_commodity);
-			}
-
-			//crew recruited
-			for (vector<CrewMember*>::iterator it = m_warship->m_reward_interface.m_crew_recruited.begin(); it != m_warship->m_reward_interface.m_crew_recruited.end(); it++)
-			{
-				m_warship->AddNewCrewMember(*it);
-			}
-
-			//crew killed
-			for (vector<CrewMember*>::iterator it = m_warship->m_reward_interface.m_crew_killed.begin(); it != m_warship->m_reward_interface.m_crew_killed.end(); it++)
-			{
-				vector<CrewMember*> old_crew;
-				for (vector<CrewMember*>::iterator it2 = m_warship->m_crew[0].begin(); it2 != m_warship->m_crew[0].end(); it2++)
-				{
-					old_crew.push_back(*it2);
-				}
-				m_warship->m_crew[0].clear();
-				for (vector<CrewMember*>::iterator it2 = old_crew.begin(); it2 != old_crew.end(); it2++)
-				{
-					if (*it == *it2)
-					{
-						continue;
-					}
-					else
-					{
-						m_warship->m_crew[0].push_back(*it2);
-					}
-				}
-			}
-
-			//set next menu
-			SetNextMenuFromReward(m_warship->m_reward_interface.m_reward);
-
-			//kill reward interface
-			m_warship->m_reward_interface.Destroy();
-		}
-	}
-	else if (m_menu == Menu_Dockyard)
-	{
-		string buy_upgrade = m_warship->m_dockyard_interface.Update(deltaTime);
-		if (buy_upgrade.empty() == false)
-		{
-			//apply upgrade
-			m_warship->ApplyUpgrade(buy_upgrade);
-		}
-
-		if (m_warship->m_dockyard_interface.m_leave_button->ButtonUpdate() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
-		{
-			//close interface
-			m_warship->m_dockyard_interface.Destroy();
-			m_menu = Menu_CrewUnboard;
-		}
-	}
-
-	//close crew unboard interface?
-	if (m_menu == Menu_CrewUnboardLeave)
-	{
-		CloseCrewUnboardInterface();
-	}
+	UpdateMenus(deltaTime);
 
 	//Music
 	(*CurrentGame).ManageMusicTransitions(deltaTime);
@@ -2026,7 +955,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				tile->m_location = location;
 			}
 
-			warship->m_nb_crew = warship->m_crew[0].size();
+			warship->m_nb_crew = (int)warship->m_crew[0].size();
 		}
 
 		data.close();  // on ferme le fichier
@@ -2428,7 +1357,7 @@ void Gameloop::GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y)
 
 void Gameloop::GenerateRandomShips(int zone_coord_x, int zone_coord_y)
 {
-	for (int a = Alliance_Enemy; a <= Alliance_Ally; a++)
+	for (int a = Alliance_Enemy; a <= Alliance_Neutral; a++)
 	{
 		for (int i = Ship_FirstClass; i < NB_SHIP_TYPES; i++)
 		{
@@ -2442,17 +1371,17 @@ void Gameloop::GenerateRandomShips(int zone_coord_x, int zone_coord_y)
 				}
 				case Ship_SecondClass:
 				{
-					r = a == Alliance_Enemy ? 30 : 30;
+					r = a == Alliance_Enemy ? 20 : 0;
 					break;
 				}
 				case Ship_CommercialLarge:
 				{
-					//r = a == Alliance_Enemy ? 30 : 30;//TODO NEUTRAL ALLIANCE
+					r = a == Alliance_Neutral ? 10 : 0;
 					break;
 				}
 				case Ship_CommercialSmall:
 				{
-					//r = a == Alliance_Enemy ? 30 : 30;//TODO NEUTRAL ALLIANCE
+					r = a == Alliance_Neutral ? 20 : 0;
 					break;
 				}
 			}
@@ -2705,6 +1634,1122 @@ void Gameloop::SetAIStrategicalDestination(Ship* ship, DMS_Coord warship_DMS)
 	{
 		ship->UpdateAITilesCanBeSeen();
 		ship->SetSailsToWaterTile(ship->m_destination, warship_DMS);
+	}
+}
+
+void Gameloop::UpdateShips(sf::Time deltaTime)
+{
+	//<!> Doublon of Update
+	const GameEntity* selection = (*CurrentGame).m_selected_ui;
+	const GameEntity* previous_selection = selection;
+	const GameEntity* hovered = (*CurrentGame).m_hovered_ui;
+	const MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
+	//Ships update
+	DMS_Coord warship_DMS = m_warship->m_DMS;
+	int shipsVectorSize = m_ships.size();
+	bool ship_moving = false;
+	for (int i = 0; i < shipsVectorSize; i++)
+	{
+		if (m_ships[i]->m_speed != sf::Vector2f(0, 0))
+		{
+			ship_moving = true;
+			break;
+		}
+	}
+
+	if (m_scale == Scale_Strategic && ship_moving == false && (*CurrentGame).m_pause == false && m_menu == Menu_None)
+	{
+		for (int i = 0; i < shipsVectorSize; i++)
+		{
+			m_ships[i]->m_has_played = false;
+		}
+	}
+
+	for (int i = 0; i < shipsVectorSize; i++)
+	{
+		Ship* ship = m_ships[i];
+
+		//Strategical scale update
+		if (m_scale == Scale_Strategic)
+		{
+			if (ship == m_warship)
+			{
+				//Orders
+				if (ship->m_selected == true && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
+				{
+					WaterTile* tile_hovered = (WaterTile*)hovered;
+
+					//Hovering a water tile that is not our current tile?
+					if (WaterTile::SameDMS(warship_DMS, tile_hovered->m_DMS) == false)
+					{
+						//Scan all enemy ships to see if we're in range for combat with anyone
+						Ship* ship_in_combat_range = NULL;
+						for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
+						{
+							ship_in_combat_range = IsDMSInCombatRange(tile_hovered->m_DMS, true);
+							if (ship_in_combat_range != NULL)
+							{
+								break;
+							}
+						}
+
+						//Sail orders
+						if (m_menu == Menu_None && ship_moving == false)// m_warship->m_speed == sf::Vector2f(0, 0))
+						{
+							int cost = m_warship->GetShortestPathLength(m_warship->m_tile, tile_hovered);
+
+							//Contextual orders' feedback
+							if (ship_in_combat_range == NULL)
+							{
+								if (tile_hovered->m_location == NULL || tile_hovered->m_location->m_type != Location_Seaport)
+								{
+									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
+								}
+								else
+								{
+									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
+								}
+							}
+							else if (ship_in_combat_range->m_alliance == Alliance_Enemy)
+							{
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost, ship_in_combat_range->GetEstimatedCombatStrength());
+							}
+							else if (ship_in_combat_range->m_alliance == Alliance_Ally)
+							{
+								m_contextual_order->SetContextualOrder(Order_Interact, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
+							}
+							else if (ship_in_combat_range->m_alliance == Alliance_Neutral)
+							{
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
+							}
+
+							//Sail order
+							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty && cost <= m_warship->m_moves_max)
+							{
+								if (m_warship->SetSailsToWaterTile(tile_hovered, warship_DMS) == true)
+								{
+									SpendDays(cost, false);
+									m_warship->m_can_open_new_menu = true;
+								}
+							}
+						}
+					}
+				}
+
+				ship->GameEntity::Update(deltaTime);
+
+				//Rooms
+				m_warship->UpdateRooms();
+			}
+			else//AI
+			{
+				//other ships update their position and visibility respect to player ship
+				//TODO: finalize round up/down for visibility
+				int x = ship->m_tile->m_DMS.m_minute_x;//+ (ship->m_speed.x < 0 && ship->m_DMS.m_second_x > 0 ? 0 : 0);
+				int y = ship->m_tile->m_DMS.m_minute_y + (ship->m_speed.y > 0 && ship->m_DMS.m_second_y > 0 ? 1 : 0);
+				ship->m_can_be_seen = ship->m_tile->m_zone->m_watertiles[x][y]->m_can_be_seen;
+				ship->UpdatePosition(warship_DMS);
+
+				//AI strategical movement
+				if (ship->m_has_played == false)
+				{
+					if (m_warship->GetDistanceToWaterTile(ship->m_tile) < NB_WATERTILE_VIEW_RANGE + m_warship->m_moves_max)
+					{
+						SetAIStrategicalDestination(ship, warship_DMS);
+					}
+				}
+
+				ship->AnimatedSprite::update(deltaTime);
+			}
+
+			//apply orders (pathfind, speed...)
+			if ((*CurrentGame).m_pause == false && m_menu == Menu_None)
+			{
+				ship->UpdateStrategical(deltaTime, warship_DMS);
+			}
+
+			//Player ship UI
+			if (ship == m_warship)
+			{
+				ostringstream ss;
+				ss << "\n\n\n";
+				ss << ship->m_DMS.m_degree_y << "°" << ship->m_DMS.m_minute_y << "' " << (int)ship->m_DMS.m_second_y << "\"\N";
+				ss << "\n";
+				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"\E";
+				ship->m_text.setString(ss.str());
+			}
+		}
+
+		//Tactical scale update (and player)
+		if (ship != m_warship && ship != m_tactical_ship)
+		{
+			continue;
+		}
+
+		if (ship->m_sinking_timer <= 0)
+		{
+			//Rooms
+			Room* room_hovered = NULL;
+			for (vector<Room*>::iterator it = ship->m_rooms.begin(); it != ship->m_rooms.end(); it++)
+			{
+				int flood = 0;
+				(*it)->UpdatePosition();
+
+				//weapon selected and hovering enemy room? highlight targeted room
+				if (selection != NULL && selection->m_UI_type == UI_Weapon && (hovered == NULL || hovered->m_UI_type != UI_Connexion) && (*it)->m_alliance == Alliance_Enemy && (*it)->IsHoveredByMouse() == true && (*it)->m_type != Room_PrisonCell)//prison cells can't be targeted
+				{
+					room_hovered = *it;
+				}
+
+				//Room tiles
+				for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+				{
+					if ((*it2)->m_flood > 0)
+					{
+						flood++;
+					}
+
+					UpdateRoomTileFeedback(*it2, deltaTime, ship);
+
+					//crew move order feedback (hovering tile)
+					if (ship == m_warship && m_warship->m_is_fleeing == false)
+					{
+						if (selection != NULL && selection->m_UI_type == UI_CrewMember)
+						{
+							(*it2)->Update(deltaTime);
+
+							//contextuel order feedback
+							CrewMember* crew = (CrewMember*)selection;
+							if ((*it2)->IsHoveredByMouse() == true && crew->m_alliance == (*it2)->m_room->m_alliance)
+							{
+								UpdateContextualOrderFeedback(crew, *it2);
+							}
+						}
+						else
+						{
+							(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+							(*it2)->m_shape_container.setOutlineThickness(-1.f);
+							(*it2)->UpdatePosition();
+						}
+					}
+					else
+					{
+						(*it2)->UpdatePosition();
+					}
+				}
+
+				(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
+			}
+
+			//Update weapon's target room and feedbacks
+			if (selection != NULL && selection->m_UI_type == UI_Weapon)
+			{
+				Weapon* weapon = (Weapon*)selection;
+				UpdateTargetRoom(weapon, room_hovered);
+			}
+
+			//Room connexions
+			for (vector<RoomConnexion*>::iterator it = ship->m_connexions.begin(); it != ship->m_connexions.end(); it++)
+			{
+				if (ship == m_warship && m_warship->m_is_fleeing == false)
+				{
+					(*it)->Update(deltaTime);
+					if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false && (*it)->m_tiles.first->m_room->m_alliance == Alliance_Player)
+					{
+						m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition(), true);
+					}
+				}
+				else
+				{
+					(*it)->UpdatePosition();
+				}
+			}
+
+			//Close/open connexion
+			if (ship == m_warship && mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion && ship->m_is_fleeing == false)
+			{
+				RoomConnexion* connexion = (RoomConnexion*)hovered;
+				if (connexion->m_ship == ship)
+				{
+					connexion->SetLock(!connexion->m_is_locked);
+				}
+			}
+
+			//Crew update (and reomving the dead)
+			for (int j = 0; j < 2; j++)
+			{
+				vector<CrewMember*> old_crew;
+				for (vector<CrewMember*>::iterator it = ship->m_crew[j].begin(); it != ship->m_crew[j].end(); it++)
+				{
+					old_crew.push_back(*it);
+				}
+				ship->m_crew[j].clear();
+
+				int fidelity = 0;
+				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+				{
+					//prisoners vs non-prisoners opponent?
+					if ((*it)->m_melee_opponent == NULL)
+					{
+						for (vector<CrewMember*>::iterator it2 = ship->m_crew[(j + 1) % 2].begin(); it2 != ship->m_crew[(j + 1) % 2].end(); it2++)
+						{
+							if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
+							{
+								(*it)->m_melee_opponent = *it2;
+								if ((*it2)->m_melee_opponent == NULL)
+								{
+									(*it2)->m_melee_opponent = *it;
+								}
+								break;
+							}
+						}
+					}
+
+					//opponent catch us on melee?
+					if ((*it)->m_melee_opponent != NULL)
+					{
+						//cancel movement
+						if ((*it)->m_destination != NULL)
+						{
+							(*it)->m_destination->m_crew = NULL;
+						}
+						(*it)->m_destination = NULL;
+						(*it)->m_speed = sf::Vector2f(0, 0);
+
+						//fight
+						(*it)->UpdateMelee(deltaTime);
+
+						//update feedbacks and life bar
+						(*it)->GameEntity::Update(deltaTime);
+						(*it)->UpdateLifeBar();
+					}
+					else
+					{
+						//update: crew movement/heal/repair
+						if (ship->m_is_fleeing == false)
+						{
+							(*it)->Update(deltaTime);
+							if (j == 1)
+							{
+								//prisoners only: escape and roam if the prison cell is open
+								ship->UpdatePrisonerEscape(*it, deltaTime);
+							}
+						}
+						else
+						{
+							(*it)->UpdatePosition();
+						}
+					}
+
+					if (ship->m_is_fleeing == false)
+					{
+						if (ship == m_warship)
+						{
+							//create or update HUD for crew details
+							if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
+							{
+								m_warship->m_crew_interface.Destroy();
+								m_warship->m_crew_interface.Init(*it);
+							}
+							else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
+							{
+								m_warship->m_crew_interface.Destroy();
+								m_warship->m_crew_interface.Init(*it);
+							}
+							else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
+							{
+								m_warship->m_crew_interface.Destroy();
+							}
+
+							if (m_warship->m_crew_interface.m_crew == *it)
+							{
+								m_warship->m_crew_interface.Update();
+							}
+						}
+						else
+						{
+							//Enemy AI
+							UpdateAICrew(*it);
+						}
+					}
+
+					if ((*it)->m_health > 0)
+					{
+						ship->m_crew[j].push_back(*it);
+						if (j == 0)
+						{
+							fidelity += (*it)->m_fidelity;
+						}
+					}
+					else
+					{
+						ship->m_nb_crew--;
+						if ((*CurrentGame).m_selected_ui == *it)
+						{
+							(*CurrentGame).m_selected_ui = NULL;
+						}
+						if ((*CurrentGame).m_hovered_ui == *it)
+						{
+							(*CurrentGame).m_hovered_ui = NULL;
+						}
+
+						if (ship == m_warship)
+						{
+							Warship* warship = (Warship*)ship;
+							if (warship->m_crew_interface.m_crew == *it)
+							{
+								m_warship->m_crew_interface.Destroy();
+							}
+						}
+
+						delete* it;
+					}
+				}
+
+				if (j == 0)
+				{
+					ship->m_resources[Resource_Fidelity] = ship->m_crew[j].empty() == true ? 50 : fidelity / ship->m_crew[j].size();
+				}
+			}
+
+			//Move order for player's crew
+			if (ship == m_warship && mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile && ship->m_is_fleeing == false)
+			{
+				CrewMember* crew = (CrewMember*)selection;
+				RoomTile* destination = (RoomTile*)hovered;
+
+				//tile is free?
+				if (destination->m_crew == NULL && destination->m_weapon == NULL)
+				{
+					//free previous destination's booking (if any)
+					if (crew->m_destination != NULL)
+					{
+						crew->m_destination->m_crew = NULL;
+					}
+
+					//book new destination
+					destination->m_crew = crew;
+
+					//assign destination for pathfind
+					crew->m_destination = destination;
+				}
+			}
+
+			//Weapons
+			if (m_scale == Scale_Tactical)
+			{
+				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
+				{
+					if (ship->m_is_fleeing == false)
+					{
+						(*it)->Update(deltaTime);
+
+						Ship* enemy_ship = ship == m_warship ? m_tactical_ship : m_warship;
+						if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
+						{
+							if ((*it)->m_target_room == NULL && ship != m_warship)
+							{
+								//AI choosing a target for each weapon
+								UpdateAITargetRoom(*it);
+							}
+
+							if ((*it)->CanFire() == true && (*it)->m_target_room != NULL && (*CurrentGame).m_pause == false)
+							{
+								if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && ship != m_warship)
+								{
+									//After firing, it's the AI, randomly reset the target at random to change target next frame
+									if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
+									{
+										(*it)->m_target_room = NULL;
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						(*it)->UpdatePosition();
+					}
+				}
+			}
+			else
+			{
+				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
+				{
+					(*it)->GameEntity::Update(deltaTime);
+				}
+			}
+
+			//Engines
+			for (vector<Engine*>::iterator it = ship->m_engines.begin(); it != ship->m_engines.end(); it++)
+			{
+				if (ship->m_is_fleeing == false)
+				{
+					(*it)->Update(deltaTime);
+
+					//Fleeing order for human
+					if (ship == m_warship && (*it)->IsHoveredByMouse() == true && m_scale == Scale_Tactical)
+					{
+						bool can_flee = ship->m_flee_count == ENGINE_FLEE_COUNT && ship->IsSystemOperational(System_Engine, (*it)->m_tile);
+						m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition(), can_flee == true);
+						if (mouse_click == Mouse_RightClick && can_flee == true)
+						{
+							ship->m_is_fleeing = true;
+
+							//remove hovering feedback
+							(*it)->m_shape_container.setOutlineColor((*it)->m_default_color);
+							(*it)->m_shape_container.setOutlineThickness(-1.f);
+						}
+					}
+					else if (ship != m_warship)
+					{
+						//IA fleeing (todo)
+					}
+				}
+				else
+				{
+					(*it)->UpdatePosition();
+					(*it)->m_systembar->UpdatePosition();
+				}
+			}
+
+			//Rudder
+			if (ship->m_rudder != NULL)
+			{
+				if (ship->m_is_fleeing == false)
+				{
+					ship->m_rudder->Update(deltaTime);
+				}
+				else
+				{
+					ship->m_rudder->UpdatePosition();
+				}
+			}
+		}
+
+		ship->UpdateTactical(deltaTime);
+	}
+}
+
+void Gameloop::UpdateBullets(sf::Time deltaTime)
+{
+	//Bullets + cleaning old bullets
+	if ((*CurrentGame).m_pause == false)
+	{
+		vector<Ammo*> old_bullets;
+		for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+		{
+			old_bullets.push_back(*it);
+		}
+		(*CurrentGame).m_bullets.clear();
+		for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
+		{
+			if ((*it)->m_can_be_seen == true && (*it)->m_target_ship->m_is_fleeing == false && m_scale == Scale_Tactical)
+			{
+				(*CurrentGame).m_bullets.push_back(*it);
+				(*it)->Update(deltaTime);
+
+				//Hit effects
+				if ((*it)->m_phase == Shoot_Hit)
+				{
+					//compute hit tiles
+					int x = (*it)->m_target_tile->m_coord_x;
+					int y = (*it)->m_target_tile->m_coord_y;
+
+					int radius = (*it)->m_radius - 1;
+
+					int a = x - radius;
+					int b = x + radius;
+
+					vector<RoomTile*> tiles_hit;
+					for (int i = x - radius; i < x + radius + 1; i++)
+					{
+						for (int j = y - radius; j < y + radius + 1; j++)
+						{
+							if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
+							{
+								//"boom": apply bullet damage and side effects
+								RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
+
+								if (tile == NULL)
+								{
+									continue;
+								}
+
+								//walls block splash damage
+								if ((*it)->m_radius > 1 && tile->m_room != (*it)->m_target_tile->m_room)
+								{
+									continue;
+								}
+
+								tiles_hit.push_back(tile);
+
+								//damage to ship
+								int damage_ship = Min((*it)->m_damage, (*it)->m_target_ship->m_health);
+								if (damage_ship > 0)
+								{
+									(*it)->m_target_ship->m_health -= damage_ship;
+
+									//pop feedback
+									ostringstream ss;
+									ss << damage_ship;
+									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Red, ss.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_OFFSET_2);
+
+									//damage to weapon
+									if (tile->m_weapon != NULL)
+									{
+										Weapon* weapon = tile->m_weapon;
+										weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
+										if (weapon->m_health == 0)
+										{
+											weapon->setColor(sf::Color::Red);
+										}
+									}
+
+									//destroying door
+									if (tile->m_connexion != NULL)
+									{
+										tile->m_connexion->Destroy();
+									}
+								}
+
+								//hull damage
+								int damage_hull = Min((*it)->m_hull_damage, tile->m_health);
+								if (damage_hull > 0)
+								{
+									tile->m_health -= damage_hull;
+								}
+
+								//piercing hull
+								if (tile->m_hull != Hull_None && tile->m_is_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
+								{
+									tile->m_is_pierced = true;
+									if (tile->m_crew != NULL)
+									{
+										tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
+									}
+
+									//pop feedback
+									ostringstream ss_hull;
+									ss_hull << "Pierced";
+									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Blue, ss_hull.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_OFFSET_2_BIS);
+								}
+
+								//shrapnel damage
+								if ((*it)->m_shrapnel_damage > 0)
+								{
+									for (int j = 0; j < 2; j++)
+									{
+										for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew[j].begin(); it2 != (*it)->m_target_ship->m_crew[j].end(); it2++)
+										{
+											if (GameEntity::IsColliding(tile, (*it2)) == true)
+											{
+												if ((*it2)->m_health > 0)
+												{
+													int damage_crew = Min((*it)->m_shrapnel_damage, (*it2)->m_health);
+													(*it2)->m_health -= damage_crew;
+
+													//pop feedback
+													ostringstream ss_crew;
+													ss_crew << damage_crew;
+													SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_1, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_SIZE_1);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					//FX of the explosion
+					int nb_hits = tiles_hit.size();
+					//shuffle possible fx hits for a "random" carpet bombing
+					if (nb_hits > 1)
+					{
+						vector<int> hits_order;
+						for (int h = 0; h < nb_hits; h++)
+						{
+							hits_order.push_back(h);
+						}
+						for (int h = 0; h < nb_hits; h++)
+						{
+							int k = hits_order[h];
+							int r = RandomizeIntBetweenValues(0, nb_hits - 1);
+							hits_order[h] = hits_order[r];
+							hits_order[r] = k;
+						}
+
+						for (int h = 0; h < nb_hits; h++)
+						{
+							RoomTile* k = tiles_hit[h];
+							tiles_hit[h] = tiles_hit[hits_order[h]];
+							tiles_hit[hits_order[h]] = k;
+						}
+					}
+
+					//set FX positions
+					for (int h = 0; h < nb_hits; h++)
+					{
+						FX* FX_hit = (*it)->m_FX_hit->Clone();
+						FX_hit->m_position = tiles_hit[h]->m_position;
+						FX_hit->UpdatePosition();
+						FX_hit->m_delay_timer = h * SHRAPNEL_DELAY;
+						(*CurrentGame).m_FX.push_back(FX_hit);
+					}
+				}
+			}
+			else
+			{
+				delete* it;
+			}
+		}
+
+		//FX + clean old FX
+		vector<FX*> old_FX;
+		for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
+		{
+			old_FX.push_back(*it);
+		}
+		(*CurrentGame).m_FX.clear();
+		for (vector<FX*>::iterator it = old_FX.begin(); it != old_FX.end(); it++)
+		{
+			if ((*it)->m_can_be_seen == true)
+			{
+				(*CurrentGame).m_FX.push_back(*it);
+				(*it)->Update(deltaTime);
+			}
+			else
+			{
+				delete* it;
+			}
+		}
+
+		//SFTextPop + clean old
+		vector<SFTextPop*> old_texts_pop;
+		for (vector<SFTextPop*>::iterator it = (*CurrentGame).m_texts_pop.begin(); it != (*CurrentGame).m_texts_pop.end(); it++)
+		{
+			old_texts_pop.push_back(*it);
+		}
+		(*CurrentGame).m_texts_pop.clear();
+		for (vector<SFTextPop*>::iterator it = old_texts_pop.begin(); it != old_texts_pop.end(); it++)
+		{
+			if ((*it)->m_alpha > 0)
+			{
+				(*CurrentGame).m_texts_pop.push_back(*it);
+				(*it)->Update(deltaTime);
+			}
+			else
+			{
+				delete* it;
+			}
+		}
+	}
+}
+
+void Gameloop::UpdateMap(sf::Time deltaTime)
+{
+	//<!> Doublon of Update
+	const GameEntity* selection = (*CurrentGame).m_selected_ui;
+	const GameEntity* previous_selection = selection;
+	const GameEntity* hovered = (*CurrentGame).m_hovered_ui;
+	const MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
+	//reset previous list
+	for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
+	{
+		(*it)->m_can_be_seen = false;
+	}
+	m_warship->m_tiles_can_be_seen.clear();
+
+	//reduce the range of tiles that are likely to be the right candidates for being seen
+	int min_x = m_warship->m_DMS.m_minute_x - (NB_WATERTILE_VIEW_RANGE + 1);
+	int max_x = m_warship->m_DMS.m_minute_x + (NB_WATERTILE_VIEW_RANGE + 1);
+	Bound(min_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+	Bound(max_x, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+	int min_y = m_warship->m_DMS.m_minute_y - (NB_WATERTILE_VIEW_RANGE + 1);
+	int max_y = m_warship->m_DMS.m_minute_y + (NB_WATERTILE_VIEW_RANGE + 1);
+	Bound(min_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+	Bound(max_y, 0, NB_WATERTILE_SUBDIVISION - 1);
+
+	for (int i = min_x; i < max_x; i++)
+	{
+		for (int j = min_y; j < max_y; j++)
+		{
+			WaterTile* tile = m_warship->m_tile->m_zone->m_watertiles[i][j];
+
+			//can be seen? no need to update other tiles because they won't be drawn anyway
+			if (m_warship->CanViewWaterTile(tile))
+			{
+				tile->m_can_be_seen = true;
+				m_warship->m_tiles_can_be_seen.push_back(tile);
+
+				//position on "radar"
+				tile->UpdatePosition(m_warship->m_DMS);
+				if (tile->m_location != NULL)
+				{
+					tile->m_location->m_position = tile->m_position;
+					tile->m_location->UpdatePosition();
+
+					if (tile->m_location->m_type == Location_Seaport)
+					{
+						Seaport* seaport = (Seaport*)tile->m_location;
+						seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
+					}
+				}
+
+				//selection
+				if (selection == m_warship && tile->m_type == Water_Empty)// && m_warship->m_destination == NULL
+				{
+					//display tile coords
+					//ostringstream ss;
+					//ss << tile->m_coord_x << ", " << tile->m_coord_y;
+					//tile->m_text.setString(ss.str());
+					tile->GameEntity::Update(deltaTime);
+				}
+				else
+				{
+					tile->GameEntity::UpdatePosition();
+
+					if (tile->m_type == Water_Empty)
+					{
+						tile->m_text.setString("");
+
+						//selection of water tiles is forbidden
+						if (tile->m_selected == true)
+						{
+							tile->m_selected = false;
+							tile->m_shape_container.setOutlineColor(tile->m_default_color);
+							(*CurrentGame).m_selected_ui = NULL;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void Gameloop::UpdateMenus(sf::Time deltaTime)
+{
+	//<!> Doublon of Update
+	const GameEntity* selection = (*CurrentGame).m_selected_ui;
+	const GameEntity* previous_selection = selection;
+	const GameEntity* hovered = (*CurrentGame).m_hovered_ui;
+	const MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
+	//HUD
+	m_resources_interface.Update();
+	m_weather_interface.Update();
+	m_combat_interface[0].Update();
+	if (m_tactical_ship)
+		m_combat_interface[1].Update();
+	else if (m_combat_interface[1].GetShip())
+		m_combat_interface[1].Destroy();
+
+	//Contextual menus
+	Ship* ship_in_combat_range = IsDMSInCombatRange(m_warship->m_DMS, true);
+	if (m_warship->m_can_open_new_menu == true && m_warship->m_has_played == false)
+	{
+		Location* location = m_warship->m_tile->m_location;
+
+		//Arriving on a special location?
+		if (location != NULL && location->m_type == Location_Seaport)
+		{
+			m_menu = Menu_CrewUnboard;
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
+			m_warship->m_can_open_new_menu = false;
+		}
+		else if (ship_in_combat_range != NULL)
+		{
+			m_menu = Menu_CrewUnboard;
+			m_warship->m_crew_unboard_interface.Init(m_warship, NULL, ship_in_combat_range);
+			m_warship->m_can_open_new_menu = false;
+		}
+		else if (location != NULL && location->m_visited_countdown == 0 && m_warship->GetSonarRange() >= location->m_depth)
+		{
+			m_menu = Menu_CrewUnboard;
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location, NULL);
+			m_warship->m_can_open_new_menu = false;
+		}
+	}
+
+	//Help interface
+	if (hovered != NULL && hovered->m_UI_type == UI_Commodity)
+	{
+		Commodity* commodity = (Commodity*)hovered;
+		m_help_interface.Init(commodity->m_display_name, commodity->m_description, sf::Vector2f(commodity->m_position.x - RESOURCES_ICON_SIZE * 0.5, commodity->m_position.y + RESOURCES_ICON_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Resource)
+	{
+		Resource* resource = (Resource*)hovered;
+
+		if (resource->m_type == Resource_Fidelity)
+		{
+			string description = "Crew fidelity is important, as low fidelity will sometimes occasion mutiny.";
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
+		}
+		else if (resource->m_type == Resource_Days)
+		{
+			string description = "Days are passing, and the Royal Navy might just be closing on you very soon.";
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
+		}
+		else
+		{
+			string description = "Your holds of resources.";
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
+		}
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Rudder)
+	{
+		Rudder* rudder = (Rudder*)hovered;
+		string display_name = (*CurrentGame).m_dico_ship_systems[rudder->m_tile->m_system];
+		string activated = m_warship->IsSystemOperational(System_Navigation, rudder->m_tile) == true ? "operated" : "not operated";
+		string description = "Status: " + activated + "\n+" + std::to_string((int)(100 * NAVIGATION_DODGE_CHANCE)) + "% dodge chance (if operated by a crew member).\nThe operating crew also adds his Nagivation skill % to dodge chances.";
+		m_help_interface.Init(display_name, description, sf::Vector2f(rudder->m_position.x - ROOMTILE_SIZE * 0.5, rudder->m_position.y + ROOMTILE_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Engine)
+	{
+		Engine* engine = (Engine*)hovered;
+		string display_name = (*CurrentGame).m_dico_ship_systems[engine->m_tile->m_system];
+		string activated = m_warship->IsSystemOperational(System_Engine, engine->m_tile) == true ? "operated" : "not operated";
+		string description = "Status: " + activated + "\nCharges the Flee thrusters (if operated by a crew member).\nWhen fully charged, right-click on the Engine to flee an ungoing combat.\n\n+" + std::to_string((int)(100 * ENGINE_DODGE_CHANCE)) + "% dodge chance per engine (if operated by a crew member).\nThe operating crew also adds his Engine skill % to dodge chances.";
+		m_help_interface.Init(display_name, description, sf::Vector2f(engine->m_position.x - ROOMTILE_SIZE * 0.5, engine->m_position.y + ROOMTILE_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_Weapon)
+	{
+		Weapon* weapon = (Weapon*)hovered;
+		string display_name = (*CurrentGame).m_dico_ship_weapons[weapon->m_type];
+		string activated = m_warship->IsSystemOperational(System_Weapon, weapon->m_tile) == true ? "operated" : "not operated";
+		string description = "Status: " + activated + "\nLoads and fire on enemy ships during combat (as long as operated by a crew member).\nSelect it with left-click and right-click to assign a target during combat.";
+		if (weapon->m_type == Weapon_Cannon)
+		{
+			description += "\n\nCannons aims at random into a target room, dealing great damage to the hull and crew members.";
+		}
+		else if (weapon->m_type == Weapon_Torpedo)
+		{
+			description += "\n\nTorpedo aims at random onto a target hull, piercing it and causing flooding into the enemy ship.";
+		}
+		else if (weapon->m_type == Weapon_Shrapnel)
+		{
+			description += "\n\nShrapnel aims at random into a target room, dealing spread damage to crew members, but not to the hull.";
+		}
+
+		m_help_interface.Init(display_name, description, sf::Vector2f(weapon->m_position.x - ROOMTILE_SIZE * 0.5, weapon->m_position.y + ROOMTILE_SIZE * 0.5));
+	}
+	else if (hovered != NULL && hovered->m_UI_type == UI_ResourceUpkeep)
+	{
+		Resource* resource = (Resource*)hovered;
+		string description = "Crew upkeep costs resources every day.\nEach day passed with the upkeep paid increase crew fidelity.\nUpkeep costs unpaid decrease crew fidelity.";
+		m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
+	}
+	else if (m_help_interface.m_panel != NULL)
+	{
+		m_help_interface.Destroy();
+	}
+
+	//Crew overboard menu
+	if (m_menu == Menu_CrewOverboard)
+	{
+		if (m_warship->m_crew_overboard_interface.Update(deltaTime) == true)
+		{
+			m_menu = Menu_None;
+		}
+	}
+	else if (m_menu == Menu_PrisonersChoice)
+	{
+		m_warship->m_prisoners_choice_interface.Update(deltaTime);
+
+		if (m_warship->m_prisoners_choice_interface.m_crew.empty() == true)
+		{
+			m_warship->m_prisoners_choice_interface.Destroy();
+			m_menu = Menu_None;
+		}
+	}
+	else if (m_menu == Menu_CrewUnboard)
+	{
+		CrewMember* crew = NULL;
+		if (hovered != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_window_has_focus == true)
+		{
+			//add crew to interface
+			if (hovered->m_UI_type == UI_CrewMember)
+			{
+				CrewMember* crew = (CrewMember*)hovered;
+				m_warship->m_crew_unboarding.push_back(crew);
+				m_warship->m_crew_unboard_interface.AddCrewToInterface(crew);
+			}
+			//remove crew from interface
+			else if (hovered->m_UI_type == UI_CrewMemberUnboarding)
+			{
+				CrewMember* crew = (CrewMember*)hovered;
+				m_warship->m_crew_unboard_interface.RemoveCrewFromInterface(crew);
+
+				vector<CrewMember*> old_crew;
+				for (vector<CrewMember*>::iterator it = m_warship->m_crew_unboarding.begin(); it != m_warship->m_crew_unboarding.end(); it++)
+				{
+					old_crew.push_back(*it);
+				}
+				m_warship->m_crew_unboarding.clear();
+				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+				{
+					if ((*it) != crew)
+					{
+						m_warship->m_crew_unboarding.push_back(*it);
+					}
+				}
+			}
+		}
+
+		Choice* choice = m_warship->m_crew_unboard_interface.Update(deltaTime);
+
+		//choice made?
+		if (choice != NULL)
+		{
+			//pay costs
+			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
+			{
+				if (j != Resource_Days && j != Resource_Fidelity)
+				{
+					m_warship->AddResource(ResourceType(j), -choice->m_cost[j]);
+				}
+				else if (j == Resource_Days)
+				{
+					SpendDays(choice->m_cost[j], true);
+				}
+			}
+
+			if (choice->m_cost_commodity != Commodity_None)
+			{
+				RemoveCommodity(choice->m_cost_commodity);
+			}
+
+			//get reward
+			string rewardID = choice->RandomizeRewardID();
+			Reward* reward = GenerateReward(rewardID, m_warship->m_crew_unboard_interface.m_location, m_warship->m_crew_unboard_interface.m_other_ship, choice->m_gauge_value, choice->m_gauge_value_max);
+
+			//reward is not empty? open the reward interface.
+			if (reward != NULL && reward->m_string.compare("0") != 0)
+			{
+				//crew killed or recruited?
+				int size = reward->m_resources.size();
+				for (int i = 0; i < size; i++)
+				{
+					if (reward->m_resources[i].first == Resource_Crew)
+					{
+						//crew killed
+						if (reward->m_resources[i].second < 0)
+						{
+							//cannot kill more than unboarded
+							for (int k = 0; k < -reward->m_resources[i].second; k++)
+							{
+								if (m_warship->m_crew_unboarding.size() > k)
+								{
+									m_warship->m_reward_interface.m_crew_killed.push_back(m_warship->m_crew_unboarding[k]);
+								}
+							}
+							reward->m_resources[i].second = -m_warship->m_reward_interface.m_crew_killed.size();
+						}
+						else//crew recruited
+						{
+							for (int k = 0; k < reward->m_resources[i].second; k++)
+							{
+								m_warship->m_reward_interface.m_crew_recruited.push_back(new CrewMember(Crew_Civilian, m_warship->m_alliance));
+							}
+						}
+					}
+				}
+
+				m_warship->m_reward_interface.Init(m_warship, reward);
+				m_menu = Menu_Reward;
+			}
+			else//no reward interface
+			{
+				//set next menu
+				SetNextMenuFromReward(reward);
+			}
+		}
+	}
+	else if (m_menu == Menu_Reward)
+	{
+		if (m_warship->m_reward_interface.Update() == true)
+		{
+			//give reward
+			for (vector<pair<ResourceType, int> >::iterator it = m_warship->m_reward_interface.m_reward->m_resources.begin(); it != m_warship->m_reward_interface.m_reward->m_resources.end(); it++)
+			{
+				m_warship->AddResource((*it).first, (*it).second);
+			}
+
+			//secret location revealed
+			if (m_warship->m_reward_interface.m_reward->m_DMS_location != NULL)
+			{
+				DMS_Coord& dms = *m_warship->m_reward_interface.m_reward->m_DMS_location;
+				(*CurrentGame).m_waterzones[dms.m_degree_x][dms.m_degree_y]->m_watertiles[dms.m_minute_x][dms.m_minute_y]->m_location->m_known = true;
+				printf("");
+			}
+
+			//commodity
+			if (m_warship->m_reward_interface.m_reward->m_commodity != Commodity_None)
+			{
+				AddCommodityToHolds(m_warship->m_reward_interface.m_reward->m_commodity);
+			}
+
+			//crew recruited
+			for (vector<CrewMember*>::iterator it = m_warship->m_reward_interface.m_crew_recruited.begin(); it != m_warship->m_reward_interface.m_crew_recruited.end(); it++)
+			{
+				m_warship->AddNewCrewMember(*it);
+			}
+
+			//crew killed
+			for (vector<CrewMember*>::iterator it = m_warship->m_reward_interface.m_crew_killed.begin(); it != m_warship->m_reward_interface.m_crew_killed.end(); it++)
+			{
+				vector<CrewMember*> old_crew;
+				for (vector<CrewMember*>::iterator it2 = m_warship->m_crew[0].begin(); it2 != m_warship->m_crew[0].end(); it2++)
+				{
+					old_crew.push_back(*it2);
+				}
+				m_warship->m_crew[0].clear();
+				for (vector<CrewMember*>::iterator it2 = old_crew.begin(); it2 != old_crew.end(); it2++)
+				{
+					if (*it == *it2)
+					{
+						continue;
+					}
+					else
+					{
+						m_warship->m_crew[0].push_back(*it2);
+					}
+				}
+			}
+
+			//set next menu
+			SetNextMenuFromReward(m_warship->m_reward_interface.m_reward);
+
+			//kill reward interface
+			m_warship->m_reward_interface.Destroy();
+		}
+	}
+	else if (m_menu == Menu_Dockyard)
+	{
+		string buy_upgrade = m_warship->m_dockyard_interface.Update(deltaTime);
+		if (buy_upgrade.empty() == false)
+		{
+			//apply upgrade
+			m_warship->ApplyUpgrade(buy_upgrade);
+		}
+
+		if (m_warship->m_dockyard_interface.m_leave_button->ButtonUpdate() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
+		{
+			//close interface
+			m_warship->m_dockyard_interface.Destroy();
+			m_menu = Menu_CrewUnboard;
+		}
+	}
+
+	//close crew unboard interface?
+	if (m_menu == Menu_CrewUnboardLeave)
+	{
+		CloseCrewUnboardInterface();
 	}
 }
 

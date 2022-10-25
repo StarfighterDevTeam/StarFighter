@@ -108,6 +108,10 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 		{
 			ss_narrative << "You approach a commercial ship that doesn't seem like a threat.\nOn the hull, you can read the name '" << other_ship->m_display_name.c_str() << "'.";
 		}
+		else if (other_ship->m_alliance == Alliance_Neutral)
+		{
+			ss_narrative << "You approach a commercial ship that doesn't seem to be willing to cooperate.\nOn the hull, you can read the name '" << other_ship->m_display_name.c_str() << "'.";
+		}
 	}
 	
 	float offset_y = m_panel->m_position.y - CREWUNBOARDINTERFACE_SIZE_Y * 0.5;

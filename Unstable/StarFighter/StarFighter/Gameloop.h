@@ -38,7 +38,6 @@ public:
 	~Gameloop();
 	
 	void Update(sf::Time deltaTime);
-	void UpdateUI(sf::Time deltaTime);
 	void Draw();
 
 	//PIRATES
@@ -76,6 +75,10 @@ public:
 
 	void UpdateAICrew(CrewMember* crew);
 	void UpdateAITargetRoom(Weapon* weapon);
+	void UpdateShips(sf::Time deltaTime);
+	void UpdateBullets(sf::Time deltaTime);
+	void UpdateMap(sf::Time deltaTime);
+	void UpdateMenus(sf::Time deltaTime);
 
 	void GenerateRandomIslands(int zone_coord_x, int zone_coord_y);
 	void GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y);

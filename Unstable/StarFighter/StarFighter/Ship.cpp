@@ -52,7 +52,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 			m_weapons.push_back(new Weapon(Weapon_Shrapnel, false));
 			m_engines.push_back(new Engine());
 			m_engines.push_back(new Engine());
-			m_nb_crew_max = RandomizeIntBetweenValues(9, 12);
+			m_nb_crew = 4;
 			m_nb_prison_cells = 4;
 			break;
 		}
@@ -62,7 +62,8 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 			m_weapons.push_back(new Weapon(Weapon_Cannon, false));
 			m_weapons.push_back(new Weapon(Weapon_Torpedo, false));
 			m_engines.push_back(new Engine());
-			m_nb_crew_max = RandomizeIntBetweenValues(4, 8);
+			m_nb_crew = RandomizeIntBetweenValues(4, 8);
+			m_nb_crew_max = m_nb_crew;
 			m_nb_prison_cells = 3;
 			break;
 		}
@@ -70,32 +71,34 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 		{
 			m_moves_max = NB_MOVES_PER_DAY - 2;
 			m_weapons.push_back(new Weapon(Weapon_Cannon, false));
-			m_nb_crew_max = RandomizeIntBetweenValues(3, 5);
+			m_nb_crew = RandomizeIntBetweenValues(3, 5);
+			m_nb_crew_max = m_nb_crew;
 			m_nb_prison_cells = 2;
 			break;
 		}
 		case Ship_CommercialLarge:
 		{
-			m_moves_max = NB_MOVES_PER_DAY;
-			m_nb_crew_max = RandomizeIntBetweenValues(6, 8);
+			m_moves_max = 0;
+			m_nb_crew = RandomizeIntBetweenValues(6, 8);
+			m_nb_crew_max = m_nb_crew;
 			m_nb_prison_cells = 4;
 			break;
 		}
 		case Ship_CommercialSmall:
 		{
-			m_moves_max = NB_MOVES_PER_DAY - 1;
-			m_nb_crew_max = RandomizeIntBetweenValues(2, 4);
+			m_moves_max = 0;
+			m_nb_crew = RandomizeIntBetweenValues(2, 4);
+			m_nb_crew_max = m_nb_crew;
 			m_nb_prison_cells = 0;
 			break;
 		}
 	}
 
 	//crew
-	for (int i = 0; i < m_nb_crew_max; i++)
+	for (int i = 0; i < m_nb_crew; i++)
 	{
 		m_crew[0].push_back(new CrewMember(Crew_Civilian, alliance));
 	}
-	m_nb_crew = (int)m_crew[0].size();
 
 	//prisoners
 	int nb_prisoners = RandomizeIntBetweenValues(0, m_nb_prison_cells);
@@ -119,26 +122,36 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	{
 		case Alliance_Player:
 		{
-			m_textureName = "2D/warship_icon.png";
+			m_textureName = "2D/ship_player_icon.png";
 			break;
 		}
 		case Alliance_Enemy:
 		{
-			m_textureName = "2D/enemy_icon.png";
+			m_textureName = "2D/ship_enemy_icon.png";
 
 			m_choicesID[0] = "fight";
-			m_choicesID[1] = "flee";
+			m_choicesID[1] = "leave";
 			m_choicesID[2] = "";
 			m_choicesID[3] = "";
 			break;
 		}
 		case Alliance_Ally:
 		{
-			m_textureName = "2D/ship_neutral_icon.png";
+			m_textureName = "2D/ship_ally_icon.png";
 
 			m_choicesID[0] = "trade";
 			m_choicesID[1] = "leave_trade";
 			m_choicesID[2] = "";
+			m_choicesID[3] = "";
+			break;
+		}
+		case Alliance_Neutral:
+		{
+			m_textureName = "2D/ship_neutral_icon.png";
+
+			m_choicesID[0] = "fight";
+			m_choicesID[1] = "trade";
+			m_choicesID[2] = "leave";
 			m_choicesID[3] = "";
 			break;
 		}
@@ -998,7 +1011,6 @@ void Ship::CenterRoomPositions(bool is_enemy)
 			(*it)->m_position = (*it)->m_tile->m_position;
 	}
 }
-
 
 void Ship::InitCombat()
 {
