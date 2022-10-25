@@ -34,7 +34,6 @@ Gameloop::Gameloop()
 		SavePlayerData(m_warship);
 	}
 	
-
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
 	//m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
 	m_tactical_ship = NULL;
@@ -146,7 +145,6 @@ void Gameloop::Update(sf::Time deltaTime)
 	
 	//UPDATING GAME ENTITIES
 	m_warship->UpdateUpkeepCosts();
-	m_warship->UpdateEstimatedCombatStrength();
 
 	//change of scale?
 	UpdateTacticalScale();
@@ -316,7 +314,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Enemy)
 							{
-								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost);
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost, ship_in_combat_range->GetEstimatedCombatStrength());
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Ally)
 							{
@@ -1201,7 +1199,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			//crew recruited
 			for (vector<CrewMember*>::iterator it = m_warship->m_reward_interface.m_crew_recruited.begin(); it != m_warship->m_reward_interface.m_crew_recruited.end(); it++)
 			{
-				m_warship->AddCrewMember(*it, m_warship->m_rooms.front());
+				m_warship->AddNewCrewMember(*it);
 			}
 
 			//crew killed
@@ -2445,6 +2443,16 @@ void Gameloop::GenerateRandomShips(int zone_coord_x, int zone_coord_y)
 				case Ship_SecondClass:
 				{
 					r = a == Alliance_Enemy ? 30 : 30;
+					break;
+				}
+				case Ship_CommercialLarge:
+				{
+					//r = a == Alliance_Enemy ? 30 : 30;//TODO NEUTRAL ALLIANCE
+					break;
+				}
+				case Ship_CommercialSmall:
+				{
+					//r = a == Alliance_Enemy ? 30 : 30;//TODO NEUTRAL ALLIANCE
 					break;
 				}
 			}

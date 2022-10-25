@@ -2,9 +2,8 @@
 
 extern Game* CurrentGame;
 
-
 #define WEATHER_INTERFACE_PANEL_SIZE_X			(64 * MAX_WEATHER_FORECASTS)
-#define WEATHER_INTERFACE_PANEL_SIZE_Y			(64 * 2 + 64)
+#define WEATHER_INTERFACE_PANEL_SIZE_Y			(64 * 2)
 
 WeatherInterface::WeatherInterface()
 {

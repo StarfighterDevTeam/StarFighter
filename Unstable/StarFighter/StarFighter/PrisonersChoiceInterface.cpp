@@ -171,14 +171,12 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 			}
 			else if (i == 1)//imprison
 			{
-				if (m_ship->ImprisonCrew(m_crew_selected) == false)
-				{
+				if (m_ship->AddNewPrisoner(m_crew_selected) == false)
 					break;
-				}
 			}
 			else if (i == 2)//hire
 			{
-				m_ship->AddCrewMember(m_crew_selected);
+				m_ship->AddNewCrewMember(m_crew_selected);
 			}
 
 			//update prisoners list

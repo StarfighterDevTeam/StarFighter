@@ -97,9 +97,10 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//hull
 	FlagHullRoomTiles();
 
-	//WEAPONS
-	//gunner tiles
-	for (int i = 0; i < 3; i++)
+	//weapon tiles
+	int weapons_room_size = weapon_room->m_tiles.size() - 1;
+	int nb_weapons = (int)m_weapons.size();
+	for (int i = 0; i < nb_weapons && i < weapons_room_size; i++)
 	{
 		int x = i * weapon_room->m_width + weapon_room->m_width - 1;
 		weapon_room->m_tiles[x]->m_operator_tile = weapon_room->m_tiles[x - 1];
@@ -107,41 +108,33 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
-		Weapon* weapon = NULL;
-		if (i == 0)
-		{
-			weapon = new Weapon(Weapon_Cannon, false);
-		}
-		else if (i == 1)
-		{
-			weapon = new Weapon(Weapon_Cannon, false);
-		}
-		else if (i == 2)
-		{
-			weapon = new Weapon(Weapon_Torpedo, false);
-		}
-
+		Weapon* weapon = m_weapons[i];
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 	}
 
 	//navigation tile
-	nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
-	nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
-	nav_room->m_tiles[2]->m_system = System_Navigation;
-	AddRudderToTile(nav_room->m_tiles[2]);
+	if (m_rudder)
+	{
+		nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
+		nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
+		nav_room->m_tiles[2]->m_system = System_Navigation;
+		AddRudderToTile(m_rudder, nav_room->m_tiles[2]);
+	}
 	
 	//engine tiles
-	for (int i = 0; i < 2; i++)
+	int engines_room_size = 2;// engine_room->m_tiles.size() - 1;
+	int nb_engines = (int)m_engines.size();
+	for (int i = 0; i < nb_engines && i < engines_room_size; i++)
 	{
-		i *= engine_room->m_width - 1;
-		engine_room->m_tiles[i + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[i];
-		engine_room->m_tiles[i]->m_system_tile = engine_room->m_tiles[i + engine_room->m_width];
-		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
-		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
+		int x = i * (engine_room->m_width - 1);
+		engine_room->m_tiles[x + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[x];
+		engine_room->m_tiles[x]->m_system_tile = engine_room->m_tiles[x + engine_room->m_width];
+		engine_room->m_tiles[x + engine_room->m_width]->m_system = System_Engine;
+		AddEngineToTile(m_engines[i], engine_room->m_tiles[x + engine_room->m_width]);
 	}
 
 	//estimated combat strength
-	UpdateEstimatedCombatStrength();
+	ComputeEstimatedCombatStrength();
 }
 
 void Warship::Init()
@@ -158,8 +151,7 @@ void Warship::Init()
 
 	for (int i = 0; i < 1; i++)
 	{
-		CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
-		AddCrewMember(crew, m_rooms.front());
+		AddNewCrewMember(new CrewMember(Crew_Pirate, m_alliance));
 	}
 }
 

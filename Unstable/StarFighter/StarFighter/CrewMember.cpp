@@ -625,7 +625,7 @@ RoomTile* CrewMember::GetFreeRoomTile(Room* room)
 	return NULL;
 }
 
-bool CrewMember::Imprison(RoomTile* prison_cell)
+bool CrewMember::ImprisonInTile(RoomTile* prison_cell)
 {
 	if (prison_cell->m_crew != NULL)
 	{

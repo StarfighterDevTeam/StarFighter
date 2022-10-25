@@ -29,8 +29,10 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	m_flee_count = 0.f;
 	m_is_charging_flee_count = false;
 	m_is_fleeing = false;
+	m_estimatedCombatStrength = 0;
+	m_nb_prison_cells = 0;
 
-	m_rudder = NULL;
+	m_rudder = new Rudder();
 
 	m_sinking_timer = 0.f;
 
@@ -39,25 +41,77 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(U
 	//get on tile
 	SetDMSCoord(coord);
 
-	//stats
+	//stats, crew & systems
 	switch (type)
 	{
 		case Ship_Warship:
 		{
 			m_moves_max = NB_MOVES_PER_DAY;
+			m_weapons.push_back(new Weapon(Weapon_Cannon, false));
+			m_weapons.push_back(new Weapon(Weapon_Torpedo, false));
+			m_weapons.push_back(new Weapon(Weapon_Shrapnel, false));
+			m_engines.push_back(new Engine());
+			m_engines.push_back(new Engine());
+			m_nb_crew_max = RandomizeIntBetweenValues(9, 12);
+			m_nb_prison_cells = 4;
 			break;
 		}
 		case Ship_FirstClass:
 		{
 			m_moves_max = NB_MOVES_PER_DAY - 1;
+			m_weapons.push_back(new Weapon(Weapon_Cannon, false));
+			m_weapons.push_back(new Weapon(Weapon_Torpedo, false));
+			m_engines.push_back(new Engine());
+			m_nb_crew_max = RandomizeIntBetweenValues(4, 8);
+			m_nb_prison_cells = 3;
 			break;
 		}
 		case Ship_SecondClass:
 		{
 			m_moves_max = NB_MOVES_PER_DAY - 2;
+			m_weapons.push_back(new Weapon(Weapon_Cannon, false));
+			m_nb_crew_max = RandomizeIntBetweenValues(3, 5);
+			m_nb_prison_cells = 2;
+			break;
+		}
+		case Ship_CommercialLarge:
+		{
+			m_moves_max = NB_MOVES_PER_DAY;
+			m_nb_crew_max = RandomizeIntBetweenValues(6, 8);
+			m_nb_prison_cells = 4;
+			break;
+		}
+		case Ship_CommercialSmall:
+		{
+			m_moves_max = NB_MOVES_PER_DAY - 1;
+			m_nb_crew_max = RandomizeIntBetweenValues(2, 4);
+			m_nb_prison_cells = 0;
 			break;
 		}
 	}
+
+	//crew
+	for (int i = 0; i < m_nb_crew_max; i++)
+	{
+		m_crew[0].push_back(new CrewMember(Crew_Civilian, alliance));
+	}
+	m_nb_crew = (int)m_crew[0].size();
+
+	//prisoners
+	int nb_prisoners = RandomizeIntBetweenValues(0, m_nb_prison_cells);
+	for (int i = 0; i < nb_prisoners; i++)
+	{
+		float random_crew_type = RandomizeFloatBetweenValues(0, 1);
+		if (random_crew_type < 0.25f)
+			m_crew[1].push_back(new CrewMember(Crew_Pirate, alliance));
+		else if (random_crew_type < 0.5f)
+			m_crew[1].push_back(new CrewMember(Crew_Civilian, alliance));
+		else
+			m_crew[1].push_back(new CrewMember(Crew_Slave, alliance));
+	}
+
+	//estimated combat strength
+	ComputeEstimatedCombatStrength();
 
 	//shape for water tiles
 	Texture* texture;
@@ -184,7 +238,7 @@ void Ship::UpdatePosition(DMS_Coord warship_DMS)
 
 void Ship::UpdateTactical(Time deltaTime)
 {
-	UpdateEstimatedCombatStrength();
+	ComputeEstimatedCombatStrength();
 	UpdateFlooding(deltaTime);
 
 	if (m_is_charging_flee_count == true)
@@ -385,13 +439,34 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 	return room;
 }
 
-CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
+bool Ship::AddNewCrewMember(CrewMember* crew)
 {
-	//if (m_nb_crew >= m_nb_crew_max)
-	//{
-	//	return NULL;
-	//}
+	if (m_nb_crew < m_nb_crew_max)
+	{
+		if (AddCrewMemberToRoom(crew) == true)
+		{
+			m_crew[0].push_back(crew);
+			m_nb_crew++;
+			return true;
+		}
+	}
+	
+	return false;
+}
 
+bool Ship::AddNewPrisoner(CrewMember* prisoner)
+{
+	if (AddCrewToPrisonCells(prisoner) == true)
+	{
+		m_crew[1].push_back(prisoner);
+		return true;
+	}
+	
+	return false;
+}
+
+bool Ship::AddCrewMemberToRoom(CrewMember* crew, Room* room)
+{
 	if (room == NULL)
 	{
 		for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
@@ -405,33 +480,22 @@ CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 	}
 
 	RoomTile* tile = crew->GetFreeRoomTile(room);
-
 	if (tile == NULL)
-	{
-		return NULL;
-	}
+		return false;
 
 	//position
 	crew->m_position = tile->m_position;
 
-	//add to crew lists
-	m_crew[0].push_back(crew);
-
 	//assign crew to tile
 	crew->m_tile = tile;
 	tile->m_crew = crew;
-
-	m_nb_crew++;
-	crew->m_alliance = m_alliance;
-
-	crew->m_is_prisoner = false;
 	crew->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);
 	crew->m_text.SetPosition(crew->m_position);
 
-	return crew;
+	return true;
 }
 
 bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
@@ -616,9 +680,6 @@ void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
 	//position
 	weapon->m_position = tile->m_position;
 
-	//add to crew lists
-	m_weapons.push_back(weapon);
-
 	//assign crew to tile
 	weapon->m_tile = tile;
 	tile->m_weapon = weapon;
@@ -629,15 +690,10 @@ void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
 	weapon->UpdatePosition();
 }
 
-void Ship::AddEngineToTile(RoomTile* tile)
+void Ship::AddEngineToTile(Engine* engine, RoomTile* tile)
 {
-	Engine* engine = new Engine();
-
 	//position
 	engine->m_position = tile->m_position;
-
-	//add to crew lists
-	m_engines.push_back(engine);
 
 	//assign crew to tile
 	engine->m_tile = tile;
@@ -649,21 +705,19 @@ void Ship::AddEngineToTile(RoomTile* tile)
 	engine->UpdatePosition();
 }
 
-void Ship::AddRudderToTile(RoomTile* tile)
+void Ship::AddRudderToTile(Rudder* rudder, RoomTile* tile)
 {
-	m_rudder = new Rudder();
-
 	//position
-	m_rudder->m_position = tile->m_position;
+	rudder->m_position = tile->m_position;
 
 	//assign crew to tile
-	m_rudder->m_tile = tile;
-	tile->m_rudder = m_rudder;
+	rudder->m_tile = tile;
+	tile->m_rudder = rudder;
 
 	//save owner ship
-	m_rudder->m_ship = this;
+	rudder->m_ship = this;
 
-	m_rudder->UpdatePosition();
+	rudder->UpdatePosition();
 }
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
@@ -809,9 +863,10 @@ void Ship::BuildShip()
 	//hull
 	FlagHullRoomTiles();
 
-	//gunner tiles
-	int size = weapon_room->m_tiles.size() - 1;
-	for (int i = 0; i < 3; i++)
+	//weapon tiles
+	int weapons_room_size = weapon_room->m_tiles.size() - 1;
+	int nb_weapons = (int)m_weapons.size();
+	for (int i = 0; i < nb_weapons && i < weapons_room_size; i++)
 	{
 		int x = i * weapon_room->m_width;
 		weapon_room->m_tiles[x]->m_operator_tile = weapon_room->m_tiles[x + 1];
@@ -819,50 +874,39 @@ void Ship::BuildShip()
 
 		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
-		Weapon* weapon = NULL;
-		if (i == 0)
-		{
-			weapon = new Weapon(Weapon_Cannon, false);
-		}
-		else if (i == 1)
-		{
-			weapon = new Weapon(Weapon_Torpedo, false);
-		}
-		else if (i == 2)
-		{
-			weapon = new Weapon(Weapon_Shrapnel, false);
-		}
-		
+		Weapon* weapon = m_weapons[i];
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 		weapon->setAnimationLine(1);//horizontal mirroring
 		weapon->m_angle = 270.f;
 	}
 
 	//navigation tile
-	if (nav_room->m_tiles[2]->m_coord_y == nav_room->m_upcorner_y)
+	if (m_rudder)
 	{
-		nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
-		nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
+		if (nav_room->m_tiles[2]->m_coord_y == nav_room->m_upcorner_y)
+		{
+			nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
+			nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
 
-		nav_room->m_tiles[2]->m_system = System_Navigation;
+			nav_room->m_tiles[2]->m_system = System_Navigation;
 
-		AddRudderToTile(nav_room->m_tiles[2]);
+			AddRudderToTile(m_rudder, nav_room->m_tiles[2]);
+		}
 	}
 
 	//engine tiles
-	for (int i = 0; i < 2; i++)
+	int engines_room_size = engine_room->m_tiles.size() - 1;
+	int nb_engines = (int)m_engines.size();
+	for (int i = 0; i < nb_engines && i < engines_room_size; i++)
 	{
 		i *= engine_room->m_width - 1;
 		engine_room->m_tiles[i + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[i];
 		engine_room->m_tiles[i]->m_system_tile = engine_room->m_tiles[i + engine_room->m_width];
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
-		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
+		AddEngineToTile(m_engines[i], engine_room->m_tiles[i + engine_room->m_width]);
 	}
 
 	//crew
-	m_nb_crew_max = 12;
-	m_nb_crew = 0;
-
 	vector<Room*> possible_rooms;
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
@@ -871,20 +915,16 @@ void Ship::BuildShip()
 			possible_rooms.push_back(*it);
 		}
 	}
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < m_nb_crew; i++)
 	{
 		int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
-		//r = 12;
-		CrewMember* crew = new CrewMember(Crew_Civilian, m_alliance);
-		AddCrewMember(crew, possible_rooms[r]);
+		AddCrewMemberToRoom(m_crew[0][i], possible_rooms[r]);
 	}
 
 	//prisoners
-	CrewMember* prisoner = new CrewMember(Crew_Civilian, m_alliance);
-	ImprisonCrew(prisoner);
-
-	//estimated combat strength
-	UpdateEstimatedCombatStrength();
+	int nb_prisoners = (int)m_crew[1].size();
+	for (int i = 0; i < nb_prisoners; i++)
+		AddCrewToPrisonCells(m_crew[1][i]);
 }
 
 void Ship::CenterRoomPositions(bool is_enemy)
@@ -946,14 +986,16 @@ void Ship::CenterRoomPositions(bool is_enemy)
 	{
 		for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
 		{
-			(*it)->m_position = (*it)->m_tile->m_position;
+			if ((*it)->m_tile)
+				(*it)->m_position = (*it)->m_tile->m_position;
 		}
 	}
 
 	//weapons
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
-		(*it)->m_position = (*it)->m_tile->m_position;
+		if ((*it)->m_tile)
+			(*it)->m_position = (*it)->m_tile->m_position;
 	}
 }
 
@@ -1388,14 +1430,14 @@ bool Ship::IsPrisonCellFree()
 	return false;
 }
 
-bool Ship::ImprisonCrew(CrewMember* crew)
+bool Ship::AddCrewToPrisonCells(CrewMember* crew)
 {
 	int i = 0;
 	for (vector<RoomTile*>::iterator it = m_prison_cells.begin(); it != m_prison_cells.end(); it++)
 	{
 		if ((*it)->m_crew == NULL)
 		{
-			if (crew->Imprison(*it) == false)
+			if (crew->ImprisonInTile(*it) == false)
 			{
 				return false;
 			}
@@ -1411,11 +1453,6 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 			i++;
 		}
 	}
-
-
-	//free cell found
-	m_crew[1].push_back(crew);
-	crew->m_alliance = m_alliance;
 
 	return true;
 }
@@ -2395,7 +2432,7 @@ bool Ship::HasUpgrade(string upgrade_type)
 	return false;
 }
 
-void Ship::UpdateEstimatedCombatStrength()
+void Ship::ComputeEstimatedCombatStrength()
 {
 	float combatStrength = 0.f;
 
@@ -2408,9 +2445,7 @@ void Ship::UpdateEstimatedCombatStrength()
 
 	//crew
 	for (CrewMember* crew : m_crew[0])
-	{
 		combatStrength += crew->m_skills[Skill_Combat];
-	}
 
 	//total
 	m_estimatedCombatStrength = combatStrength;

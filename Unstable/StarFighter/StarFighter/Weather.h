@@ -3,7 +3,7 @@
 
 #include "Game.h"
 
-#define MAX_WEATHER_FORECASTS	10
+#define MAX_WEATHER_FORECASTS	7
 
 enum WeatherCondition : int
 {

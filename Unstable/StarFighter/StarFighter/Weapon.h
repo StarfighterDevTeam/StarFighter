@@ -10,10 +10,10 @@
 class Ship;//forward declaration
 
 #define CANNON_HEALTH_MAX		30
-#define CANNON_RATE_OF_FIRE		8.f
+#define CANNON_RATE_OF_FIRE		5.f
 #define CANNON_ANGLESPEED		20.f
 
-#define TORPEDO_RATE_OF_FIRE		10.f
+#define TORPEDO_RATE_OF_FIRE	10.f
 #define TORPEDO_ANGLESPEED		10.f
 
 #define SHRAPNEL_RATE_OF_FIRE	12.f

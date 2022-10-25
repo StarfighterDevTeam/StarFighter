@@ -33,7 +33,7 @@ public:
 	void Draw(sf::RenderTexture& screen);
 
 	ContextualOrderType m_type;
-	void SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible, int value = 0);
+	void SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible, int value = 0, int value2 = 0);
 
 	GameEntity* m_mouse_click;
 };

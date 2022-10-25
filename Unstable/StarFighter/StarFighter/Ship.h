@@ -58,6 +58,7 @@ public:
 	int m_flood_max;
 	int m_lifeboats;
 	int m_diving_suits;
+	int m_nb_prison_cells;
 
 	float m_flee_timer;
 	float m_flee_count;
@@ -95,17 +96,19 @@ public:
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
-	CrewMember* AddCrewMember(CrewMember* crew, Room* room = NULL);
+	bool AddNewCrewMember(CrewMember* crew);
+	bool AddNewPrisoner(CrewMember* prisoner);
+	bool AddCrewMemberToRoom(CrewMember* crew, Room* room = NULL);
 
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
-	void AddEngineToTile(RoomTile* tile);
-	void AddRudderToTile(RoomTile* tile);
+	void AddEngineToTile(Engine* engine, RoomTile* tile);
+	void AddRudderToTile(Rudder* rudder, RoomTile* tile);
 
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool IsFlooded();
 
-	bool ImprisonCrew(CrewMember* crew);
+	bool AddCrewToPrisonCells(CrewMember* crew);
 	bool IsPrisonCellFree();
 	void UpdatePrisonerEscape(CrewMember* crew, sf::Time deltaTime);
 	void EscapeToRandomTileInRoom(CrewMember* crew, Room* room);
@@ -117,7 +120,7 @@ public:
 
 	void UpdateFlooding(Time deltaTime);
 	void UpdateShipOffset();
-	void UpdateEstimatedCombatStrength();
+	void ComputeEstimatedCombatStrength();
 	float GetEstimatedCombatStrength() { return m_estimatedCombatStrength; }
 
 	void InitCombat();

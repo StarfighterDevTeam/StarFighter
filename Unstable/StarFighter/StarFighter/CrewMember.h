@@ -43,7 +43,7 @@ public:
 	RoomTile* GetFreeRoomTile(Room* room);
 	void MoveToRoomTile(RoomTile* tile);
 
-	bool Imprison(RoomTile* prison_cell);
+	bool ImprisonInTile(RoomTile* prison_cell);
 	void UpdateMelee(sf::Time deltaTime);
 	float UpdateAndGetMeleeRof();
 	void UpdateAnimation();

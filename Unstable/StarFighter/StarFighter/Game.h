@@ -66,6 +66,8 @@ enum ShipType
 {
 	Ship_FirstClass,
 	Ship_SecondClass,
+	Ship_CommercialLarge,
+	Ship_CommercialSmall,
 	NB_SHIP_TYPES,
 	Ship_Warship,
 };

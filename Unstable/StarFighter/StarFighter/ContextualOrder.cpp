@@ -28,7 +28,7 @@ void ContextualOrder::Draw(sf::RenderTexture& screen)
 	m_mouse_click->Draw(screen);
 }
 
-void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible, int value)
+void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible, int value, int value2)
 {
 	//change order type?
 	if (m_type != order)
@@ -55,7 +55,7 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 			}
 			case Order_Engage:
 			{
-				ss_order << "Engage ship: " << value << " days";
+				ss_order << "Engage ship: " << value << " days" << " (" << value2 << ")";
 				textureName = "2D/order_melee.png";
 				text_color = is_possible == true ? text_color : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
