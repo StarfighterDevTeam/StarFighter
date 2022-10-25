@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 
 #define MAX_WIND_STRENGTH					100.f
 #define MIN_HYGROMETRY_INCREMENTATION		0.f
-#define MAX_HYGROMETRY_INCREMENTATION		0.1f
+#define MAX_HYGROMETRY_INCREMENTATION		0.05f
 #define MIN_HYGROMETRY_LOSS_AFTER_RAIN		0.1f
 #define MAX_HYGROMETRY_LOSS_AFTER_RAIN		1.f
 #define NB_WEATHER_CYCLES_PER_DAY			4
@@ -52,12 +52,12 @@ WeatherForecast Weather::ComputeNextForecast(WeatherForecast previousForecast)
 		condition = WeatherCondition::MostlySunny;
 	else if (hygrometry < 0.7f)
 		condition = WeatherCondition::Cloudy;
-	else if (hygrometry < 0.9f)
-		condition = WeatherCondition::Rainy;
-	else if (windStrength < 20.f)
+	else if (windStrength < 0.1f * MAX_WIND_STRENGTH)
 		condition = WeatherCondition::Foggy;
-	else
+	else if (windStrength > 0.8f * MAX_WIND_STRENGTH)
 		condition = WeatherCondition::Tempest;
+	else
+		condition = WeatherCondition::Rainy;
 
 	return WeatherForecast(condition, windStrength, windDirection, seaState, hygrometry);
 }

@@ -1752,12 +1752,25 @@ void Ship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	int index = 0;
 	while (index < path_size)
 	{
-		if (index == path_size - 1)
+		if (index == path_size - 1)//last point
 		{
+			m_current_path.push_back(temp_path[index]);
 			break;
 		}
 
-		m_current_path.push_back(temp_path[index]);
+		//straight line: remove intermediary points
+		if (index > 0
+			&& ((temp_path[index - 1]->m_coord_x == temp_path[index]->m_coord_x && temp_path[index - 1]->m_coord_x == temp_path[index + 1]->m_coord_x)
+				|| (temp_path[index - 1]->m_coord_y == temp_path[index]->m_coord_y && temp_path[index - 1]->m_coord_y == temp_path[index + 1]->m_coord_y)))
+
+		{
+			index++;
+			continue;
+		}
+		else
+		{
+			m_current_path.push_back(temp_path[index]);
+		}
 
 		int temp_index = index;
 
