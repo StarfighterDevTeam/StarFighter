@@ -220,4 +220,7 @@ pip-log.txt
 # CUSTOM
 .vs/
 *.exe
+*.idb
+StarEngine.lib
+StarEngine-d.lib
 imgui.ini
