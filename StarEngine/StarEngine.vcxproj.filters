@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PreparePostBuild.bat" />
+    <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui-sfml">
