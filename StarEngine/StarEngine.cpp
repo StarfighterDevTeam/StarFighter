@@ -36,6 +36,12 @@ bool StarEngine::Init(const char* title, const char* iconName, WindowResolutions
 	icon.loadFromFile(makePath(iconName));
 	m_renderWindow->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
+	// ImGui init
+	if (!ImGui::SFML::Init(*m_renderWindow))
+	{
+		LOGGER_WRITE(Logger::LERROR, "Failed to init ImGui-SFML");
+	}
+
 	// Inputs initialization
 	InputsManager = CreateInputs();
 
@@ -70,15 +76,18 @@ void StarEngine::Run()
 		sf::Event event;
 		while (m_renderWindow->pollEvent(event))
 		{
+			ImGui::SFML::ProcessEvent(*m_renderWindow, event);
 			if (event.type == sf::Event::Closed)
 			{
 				m_renderWindow->close();
+				ImGui::SFML::Shutdown();
 			}
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 		{
 			m_renderWindow->close();
+			ImGui::SFML::Shutdown();
 		}
 
 		//Resolution switch
@@ -155,14 +164,23 @@ void StarEngine::Run()
 
 		dt = deltaClock.restart();
 
-		if (!(*CurrentGame).m_pause)
+		if (!(*CurrentGame).m_pause && m_renderWindow->isOpen())
 		{
+			// Update ImGui
+			ImGui::SFML::Update(*m_renderWindow, dt); 
+			ImGui::SFML::SetCurrentWindow(*m_renderWindow);
+
+			ImGui::ShowDemoWindow();
+			
 			//Update
 			m_inGameState->Update(dt);
 
 			//Draw
 			m_inGameState->Draw();
 			//sfgui.Display(renderWindow);
+
+			// Render ImGui
+			ImGui::SFML::Render(*m_renderWindow);
 
 			//Diplay
 			m_renderWindow->display();

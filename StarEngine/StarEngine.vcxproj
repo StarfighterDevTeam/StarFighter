@@ -14,19 +14,19 @@
     <ProjectGuid>{0E597010-FFD0-4F2D-8E1F-E9CF417A41F2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>StarEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -60,7 +60,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>SFML-2.4.0\include;..\$(SolutionName)\EngineConfig</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>SFML-2.6.1\include;imgui-docking;imgui-sfml\imgui-sfml-2.6.x;..\$(SolutionName)\EngineConfig</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,7 +77,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>SFML-2.4.0\include;..\$(SolutionName)\EngineConfig</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>SFML-2.6.1\include;imgui-docking;imgui-sfml\imgui-sfml-2.6.x;..\$(SolutionName)\EngineConfig</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,6 +90,12 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
+    <ClCompile Include="imgui-docking\imgui.cpp" />
+    <ClCompile Include="imgui-docking\imgui_demo.cpp" />
+    <ClCompile Include="imgui-docking\imgui_draw.cpp" />
+    <ClCompile Include="imgui-docking\imgui_tables.cpp" />
+    <ClCompile Include="imgui-docking\imgui_widgets.cpp" />
+    <ClCompile Include="imgui-sfml\imgui-sfml-2.6.x\imgui-SFML.cpp" />
     <ClCompile Include="SEGame.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -108,6 +115,15 @@
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="FileLoadUtils.h" />
+    <ClInclude Include="imgui-docking\imconfig.h" />
+    <ClInclude Include="imgui-docking\imgui.h" />
+    <ClInclude Include="imgui-docking\imgui_internal.h" />
+    <ClInclude Include="imgui-docking\imstb_rectpack.h" />
+    <ClInclude Include="imgui-docking\imstb_textedit.h" />
+    <ClInclude Include="imgui-docking\imstb_truetype.h" />
+    <ClInclude Include="imgui-sfml\imgui-sfml-2.6.x\imconfig-SFML.h" />
+    <ClInclude Include="imgui-sfml\imgui-sfml-2.6.x\imgui-SFML.h" />
+    <ClInclude Include="imgui-sfml\imgui-sfml-2.6.x\imgui-SFML_export.h" />
     <ClInclude Include="SEGame.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />

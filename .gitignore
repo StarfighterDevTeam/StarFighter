@@ -216,3 +216,8 @@ pip-log.txt
 
 # Librairies
 !/Libraries/**
+
+# CUSTOM
+.vs/
+*.exe
+imgui.ini

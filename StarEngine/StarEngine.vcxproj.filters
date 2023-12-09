@@ -17,6 +17,24 @@
     <ClCompile Include="SEInputs.cpp" />
     <ClCompile Include="SEShip.cpp" />
     <ClCompile Include="SEGame.cpp" />
+    <ClCompile Include="imgui-sfml\imgui-sfml-2.6.x\imgui-SFML.cpp">
+      <Filter>imgui-sfml</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_demo.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_draw.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_tables.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-docking\imgui_widgets.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
@@ -39,8 +57,43 @@
     <ClInclude Include="SEInputs.h" />
     <ClInclude Include="SEShip.h" />
     <ClInclude Include="SEGame.h" />
+    <ClInclude Include="imgui-sfml\imgui-sfml-2.6.x\imconfig-SFML.h">
+      <Filter>imgui-sfml</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-sfml\imgui-sfml-2.6.x\imgui-SFML.h">
+      <Filter>imgui-sfml</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-sfml\imgui-sfml-2.6.x\imgui-SFML_export.h">
+      <Filter>imgui-sfml</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-docking\imconfig.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-docking\imgui.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-docking\imgui_internal.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-docking\imstb_rectpack.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-docking\imstb_textedit.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-docking\imstb_truetype.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="PreparePostBuild.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="imgui-sfml">
+      <UniqueIdentifier>{36eb9650-ca03-45ed-a0eb-9f33ba5fd595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui-docking">
+      <UniqueIdentifier>{9072c82f-0c6a-417c-bb1b-b98f8e995488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
