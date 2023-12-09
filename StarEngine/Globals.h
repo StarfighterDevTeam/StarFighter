@@ -37,17 +37,17 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 #define TEXTURE_SIZE_LIMITATION						8187
 
-#define PIXEL_PERFECT_COLLISION							true
-#define GRAZE_DISTANCE									30
+#define PIXEL_PERFECT_COLLISION						true
+#define GRAZE_DISTANCE								30.f
 
 //MUSIC
-#define DEFAULT_MUSIC_VOLUME						50
-#define DEFAULT_SFX_VOLUME							100
-#define MUSIC_FADE_IN_TIME						2.f
-#define MUSIC_FADE_OUT_TIME						2.f
+#define DEFAULT_MUSIC_VOLUME						50.f
+#define DEFAULT_SFX_VOLUME							100.f
+#define MUSIC_FADE_IN_TIME							2.f
+#define MUSIC_FADE_OUT_TIME							2.f
 
 //TEXT POP FEEDBACK
-#define TEXT_POP_OFFSET_Y							10
+#define TEXT_POP_OFFSET_Y							10.f
 
 #define INTERACTION_BUTTON_A_FILENAME			"2D/HUD/Button_A.png"
 #define INTERACTION_BUTTON_X_FILENAME			"2D/HUD/Button_X.png"

@@ -72,8 +72,8 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->m_animationNumber = animationNumber;
 	this->m_frameNumber = frameNumber;
 	this->m_initial_position = sf::Vector2f(position.x, position.y);
-	this->m_size.x = ((*texture).getSize().x / frameNumber);
-	this->m_size.y = ((*texture).getSize().y / animationNumber);
+	this->m_size.x = 1.f * ((*texture).getSize().x / frameNumber);
+	this->m_size.y = 1.f * ((*texture).getSize().y / animationNumber);
 
 	this->m_collider_type = GameObjectType::BackgroundObject;
 	this->m_defaultAnimation.setSpriteSheet(*texture);
@@ -83,7 +83,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 		{
 			int x = ((*texture).getSize().x / frameNumber)*(i);
 			int y = ((*texture).getSize().y / animationNumber)*(j);
-			this->m_defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+			this->m_defaultAnimation.addFrame(sf::IntRect(x, y, (int)this->m_size.x, (int)this->m_size.y));
 		}
 	}
 	
@@ -105,7 +105,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
+	sf::Texture* texture = loader->loadTexture(textureName, (int)size.x*frameNumber, (int)size.y*animationNumber);
 	this->m_textureName = textureName;
 
 	this->setOrigin(size.x / 2, size.y / 2);
@@ -117,7 +117,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber, pixels);
+	sf::Texture* texture = loader->loadTexture(textureName, (int)size.x*frameNumber, (int)size.y*animationNumber, pixels);
 	m_textureName = textureName;
 
 	setOrigin(size.x / 2, size.y / 2);
@@ -234,7 +234,7 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
+	angle += (float)M_PI_2;
 	//angle = (fmod(angle, 2 * M_PI));
 
 	return angle;
@@ -267,7 +267,7 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
+	angle += (float)M_PI_2;
 
 	return angle;
 }

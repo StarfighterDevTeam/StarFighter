@@ -105,8 +105,8 @@ int RandomizeIntBetweenValues(int min_value, int max_value)
 
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 {
-	int min = floor (min_max_values.x + 0.5);
-	int max = floor (min_max_values.y + 0.5);
+	int min = (int)floor(min_max_values.x + 0.5);
+	int max = (int)floor(min_max_values.y + 0.5);
 	int random_value = rand() % (max - min +1);
 	random_value += min;
 
