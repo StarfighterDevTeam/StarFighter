@@ -1,3 +1,3 @@
-Upgrade_hp_2 0
-Upgrade_jump_1 0
-Upgrade_shield_1 0
+Restores_hp_1 0
+Upgrade_drone_minirocket_1 0
+Upgrade_drone_laser_1 0

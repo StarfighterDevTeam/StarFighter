@@ -95,8 +95,8 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	//feedback
 	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
 	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 14, _white, getPosition());
-	sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
-	m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size.y / 2));
+	sf::Vector2f size_ = m_fake_ship ? m_fake_ship->m_size : m_size;
+	m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size_.y / 2));
 	m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
 	m_recall_text->m_DontGarbageMe = true;
 	m_recall_text->m_visible = false;
