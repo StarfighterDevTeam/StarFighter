@@ -87,6 +87,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Evolution.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Generation.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Individual.cpp" />
@@ -94,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Evolution.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Generation.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Individual.h" />

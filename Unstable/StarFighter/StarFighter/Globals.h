@@ -26,8 +26,8 @@ std::string StringCut(std::string str, const size_t length);
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080
 
-#define	WINDOW_RESOLUTION_X						1600
-#define WINDOW_RESOLUTION_Y						900
+#define	WINDOW_RESOLUTION_X						900
+#define WINDOW_RESOLUTION_Y						600
 
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f

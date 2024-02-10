@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <cmath>
 #include <SFML/Audio.hpp>
+#include "SFML/Graphics.hpp"
 #include "Globals.h"
 #include "Generation.h"
+#include "Game.h"
 
 #endif // STARFIGHTER_H_INCLUDED
