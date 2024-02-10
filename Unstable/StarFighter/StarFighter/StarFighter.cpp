@@ -56,6 +56,11 @@ int main()
 				newgame.reset();
 			}
 
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+			{
+				//newgame.setPause(!newgame.isPaused());
+			}
+
 			//actions
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
@@ -92,7 +97,8 @@ int main()
 
 		dt = deltaClock.restart();
 
-		newgame.update(dt, action);
+		if (!newgame.isPaused())
+			newgame.update(dt, action);
 		newgame.draw();
 		renderWindow.display();
 	}
