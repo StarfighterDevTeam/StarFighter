@@ -1,15 +1,16 @@
 #include "Game.h"
 #include "Globals.h"
+#include "Individual.h"
 #include "assert.h"
 
-#define GRID_NB_LINES	20
-#define LEFT_MARGIN		150.f
-#define UP_MARGIN		150.f
-#define CELL_SIZE		20.f
-#define GRID_THICKNESS	2.f
-#define START_SIZE		3
+#define GRID_NB_LINES		20
+#define LEFT_MARGIN			150.f
+#define UP_MARGIN			150.f
+#define CELL_SIZE			20.f
+#define GRID_THICKNESS		2.f
+#define START_SIZE			3
 
-#define GAME_SPEED		6.f
+#define GAME_SPEED			6.f
 
 Game::Game()
 {
@@ -201,12 +202,13 @@ void Game::update(sf::Time dt, Action action)
 	if (action != Action::STRAIGHT)
 	{
 		actionApplied = action;
-		printf("action: %d\n", (int)action);
+		//printf("action: %d\n", (int)action);
 	}
 
 	if (m_tickTimer > 1.f / GAME_SPEED)
 	{
-		printf("tick: %d\n", m_tick);
+		//printf("tick: %d\n", m_tick);
+		//
 
 		m_tickTimer = 0.f;
 		m_tick++;
@@ -333,4 +335,23 @@ State Game::computeState()
 	state.bFoodDown = m_foodPos.y > headPos.y;
 
 	return state;
+}
+
+Action Game::getAction(State state, Individual* individual)
+{
+	int decimal =
+		(int)state.bDangerStraight
+		+ (int)state.bDangerLeft * 2
+		+ (int)state.bDangerRight * 2 * 2
+		+ (int)state.bDirectionLeft * 2 * 2 * 2
+		+ (int)state.bDirectionRight * 2 * 2 * 2 * 2
+		+ (int)state.bDirectionUp * 2 * 2 * 2 * 2 * 2
+		+ (int)state.bDirectionDown * 2 * 2 * 2 * 2 * 2 * 2
+		+ (int)state.bFoodLeft * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+ (int)state.bFoodRight * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+ (int)state.bFoodUp * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+ (int)state.bFoodDown * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+
+	Action action = (Action)individual->m_dna[decimal];
+	return action;
 }

@@ -3,6 +3,8 @@
 
 #include "SFML//Graphics.hpp"
 
+class Individual;
+
 enum class Direction : int
 {
 	LEFT,
@@ -48,6 +50,8 @@ public:
 	sf::Vector2u spawnFood();
 	void setPause(bool bPause)		{ m_bPaused = bPause; }
 	bool isPaused()					{ return m_bPaused; }
+	State getState()				{ return m_state; }
+	Action getAction(State state, Individual* individual);
 
 private:
 	sf::Vector2f getCellPos(int x, int y);

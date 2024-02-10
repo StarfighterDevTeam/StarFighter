@@ -1,5 +1,7 @@
 #include "StarFighter.h"
 
+#define HUMAN_PLAYER_ONLY	false
+
 int main()
 {
 	//SFML Window
@@ -22,20 +24,14 @@ int main()
 	//Random seed
 	srand(time(NULL));
 
-	//randomize secret
-	Individual secret;
-	printf("secret: ");
-	secret.DisplayDNA();
-	printf("\n");
-
-	printf("\nGeneration 0. ");
+	printf("\nGeneration 0.\n");
 	Generation current_gen = Generation();
-	current_gen.ComputeFitness(secret);
+	//current_gen.ComputeFitness(secret);
 	current_gen.OrderPopulation();
 	Individual& hero = current_gen.m_population[POPULATION_SIZE - 1];
-	printf("HERO dna: ");
-	hero.DisplayDNA();
-	printf(", Fitness: %d\n", hero.m_fitness);
+	//printf("HERO dna: ");
+	//hero.DisplayDNA();
+	//printf(", Fitness: %d\n", hero.m_fitness);
 
 	//Main loop
 	while (renderWindow.isOpen())
@@ -96,6 +92,12 @@ int main()
 		}
 
 		dt = deltaClock.restart();
+
+		//AI
+		if (HUMAN_PLAYER_ONLY == false)
+		{
+			action = newgame.getAction(newgame.getState(), &hero);
+		}
 
 		if (!newgame.isPaused())
 			newgame.update(dt, action);
