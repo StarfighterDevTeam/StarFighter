@@ -29,16 +29,23 @@ public:
 	void reset();
 
 	Direction getPlayerDirection()	{ return playerDirection; }
+	sf::Vector2u spawnFood();
 
 private:
 	sf::Vector2f getCellPos(int x, int y);
+	bool isPlayerCell(int x, int y);
+	bool isCollidingWithSelf();
+	void growSnake();
 
 	sf::RenderWindow* m_window;
 
-	sf::Vector2u playerPos;
+	std::vector<sf::Vector2u> playerPos;
+	sf::Vector2u foodPos;
 	Direction playerDirection;
 	int tick;
+	int score;
 	float tickTimer;
+	bool bPaused;
 	sf::Font* m_font;
 };
 
