@@ -12,9 +12,17 @@ Game::Game()
 {
 }
 
+Game::~Game()
+{
+	delete m_font;
+}
+
 void Game::init(sf::RenderWindow* pWindow)
 {
 	m_window = pWindow;
+
+	m_font = new sf::Font();
+	if (!m_font->loadFromFile("Fonts/arial.ttf")) {}
 
 	reset();
 }
@@ -127,5 +135,15 @@ void Game::draw()
 	payerCell.setPosition(getCellPos(playerPos.x, playerPos.y));
 	m_window->draw(payerCell);
 
-
+	//texts
+	sf::Text tickText;
+	tickText.setFont(*m_font);
+	tickText.setOrigin(sf::Vector2f(8.f, 8.f));
+	tickText.setCharacterSize(16.f);
+	tickText.setColor(sf::Color(255, 255, 255, 255));
+	tickText.setString("Tessssssssssssst");
+	tickText.setPosition(200.f, 20.f);
+	m_window->draw(tickText);
+	//tickText.setOutlineThickness(2);
+	//tickText.setOutlineColor(COLOR_DARKBLUE);
 }

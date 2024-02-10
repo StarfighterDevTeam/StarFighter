@@ -22,6 +22,7 @@ class Game
 {
 public:
 	Game();
+	~Game();
 	void init(sf::RenderWindow* pWindow);
 	void update(sf::Time dt, Action action);
 	void draw();
@@ -38,6 +39,7 @@ private:
 	Direction playerDirection;
 	int tick;
 	float tickTimer;
+	sf::Font* m_font;
 };
 
 #endif // GAME_H_INCLUDED
