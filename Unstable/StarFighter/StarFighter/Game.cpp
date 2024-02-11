@@ -9,6 +9,7 @@
 #define CELL_SIZE			20.f
 #define GRID_THICKNESS		2.f
 #define START_SIZE			3
+#define TIMEOUT_RATIO		20.f
 
 #define GAME_SPEED			6.f
 
@@ -26,7 +27,7 @@ void Game::init(sf::RenderWindow* pWindow)
 	m_window = pWindow;
 
 	m_font = new sf::Font();
-	if (!m_font->loadFromFile("Fonts/arial.ttf")) {}
+	if (!m_font->loadFromFile("Assets/Fonts/arial.ttf")) {}
 	m_bPaused = false;
 
 	reset();
@@ -39,12 +40,14 @@ void Game::reset()
 	m_playerDirection = Direction::RIGHT;
 	m_tick = 0;
 	m_tickTimer = 0.f;
+	m_foodTimer = 0.f;
 	m_score = 0;
 
 	for (int i = 0; i < START_SIZE - 1; i++)
 		growSnake();
 
 	spawnFood();
+	m_state = computeState();
 }
 
 sf::Vector2f Game::getCellPos(int x, int y)
@@ -193,9 +196,10 @@ sf::Vector2u Game::getNextCell(Action action)
 	return nextPos;
 }
 
-void Game::update(sf::Time dt, Action action)
+int Game::update(sf::Time dt, Action action)
 {
 	m_tickTimer += dt.asSeconds();
+	m_foodTimer += dt.asSeconds();
 	const float frameDuration = 1.f / GAME_SPEED;
 
 	static Action actionApplied = Action::STRAIGHT;//store action if it's a turn and apply it once per tick
@@ -207,9 +211,6 @@ void Game::update(sf::Time dt, Action action)
 
 	if (m_tickTimer > 1.f / GAME_SPEED)
 	{
-		//printf("tick: %d\n", m_tick);
-		//
-
 		m_tickTimer = 0.f;
 		m_tick++;
 
@@ -250,19 +251,27 @@ void Game::update(sf::Time dt, Action action)
 			m_score++;
 			growSnake();
 			spawnFood();
+			m_foodTimer = 0.f;
 		}
 
 		//collision (= game over)
 		const bool bCollisionWithWall = m_playerPos[0].x < 0 || m_playerPos[0].x >= GRID_NB_LINES || m_playerPos[0].y < 0 || m_playerPos[0].y >= GRID_NB_LINES;
 		const bool bCollisionWithOwnBody = bCollisionWithWall ? false : isCollidingWithSelf();
-		if (bCollisionWithWall || bCollisionWithOwnBody)
+		const bool bTimeOut = m_foodTimer > (m_score + 1) * TIMEOUT_RATIO;
+		if (bCollisionWithWall || bCollisionWithOwnBody || bTimeOut)
 		{
-			if (bCollisionWithWall)
-				printf("--- GAME OVER : Collision with Wall --- Score: %d, Ticks: %d\n", m_score, m_tick);
-			else if (bCollisionWithOwnBody)
-				printf("--- GAME OVER : Collision with Body --- Score: %d, Ticks: %d\n", m_score, m_tick);
+			//if (bCollisionWithWall)
+			//	printf("--- GAME OVER : Collision with Wall --- Score: %d, Ticks: %d\n", m_score, m_tick);
+			//else if (bCollisionWithOwnBody)
+			//	printf("--- GAME OVER : Collision with Body --- Score: %d, Ticks: %d\n", m_score, m_tick);
+			//else if (bTimeOut)
+			//	printf("--- GAME OVER : Time Out --- Score: %d, Ticks: %d\n", m_score, m_tick);
+
+			const int finalScore = computeScore();
 
 			reset();
+
+			return finalScore;
 		}
 
 		//compute new state
@@ -271,6 +280,8 @@ void Game::update(sf::Time dt, Action action)
 		//reset action for next tick
 		actionApplied = Action::STRAIGHT;
 	}
+
+	return -1;
 }
 
 void Game::draw()
@@ -308,6 +319,14 @@ void Game::draw()
 	foodCell.setOutlineColor(sf::Color(255, 255, 255, 0));
 	foodCell.setPosition(getCellPos(m_foodPos.x, m_foodPos.y));
 	m_window->draw(foodCell);
+
+	//text
+	sf::Text scoreText;
+	scoreText.setFont(*m_font);
+	scoreText.setCharacterSize(20.f);
+	scoreText.setColor(sf::Color::White);
+	scoreText.setPosition(50.f, 50.f);
+	scoreText.setString("TEST");
 }
 
 State Game::computeState()
@@ -354,4 +373,13 @@ Action Game::getAction(State state, Individual* individual)
 
 	Action action = (Action)individual->m_dna[decimal];
 	return action;
+}
+
+int Game::computeScore()
+{
+	const int tickScore = m_tick;
+	const int foodScore = m_score;
+	const int efficiencyMalus = m_score > 0 ? m_tick / m_score : 0;
+	const int finalScore = m_tick + 10 * m_score - efficiencyMalus;
+	return finalScore;
 }

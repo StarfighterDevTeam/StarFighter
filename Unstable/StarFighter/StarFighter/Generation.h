@@ -7,6 +7,7 @@ class Generation
 {
 public:
 	Generation();
+	Generation(int gen_index);
 
 	Individual m_population[POPULATION_SIZE];
 	int m_gen;

@@ -24,85 +24,105 @@ int main()
 	//Random seed
 	srand(time(NULL));
 
-	printf("\nGeneration 0.\n");
-	Generation current_gen = Generation();
-	//current_gen.ComputeFitness(secret);
-	current_gen.OrderPopulation();
-	Individual& hero = current_gen.m_population[POPULATION_SIZE - 1];
-	//printf("HERO dna: ");
-	//hero.DisplayDNA();
-	//printf(", Fitness: %d\n", hero.m_fitness);
-
 	//Main loop
 	while (renderWindow.isOpen())
 	{
-		sf::Event event;
-
-		Action action = Action::STRAIGHT;
-
-		while (renderWindow.pollEvent(event))
+		//Generations
 		{
-			if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			//Loop through generations
+			for (int genId = 0; genId < 2; genId++)
 			{
-				renderWindow.close();
-			}
+				Generation current_gen = Generation(genId);
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
-			{
-				newgame.reset();
-			}
+				//Loop through individuals
+				for (int individualId = 0; individualId < POPULATION_SIZE; individualId++)
+				{
+					if (HUMAN_PLAYER_ONLY == false)
+						printf("Gen: %d, Individual: %d", genId, individualId);
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-			{
-				//newgame.setPause(!newgame.isPaused());
-			}
+					newgame.reset();
+					bool bGameOver = false;
 
-			//actions
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			{
-				if (newgame.getPlayerDirection() == Direction::UP)
-					action = Action::TURN_LEFT;
-				else if (newgame.getPlayerDirection() == Direction::DOWN)
-					action = Action::TURN_RIGHT;
-			}
+					//Game loop
+					while (!bGameOver || HUMAN_PLAYER_ONLY)
+					{
+						Action action = Action::STRAIGHT;
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			{
-				if (newgame.getPlayerDirection() == Direction::UP)
-					action = Action::TURN_RIGHT;
-				else if (newgame.getPlayerDirection() == Direction::DOWN)
-					action = Action::TURN_LEFT;
-			}
+						if (HUMAN_PLAYER_ONLY == false)
+							action = newgame.getAction(newgame.getState(), &current_gen.m_population[individualId]);
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			{
-				if (newgame.getPlayerDirection() == Direction::LEFT)
-					action = Action::TURN_RIGHT;
-				else if (newgame.getPlayerDirection() == Direction::RIGHT)
-					action = Action::TURN_LEFT;
-			}
+						//human inputs
+						sf::Event event;
+						while (renderWindow.pollEvent(event))
+						{
+							if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+							{
+								renderWindow.close();
+							}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			{
-				if (newgame.getPlayerDirection() == Direction::LEFT)
-					action = Action::TURN_LEFT;
-				else if (newgame.getPlayerDirection() == Direction::RIGHT)
-					action = Action::TURN_RIGHT;
+							if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+							{
+								newgame.reset();
+							}
+
+							if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+							{
+								//newgame.setPause(!newgame.isPaused());
+							}
+
+							if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+							{
+								if (newgame.getPlayerDirection() == Direction::UP)
+									action = Action::TURN_LEFT;
+								else if (newgame.getPlayerDirection() == Direction::DOWN)
+									action = Action::TURN_RIGHT;
+							}
+
+							if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+							{
+								if (newgame.getPlayerDirection() == Direction::UP)
+									action = Action::TURN_RIGHT;
+								else if (newgame.getPlayerDirection() == Direction::DOWN)
+									action = Action::TURN_LEFT;
+							}
+
+							if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+							{
+								if (newgame.getPlayerDirection() == Direction::LEFT)
+									action = Action::TURN_RIGHT;
+								else if (newgame.getPlayerDirection() == Direction::RIGHT)
+									action = Action::TURN_LEFT;
+							}
+
+							if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+							{
+								if (newgame.getPlayerDirection() == Direction::LEFT)
+									action = Action::TURN_LEFT;
+								else if (newgame.getPlayerDirection() == Direction::RIGHT)
+									action = Action::TURN_RIGHT;
+							}
+						}
+
+						dt = deltaClock.restart();
+
+						const int score = newgame.update(dt, action);
+
+						if (HUMAN_PLAYER_ONLY == false)
+						{
+							if (score >= 0)
+							{
+								bGameOver = true;
+								current_gen.m_population[individualId].setFitness(score);
+								printf(" Score: %d\n", score);
+							}
+						}
+
+						newgame.draw();
+						renderWindow.display();
+					}
+				}
 			}
 		}
-
-		dt = deltaClock.restart();
-
-		//AI
-		if (HUMAN_PLAYER_ONLY == false)
-		{
-			action = newgame.getAction(newgame.getState(), &hero);
-		}
-
-		if (!newgame.isPaused())
-			newgame.update(dt, action);
-		newgame.draw();
-		renderWindow.display();
 	}
 
 	//while (hero.m_fitness < MAX_FITNESS || current_gen.m_gen == 0)

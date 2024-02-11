@@ -42,7 +42,7 @@ public:
 	Game();
 	~Game();
 	void init(sf::RenderWindow* pWindow);
-	void update(sf::Time dt, Action action);
+	int update(sf::Time dt, Action action);//returns score on game over
 	void draw();
 	void reset();
 
@@ -61,6 +61,7 @@ private:
 	bool isCollidingWithSelf();
 	void growSnake();
 	State computeState();
+	int computeScore();
 
 	sf::RenderWindow* m_window;
 
@@ -70,6 +71,7 @@ private:
 	int m_tick;
 	int m_score;
 	float m_tickTimer;
+	float m_foodTimer;
 	bool m_bPaused;
 	sf::Font* m_font;
 	State m_state;

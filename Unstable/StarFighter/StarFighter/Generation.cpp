@@ -2,11 +2,16 @@
 
 Generation::Generation()
 {
-	m_gen = 0;
+	Generation(0);
+}
+
+Generation::Generation(int gen_index)
+{
+	m_gen = gen_index;
 	for (int i = 0; i < POPULATION_SIZE; i++)
 	{
 		m_population[i].m_index = i;
-		m_population[i].m_gen = 0;
+		m_population[i].m_gen = gen_index;
 		m_population[i].m_generation = this;
 	}
 }

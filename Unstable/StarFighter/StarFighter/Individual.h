@@ -23,6 +23,8 @@ public:
 
 	static int ComputeFitness(Individual& individual, Individual& const secret);
 	static int ComputeFitness(int dna_individual[], int dna_secret[]);
+	void setFitness(const int score)		{ m_fitness = score; }
+	int getFitness()						{ return m_fitness; }
 
 	int m_dna[DNA_LENGTH];
 	int m_index;
