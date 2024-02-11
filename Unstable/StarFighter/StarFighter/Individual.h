@@ -26,6 +26,9 @@ public:
 	void setFitness(const int score)		{ m_fitness = score; }
 	int getFitness()						{ return m_fitness; }
 
+	bool saveInFile();
+	bool loadFromFile();
+
 	int m_dna[DNA_LENGTH];
 	int m_index;
 	int m_fitness;

@@ -1,4 +1,7 @@
 #include "Individual.h"
+#include "rapidxml-1.13/RapidXmlLib.h"
+#include <fstream>
+#include <sstream>
 
 Individual::Individual()
 {
@@ -316,10 +319,77 @@ int Individual::ComputeFitness(int dna_individual[], int dna_secret[])
 	return fitness;
 }
 
-
 int Individual::ComputeFitness(Individual& individual, Individual& const secret)
 {
 	individual.m_fitness = ComputeFitness(individual.m_dna, secret.m_dna);
 
 	return individual.m_fitness;
+}
+
+bool Individual::saveInFile()
+{
+	using namespace rapidxml;
+	xml_document<> doc;
+
+	xml_node<>* decl = doc.allocate_node(node_declaration);
+	decl->append_attribute(doc.allocate_attribute("version", "1.0"));
+	decl->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+	doc.append_node(decl);
+
+	xml_node<>* individualNode = doc.allocate_node(node_element, "individual");
+	doc.append_node(individualNode);
+
+	appendXmlAttribute(doc, individualNode, "fitness", m_fitness);
+
+	for (int i = 0; i < DNA_LENGTH - 1; i++)
+	{
+		xml_node<>* geneNode = doc.allocate_node(node_element, "gene");
+		appendXmlAttribute(doc, geneNode, "state", i);
+		appendXmlAttribute(doc, geneNode, "action", m_dna[i]);
+		individualNode->append_node(geneNode);
+	}
+		
+	// Save to file
+	const std::string path = HERO_XML_FILE;
+	std::ofstream outFile(path);
+	if (!outFile.is_open())
+	{
+		return false;
+	}
+	outFile << doc;
+	outFile.close();
+	doc.clear();
+
+	return true;
+}
+
+bool Individual::loadFromFile()
+{
+	using namespace rapidxml;
+	xml_document<> doc;
+
+	std::ifstream file(HERO_XML_FILE);
+	if (!file.is_open())
+		return false;
+
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	std::string content(buffer.str());
+	doc.parse<0>(&content[0]);
+
+	xml_node<>* individualNode = doc.first_node("individual");
+	if (!individualNode)
+		return false;
+
+	setFitness(0);
+	setFitness(std::stoi(individualNode->first_attribute("fitness")->value()));
+
+	int geneId = 0;
+	for (xml_node<>* geneNode = individualNode->first_node("gene"); geneNode; geneNode = geneNode->next_sibling("gene"))
+	{
+		m_dna[geneId] = std::stoi(geneNode->first_attribute("action")->value());
+		geneId++;
+	}
+
+	return true;
 }

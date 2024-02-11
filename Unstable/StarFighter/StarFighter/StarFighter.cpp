@@ -31,6 +31,9 @@ int main()
 		{
 			//Loop through generations
 			Individual hero;
+			if (hero.loadFromFile())
+				printf("--- Hero loaded (score: %d) ---\n\n", hero.getFitness());
+
 			int eraId = 0;
 			for (int genId = 0; genId < NB_GENERATIONS; genId++)
 			{
@@ -164,7 +167,10 @@ int main()
 							eraId++;
 							current_gen.OrderPopulation();
 							if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
+							{
 								hero = current_gen.m_population[POPULATION_SIZE - 1];
+								hero.saveInFile();
+							}
 
 							printf("--- Hero playing (top score: %d)---\n", hero.getFitness());
 						}
@@ -175,7 +181,10 @@ int main()
 				current_gen.OrderPopulation();
 
 				if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
+				{
 					hero = current_gen.m_population[POPULATION_SIZE - 1];
+					hero.saveInFile();
+				}
 
 				const int averageScore = current_gen.getAverageFitness();
 				printf("--- Generation results: top score: %d, average score: %d ---\n\n", current_gen.m_population[POPULATION_SIZE - 1].getFitness(), averageScore);

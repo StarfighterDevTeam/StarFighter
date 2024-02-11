@@ -7,6 +7,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "./rapidxml-1.13/rapidxml.hpp"
+
 using namespace sf;
 
 std::string makePath(const std::string& srcPath);
@@ -20,7 +22,7 @@ std::string StringCut(std::string str, const size_t length);
 #define DNA_ENTROPY			3
 #define MAX_FITNESS			40
 #define POPULATION_SIZE		30
-#define NB_GENERATIONS		2000
+#define NB_GENERATIONS		1000
 
 //###
 #define	REF_WINDOW_RESOLUTION_X					1920
@@ -51,7 +53,7 @@ std::string StringCut(std::string str, const size_t length);
 #define MUSIC_FADE_OUT_TIME						2.f
 
 //CSV DATA
-#define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"
+#define HERO_XML_FILE							"Assets/Saves/hero.xml"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
@@ -65,6 +67,5 @@ float MinBetweenValues(sf::Vector2f values);
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max);
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
-
 
 #endif // GLOBALS_H_INCLUDED
