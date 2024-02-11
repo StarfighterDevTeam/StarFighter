@@ -33,6 +33,7 @@ void Generation::OrderPopulation()
 	}
 }
 
+/*
 void Generation::CreateNewGeneration(Individual& hero)
 {	
 	m_gen++;
@@ -110,6 +111,7 @@ void Generation::CreateNewGeneration(Individual& hero)
 		}
 	}
 }
+*/
 
 void Generation::ComputeFitness(Individual& const secret)
 {
@@ -119,7 +121,7 @@ void Generation::ComputeFitness(Individual& const secret)
 	}
 }
 
-void Generation::evoluate(Generation& gen, const Individual& hero)
+void Generation::evoluate(Generation& gen, const Individual& hero, int learningRate)
 {
 	Generation oldGen = gen;//make a copy before overwriting gen
 
@@ -187,14 +189,14 @@ void Generation::evoluate(Generation& gen, const Individual& hero)
 			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_AlternateOdd);
 			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
 
-			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add);
-			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand);
+			Individual::mutate(		gen.m_population[i--], hero, Mutation_Add, learningRate);
+			Individual::mutate(		gen.m_population[i--], hero, Mutation_Expand, learningRate);
 
-			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add);
-			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand);
+			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add, learningRate);
+			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand, learningRate);
 
-			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Add);
-			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Expand);
+			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Add, learningRate);
+			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Expand, learningRate);
 
 			//Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Add);
 			//Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Expand);

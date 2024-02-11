@@ -13,9 +13,9 @@ public:
 	int m_gen;
 
 	void OrderPopulation();
-	void CreateNewGeneration(Individual& hero);
+	//void CreateNewGeneration(Individual& hero);
 	void ComputeFitness(Individual& const secret);
-	static void evoluate(Generation& gen, const Individual& hero);
+	static void evoluate(Generation& gen, const Individual& hero, int learningRate);
 	int getAverageFitness();
 };
 

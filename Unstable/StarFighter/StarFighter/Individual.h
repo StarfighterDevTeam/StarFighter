@@ -19,7 +19,7 @@ public:
 	void DisplayEvolutionRecord(int dna_secret[]);
 	void copy(const Individual& individual);
 	static void crossOver(Individual& output, const Individual& input_a, const Individual& input_b, CrossOverType type);
-	static void mutate(Individual& output, const Individual& input, MutationType type, int repeat = 10);
+	static void mutate(Individual& output, const Individual& input, MutationType type, int repeat);
 
 	static int ComputeFitness(Individual& individual, Individual& const secret);
 	static int ComputeFitness(int dna_individual[], int dna_secret[]);

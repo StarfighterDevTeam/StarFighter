@@ -9,7 +9,7 @@
 #define CELL_SIZE			20.f
 #define GRID_THICKNESS		2.f
 #define START_SIZE			3
-#define TIMEOUT_TICK_RATIO	20
+#define TIMEOUT_TICK_RATIO	50
 
 #define GAME_SPEED_TRAINING			10000.f//300.f
 #define GAME_SPEED_REALTIME			50.f//300.f

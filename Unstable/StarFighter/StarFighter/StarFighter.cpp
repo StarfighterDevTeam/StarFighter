@@ -67,6 +67,10 @@ int main()
 							if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 							{
 								newgame.reset();
+								bEvolutionOver = false;
+								genId = 0;
+								individualId = 0;
+								printf("Restart using last generation");
 							}
 
 							if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
@@ -116,7 +120,8 @@ int main()
 							if (score >= 0)
 							{
 								bGameOver = true;
-								current_gen.m_population[individualId].setFitness(score);
+								if (!bEvolutionOver)
+									current_gen.m_population[individualId].setFitness(score);
 								printf(" Score: %d\n", score);
 							}
 						}
@@ -135,9 +140,9 @@ int main()
 							bEvolutionOver = true;
 							current_gen.OrderPopulation();
 							if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
-								hero = current_gen.m_population[0];
+								hero = current_gen.m_population[POPULATION_SIZE - 1];
 
-							printf("--- Hero playing ---\n");
+							printf("--- Hero playing (top score: %d)---\n", hero.getFitness());
 						}
 					}
 				}
@@ -146,14 +151,14 @@ int main()
 				current_gen.OrderPopulation();
 
 				if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
-					hero = current_gen.m_population[0];
+					hero = current_gen.m_population[POPULATION_SIZE - 1];
 
 				const int averageScore = current_gen.getAverageFitness();
 				printf("--- Generation results: top score: %d, average score: %d ---\n\n", current_gen.m_population[POPULATION_SIZE - 1].getFitness(), averageScore);
 
 				//Evoluate
 				if (genId < NB_GENERATIONS - 1)
-					Generation::evoluate(current_gen, hero);
+					Generation::evoluate(current_gen, hero, 10);
 			}
 		}
 	}
