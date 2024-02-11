@@ -68,7 +68,7 @@ int main()
 								renderWindow.close();
 							}
 
-							if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::R)
 							{
 								newgame.reset();
 								bEvolutionOver = false;
@@ -77,7 +77,15 @@ int main()
 								printf("Restart using last generation");
 							}
 
-							if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::E)
+							{
+								newgame.reset();
+								bEvolutionOver = !bEvolutionOver;
+								if (bEvolutionOver)
+									printf("\n--- Hero playing (top score: %d)---\n", hero.getFitness());
+							}
+
+							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::P)
 							{
 								//newgame.setPause(!newgame.isPaused());
 							}

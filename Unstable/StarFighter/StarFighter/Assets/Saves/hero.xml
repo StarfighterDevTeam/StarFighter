@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<individual fitness="2134">
-	<gene state="0" action="1"/>
+<individual fitness="2973">
+	<gene state="0" action="0"/>
 	<gene state="1" action="1"/>
-	<gene state="2" action="2"/>
+	<gene state="2" action="0"/>
 	<gene state="3" action="0"/>
 	<gene state="4" action="2"/>
 	<gene state="5" action="0"/>
@@ -50,7 +50,7 @@
 	<gene state="47" action="2"/>
 	<gene state="48" action="1"/>
 	<gene state="49" action="2"/>
-	<gene state="50" action="1"/>
+	<gene state="50" action="0"/>
 	<gene state="51" action="2"/>
 	<gene state="52" action="0"/>
 	<gene state="53" action="1"/>
@@ -216,7 +216,7 @@
 	<gene state="213" action="1"/>
 	<gene state="214" action="2"/>
 	<gene state="215" action="2"/>
-	<gene state="216" action="1"/>
+	<gene state="216" action="2"/>
 	<gene state="217" action="1"/>
 	<gene state="218" action="1"/>
 	<gene state="219" action="2"/>
@@ -509,7 +509,7 @@
 	<gene state="506" action="0"/>
 	<gene state="507" action="0"/>
 	<gene state="508" action="2"/>
-	<gene state="509" action="0"/>
+	<gene state="509" action="1"/>
 	<gene state="510" action="2"/>
 	<gene state="511" action="0"/>
 	<gene state="512" action="2"/>
@@ -530,7 +530,7 @@
 	<gene state="527" action="0"/>
 	<gene state="528" action="1"/>
 	<gene state="529" action="1"/>
-	<gene state="530" action="2"/>
+	<gene state="530" action="1"/>
 	<gene state="531" action="1"/>
 	<gene state="532" action="0"/>
 	<gene state="533" action="2"/>
@@ -670,7 +670,7 @@
 	<gene state="667" action="0"/>
 	<gene state="668" action="2"/>
 	<gene state="669" action="0"/>
-	<gene state="670" action="0"/>
+	<gene state="670" action="2"/>
 	<gene state="671" action="2"/>
 	<gene state="672" action="1"/>
 	<gene state="673" action="0"/>
@@ -698,7 +698,7 @@
 	<gene state="695" action="2"/>
 	<gene state="696" action="0"/>
 	<gene state="697" action="1"/>
-	<gene state="698" action="1"/>
+	<gene state="698" action="2"/>
 	<gene state="699" action="1"/>
 	<gene state="700" action="0"/>
 	<gene state="701" action="0"/>
@@ -759,7 +759,7 @@
 	<gene state="756" action="2"/>
 	<gene state="757" action="2"/>
 	<gene state="758" action="1"/>
-	<gene state="759" action="1"/>
+	<gene state="759" action="2"/>
 	<gene state="760" action="0"/>
 	<gene state="761" action="1"/>
 	<gene state="762" action="0"/>
@@ -777,7 +777,7 @@
 	<gene state="774" action="0"/>
 	<gene state="775" action="2"/>
 	<gene state="776" action="1"/>
-	<gene state="777" action="2"/>
+	<gene state="777" action="0"/>
 	<gene state="778" action="2"/>
 	<gene state="779" action="2"/>
 	<gene state="780" action="1"/>
@@ -788,7 +788,7 @@
 	<gene state="785" action="1"/>
 	<gene state="786" action="2"/>
 	<gene state="787" action="2"/>
-	<gene state="788" action="0"/>
+	<gene state="788" action="1"/>
 	<gene state="789" action="0"/>
 	<gene state="790" action="0"/>
 	<gene state="791" action="2"/>
@@ -848,7 +848,7 @@
 	<gene state="845" action="1"/>
 	<gene state="846" action="2"/>
 	<gene state="847" action="1"/>
-	<gene state="848" action="1"/>
+	<gene state="848" action="0"/>
 	<gene state="849" action="0"/>
 	<gene state="850" action="2"/>
 	<gene state="851" action="2"/>
@@ -1077,7 +1077,7 @@
 	<gene state="1074" action="2"/>
 	<gene state="1075" action="2"/>
 	<gene state="1076" action="1"/>
-	<gene state="1077" action="2"/>
+	<gene state="1077" action="0"/>
 	<gene state="1078" action="2"/>
 	<gene state="1079" action="2"/>
 	<gene state="1080" action="2"/>
@@ -1140,7 +1140,7 @@
 	<gene state="1137" action="1"/>
 	<gene state="1138" action="0"/>
 	<gene state="1139" action="2"/>
-	<gene state="1140" action="1"/>
+	<gene state="1140" action="0"/>
 	<gene state="1141" action="1"/>
 	<gene state="1142" action="0"/>
 	<gene state="1143" action="0"/>
@@ -1164,7 +1164,7 @@
 	<gene state="1161" action="1"/>
 	<gene state="1162" action="2"/>
 	<gene state="1163" action="1"/>
-	<gene state="1164" action="2"/>
+	<gene state="1164" action="1"/>
 	<gene state="1165" action="1"/>
 	<gene state="1166" action="2"/>
 	<gene state="1167" action="0"/>
@@ -1200,7 +1200,7 @@
 	<gene state="1197" action="1"/>
 	<gene state="1198" action="0"/>
 	<gene state="1199" action="2"/>
-	<gene state="1200" action="2"/>
+	<gene state="1200" action="0"/>
 	<gene state="1201" action="1"/>
 	<gene state="1202" action="1"/>
 	<gene state="1203" action="0"/>
@@ -1254,12 +1254,12 @@
 	<gene state="1251" action="0"/>
 	<gene state="1252" action="2"/>
 	<gene state="1253" action="1"/>
-	<gene state="1254" action="1"/>
+	<gene state="1254" action="0"/>
 	<gene state="1255" action="0"/>
 	<gene state="1256" action="0"/>
 	<gene state="1257" action="2"/>
 	<gene state="1258" action="0"/>
-	<gene state="1259" action="1"/>
+	<gene state="1259" action="0"/>
 	<gene state="1260" action="2"/>
 	<gene state="1261" action="2"/>
 	<gene state="1262" action="0"/>
@@ -1374,7 +1374,7 @@
 	<gene state="1371" action="1"/>
 	<gene state="1372" action="1"/>
 	<gene state="1373" action="2"/>
-	<gene state="1374" action="2"/>
+	<gene state="1374" action="0"/>
 	<gene state="1375" action="0"/>
 	<gene state="1376" action="1"/>
 	<gene state="1377" action="0"/>
@@ -1448,7 +1448,7 @@
 	<gene state="1445" action="0"/>
 	<gene state="1446" action="2"/>
 	<gene state="1447" action="2"/>
-	<gene state="1448" action="1"/>
+	<gene state="1448" action="2"/>
 	<gene state="1449" action="1"/>
 	<gene state="1450" action="0"/>
 	<gene state="1451" action="1"/>
@@ -1840,7 +1840,7 @@
 	<gene state="1837" action="2"/>
 	<gene state="1838" action="1"/>
 	<gene state="1839" action="0"/>
-	<gene state="1840" action="0"/>
+	<gene state="1840" action="2"/>
 	<gene state="1841" action="1"/>
 	<gene state="1842" action="2"/>
 	<gene state="1843" action="2"/>
@@ -1924,13 +1924,13 @@
 	<gene state="1921" action="2"/>
 	<gene state="1922" action="2"/>
 	<gene state="1923" action="2"/>
-	<gene state="1924" action="1"/>
+	<gene state="1924" action="2"/>
 	<gene state="1925" action="0"/>
 	<gene state="1926" action="2"/>
 	<gene state="1927" action="1"/>
 	<gene state="1928" action="2"/>
 	<gene state="1929" action="2"/>
-	<gene state="1930" action="1"/>
+	<gene state="1930" action="0"/>
 	<gene state="1931" action="1"/>
 	<gene state="1932" action="1"/>
 	<gene state="1933" action="2"/>
@@ -1977,7 +1977,7 @@
 	<gene state="1974" action="0"/>
 	<gene state="1975" action="0"/>
 	<gene state="1976" action="0"/>
-	<gene state="1977" action="2"/>
+	<gene state="1977" action="1"/>
 	<gene state="1978" action="2"/>
 	<gene state="1979" action="2"/>
 	<gene state="1980" action="0"/>
@@ -2009,7 +2009,7 @@
 	<gene state="2006" action="2"/>
 	<gene state="2007" action="0"/>
 	<gene state="2008" action="0"/>
-	<gene state="2009" action="2"/>
+	<gene state="2009" action="0"/>
 	<gene state="2010" action="2"/>
 	<gene state="2011" action="1"/>
 	<gene state="2012" action="1"/>
@@ -2036,7 +2036,7 @@
 	<gene state="2033" action="0"/>
 	<gene state="2034" action="0"/>
 	<gene state="2035" action="0"/>
-	<gene state="2036" action="0"/>
+	<gene state="2036" action="2"/>
 	<gene state="2037" action="1"/>
 	<gene state="2038" action="0"/>
 	<gene state="2039" action="2"/>
