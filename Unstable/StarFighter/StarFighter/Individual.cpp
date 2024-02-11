@@ -3,26 +3,26 @@
 Individual::Individual()
 {
 	m_generation = NULL;
-	RandomizeDNA();
+	randomizeDNA();
 
 	//evolution record
-	Evolution* evolution = new Evolution();
-	evolution->m_gen = 0;
-	Individual::CopyDNA(m_dna, evolution->m_dna_output);
-	m_evolution_record.push_back(evolution);
+	//Evolution* evolution = new Evolution();
+	//evolution->m_gen = 0;
+	//Individual::copyDNA(m_dna, evolution->m_dna_output);
+	//m_evolution_record.push_back(evolution);
 }
 
 Individual::~Individual()
 {
 	//evolution record
-	for (int i = 0; i < m_evolution_record.size(); i++)
-	{
-		delete m_evolution_record[i];
-	}
+	//for (int i = 0; i < m_evolution_record.size(); i++)
+	//{
+	//	delete m_evolution_record[i];
+	//}
 	m_evolution_record.clear();
 }
 
-void Individual::RandomizeDNA()
+void Individual::randomizeDNA()
 {
 	for (int i = 0; i < DNA_LENGTH; i++)
 	{
@@ -30,7 +30,7 @@ void Individual::RandomizeDNA()
 	}
 }
 
-void Individual::CopyDNA(int dna_input[], int dna_output[])
+void Individual::copyDNA(int dna_input[], int dna_output[])
 {
 	for (int i = 0; i < DNA_LENGTH; i++)
 	{
@@ -143,7 +143,7 @@ void Individual::DisplayEvolutionRecord(int dna_secret[])
 	}
 };
 
-void Individual::Copy(Individual& individual)
+void Individual::copy(Individual& individual)
 {
 	m_index = individual.m_index;
 	m_fitness = individual.m_fitness;
@@ -154,23 +154,22 @@ void Individual::Copy(Individual& individual)
 	}
 
 	//evolution record
-	for (int i = 0; i < m_evolution_record.size(); i++)
-	{
-		delete m_evolution_record[i];
-	}
-	m_evolution_record.clear();
-	for (int i = 0; i < individual.m_evolution_record.size(); i++)
-	{
-		Evolution* evolution = new Evolution();
-		evolution->Copy(*individual.m_evolution_record[i]);
-		m_evolution_record.push_back(evolution);
-	}
-	
+	//for (int i = 0; i < m_evolution_record.size(); i++)
+	//{
+	//	delete m_evolution_record[i];
+	//}
+	//m_evolution_record.clear();
+	//for (int i = 0; i < individual.m_evolution_record.size(); i++)
+	//{
+	//	Evolution* evolution = new Evolution();
+	//	evolution->copy(*individual.m_evolution_record[i]);
+	//	m_evolution_record.push_back(evolution);
+	//}
 }
 
-void Individual::CrossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type)
+void Individual::crossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type)
 {
-	output.Copy(input_a);
+	output.copy(input_a);
 
 	switch (type)
 	{
@@ -225,16 +224,16 @@ void Individual::CrossOver(Individual& output, Individual& input_a, Individual& 
 	//evolution record
 	Evolution* evolution = new Evolution();
 	evolution->m_crossover = (int)type;
-	Individual::CopyDNA(input_a.m_dna, evolution->m_dna_input_a);
-	Individual::CopyDNA(input_b.m_dna, evolution->m_dna_input_b);
-	Individual::CopyDNA(output.m_dna, evolution->m_dna_output);
+	Individual::copyDNA(input_a.m_dna, evolution->m_dna_input_a);
+	Individual::copyDNA(input_b.m_dna, evolution->m_dna_input_b);
+	Individual::copyDNA(output.m_dna, evolution->m_dna_output);
 	output.m_evolution_record.push_back(evolution);
 	
 }
 
-void Individual::Mutate(Individual& output, Individual& input, MutationType type)
+void Individual::mutate(Individual& output, Individual& input, MutationType type)
 {
-	output.Copy(input);
+	output.copy(input);
 
 	int r = RandomizeIntBetweenValues(0, DNA_LENGTH - 1);
 	int v = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
@@ -263,8 +262,8 @@ void Individual::Mutate(Individual& output, Individual& input, MutationType type
 	//evolution record
 	Evolution* evolution = new Evolution();
 	evolution->m_mutation = (int)type;
-	Individual::CopyDNA(input.m_dna, evolution->m_dna_input_a);
-	Individual::CopyDNA(output.m_dna, evolution->m_dna_output);
+	Individual::copyDNA(input.m_dna, evolution->m_dna_input_a);
+	Individual::copyDNA(output.m_dna, evolution->m_dna_output);
 	output.m_evolution_record.push_back(evolution);
 }
 

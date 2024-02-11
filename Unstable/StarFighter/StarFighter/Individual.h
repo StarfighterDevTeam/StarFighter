@@ -11,15 +11,15 @@ public:
 	Individual();
 	~Individual();
 
-	void RandomizeDNA();
+	void randomizeDNA();
 
-	static void CopyDNA(int dna_input[], int dna_output[]);
+	static void copyDNA(int dna_input[], int dna_output[]);
 	void DisplayDNA();
 	static void DisplayDNA(int dna[]);
 	void DisplayEvolutionRecord(int dna_secret[]);
-	void Copy(Individual& individual);
-	static void CrossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type);
-	static void Mutate(Individual& output, Individual& input, MutationType type);
+	void copy(Individual& individual);
+	static void crossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type);
+	static void mutate(Individual& output, Individual& input, MutationType type);
 
 	static int ComputeFitness(Individual& individual, Individual& const secret);
 	static int ComputeFitness(int dna_individual[], int dna_secret[]);

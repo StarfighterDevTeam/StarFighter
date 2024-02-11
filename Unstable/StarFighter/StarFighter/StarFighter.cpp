@@ -30,9 +30,9 @@ int main()
 		//Generations
 		{
 			//Loop through generations
-			for (int genId = 0; genId < 2; genId++)
+			for (int genId = 0; genId < NB_GENERATIONS; genId++)
 			{
-				Generation current_gen = Generation(genId);
+				static Generation current_gen = Generation(0);
 
 				//Loop through individuals
 				for (int individualId = 0; individualId < POPULATION_SIZE; individualId++)
@@ -121,7 +121,16 @@ int main()
 						renderWindow.display();
 					}
 				}
+
+				//Select best individuals
+				current_gen.OrderPopulation();
+				const int averageScore = current_gen.getAverageFitness();
+				printf("Generation results: top score: %d, average score: %d\n", current_gen.m_population[POPULATION_SIZE - 1].getFitness(), averageScore);
+				if (genId < NB_GENERATIONS - 1)
+					Generation::evoluate(current_gen);
 			}
+
+			system("pause");
 		}
 	}
 

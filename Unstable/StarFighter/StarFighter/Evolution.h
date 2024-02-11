@@ -21,7 +21,7 @@ enum MutationType
 struct Evolution
 {
 	Evolution();
-	void Copy(Evolution& const evolution);
+	void copy(Evolution& const evolution);
 
 	int m_mutation;
 	int m_crossover;

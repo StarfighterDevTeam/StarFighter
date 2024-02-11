@@ -69,9 +69,9 @@ private:
 	sf::Vector2u m_foodPos;
 	Direction m_playerDirection;
 	int m_tick;
+	int m_tickWithoutEating;
 	int m_score;
 	float m_tickTimer;
-	float m_foodTimer;
 	bool m_bPaused;
 	sf::Font* m_font;
 	State m_state;

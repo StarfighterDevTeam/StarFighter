@@ -13,7 +13,7 @@ Evolution::Evolution()
 	}
 }
 
-void Evolution::Copy(Evolution& const evolution)
+void Evolution::copy(Evolution& const evolution)
 {
 	m_mutation = evolution.m_mutation;
 	m_crossover = evolution.m_crossover;

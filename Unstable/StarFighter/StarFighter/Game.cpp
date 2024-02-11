@@ -9,9 +9,9 @@
 #define CELL_SIZE			20.f
 #define GRID_THICKNESS		2.f
 #define START_SIZE			3
-#define TIMEOUT_RATIO		20.f
+#define TIMEOUT_TICK_RATIO	20
 
-#define GAME_SPEED			6.f
+#define GAME_SPEED			300.f
 
 Game::Game()
 {
@@ -40,7 +40,7 @@ void Game::reset()
 	m_playerDirection = Direction::RIGHT;
 	m_tick = 0;
 	m_tickTimer = 0.f;
-	m_foodTimer = 0.f;
+	m_tickWithoutEating = 0;
 	m_score = 0;
 
 	for (int i = 0; i < START_SIZE - 1; i++)
@@ -199,7 +199,6 @@ sf::Vector2u Game::getNextCell(Action action)
 int Game::update(sf::Time dt, Action action)
 {
 	m_tickTimer += dt.asSeconds();
-	m_foodTimer += dt.asSeconds();
 	const float frameDuration = 1.f / GAME_SPEED;
 
 	static Action actionApplied = Action::STRAIGHT;//store action if it's a turn and apply it once per tick
@@ -251,13 +250,15 @@ int Game::update(sf::Time dt, Action action)
 			m_score++;
 			growSnake();
 			spawnFood();
-			m_foodTimer = 0.f;
+			m_tickWithoutEating = 0;
 		}
+		else
+			m_tickWithoutEating++;
 
 		//collision (= game over)
 		const bool bCollisionWithWall = m_playerPos[0].x < 0 || m_playerPos[0].x >= GRID_NB_LINES || m_playerPos[0].y < 0 || m_playerPos[0].y >= GRID_NB_LINES;
 		const bool bCollisionWithOwnBody = bCollisionWithWall ? false : isCollidingWithSelf();
-		const bool bTimeOut = m_foodTimer > (m_score + 1) * TIMEOUT_RATIO;
+		const bool bTimeOut = m_tickWithoutEating > (m_score + 1) * TIMEOUT_TICK_RATIO;
 		if (bCollisionWithWall || bCollisionWithOwnBody || bTimeOut)
 		{
 			//if (bCollisionWithWall)
@@ -380,6 +381,6 @@ int Game::computeScore()
 	const int tickScore = m_tick;
 	const int foodScore = m_score;
 	const int efficiencyMalus = m_score > 0 ? m_tick / m_score : 0;
-	const int finalScore = m_tick + 10 * m_score - efficiencyMalus;
+	const int finalScore = m_tick + 100 * m_score - efficiencyMalus;
 	return finalScore;
 }
