@@ -30,7 +30,7 @@ void Individual::randomizeDNA()
 	}
 }
 
-void Individual::copyDNA(int dna_input[], int dna_output[])
+void Individual::copyDNA(const int dna_input[], int dna_output[])
 {
 	for (int i = 0; i < DNA_LENGTH; i++)
 	{
@@ -143,7 +143,7 @@ void Individual::DisplayEvolutionRecord(int dna_secret[])
 	}
 };
 
-void Individual::copy(Individual& individual)
+void Individual::copy(const Individual& individual)
 {
 	m_index = individual.m_index;
 	m_fitness = individual.m_fitness;
@@ -167,7 +167,7 @@ void Individual::copy(Individual& individual)
 	//}
 }
 
-void Individual::crossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type)
+void Individual::crossOver(Individual& output, const Individual& input_a, const Individual& input_b, CrossOverType type)
 {
 	output.copy(input_a);
 
@@ -231,15 +231,17 @@ void Individual::crossOver(Individual& output, Individual& input_a, Individual& 
 	
 }
 
-void Individual::mutate(Individual& output, Individual& input, MutationType type)
+void Individual::mutate(Individual& output, const Individual& input, MutationType type, int repeat)
 {
 	output.copy(input);
 
-	int r = RandomizeIntBetweenValues(0, DNA_LENGTH - 1);
-	int v = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
-
-	switch (type)
+	for (int i = 0; i < repeat; i++)
 	{
+		const int r = RandomizeIntBetweenValues(0, DNA_LENGTH - 1);
+		const int v = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
+
+		switch (type)
+		{
 		case Mutation_Add:
 		{
 			output.m_dna[r] = (input.m_dna[r] + v) % DNA_ENTROPY;
@@ -257,14 +259,15 @@ void Individual::mutate(Individual& output, Individual& input, MutationType type
 		}
 		default:
 			break;
+		}
 	}
 
 	//evolution record
-	Evolution* evolution = new Evolution();
-	evolution->m_mutation = (int)type;
-	Individual::copyDNA(input.m_dna, evolution->m_dna_input_a);
-	Individual::copyDNA(output.m_dna, evolution->m_dna_output);
-	output.m_evolution_record.push_back(evolution);
+	//Evolution* evolution = new Evolution();
+	//evolution->m_mutation = (int)type;
+	//Individual::copyDNA(input.m_dna, evolution->m_dna_input_a);
+	//Individual::copyDNA(output.m_dna, evolution->m_dna_output);
+	//output.m_evolution_record.push_back(evolution);
 }
 
 int Individual::ComputeFitness(int dna_individual[], int dna_secret[])

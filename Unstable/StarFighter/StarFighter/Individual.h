@@ -13,13 +13,13 @@ public:
 
 	void randomizeDNA();
 
-	static void copyDNA(int dna_input[], int dna_output[]);
+	static void copyDNA(const int dna_input[], int dna_output[]);
 	void DisplayDNA();
 	static void DisplayDNA(int dna[]);
 	void DisplayEvolutionRecord(int dna_secret[]);
-	void copy(Individual& individual);
-	static void crossOver(Individual& output, Individual& input_a, Individual& input_b, CrossOverType type);
-	static void mutate(Individual& output, Individual& input, MutationType type);
+	void copy(const Individual& individual);
+	static void crossOver(Individual& output, const Individual& input_a, const Individual& input_b, CrossOverType type);
+	static void mutate(Individual& output, const Individual& input, MutationType type, int repeat = 10);
 
 	static int ComputeFitness(Individual& individual, Individual& const secret);
 	static int ComputeFitness(int dna_individual[], int dna_secret[]);

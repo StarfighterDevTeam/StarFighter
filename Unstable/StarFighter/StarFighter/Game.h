@@ -42,7 +42,7 @@ public:
 	Game();
 	~Game();
 	void init(sf::RenderWindow* pWindow);
-	int update(sf::Time dt, Action action);//returns score on game over
+	int update(sf::Time dt, Action action, bool bRealTime);//returns score on game over
 	void draw();
 	void reset();
 

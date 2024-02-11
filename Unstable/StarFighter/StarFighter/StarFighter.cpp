@@ -109,7 +109,7 @@ int main()
 
 						dt = deltaClock.restart();
 
-						const int score = newgame.update(dt, action);
+						const int score = newgame.update(dt, action, bEvolutionOver);
 
 						if (HUMAN_PLAYER_ONLY == false)
 						{
@@ -121,16 +121,24 @@ int main()
 							}
 						}
 
-						newgame.draw();
-						renderWindow.display();
-					}
+						if (bEvolutionOver)
+						{
+							newgame.draw();
+							renderWindow.display();
+						}
 
-					//end of evolution? loop play with Hero DNA
-					if (individualId == POPULATION_SIZE - 1 && genId == NB_GENERATIONS - 1)
-					{
-						bEvolutionOver = true;
-						current_gen.OrderPopulation();
-						hero = current_gen.m_population[POPULATION_SIZE - 1];
+						//end of evolution? loop play with Hero DNA
+						if (!bEvolutionOver && individualId == POPULATION_SIZE - 1 && genId == NB_GENERATIONS - 1)
+						{
+							printf("\n");
+							system("pause");
+							bEvolutionOver = true;
+							current_gen.OrderPopulation();
+							if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
+								hero = current_gen.m_population[0];
+
+							printf("--- Hero playing ---\n");
+						}
 					}
 				}
 
@@ -141,33 +149,14 @@ int main()
 					hero = current_gen.m_population[0];
 
 				const int averageScore = current_gen.getAverageFitness();
-				printf("Generation results: top score: %d, average score: %d\n", current_gen.m_population[POPULATION_SIZE - 1].getFitness(), averageScore);
-				if (genId < NB_GENERATIONS - 1)
-					Generation::evoluate(current_gen);
-			}
+				printf("--- Generation results: top score: %d, average score: %d ---\n\n", current_gen.m_population[POPULATION_SIZE - 1].getFitness(), averageScore);
 
-			system("pause");
+				//Evoluate
+				if (genId < NB_GENERATIONS - 1)
+					Generation::evoluate(current_gen, hero);
+			}
 		}
 	}
-
-	//while (hero.m_fitness < MAX_FITNESS || current_gen.m_gen == 0)
-	//{
-	//	printf("\nGeneration %d. ", current_gen.m_gen + 1);
-	//	current_gen.CreateNewGeneration(hero);
-	//	current_gen.ComputeFitness(secret);
-	//	current_gen.OrderPopulation();
-	//	hero = current_gen.m_population[POPULATION_SIZE - 1];
-	//
-	//	printf("HERO dna: ");
-	//	hero.DisplayDNA();
-	//	printf(", Fitness: %d\n", hero.m_fitness);
-	//	
-	//}
-	//
-	//printf("\nSUCESS.\n");
-	//hero.DisplayEvolutionRecord(secret.m_dna);
-	//printf("\n");
-	//system("pause");
 
 	return 0;
 }

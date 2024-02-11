@@ -11,7 +11,8 @@
 #define START_SIZE			3
 #define TIMEOUT_TICK_RATIO	20
 
-#define GAME_SPEED			300.f
+#define GAME_SPEED_TRAINING			10000.f//300.f
+#define GAME_SPEED_REALTIME			50.f//300.f
 
 Game::Game()
 {
@@ -196,10 +197,10 @@ sf::Vector2u Game::getNextCell(Action action)
 	return nextPos;
 }
 
-int Game::update(sf::Time dt, Action action)
+int Game::update(sf::Time dt, Action action, bool bRealTime)
 {
 	m_tickTimer += dt.asSeconds();
-	const float frameDuration = 1.f / GAME_SPEED;
+	const float frameDuration = 1.f / (bRealTime ? GAME_SPEED_REALTIME : GAME_SPEED_TRAINING);
 
 	static Action actionApplied = Action::STRAIGHT;//store action if it's a turn and apply it once per tick
 	if (action != Action::STRAIGHT)
@@ -208,7 +209,7 @@ int Game::update(sf::Time dt, Action action)
 		//printf("action: %d\n", (int)action);
 	}
 
-	if (m_tickTimer > 1.f / GAME_SPEED)
+	if (m_tickTimer > frameDuration)
 	{
 		m_tickTimer = 0.f;
 		m_tick++;
