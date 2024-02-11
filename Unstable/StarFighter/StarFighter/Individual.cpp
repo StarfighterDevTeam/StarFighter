@@ -5,7 +5,8 @@
 
 Individual::Individual()
 {
-	m_generation = NULL;
+	m_generation = nullptr;
+	m_badGene = -1;
 	randomizeDNA();
 
 	//evolution record
@@ -22,7 +23,7 @@ Individual::~Individual()
 	//{
 	//	delete m_evolution_record[i];
 	//}
-	m_evolution_record.clear();
+	//m_evolution_record.clear();
 }
 
 void Individual::randomizeDNA()
@@ -240,28 +241,28 @@ void Individual::mutate(Individual& output, const Individual& input, MutationTyp
 
 	for (int i = 0; i < repeat; i++)
 	{
-		const int r = RandomizeIntBetweenValues(0, DNA_LENGTH - 1);
-		const int v = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
+		const int r = (i == 0 && input.m_badGene >= 0) ? input.m_badGene : RandomizeIntBetweenValues(0, DNA_LENGTH - 1);//prioritize mutation of a bad gene if any
+		const int v = RandomizeIntBetweenValues(1, DNA_ENTROPY - 1);
 
 		switch (type)
 		{
-		case Mutation_Add:
-		{
-			output.m_dna[r] = (input.m_dna[r] + v) % DNA_ENTROPY;
-			break;
-		}
-		case Mutation_Erase:
-		{
-			output.m_dna[r] = 0;
-			break;
-		}
-		case Mutation_Expand:
-		{
-			output.m_dna[(r + v) % DNA_ENTROPY] = input.m_dna[r];
-			break;
-		}
-		default:
-			break;
+			case Mutation_Add:
+			{
+				output.m_dna[r] = (input.m_dna[r] + v) % DNA_ENTROPY;
+				break;
+			}
+			case Mutation_Erase:
+			{
+				output.m_dna[r] = 0;
+				break;
+			}
+			case Mutation_Expand:
+			{
+				output.m_dna[(r + v) % DNA_ENTROPY] = input.m_dna[r];
+				break;
+			}
+			default:
+				break;
 		}
 	}
 

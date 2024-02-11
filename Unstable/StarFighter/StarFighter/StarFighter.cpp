@@ -55,9 +55,9 @@ int main()
 						Action action = Action::STRAIGHT;
 
 						const Individual& current_individual = bEvolutionOver ? hero : current_gen.m_population[individualId];
-
+						const int stateId = newgame.getStateId();//compute game state into a decimal input value
 						if (HUMAN_PLAYER_ONLY == false)
-							action = newgame.getAction(newgame.getState(), current_individual);
+							action = newgame.getAction(stateId, current_individual);
 
 						//human inputs
 						sf::Event event;
@@ -135,11 +135,13 @@ int main()
 									case Death::WALL:
 									{
 										std::strcpy(death_str, "Wall");
+										current_gen.m_population[individualId].setBadGene(stateId);
 										break;
 									}
 									case Death::OWN:
 									{
 										std::strcpy(death_str, "Own body");
+										current_gen.m_population[individualId].setBadGene(stateId);
 										break;
 									}
 									case Death::TIMEOUT:

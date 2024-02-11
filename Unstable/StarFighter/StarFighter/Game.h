@@ -56,9 +56,10 @@ public:
 	Direction getPlayerDirection()	{ return m_playerDirection; }
 	sf::Vector2u spawnFood();
 	void setPause(bool bPause)		{ m_bPaused = bPause; }
-	bool isPaused()					{ return m_bPaused; }
-	State getState()				{ return m_state; }
-	Action getAction(const State state, const Individual& individual);
+	bool isPaused()	const			{ return m_bPaused; }
+	State getState() const			{ return m_state; }
+	int getStateId() const;
+	Action getAction(const int stateId, const Individual& individual);
 
 private:
 	sf::Vector2f getCellPos(int x, int y);

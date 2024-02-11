@@ -24,7 +24,9 @@ public:
 	static int ComputeFitness(Individual& individual, Individual& const secret);
 	static int ComputeFitness(int dna_individual[], int dna_secret[]);
 	void setFitness(const int score)		{ m_fitness = score; }
-	int getFitness()						{ return m_fitness; }
+	int getFitness() const					{ return m_fitness; }
+	void setBadGene(int badGeneId)			{ m_badGene = badGeneId; }
+	int getBadGene() const					{ return m_badGene; }
 
 	bool saveInFile();
 	bool loadFromFile();
@@ -34,6 +36,7 @@ public:
 	int m_fitness;
 	int m_gen;
 	Generation* m_generation;
+	int m_badGene;
 
 	std::vector<Evolution*> m_evolution_record;
 };

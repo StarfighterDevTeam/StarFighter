@@ -362,22 +362,27 @@ State Game::computeState()
 	return state;
 }
 
-Action Game::getAction(const State state, const Individual& individual)
+int Game::getStateId() const
 {
 	const int decimal =
-		(int)state.bDangerStraight
-		+ (int)state.bDangerLeft * 2
-		+ (int)state.bDangerRight * 2 * 2
-		+ (int)state.bDirectionLeft * 2 * 2 * 2
-		+ (int)state.bDirectionRight * 2 * 2 * 2 * 2
-		+ (int)state.bDirectionUp * 2 * 2 * 2 * 2 * 2
-		+ (int)state.bDirectionDown * 2 * 2 * 2 * 2 * 2 * 2
-		+ (int)state.bFoodLeft * 2 * 2 * 2 * 2 * 2 * 2 * 2
-		+ (int)state.bFoodRight * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
-		+ (int)state.bFoodUp * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
-		+ (int)state.bFoodDown * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+			(int)m_state.bDangerStraight
+		+	(int)m_state.bDangerLeft * 2
+		+	(int)m_state.bDangerRight * 2 * 2
+		+	(int)m_state.bDirectionLeft * 2 * 2 * 2
+		+	(int)m_state.bDirectionRight * 2 * 2 * 2 * 2
+		+	(int)m_state.bDirectionUp * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bDirectionDown * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodLeft * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodRight * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodUp * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodDown * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
 
-	Action action = (Action)individual.m_dna[decimal];
+	return decimal;
+}
+
+Action Game::getAction(const int stateId, const Individual& individual)
+{
+	Action action = (Action)individual.m_dna[stateId];
 	return action;
 }
 
