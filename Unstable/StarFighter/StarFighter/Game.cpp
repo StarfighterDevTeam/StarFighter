@@ -197,8 +197,9 @@ sf::Vector2u Game::getNextCell(Action action)
 	return nextPos;
 }
 
-int Game::update(sf::Time dt, Action action, bool bRealTime)
+void Game::update(sf::Time dt, Action action, bool bRealTime, int& score, Death& death)
 {
+	score = -1;
 	m_tickTimer += dt.asSeconds();
 	const float frameDuration = 1.f / (bRealTime ? GAME_SPEED_REALTIME : GAME_SPEED_TRAINING);
 
@@ -269,11 +270,16 @@ int Game::update(sf::Time dt, Action action, bool bRealTime)
 			//else if (bTimeOut)
 			//	printf("--- GAME OVER : Time Out --- Score: %d, Ticks: %d\n", m_score, m_tick);
 
-			const int finalScore = computeScore();
+			score = computeScore();
+			if (bCollisionWithWall)
+				death = Death::WALL;
+			else if (bCollisionWithOwnBody)
+				death = Death::OWN;
+			else
+				death = Death::TIMEOUT;
 
 			reset();
-
-			return finalScore;
+			return;
 		}
 
 		//compute new state
@@ -281,9 +287,7 @@ int Game::update(sf::Time dt, Action action, bool bRealTime)
 
 		//reset action for next tick
 		actionApplied = Action::STRAIGHT;
-	}
-
-	return -1;
+	};
 }
 
 void Game::draw()

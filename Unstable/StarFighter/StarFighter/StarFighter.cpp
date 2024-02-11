@@ -31,6 +31,7 @@ int main()
 		{
 			//Loop through generations
 			Individual hero;
+			int eraId = 0;
 			for (int genId = 0; genId < NB_GENERATIONS; genId++)
 			{
 				static Generation current_gen = Generation(0);
@@ -39,7 +40,7 @@ int main()
 				for (int individualId = 0; individualId < POPULATION_SIZE; individualId++)
 				{
 					if (HUMAN_PLAYER_ONLY == false)
-						printf("Gen: %d, Individual: %d", genId, individualId);
+						printf("Gen: %d, Individual: %d", genId + eraId * NB_GENERATIONS, individualId);
 
 					newgame.reset();
 					bool bGameOver = false;
@@ -113,16 +114,38 @@ int main()
 
 						dt = deltaClock.restart();
 
-						const int score = newgame.update(dt, action, bEvolutionOver);
+						int score;
+						Death death;
+						newgame.update(dt, action, bEvolutionOver, score, death);
 
 						if (HUMAN_PLAYER_ONLY == false)
 						{
 							if (score >= 0)
 							{
 								bGameOver = true;
-								if (!bEvolutionOver)
+								const bool bIsHero = genId > 0 && individualId == POPULATION_SIZE - 1;
+								if (!bEvolutionOver && !bIsHero)//don't re-rate the Hero
 									current_gen.m_population[individualId].setFitness(score);
-								printf(" Score: %d\n", score);
+								char death_str[128];
+								switch (death)
+								{
+									case Death::WALL:
+									{
+										std::strcpy(death_str, "Wall");
+										break;
+									}
+									case Death::OWN:
+									{
+										std::strcpy(death_str, "Own body");
+										break;
+									}
+									case Death::TIMEOUT:
+									{
+										std::strcpy(death_str, "Time out");
+										break;
+									}
+								}
+								printf(" Score: %d, Death: %s\n", score, death_str);
 							}
 						}
 
@@ -138,6 +161,7 @@ int main()
 							printf("\n");
 							system("pause");
 							bEvolutionOver = true;
+							eraId++;
 							current_gen.OrderPopulation();
 							if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
 								hero = current_gen.m_population[POPULATION_SIZE - 1];

@@ -140,7 +140,7 @@ void Generation::evoluate(Generation& gen, const Individual& hero, int learningR
 		//hero: keep him
 		if (i > POPULATION_SIZE - 1)
 		{
-			//do nothing
+			Individual::copyDNA(hero.m_dna, gen.m_population[i].m_dna);
 		}
 		//top 9: keep them
 		else if (i > POPULATION_SIZE - 1 - 9)

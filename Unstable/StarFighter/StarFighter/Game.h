@@ -20,6 +20,13 @@ enum class Action : int
 	TURN_RIGHT
 };
 
+enum class Death : int
+{
+	WALL,
+	OWN,
+	TIMEOUT
+};
+
 struct State
 {
 public:
@@ -42,7 +49,7 @@ public:
 	Game();
 	~Game();
 	void init(sf::RenderWindow* pWindow);
-	int update(sf::Time dt, Action action, bool bRealTime);//returns score on game over
+	void update(sf::Time dt, Action action, bool bRealTime, int& score, Death& death);//returns score on game over
 	void draw();
 	void reset();
 
