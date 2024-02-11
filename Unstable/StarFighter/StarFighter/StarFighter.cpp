@@ -30,6 +30,7 @@ int main()
 		//Generations
 		{
 			//Loop through generations
+			Individual hero;
 			for (int genId = 0; genId < NB_GENERATIONS; genId++)
 			{
 				static Generation current_gen = Generation(0);
@@ -42,14 +43,17 @@ int main()
 
 					newgame.reset();
 					bool bGameOver = false;
+					bool bEvolutionOver = false;
 
 					//Game loop
-					while (!bGameOver || HUMAN_PLAYER_ONLY)
+					while (!bGameOver || bEvolutionOver || HUMAN_PLAYER_ONLY)
 					{
 						Action action = Action::STRAIGHT;
 
+						const Individual& current_individual = bEvolutionOver ? hero : current_gen.m_population[individualId];
+
 						if (HUMAN_PLAYER_ONLY == false)
-							action = newgame.getAction(newgame.getState(), &current_gen.m_population[individualId]);
+							action = newgame.getAction(newgame.getState(), current_individual);
 
 						//human inputs
 						sf::Event event;
@@ -120,10 +124,22 @@ int main()
 						newgame.draw();
 						renderWindow.display();
 					}
+
+					//end of evolution? loop play with Hero DNA
+					if (individualId == POPULATION_SIZE - 1 && genId == NB_GENERATIONS - 1)
+					{
+						bEvolutionOver = true;
+						current_gen.OrderPopulation();
+						hero = current_gen.m_population[POPULATION_SIZE - 1];
+					}
 				}
 
 				//Select best individuals
 				current_gen.OrderPopulation();
+
+				if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
+					hero = current_gen.m_population[0];
+
 				const int averageScore = current_gen.getAverageFitness();
 				printf("Generation results: top score: %d, average score: %d\n", current_gen.m_population[POPULATION_SIZE - 1].getFitness(), averageScore);
 				if (genId < NB_GENERATIONS - 1)

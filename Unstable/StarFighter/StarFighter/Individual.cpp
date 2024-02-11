@@ -240,23 +240,23 @@ void Individual::mutate(Individual& output, Individual& input, MutationType type
 
 	switch (type)
 	{
-	case Mutation_Add:
-	{
-		output.m_dna[r] = (input.m_dna[r] + v) % DNA_ENTROPY;
-		break;
-	}
-	case Mutation_Erase:
-	{
-		output.m_dna[r] = 0;
-		break;
-	}
-	case Mutation_Expand:
-	{
-		output.m_dna[(r + v) % DNA_ENTROPY] = input.m_dna[r];
-		break;
-	}
-	default:
-		break;
+		case Mutation_Add:
+		{
+			output.m_dna[r] = (input.m_dna[r] + v) % DNA_ENTROPY;
+			break;
+		}
+		case Mutation_Erase:
+		{
+			output.m_dna[r] = 0;
+			break;
+		}
+		case Mutation_Expand:
+		{
+			output.m_dna[(r + v) % DNA_ENTROPY] = input.m_dna[r];
+			break;
+		}
+		default:
+			break;
 	}
 
 	//evolution record

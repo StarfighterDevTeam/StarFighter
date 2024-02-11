@@ -357,9 +357,9 @@ State Game::computeState()
 	return state;
 }
 
-Action Game::getAction(State state, Individual* individual)
+Action Game::getAction(const State state, const Individual& individual)
 {
-	int decimal =
+	const int decimal =
 		(int)state.bDangerStraight
 		+ (int)state.bDangerLeft * 2
 		+ (int)state.bDangerRight * 2 * 2
@@ -372,7 +372,7 @@ Action Game::getAction(State state, Individual* individual)
 		+ (int)state.bFoodUp * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
 		+ (int)state.bFoodDown * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
 
-	Action action = (Action)individual->m_dna[decimal];
+	Action action = (Action)individual.m_dna[decimal];
 	return action;
 }
 

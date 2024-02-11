@@ -140,18 +140,18 @@ void Generation::evoluate(Generation& gen)
 		{
 			//do nothing
 		}
-		//random 5: keep them
-		else if (i > POPULATION_SIZE - 10 - 5)
+		//random 3: keep them
+		else if (i > POPULATION_SIZE - 10 - 3)
 		{
 			const int random = RandomizeIntBetweenValues(0, i);
 			Individual::copyDNA(oldGen.m_population[random].m_dna, gen.m_population[i].m_dna);
 		}
 		//new random 5: generate them
-		else if (i > POPULATION_SIZE - 10 - 5 - 5)
+		else if (i > POPULATION_SIZE - 10 - 3 - 5)
 		{
 			gen.m_population[i].randomizeDNA();
 		}
-		//last 10 : crossovers & mutations between top 3 DNAs
+		//last 12 : crossovers & mutations between top 3 DNAs
 		else 
 		{
 			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 2], CrossOver_FirstHalf);
@@ -181,6 +181,9 @@ void Generation::evoluate(Generation& gen)
 			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_SecondHalf);
 			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_AlternateOdd);
 			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
+
+			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add);
+			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand);
 
 			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add);
 			Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand);

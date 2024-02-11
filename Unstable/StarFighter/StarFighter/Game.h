@@ -51,7 +51,7 @@ public:
 	void setPause(bool bPause)		{ m_bPaused = bPause; }
 	bool isPaused()					{ return m_bPaused; }
 	State getState()				{ return m_state; }
-	Action getAction(State state, Individual* individual);
+	Action getAction(const State state, const Individual& individual);
 
 private:
 	sf::Vector2f getCellPos(int x, int y);
