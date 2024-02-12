@@ -318,12 +318,19 @@ void Game::draw()
 		}
 	}
 
-	//player
+	//player head
+	sf::RectangleShape payerCell(sf::Vector2f(CELL_SIZE - GRID_THICKNESS, CELL_SIZE - GRID_THICKNESS));
+	payerCell.setFillColor(sf::Color(0, 255, 0, 255));
+	payerCell.setOutlineColor(sf::Color(255, 255, 255, 0));
+	payerCell.setPosition(getCellPos(m_playerPos[0].x, m_playerPos[0].y));
+	m_window->draw(payerCell);
+
+	//player body
 	int snakeSize = (int)m_playerPos.size();
-	for (int i = 0; i < snakeSize; i++)
+	for (int i = 1; i < snakeSize; i++)
 	{
 		sf::RectangleShape payerCell(sf::Vector2f(CELL_SIZE - GRID_THICKNESS, CELL_SIZE - GRID_THICKNESS));
-		payerCell.setFillColor(sf::Color(0, 255, 0, 255));
+		payerCell.setFillColor(sf::Color(0, 128, 0, 255));
 		payerCell.setOutlineColor(sf::Color(255, 255, 255, 0));
 		payerCell.setPosition(getCellPos(m_playerPos[i].x, m_playerPos[i].y));
 		m_window->draw(payerCell);
@@ -369,7 +376,7 @@ State Game::computeState()
 	state.bFoodUp = m_foodPos.y < headPos.y;
 	state.bFoodDown = m_foodPos.y > headPos.y;
 
-	state.bWallSeenRight = isWallSeen(headPos, nextCellStraight - headPos);
+	state.bWallSeenStraight = isWallSeen(headPos, nextCellStraight - headPos);
 	state.bWallSeenLeft = isWallSeen(headPos, nextCellLeft - headPos);
 	state.bWallSeenRight = isWallSeen(headPos, nextCellRight - headPos);
 
