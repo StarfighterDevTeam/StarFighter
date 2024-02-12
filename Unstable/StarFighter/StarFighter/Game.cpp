@@ -3,17 +3,6 @@
 #include "Individual.h"
 #include "assert.h"
 
-#define GRID_NB_LINES		20
-#define LEFT_MARGIN			150.f
-#define UP_MARGIN			150.f
-#define CELL_SIZE			20.f
-#define GRID_THICKNESS		2.f
-#define START_SIZE			3
-#define TIMEOUT_TICK_RATIO	50
-
-#define GAME_SPEED_TRAINING			10000.f//300.f
-#define GAME_SPEED_REALTIME			50.f//300.f
-
 Game::Game()
 {
 }
@@ -197,11 +186,11 @@ sf::Vector2u Game::getNextCell(Action action)
 	return nextPos;
 }
 
-void Game::update(sf::Time dt, Action action, bool bRealTime, int& score, Death& death)
+void Game::update(sf::Time dt, Action action, bool bRealTime, bool bWritingDNA, int& score, Death& death, bool& bGameOver)
 {
-	score = -1;
+	bGameOver = false;
 	m_tickTimer += dt.asSeconds();
-	const float frameDuration = 1.f / (bRealTime ? GAME_SPEED_REALTIME : GAME_SPEED_TRAINING);
+	const float frameDuration = 1.f / (bRealTime ? (bWritingDNA ? GAME_SPEED_NORMAL : GAME_SPEED_FAST) : GAME_SPEED_TRAINING);
 
 	static Action actionApplied = Action::STRAIGHT;//store action if it's a turn and apply it once per tick
 	if (action != Action::STRAIGHT)
@@ -257,10 +246,15 @@ void Game::update(sf::Time dt, Action action, bool bRealTime, int& score, Death&
 		else
 			m_tickWithoutEating++;
 
-		//collision (= game over)
+		//game over conditions
 		const bool bCollisionWithWall = m_playerPos[0].x < 0 || m_playerPos[0].x >= GRID_NB_LINES || m_playerPos[0].y < 0 || m_playerPos[0].y >= GRID_NB_LINES;
 		const bool bCollisionWithOwnBody = bCollisionWithWall ? false : isCollidingWithSelf();
 		const bool bTimeOut = m_tickWithoutEating > (m_score + 1) * TIMEOUT_TICK_RATIO;
+
+		//score
+		score = computeScore();
+
+		//death
 		if (bCollisionWithWall || bCollisionWithOwnBody || bTimeOut)
 		{
 			//if (bCollisionWithWall)
@@ -270,7 +264,6 @@ void Game::update(sf::Time dt, Action action, bool bRealTime, int& score, Death&
 			//else if (bTimeOut)
 			//	printf("--- GAME OVER : Time Out --- Score: %d, Ticks: %d\n", m_score, m_tick);
 
-			score = computeScore();
 			if (bCollisionWithWall)
 				death = Death::WALL;
 			else if (bCollisionWithOwnBody)
@@ -278,7 +271,7 @@ void Game::update(sf::Time dt, Action action, bool bRealTime, int& score, Death&
 			else
 				death = Death::TIMEOUT;
 
-			reset();
+			bGameOver = true;
 			return;
 		}
 

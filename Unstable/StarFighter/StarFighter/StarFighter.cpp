@@ -1,7 +1,5 @@
 #include "StarFighter.h"
 
-#define HUMAN_PLAYER_ONLY	false
-
 int main()
 {
 	//SFML Window
@@ -30,6 +28,7 @@ int main()
 		//Generations
 		{
 			//Loop through generations
+			static bool bWritingDNA = WRITE_DNA;
 			Individual hero;
 			if (hero.loadFromFile())
 				printf("--- Hero loaded (score: %d) ---\n\n", hero.getFitness());
@@ -54,17 +53,19 @@ int main()
 					{
 						Action action = Action::STRAIGHT;
 
-						const Individual& current_individual = bEvolutionOver ? hero : current_gen.m_population[individualId];
+						Individual& current_individual = bEvolutionOver ? hero : current_gen.m_population[individualId];
 						const int stateId = newgame.getStateId();//compute game state into a decimal input value
-						if (HUMAN_PLAYER_ONLY == false)
+						if (HUMAN_PLAYER_ONLY == false && bWritingDNA == false)
 							action = newgame.getAction(stateId, current_individual);
 
 						//human inputs
 						sf::Event event;
+						bool bShouldQuit = false;
 						while (renderWindow.pollEvent(event))
 						{
 							if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 							{
+								bShouldQuit = true;
 								renderWindow.close();
 							}
 
@@ -75,6 +76,15 @@ int main()
 								genId = 0;
 								individualId = 0;
 								printf("Restart using last generation");
+							}
+
+							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::W)
+							{
+								bWritingDNA = !bWritingDNA;
+								if (bWritingDNA)
+									printf("\n--- Writing DNA ---");
+								else
+									printf("\n--- STOP Writing DNA ---");
 							}
 
 							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::E)
@@ -123,20 +133,38 @@ int main()
 							}
 						}
 
-						dt = deltaClock.restart();
+						//write DNA
+						if (bWritingDNA)
+						{
+							if (bShouldQuit)
+							{
+								Individual previous_hero;
+								if (!previous_hero.loadFromFile() || previous_hero.getFitness() < hero.getFitness())
+									hero.saveInFile();
+							}
 
+							hero.m_dna[stateId] = (int)action;
+						}
+
+						//update game
+						dt = deltaClock.restart();
 						int score;
 						Death death;
-						newgame.update(dt, action, bEvolutionOver, score, death);
+						newgame.update(dt, action, bEvolutionOver || bWritingDNA, bWritingDNA, score, death, bGameOver);
+
+						current_individual.setFitness(score);
+
+						if (bGameOver)
+							newgame.reset();
 
 						if (HUMAN_PLAYER_ONLY == false)
 						{
-							if (score >= 0)
+							//game over => compute score and display reason for death
+							if (bGameOver)
 							{
-								bGameOver = true;
 								const bool bIsHero = genId > 0 && individualId == POPULATION_SIZE - 1;
-								if (!bEvolutionOver && !bIsHero)//don't re-rate the Hero
-									current_gen.m_population[individualId].setFitness(score);
+								if (&current_individual == &hero && !bWritingDNA)//don't re-rate the Hero
+									current_individual.setFitness(score);
 								char death_str[128];
 								switch (death)
 								{
@@ -162,14 +190,15 @@ int main()
 							}
 						}
 
-						if (bEvolutionOver)
+						//display
+						if (bEvolutionOver || bWritingDNA)
 						{
 							newgame.draw();
 							renderWindow.display();
 						}
 
 						//end of evolution? loop play with Hero DNA
-						if (!bEvolutionOver && individualId == POPULATION_SIZE - 1 && genId == NB_GENERATIONS - 1)
+						if (!bEvolutionOver && !bWritingDNA && individualId == POPULATION_SIZE - 1 && genId == NB_GENERATIONS - 1)
 						{
 							printf("\n");
 							system("pause");

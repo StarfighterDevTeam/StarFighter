@@ -3,6 +3,21 @@
 
 #include "SFML//Graphics.hpp"
 
+#define GRID_NB_LINES				20
+#define LEFT_MARGIN					150.f
+#define UP_MARGIN					150.f
+#define CELL_SIZE					20.f
+#define GRID_THICKNESS				2.f
+#define START_SIZE					3
+#define TIMEOUT_TICK_RATIO			50
+
+#define GAME_SPEED_TRAINING			10000.f//300.f
+#define GAME_SPEED_FAST				50.f//300.f
+#define GAME_SPEED_NORMAL			10.f
+
+#define HUMAN_PLAYER_ONLY			false
+#define WRITE_DNA					false
+
 class Individual;
 
 enum class Direction : int
@@ -49,7 +64,7 @@ public:
 	Game();
 	~Game();
 	void init(sf::RenderWindow* pWindow);
-	void update(sf::Time dt, Action action, bool bRealTime, int& score, Death& death);//returns score on game over
+	void update(sf::Time dt, Action action, bool bRealTime, bool bWritingDNA, int& score, Death& death, bool& bGameOver);//returns score on game over
 	void draw();
 	void reset();
 
