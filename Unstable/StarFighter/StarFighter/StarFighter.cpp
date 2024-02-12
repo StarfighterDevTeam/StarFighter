@@ -69,7 +69,7 @@ int main()
 								renderWindow.close();
 							}
 
-							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::R)
+							if (bEvolutionOver == true || event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::R)
 							{
 								newgame.reset();
 								bEvolutionOver = false;
@@ -201,14 +201,17 @@ int main()
 						if (!bEvolutionOver && !bWritingDNA && individualId == POPULATION_SIZE - 1 && genId == NB_GENERATIONS - 1)
 						{
 							printf("\n");
-							system("pause");
+							//system("pause");
 							bEvolutionOver = true;
 							eraId++;
 							current_gen.OrderPopulation();
 							if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
 							{
 								hero = current_gen.m_population[POPULATION_SIZE - 1];
-								hero.saveInFile();
+
+								Individual previous_hero;
+								if (!previous_hero.loadFromFile() || previous_hero.getFitness() < hero.getFitness())
+									hero.saveInFile();
 							}
 
 							printf("--- Hero playing (top score: %d)---\n", hero.getFitness());
@@ -222,7 +225,10 @@ int main()
 				if (hero.m_fitness < current_gen.m_population[POPULATION_SIZE - 1].getFitness())//keep hero
 				{
 					hero = current_gen.m_population[POPULATION_SIZE - 1];
-					hero.saveInFile();
+
+					Individual previous_hero;
+					if (!previous_hero.loadFromFile() || previous_hero.getFitness() < hero.getFitness())
+						hero.saveInFile();
 				}
 
 				const int averageScore = current_gen.getAverageFitness();
