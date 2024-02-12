@@ -56,6 +56,9 @@ public:
 	bool bFoodRight;
 	bool bFoodUp;
 	bool bFoodDown;
+	bool bWallSeenStraight;
+	bool bWallSeenLeft;
+	bool bWallSeenRight;
 };
 
 class Game
@@ -82,6 +85,7 @@ private:
 	bool isPlayerCell(int x, int y);
 	bool isDangerCell(int x, int y);
 	bool isCollidingWithSelf();
+	bool isWallSeen(sf::Vector2u pos, sf::Vector2u increment);
 	void growSnake();
 	State computeState();
 	int computeScore();

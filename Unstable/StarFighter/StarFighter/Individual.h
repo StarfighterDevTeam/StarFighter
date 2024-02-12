@@ -13,16 +13,16 @@ public:
 
 	void randomizeDNA();
 
-	static void copyDNA(const int dna_input[], int dna_output[]);
-	void DisplayDNA();
-	static void DisplayDNA(int dna[]);
-	void DisplayEvolutionRecord(int dna_secret[]);
+	static void copyDNA(const uint8_t dna_input[], uint8_t dna_output[]);
+	void displayDNA();
+	static void displayDNA(uint8_t dna[]);
+	void DisplayEvolutionRecord(uint8_t dna_secret[]);
 	void copy(const Individual& individual);
 	static void crossOver(Individual& output, const Individual& input_a, const Individual& input_b, CrossOverType type);
 	static void mutate(Individual& output, const Individual& input, MutationType type, int repeat);
 
 	static int ComputeFitness(Individual& individual, Individual& const secret);
-	static int ComputeFitness(int dna_individual[], int dna_secret[]);
+	static int ComputeFitness(uint8_t dna_individual[], uint8_t dna_secret[]);
 	void setFitness(const int score)		{ m_fitness = score; }
 	int getFitness() const					{ return m_fitness; }
 	void setBadGene(int badGeneId)			{ m_badGene = badGeneId; }
@@ -31,7 +31,7 @@ public:
 	bool saveInFile();
 	bool loadFromFile();
 
-	int m_dna[DNA_LENGTH];
+	uint8_t m_dna[DNA_LENGTH];
 	int m_index;
 	int m_fitness;
 	int m_gen;

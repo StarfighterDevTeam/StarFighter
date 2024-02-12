@@ -121,15 +121,15 @@ void Generation::ComputeFitness(Individual& const secret)
 	}
 }
 
-void Generation::evoluate(Generation& gen, const Individual& hero, int learningRate)
+void Generation::evoluate(const Individual& hero)
 {
-	Generation oldGen = gen;//make a copy before overwriting gen
+	Generation oldGen = *this;//make a copy before overwriting gen
 
-	gen.m_gen++;
+	m_gen++;
 	int last_threshold = POPULATION_SIZE - 1;
 	for (int i = POPULATION_SIZE - 1; i > 0; i--)
 	{
-		gen.m_population[i].m_gen = gen.m_gen;
+		m_population[i].m_gen = m_gen;
 
 		//evolution record
 		//Evolution* evolution = new Evolution();
@@ -140,7 +140,7 @@ void Generation::evoluate(Generation& gen, const Individual& hero, int learningR
 		//hero: keep him
 		if (i > POPULATION_SIZE - 1)
 		{
-			Individual::copyDNA(hero.m_dna, gen.m_population[i].m_dna);
+			Individual::copyDNA(hero.m_dna, m_population[i].m_dna);
 		}
 		//top 9: keep them
 		else if (i > POPULATION_SIZE - 1 - 9)
@@ -151,61 +151,61 @@ void Generation::evoluate(Generation& gen, const Individual& hero, int learningR
 		else if (i > POPULATION_SIZE - 1 - 9 - 3)
 		{
 			const int random = RandomizeIntBetweenValues(0, i);
-			Individual::copyDNA(oldGen.m_population[random].m_dna, gen.m_population[i].m_dna);
+			Individual::copyDNA(oldGen.m_population[random].m_dna, m_population[i].m_dna);
 		}
 		//new random 5: generate them
 		else if (i > POPULATION_SIZE - 1 - 9 - 3 - 5)
 		{
-			gen.m_population[i].randomizeDNA();
+			m_population[i].randomizeDNA();
 		}
 		//last 12 : crossovers & mutations between top 3 DNAs
 		else 
 		{
-			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_FirstHalf);
-			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_SecondHalf);
-			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_AlternateOdd);
-			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_AlternateNotOdd);
+			Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_FirstHalf);
+			Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_SecondHalf);
+			Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_AlternateOdd);
+			Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], hero, CrossOver_AlternateNotOdd);
 
-			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_FirstHalf);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
+			Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 2], CrossOver_FirstHalf);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
 
-			Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_SecondHalf);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
+			Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 2], CrossOver_SecondHalf);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
 
-			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateOdd);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
+			//Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateOdd);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
 
-			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
+			//Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 1], Mutation_Add);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[i + 2], Mutation_Expand);
 
-			//Individual::crossOver(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateOdd);
+			//Individual::crossOver(m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateOdd);
 
-			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_FirstHalf);
-			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_SecondHalf);
-			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_AlternateOdd);
-			//Individual::crossOver(	gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
+			//Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_FirstHalf);
+			//Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_SecondHalf);
+			//Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 4], CrossOver_AlternateOdd);
+			//Individual::crossOver(	m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], oldGen.m_population[POPULATION_SIZE - 3], CrossOver_AlternateNotOdd);
 
-			Individual::mutate(		gen.m_population[i--], hero, Mutation_Add, learningRate);
-			Individual::mutate(		gen.m_population[i--], hero, Mutation_Expand, learningRate);
+			Individual::mutate(		m_population[i--], hero, Mutation_Add, RandomizeIntBetweenValues(1, (int)(DNA_LENGTH * 0.01f)));
+			Individual::mutate(		m_population[i--], hero, Mutation_Expand, RandomizeIntBetweenValues(1, (int)(DNA_LENGTH * 0.01f)));
 
-			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add, learningRate);
-			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand, learningRate);
+			Individual::mutate(m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Add, RandomizeIntBetweenValues(1, (int)(DNA_LENGTH * 0.01f)));
+			Individual::mutate(m_population[i--], oldGen.m_population[POPULATION_SIZE - 1], Mutation_Expand, RandomizeIntBetweenValues(1, (int)(DNA_LENGTH * 0.01f)));
 
-			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Add, learningRate);
-			Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Expand, learningRate);
+			Individual::mutate(m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Add, RandomizeIntBetweenValues(1, (int)(DNA_LENGTH * 0.01f)));
+			Individual::mutate(m_population[i--], oldGen.m_population[POPULATION_SIZE - 2], Mutation_Expand, RandomizeIntBetweenValues(1, (int)(DNA_LENGTH * 0.01f)));
 
-			//Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Add);
-			//Individual::mutate(gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Expand);
+			//Individual::mutate(m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Add);
+			//Individual::mutate(m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Expand);
 
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Add);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Expand);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Add);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[POPULATION_SIZE - 3], Mutation_Expand);
 			//
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 4], Mutation_Add);
-			//Individual::mutate(		gen.m_population[i--], oldGen.m_population[POPULATION_SIZE - 4], Mutation_Expand);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[POPULATION_SIZE - 4], Mutation_Add);
+			//Individual::mutate(		m_population[i--], oldGen.m_population[POPULATION_SIZE - 4], Mutation_Expand);
 		}
 	}
 }

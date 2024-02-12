@@ -28,23 +28,23 @@ Individual::~Individual()
 
 void Individual::randomizeDNA()
 {
-	for (int i = 0; i < DNA_LENGTH; i++)
+	for (short i = 0; i < DNA_LENGTH; i++)
 	{
 		m_dna[i] = RandomizeIntBetweenValues(0, DNA_ENTROPY - 1);
 	}
 }
 
-void Individual::copyDNA(const int dna_input[], int dna_output[])
+void Individual::copyDNA(const uint8_t dna_input[], uint8_t dna_output[])
 {
-	for (int i = 0; i < DNA_LENGTH; i++)
+	for (short i = 0; i < DNA_LENGTH; i++)
 	{
 		dna_output[i] = dna_input[i];
 	}
 }
 
-void Individual::DisplayDNA()
+void Individual::displayDNA()
 {
-	for (int i = 0; i < DNA_LENGTH; i++)
+	for (short i = 0; i < DNA_LENGTH; i++)
 	{
 		printf("%d", m_dna[i]);
 		if (i < DNA_LENGTH - 1)
@@ -52,9 +52,9 @@ void Individual::DisplayDNA()
 	}
 };
 
-void Individual::DisplayDNA(int dna[])
+void Individual::displayDNA(uint8_t dna[])
 {
-	for (int i = 0; i < DNA_LENGTH; i++)
+	for (short i = 0; i < DNA_LENGTH; i++)
 	{
 		printf("%d", dna[i]);
 		if (i < DNA_LENGTH - 1)
@@ -62,7 +62,7 @@ void Individual::DisplayDNA(int dna[])
 	}
 };
 
-void Individual::DisplayEvolutionRecord(int dna_secret[])
+void Individual::DisplayEvolutionRecord(uint8_t dna_secret[])
 {
 	printf("Evolution record:\n");
 	for (int i = 0; i < m_evolution_record.size(); i++)
@@ -73,7 +73,7 @@ void Individual::DisplayEvolutionRecord(int dna_secret[])
 		{
 			printf("-Generation: %d", evo.m_gen);
 			printf(" -> ");
-			DisplayDNA();
+			displayDNA();
 			printf(", Fitness: %d", ComputeFitness(evo.m_dna_output, dna_secret));
 			printf("\n");
 		}
@@ -101,9 +101,9 @@ void Individual::DisplayEvolutionRecord(int dna_secret[])
 			}
 
 			printf(" ");
-			DisplayDNA(evo.m_dna_input_a);
+			displayDNA(evo.m_dna_input_a);
 			printf(" -> ");
-			DisplayDNA(evo.m_dna_output);
+			displayDNA(evo.m_dna_output);
 			printf(", Fitness: %d", ComputeFitness(evo.m_dna_output, dna_secret));
 			printf("\n");
 		}
@@ -136,11 +136,11 @@ void Individual::DisplayEvolutionRecord(int dna_secret[])
 			}
 
 			printf(" ");
-			DisplayDNA(evo.m_dna_input_a);
+			displayDNA(evo.m_dna_input_a);
 			printf(" + ");
-			DisplayDNA(evo.m_dna_input_b);
+			displayDNA(evo.m_dna_input_b);
 			printf(" -> ");
-			DisplayDNA(evo.m_dna_output);
+			displayDNA(evo.m_dna_output);
 			printf(", Fitness: %d", ComputeFitness(evo.m_dna_output, dna_secret));
 			printf("\n");
 		}
@@ -152,7 +152,7 @@ void Individual::copy(const Individual& individual)
 	m_index = individual.m_index;
 	m_fitness = individual.m_fitness;
 	m_gen = individual.m_gen;
-	for (int i = 0; i < DNA_LENGTH; i++)
+	for (short i = 0; i < DNA_LENGTH; i++)
 	{
 		m_dna[i] = individual.m_dna[i];
 	}
@@ -179,7 +179,7 @@ void Individual::crossOver(Individual& output, const Individual& input_a, const 
 	{
 		case CrossOver_FirstHalf:
 		{
-			for (int i = 0; i < DNA_LENGTH; i++)
+			for (short i = 0; i < DNA_LENGTH; i++)
 			{
 				if (i < DNA_LENGTH / 2)
 					output.m_dna[i] = input_b.m_dna[i];
@@ -190,7 +190,7 @@ void Individual::crossOver(Individual& output, const Individual& input_a, const 
 		}
 		case CrossOver_SecondHalf:
 		{
-			for (int i = 0; i < DNA_LENGTH; i++)
+			for (short i = 0; i < DNA_LENGTH; i++)
 			{
 				if (i < DNA_LENGTH / 2)
 					output.m_dna[i] = input_a.m_dna[i];
@@ -201,7 +201,7 @@ void Individual::crossOver(Individual& output, const Individual& input_a, const 
 		}
 		case CrossOver_AlternateOdd:
 		{
-			for (int i = 0; i < DNA_LENGTH; i++)
+			for (short i = 0; i < DNA_LENGTH; i++)
 			{
 				if (i % DNA_LENGTH == 0)
 					output.m_dna[i] = input_a.m_dna[i];
@@ -212,7 +212,7 @@ void Individual::crossOver(Individual& output, const Individual& input_a, const 
 		}
 		case CrossOver_AlternateNotOdd:
 		{
-			for (int i = 0; i < DNA_LENGTH; i++)
+			for (short i = 0; i < DNA_LENGTH; i++)
 			{
 				if (i % 2 == 0)
 					output.m_dna[i] = input_b.m_dna[i];
@@ -241,8 +241,8 @@ void Individual::mutate(Individual& output, const Individual& input, MutationTyp
 
 	for (int i = 0; i < repeat; i++)
 	{
-		const int r = (i == 0 && input.m_badGene >= 0) ? input.m_badGene : RandomizeIntBetweenValues(0, DNA_LENGTH - 1);//prioritize mutation of a bad gene if any
-		const int v = RandomizeIntBetweenValues(1, DNA_ENTROPY - 1);
+		const short r = (i == 0 && input.m_badGene >= 0) ? input.m_badGene : RandomizeIntBetweenValues(0, DNA_LENGTH - 1);//prioritize mutation of a bad gene if any
+		const uint8_t v = RandomizeIntBetweenValues(1, DNA_ENTROPY - 1);
 
 		switch (type)
 		{
@@ -274,12 +274,12 @@ void Individual::mutate(Individual& output, const Individual& input, MutationTyp
 	//output.m_evolution_record.push_back(evolution);
 }
 
-int Individual::ComputeFitness(int dna_individual[], int dna_secret[])
+int Individual::ComputeFitness(uint8_t dna_individual[], uint8_t dna_secret[])
 {
 	std::vector<int> slots_marked;
 
 	int fitness = 0;
-	for (int i = 0; i < DNA_LENGTH; i++)//proposal
+	for (short i = 0; i < DNA_LENGTH; i++)//proposal
 	{
 		if (dna_individual[i] == dna_secret[i])
 		{
@@ -290,9 +290,9 @@ int Individual::ComputeFitness(int dna_individual[], int dna_secret[])
 		}
 	}
 
-	for (int i = 0; i < DNA_LENGTH; i++)//proposal
+	for (short i = 0; i < DNA_LENGTH; i++)//proposal
 	{
-		for (int j = 0; j < DNA_LENGTH; j++)//secret
+		for (short j = 0; j < DNA_LENGTH; j++)//secret
 		{
 			if (dna_individual[i] == dna_secret[j])
 			{
@@ -342,7 +342,7 @@ bool Individual::saveInFile()
 
 	appendXmlAttribute(doc, individualNode, "fitness", m_fitness);
 
-	for (int i = 0; i < DNA_LENGTH - 1; i++)
+	for (short i = 0; i < DNA_LENGTH - 1; i++)
 	{
 		xml_node<>* geneNode = doc.allocate_node(node_element, "gene");
 		appendXmlAttribute(doc, geneNode, "state", i);
@@ -388,7 +388,7 @@ bool Individual::loadFromFile()
 	int geneId = 0;
 	for (xml_node<>* geneNode = individualNode->first_node("gene"); geneNode; geneNode = geneNode->next_sibling("gene"))
 	{
-		m_dna[geneId] = std::stoi(geneNode->first_attribute("action")->value());
+		m_dna[geneId] = (uint8_t)std::stoi(geneNode->first_attribute("action")->value());
 		geneId++;
 	}
 

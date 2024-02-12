@@ -186,6 +186,23 @@ sf::Vector2u Game::getNextCell(Action action)
 	return nextPos;
 }
 
+bool Game::isWallSeen(sf::Vector2u pos, sf::Vector2u increment)
+{
+	pos.x += increment.x;
+	pos.y += increment.y;
+
+	while (pos.x >= 0 && pos.x <= GRID_NB_LINES - 1 && pos.y >= 0 && pos.y <= GRID_NB_LINES - 1)
+	{
+		if (isPlayerCell(pos.x, pos.y))
+			return false;
+
+		pos.x += increment.x;
+		pos.y += increment.y;
+	}
+
+	return true;
+}
+
 void Game::update(sf::Time dt, Action action, bool bRealTime, bool bWritingDNA, int& score, Death& death, bool& bGameOver)
 {
 	bGameOver = false;
@@ -352,6 +369,10 @@ State Game::computeState()
 	state.bFoodUp = m_foodPos.y < headPos.y;
 	state.bFoodDown = m_foodPos.y > headPos.y;
 
+	state.bWallSeenRight = isWallSeen(headPos, nextCellStraight - headPos);
+	state.bWallSeenLeft = isWallSeen(headPos, nextCellLeft - headPos);
+	state.bWallSeenRight = isWallSeen(headPos, nextCellRight - headPos);
+
 	return state;
 }
 
@@ -359,16 +380,19 @@ int Game::getStateId() const
 {
 	const int decimal =
 			(int)m_state.bDangerStraight
-		+	(int)m_state.bDangerLeft * 2
-		+	(int)m_state.bDangerRight * 2 * 2
-		+	(int)m_state.bDirectionLeft * 2 * 2 * 2
-		+	(int)m_state.bDirectionRight * 2 * 2 * 2 * 2
-		+	(int)m_state.bDirectionUp * 2 * 2 * 2 * 2 * 2
-		+	(int)m_state.bDirectionDown * 2 * 2 * 2 * 2 * 2 * 2
-		+	(int)m_state.bFoodLeft * 2 * 2 * 2 * 2 * 2 * 2 * 2
-		+	(int)m_state.bFoodRight * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
-		+	(int)m_state.bFoodUp * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
-		+	(int)m_state.bFoodDown * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+		+	(int)m_state.bDangerLeft		* 2
+		+	(int)m_state.bDangerRight		* 2 * 2
+		+	(int)m_state.bDirectionLeft		* 2 * 2 * 2
+		+	(int)m_state.bDirectionRight	* 2 * 2 * 2 * 2
+		+	(int)m_state.bDirectionUp		* 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bDirectionDown		* 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodLeft			* 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodRight			* 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodUp			* 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2
+		+	(int)m_state.bFoodDown			* 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+		+	(int)m_state.bWallSeenStraight	* 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+		+	(int)m_state.bWallSeenLeft		* 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+		+	(int)m_state.bWallSeenRight		* 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
 
 	return decimal;
 }

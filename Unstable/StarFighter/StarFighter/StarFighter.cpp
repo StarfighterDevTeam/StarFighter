@@ -69,7 +69,7 @@ int main()
 								renderWindow.close();
 							}
 
-							if (bEvolutionOver == true || event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::R)
+							if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::R)
 							{
 								newgame.reset();
 								bEvolutionOver = false;
@@ -236,7 +236,7 @@ int main()
 
 				//Evoluate
 				if (genId < NB_GENERATIONS - 1)
-					Generation::evoluate(current_gen, hero, 10);
+					current_gen.evoluate(hero);
 			}
 		}
 	}
