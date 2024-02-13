@@ -54,9 +54,11 @@ int main()
 						Action action = Action::STRAIGHT;
 
 						Individual& current_individual = bEvolutionOver ? hero : current_gen.m_population[individualId];
-						const int stateId = newgame.getStateId();//compute game state into a decimal input value
-						if (HUMAN_PLAYER_ONLY == false && bWritingDNA == false)
+						const int stateId = newgame.computeStateId();//compute game state into a decimal input value
+						if (HUMAN_PLAYER_ONLY == false && bWritingDNA == false && USE_BEHARIOR_AI == false)
 							action = newgame.getAction(stateId, current_individual);
+						else if (HUMAN_PLAYER_ONLY == false && USE_BEHARIOR_AI == true)
+							action = newgame.getAction_BehaviorAI(newgame.getState(), current_individual);
 
 						//human inputs
 						sf::Event event;

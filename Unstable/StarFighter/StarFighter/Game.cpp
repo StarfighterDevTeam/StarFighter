@@ -32,6 +32,7 @@ void Game::reset()
 	m_tickTimer = 0.f;
 	m_tickWithoutEating = 0;
 	m_score = 0;
+	m_turns = 0;
 
 	for (int i = 0; i < START_SIZE - 1; i++)
 		growSnake();
@@ -231,11 +232,13 @@ void Game::update(sf::Time dt, Action action, bool bRealTime, bool bWritingDNA, 
 			case Action::TURN_LEFT:
 			{
 				m_playerDirection = (int)m_playerDirection > 0 ? (Direction)((int)m_playerDirection - 1) : (Direction)3;
+				m_turns++;
 				break;
 			}
 			case Action::TURN_RIGHT:
 			{
 				m_playerDirection = (int)m_playerDirection < 3 ? (Direction)((int)m_playerDirection + 1) : (Direction)0;
+				m_turns++;
 				break;
 			}
 		}
@@ -383,7 +386,7 @@ State Game::computeState()
 	return state;
 }
 
-int Game::getStateId() const
+int Game::computeStateId() const
 {
 	const int decimal =
 			(int)m_state.bDangerStraight
@@ -404,17 +407,125 @@ int Game::getStateId() const
 	return decimal;
 }
 
+int Game::computeScore()
+{
+	const int tickScore = m_tick;
+	const int foodScore = m_score;
+	//const int efficiencyMalus = m_score > 0 ? m_tick / m_score : 0;
+	const int turnsMalus = m_turns;
+	const int finalScore = m_tick + 100 * m_score - m_turns;
+	return std::max(finalScore, 0);
+}
+
 Action Game::getAction(const int stateId, const Individual& individual)
 {
 	Action action = (Action)individual.m_dna[stateId];
 	return action;
 }
 
-int Game::computeScore()
+Action Game::getAction_BehaviorAI(const State& state, const Individual& individual)
 {
-	const int tickScore = m_tick;
-	const int foodScore = m_score;
-	const int efficiencyMalus = m_score > 0 ? m_tick / m_score : 0;
-	const int finalScore = m_tick + 100 * m_score - efficiencyMalus;
-	return finalScore;
+	//b) quand on va vers la food, on commence par la direction actuellle
+
+	const bool bFoodIsOnTurnRight = (	state.bDirectionLeft && state.bFoodUp)
+									|| (state.bDirectionRight && state.bFoodDown)
+									|| (state.bDirectionUp && state.bFoodRight)
+									|| (state.bDirectionDown && state.bFoodLeft);
+
+	const bool bFoodIsOnTurnLeft = (	state.bDirectionLeft && state.bFoodDown)
+									|| (state.bDirectionRight && state.bFoodUp)
+									|| (state.bDirectionUp && state.bFoodLeft)
+									|| (state.bDirectionDown && state.bFoodRight);
+
+	//priorty 1: imminent danger
+	if (state.bDangerStraight)
+		if (state.bDangerLeft || (!state.bDangerRight && bFoodIsOnTurnRight))
+			return Action::TURN_RIGHT;
+		else
+			return Action::TURN_LEFT;
+
+	//priority 2: long-term danger
+
+
+	//priority 3: go to food
+	Direction current_direction;
+	if (state.bDirectionLeft)
+		current_direction = Direction::LEFT;
+	else if (state.bDirectionRight)
+		current_direction = Direction::RIGHT;
+	else if (state.bDirectionUp)
+		current_direction = Direction::UP;
+	else if (state.bDirectionDown)
+		current_direction = Direction::DOWN;
+
+	for (int i = 0; i < 4; i++)
+	{
+		//start with current direction in priority, then 90° directions, and the opposite direction in last
+		Direction iterDirection;
+		if (i == 0)
+			iterDirection = current_direction;
+		else if (i == 1)
+			iterDirection = (Direction)(((int)current_direction + 1) % 4);
+		else if (i == 2)
+			iterDirection = (Direction)(((int)current_direction - 1) % 4);
+		else
+			iterDirection = (Direction)(((int)current_direction + 2) % 4);
+		
+		if (iterDirection == Direction::LEFT && state.bFoodLeft)
+		{
+			if (state.bDirectionLeft && !state.bDangerStraight)
+				return Action::STRAIGHT;
+			else if (state.bDirectionUp && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+			else if (state.bDirectionDown && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionRight && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+			else if (state.bDirectionRight && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+		}
+		else if (iterDirection == Direction::RIGHT && state.bFoodRight)
+		{
+			if (state.bDirectionRight && !state.bDangerStraight)
+				return Action::STRAIGHT;
+			else if (state.bDirectionUp && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionDown && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+			else if (state.bDirectionLeft && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionLeft && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+		}
+		else if (iterDirection == Direction::UP && state.bFoodUp)
+		{
+			if (state.bDirectionUp && !state.bDangerStraight)
+				return Action::STRAIGHT;
+			else if (state.bDirectionRight && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+			else if (state.bDirectionLeft && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionDown && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionDown && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+		}
+		else if (iterDirection == Direction::DOWN && state.bFoodDown)
+		{
+			if (state.bDirectionDown && !state.bDangerStraight)
+				return Action::STRAIGHT;
+			else if (state.bDirectionRight && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionLeft && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+			else if (state.bDirectionUp && !state.bDangerRight)
+				return Action::TURN_RIGHT;
+			else if (state.bDirectionUp && !state.bDangerLeft)
+				return Action::TURN_LEFT;
+		}
+	}
+
+	return Action::STRAIGHT;
 }
+
+

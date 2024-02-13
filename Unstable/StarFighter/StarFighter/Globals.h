@@ -22,7 +22,7 @@ std::string StringCut(std::string str, const size_t length);
 #define DNA_ENTROPY			3
 #define MAX_FITNESS			40
 #define POPULATION_SIZE		30
-#define NB_GENERATIONS		1000
+#define NB_GENERATIONS		500
 
 //###
 #define	REF_WINDOW_RESOLUTION_X					1920

@@ -17,6 +17,7 @@
 
 #define HUMAN_PLAYER_ONLY			false
 #define WRITE_DNA					false
+#define USE_BEHARIOR_AI				true
 
 class Individual;
 
@@ -76,8 +77,9 @@ public:
 	void setPause(bool bPause)		{ m_bPaused = bPause; }
 	bool isPaused()	const			{ return m_bPaused; }
 	State getState() const			{ return m_state; }
-	int getStateId() const;
+	int computeStateId() const;
 	Action getAction(const int stateId, const Individual& individual);
+	Action getAction_BehaviorAI(const State& state, const Individual& individual);
 
 private:
 	sf::Vector2f getCellPos(int x, int y);
@@ -98,6 +100,7 @@ private:
 	int m_tick;
 	int m_tickWithoutEating;
 	int m_score;
+	int m_turns;
 	float m_tickTimer;
 	bool m_bPaused;
 	sf::Font* m_font;
