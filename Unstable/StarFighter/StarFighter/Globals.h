@@ -17,13 +17,6 @@ const char* getSavesPath();
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 std::string StringCut(std::string str, const size_t length);
 
-
-#define DNA_LENGTH			16384
-#define DNA_ENTROPY			3
-#define MAX_FITNESS			40
-#define POPULATION_SIZE		30
-#define NB_GENERATIONS		500
-
 //###
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080

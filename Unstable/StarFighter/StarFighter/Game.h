@@ -68,43 +68,13 @@ public:
 	Game();
 	~Game();
 	void init(sf::RenderWindow* pWindow);
-	void update(sf::Time dt, Action action, bool bRealTime, bool bWritingDNA, int& score, Death& death, bool& bGameOver);//returns score on game over
+	void update(sf::Time dt);
 	void draw();
 	void reset();
 
-	Direction getPlayerDirection()	{ return m_playerDirection; }
-	sf::Vector2u spawnFood();
-	void setPause(bool bPause)		{ m_bPaused = bPause; }
-	bool isPaused()	const			{ return m_bPaused; }
-	State getState() const			{ return m_state; }
-	int computeStateId() const;
-	Action getAction(const int stateId, const Individual& individual);
-	Action getAction_BehaviorAI(const State& state, const Individual& individual);
-
 private:
-	sf::Vector2f getCellPos(int x, int y);
-	sf::Vector2u getNextCell(Action action);
-	bool isPlayerCell(int x, int y);
-	bool isDangerCell(int x, int y);
-	bool isCollidingWithSelf();
-	bool isWallSeen(sf::Vector2u pos, sf::Vector2u increment);
-	void growSnake();
-	State computeState();
-	int computeScore();
-
-	sf::RenderWindow* m_window;
-
-	std::vector<sf::Vector2u> m_playerPos;
-	sf::Vector2u m_foodPos;
-	Direction m_playerDirection;
-	int m_tick;
-	int m_tickWithoutEating;
-	int m_score;
-	int m_turns;
-	float m_tickTimer;
-	bool m_bPaused;
 	sf::Font* m_font;
-	State m_state;
+	sf::RenderWindow* m_window;
 };
 
 #endif // GAME_H_INCLUDED
