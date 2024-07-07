@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="StarFighter.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -13,25 +13,22 @@ int main()
 	icon.loadFromFile(makePath(ICON_SHIP_PNG));
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
+	//Random seed
+	srand(time(NULL));
+
 	//Game
 	sf::Time dt;
 	sf::Clock deltaClock;
 	Game currentGame = Game();
 	currentGame.init(&renderWindow);
 
-	//Random seed
-	srand(time(NULL));
-
 	//Main loop
 	while (renderWindow.isOpen())
 	{
 		//Generations
 		{
-			
 			//update game
 			dt = deltaClock.restart();
-			int score;
-			Death death;
 			currentGame.update(dt);
 
 			//display
