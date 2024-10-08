@@ -216,3 +216,12 @@ pip-log.txt
 
 # Librairies
 !/Libraries/**
+*.db
+*.opendb
+*.db-wal
+*.db-shm
+*.db
+*.vsidx
+*.vsidx
+*.db
+*.vsidx

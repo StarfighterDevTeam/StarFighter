@@ -42,11 +42,11 @@ void Player::Update(sf::Time deltaTime)
 	{
 		m_inputs_direction = InputGuy::getDirections();
 
-		if (InputGuy::isSpeeding() == true)
+		if (InputGuy::isSpeeding())
 			m_inputs_direction.y = -1;
-		if (InputGuy::isBraking() == true)
+		if (InputGuy::isBraking())
 			m_inputs_direction.y = 1;
-		else if (sf::Joystick::isConnected(0) == true && InputGuy::isSpeeding() == false)
+		else if (sf::Joystick::isConnected(0) && !InputGuy::isSpeeding())
 			m_inputs_direction.y = 0;
 	}
 
@@ -54,8 +54,8 @@ void Player::Update(sf::Time deltaTime)
 
 	//weapons
 	float aim_heading = m_heading;
-	if ((*CurrentGame).m_window_has_focus == true && sf::Mouse::isButtonPressed(Mouse::Left) == true)
-		aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
+	//if ((*CurrentGame).m_window_has_focus == true && sf::Mouse::isButtonPressed(Mouse::Left) == true)
+	//	aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
 		
 	for (Weapon* weapon : m_weapons)
 	{
