@@ -225,3 +225,9 @@ pip-log.txt
 *.vsidx
 *.db
 *.vsidx
+*.db
+*.db
+*.db
+Unstable/StarFighter/.vs/StarFighter/v17/Browse.VC.db
+Unstable/StarFighter/.vs/StarFighter/v17/HierarchyCache.v1.txt
+Unstable/StarFighter/.vs/StarFighter/v17/Browse.VC.db

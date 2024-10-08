@@ -67,6 +67,8 @@ public :
 	vector<Mission*> m_missions;
 	int m_money;
 
+	GameObject* m_cursor;
+
 	//Network
 	void UpdateNetwork();
 	bool SendNetworkPacket(NetworkPacketType type, Ammo* ammo = NULL, bool is_local_player = false, Asteroid* asteroid = NULL, AsteroidField* field = NULL, Planet* planet = NULL);

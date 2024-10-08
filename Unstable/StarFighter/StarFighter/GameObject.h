@@ -99,7 +99,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
-	float m_heading;
+	float m_heading;//in degrees, between 0 and 360
 
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;

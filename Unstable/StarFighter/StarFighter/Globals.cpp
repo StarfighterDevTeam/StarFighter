@@ -389,3 +389,14 @@ void DebugDrawSegment(sf::Vector2f point_a, sf::Vector2f point_b, sf::Color colo
 
 	screen.draw(line, 2, sf::Lines);
 }
+
+float computeDeltaAngleInDegrees(const float angle1, const float angle2)
+{
+	const float deltaAngle = angle2 - angle1;
+	if (deltaAngle >= 180.f)
+		return deltaAngle - 360.f;
+	else if (deltaAngle <= -180.f)
+		return deltaAngle + 360.f;
+	else
+		return deltaAngle;
+}

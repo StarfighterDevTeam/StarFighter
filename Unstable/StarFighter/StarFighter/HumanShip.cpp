@@ -13,10 +13,10 @@ HumanShip::HumanShip(sf::Vector2i sector_index, bool is_local_player) : Ship()
 
 	//Flight model
 	m_speed_max = 800;
-	m_acceleration_max = 3000;
-	m_turn_speed = 240;
+	m_acceleration_max = 1500;
+	m_turn_speed = 160;
 	m_braking_max = 3000;
-	m_idle_decelleration = 1000;
+	m_idle_decelleration = 500;
 
 	//combat
 	m_health_max = 50;

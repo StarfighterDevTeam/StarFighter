@@ -23,6 +23,9 @@ Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
 
+	m_cursor = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/cursor.png", sf::Vector2f(32, 32));
+	(*CurrentGame).addToScene(m_cursor, FeedbacksLayer, BackgroundObject, false);
+
 	InitShip();
 }
 
@@ -30,6 +33,9 @@ Player::~Player()
 {
 	for (Mission* mission : m_missions)
 		delete mission;
+
+	delete m_cursor;
+	m_cursor = nullptr;
 }
 
 void Player::Update(sf::Time deltaTime)
@@ -38,7 +44,7 @@ void Player::Update(sf::Time deltaTime)
 	UpdateInputStates();
 
 	m_inputs_direction = sf::Vector2f(0, 0);
-	if ((*CurrentGame).m_window_has_focus == true)
+	if ((*CurrentGame).m_window_has_focus)
 	{
 		m_inputs_direction = InputGuy::getDirections();
 
@@ -50,20 +56,28 @@ void Player::Update(sf::Time deltaTime)
 			m_inputs_direction.y = 0;
 	}
 
+	//turn with mouse
+	if (m_cursor && (*CurrentGame).m_window_has_focus)
+		m_cursor->m_position = m_position + sf::Vector2f((*CurrentGame).m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -((*CurrentGame).m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
+	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
+	const float delta_heading = computeDeltaAngleInDegrees(m_heading, aim_heading);
+	if (m_inputs_direction.x == 0)
+	{
+		float turnCoeff = delta_heading / (m_turn_speed * deltaTime.asSeconds());
+		Bound(turnCoeff, -1.f, 1.f);
+		m_inputs_direction.x = turnCoeff;
+	}
+
 	ApplyFlightModel(deltaTime, m_inputs_direction);
 
 	//weapons
-	float aim_heading = m_heading;
-	//if ((*CurrentGame).m_window_has_focus == true && sf::Mouse::isButtonPressed(Mouse::Left) == true)
-	//	aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
-		
 	for (Weapon* weapon : m_weapons)
 	{
-		weapon->Update(deltaTime, aim_heading);
+		weapon->Update(deltaTime, m_heading);
 
-		if ((*CurrentGame).m_window_has_focus == true && InputGuy::isFiring() == true)
+		if ((*CurrentGame).m_window_has_focus&& InputGuy::isFiring())
 		{
-			if (weapon->IsReadyToFire() == true)
+			if (weapon->IsReadyToFire())
 			{
 				if (m_energy >= weapon->m_energy_cost)
 				{
@@ -381,7 +395,7 @@ void Player::Draw(RenderTarget& screen)
 			
 	Ship::Draw(screen);
 
-	if (m_visible == true)
+	if (m_visible)
 	{
 		screen.draw(m_energy_container_rect);
 		screen.draw(m_energy_rect);
@@ -390,6 +404,9 @@ void Player::Draw(RenderTarget& screen)
 	DebugDrawMissions();
 
 	DebugDrawMoney();
+
+	//if (m_cursor)
+	//	m_cursor->Draw(screen);
 
 	//DebugDrawSegment(getPosition(), sf::Vector2f(getPosition().x + m_speed.x, getPosition().y - m_speed.y), sf::Color::Green, (*CurrentGame).m_mainScreen);
 }

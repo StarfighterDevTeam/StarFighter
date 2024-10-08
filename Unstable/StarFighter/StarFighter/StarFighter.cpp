@@ -13,6 +13,8 @@ int main(int argc, char* argv[])
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 
+	ShowCursor(false);
+
 	//Refresh rate
 	renderWindow.setFramerateLimit(60);
 
