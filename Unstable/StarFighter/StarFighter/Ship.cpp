@@ -38,7 +38,7 @@ Ship::Ship() : Destructible()
 	m_health_container_rect.setOutlineThickness(1);
 	m_health_container_rect.setOutlineColor(sf::Color::White);
 
-	m_health_rect.setFillColor(sf::Color(0, 200, 0, 255));
+	m_health_rect.setFillColor(sf::Color(0, 200, 0, 180));
 	m_health_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5f, m_health_container_rect.getSize().y * 0.5f));
 
 	m_shield_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
@@ -47,7 +47,7 @@ Ship::Ship() : Destructible()
 	m_shield_container_rect.setOutlineThickness(1);
 	m_shield_container_rect.setOutlineColor(sf::Color::White);
 
-	m_shield_rect.setFillColor(sf::Color(0, 0, 200, 255));
+	m_shield_rect.setFillColor(sf::Color(0, 0, 200, 180));
 	m_shield_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5f, m_shield_container_rect.getSize().y * 0.5f));
 
 	m_energy_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
@@ -56,7 +56,7 @@ Ship::Ship() : Destructible()
 	m_energy_container_rect.setOutlineThickness(1);
 	m_energy_container_rect.setOutlineColor(sf::Color::White);
 
-	m_energy_rect.setFillColor(sf::Color(255, 255, 0, 255));
+	m_energy_rect.setFillColor(sf::Color(255, 255, 0, 180));
 	m_energy_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5f, m_energy_container_rect.getSize().y * 0.5f));
 }
 

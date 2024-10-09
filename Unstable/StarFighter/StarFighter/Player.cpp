@@ -4,6 +4,10 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
+#define HEALTH_BAR_SCALE		4.f
+#define SHIELD_BAR_SCALE		4.f
+#define ENERGY_BAR_SCALE		2.f
+
 Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 {
 	m_disable_inputs = false;
@@ -102,8 +106,26 @@ void Player::Update(sf::Time deltaTime)
 
 	HumanShip::Update(deltaTime);
 
-	//update energy
+	//Update health and shield bars size
+	m_health_container_rect.setSize(sf::Vector2f(HEALTH_BAR_SCALE * m_health_max, 10));
+	m_health_container_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5f, m_health_container_rect.getSize().y * 0.5f));
+	m_health_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5f, m_health_container_rect.getSize().y * 0.5f));
+
+	m_shield_container_rect.setSize(sf::Vector2f(SHIELD_BAR_SCALE * m_shield_max, 10));
+	m_shield_container_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5f, m_shield_container_rect.getSize().y * 0.5f));
+	m_shield_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5f, m_shield_container_rect.getSize().y * 0.5f));
+
+	m_health_rect.setSize(sf::Vector2f(m_health_container_rect.getSize().x * m_health / m_health_max, m_health_container_rect.getSize().y));
+	if (m_shield_max > 0)
+		m_shield_rect.setSize(sf::Vector2f(m_shield_container_rect.getSize().x * m_shield / m_shield_max, m_shield_container_rect.getSize().y));
+
+	//Update energy
 	UpdateEnergyRegen(deltaTime);
+
+	m_energy_container_rect.setSize(sf::Vector2f(ENERGY_BAR_SCALE * m_energy_max, 10));
+	m_energy_container_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5f, m_energy_container_rect.getSize().y * 0.5f));
+	m_energy_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5f, m_energy_container_rect.getSize().y * 0.5f));
+
 	m_energy_rect.setSize(sf::Vector2f(m_energy_container_rect.getSize().x * m_energy / m_energy_max, m_energy_container_rect.getSize().y));
 
 	//refill health when docking do a planet
@@ -1049,4 +1071,21 @@ void Player::UpdateNetwork()
 	{
 		(*CurrentGame).UpdateNetworkConnexion();
 	}
+}
+
+void Player::SetPosition(sf::Vector2f position)
+{
+	GameObject::SetPosition(position);
+
+	m_shield_circle->setPosition(getPosition());
+	m_gravitation_circle->setPosition(getPosition());
+
+	m_health_container_rect.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.98f));
+	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));
+
+	m_shield_container_rect.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5f - m_health_container_rect.getOutlineThickness() - m_health_container_rect.getSize().y * 0.5f));
+	m_shield_rect.setPosition(sf::Vector2f(m_shield_container_rect.getPosition().x, m_shield_container_rect.getPosition().y));
+
+	m_energy_container_rect.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, m_shield_container_rect.getPosition().y - m_shield_container_rect.getSize().y * 0.5f - m_shield_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5f));
+	m_energy_rect.setPosition(sf::Vector2f(m_energy_container_rect.getPosition().x, m_energy_container_rect.getPosition().y));
 }

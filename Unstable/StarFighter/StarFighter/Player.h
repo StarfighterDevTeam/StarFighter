@@ -38,6 +38,7 @@ public :
 	int SaveShip(Player* ship);
 	bool LoadShip(Player* ship);
 	void SetControllerType(ControlerType contoller);
+	void SetPosition(sf::Vector2f position) override;
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 
 	bool m_actions_states[NBVAL_PlayerActions];
