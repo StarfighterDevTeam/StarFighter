@@ -150,6 +150,8 @@ public:
 	SpatialObject* GetTargetableEnemyShip(GameObject* const shooter, float dist_max, float angle_delta_max);
 	void SetSectorsNbSectorsManaged();
 	sf::Vector2f computePositionOnScreen(const sf::Vector2f position) const;
+	void ClearStarSectorsKnown();
+	void ClearStoredObjects();
 
 	vector<GameObject*> m_sceneGameObjects;
 	vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];

@@ -259,9 +259,7 @@ void Ship::InitShip()
 	for (Weapon* weapon : m_weapons)
 		m_range_max = MaxBetweenValues(m_range_max, weapon->m_range);
 
-	m_health = m_health_max;
-	m_shield = m_shield_max;
-	m_energy = m_energy_max;
+	Replenish();
 
 	//shield circle
 	m_shield_circle->setRadius(m_shield_range);
@@ -272,7 +270,7 @@ void Ship::InitShip()
 	m_gravitation_circle->setRadius(m_gravitation_range);
 	m_gravitation_circle->setOrigin(sf::Vector2f(m_gravitation_range, m_gravitation_range));
 
-	//position of UI bars (health, shield, energy)
+	//position of UI bars (health, shield)
 	SetPosition(getPosition());
 }
 

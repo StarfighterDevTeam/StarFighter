@@ -812,14 +812,14 @@ void Game::DebugDrawGameObjectsStats()
 			if (object->m_layer != StarLayer && object != m_playerShip && object != m_background)
 				c++;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 7; i++)
 	{
 		sf::Text text;
 		text.setFont(*m_font[Font_Arial]);
 		text.setCharacterSize(20);
 		text.setFillColor(sf::Color::White);
 
-		text.setPosition(sf::Vector2f(50.f, 50.f * (1.f + 1.f * i)));
+		text.setPosition(sf::Vector2f(30.f, 30.f * (1.f + 1.f * i)));
 
 		if (i == 0)
 			text.setString("Spatial objects updated: " + to_string(a));
@@ -843,6 +843,9 @@ void Game::DebugDrawGameObjectsStats()
 
 		if (i == 5)
 			text.setString("Current sector: " + to_string(m_playerShip->m_sector_index.x) + ", " + to_string(m_playerShip->m_sector_index.y));
+
+		if (i == 6)
+			text.setString("Known sectors: " + to_string(m_sectorsKnown.size()));
 
 		m_mainScreen.draw(text);
 	}
@@ -931,4 +934,14 @@ sf::Vector2f Game::computePositionOnScreen(const sf::Vector2f position) const
 {
 	sf::Vector2f positionOnScreen = m_playerShip->m_position + m_zoom * sf::Vector2f(m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -(m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
 	return positionOnScreen;
+}
+
+void Game::ClearStarSectorsKnown()
+{
+	m_sectorsKnown.clear();
+}
+
+void Game::ClearStoredObjects()
+{
+	m_sceneGameObjectsStored.clear();
 }

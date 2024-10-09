@@ -12,8 +12,7 @@ Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 {
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
-	m_money = 0;
-
+	
 	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
 		m_actions_states[i] = false;
 
@@ -22,15 +21,10 @@ Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 
 	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
 
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(6.f, m_size.y * 0.5f), 0.f));
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(-6.f, m_size.y * 0.5f), 0.f));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5f + 8.f, 0.f), 0.f));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5f - 8.f, 0.f), 0.f));
-
 	m_cursor = new GameObject(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), "2D/cursor.png", sf::Vector2f(32.f, 32.f));
 	(*CurrentGame).addToScene(m_cursor, FeedbacksLayer, BackgroundObject, false);
 
-	InitShip();
+	Reset();
 }
 
 Player::~Player()
@@ -144,6 +138,10 @@ void Player::Update(sf::Time deltaTime)
 
 	SendNetworkPacket(Packet_PlayerShipUpdate);
 	ReceiveNetworkPacket();
+
+	//reset key
+	if (InputGuy::isRespawning())
+		Reset();
 }
 
 void Player::UpdateMissions()
@@ -1071,6 +1069,24 @@ void Player::UpdateNetwork()
 	{
 		(*CurrentGame).UpdateNetworkConnexion();
 	}
+}
+
+void Player::Reset()
+{
+	m_money = 0;
+
+	m_weapons.clear();
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(6.f, m_size.y * 0.5f), 0.f));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(-6.f, m_size.y * 0.5f), 0.f));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5f + 8.f, 0.f), 0.f));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5f - 8.f, 0.f), 0.f));
+
+	m_position = sf::Vector2f(0.f, 0.f);
+
+	InitShip();
+
+	(*CurrentGame).ClearStarSectorsKnown();
+	(*CurrentGame).ClearStoredObjects();
 }
 
 void Player::SetPosition(sf::Vector2f position)

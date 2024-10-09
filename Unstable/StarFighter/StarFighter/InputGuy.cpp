@@ -175,6 +175,11 @@ bool InputGuy::isPausing()
 	return sf::Keyboard::isKeyPressed(sf::Keyboard::P);
 }
 
+bool InputGuy::isRespawning()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::R);
+}
+
 Vector2f InputGuy::getDirections(ControlerType device)
 {
 	short dirX = 0;
