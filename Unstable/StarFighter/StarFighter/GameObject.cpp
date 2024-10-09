@@ -99,7 +99,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_visible = true;
 	m_garbageMe = false;
 	m_removeMe = false;
-	m_radius = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	m_radius = (float)sqrt(((m_size.x * 0.5f) * (m_size.x * 0.5f)) + ((m_size.y * 0.5f) * (m_size.y * 0.5f)));
 	m_rotation_speed = 0.f;
 }
 
@@ -107,10 +107,10 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
+	sf::Texture* texture = loader->loadTexture(textureName, size.x * frameNumber, size.y * animationNumber);
 	m_textureName = textureName;
 
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x * 0.5f, size.y * 0.5f);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
@@ -119,10 +119,10 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber, pixels);
+	sf::Texture* texture = loader->loadTexture(textureName, frameNumber * (int)size.x, animationNumber * (int)size.y, pixels);
 	m_textureName = textureName;
 
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x * 0.5f, size.y * 0.5f);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
@@ -135,10 +135,10 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 	string textureName = ss.str();
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y, pixels);
+	sf::Texture* texture = loader->loadTexture(textureName, (int)size.x, (int)size.y, pixels);
 	Init(position, speed, texture, 1, 1);
 
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x * 0.5f, size.y * 0.5f);
 }
 
 GameObject::~GameObject()
@@ -183,7 +183,7 @@ void GameObject::UpdateAnimation(sf::Time deltaTime)
 
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(getPosition(), m_speed, m_textureName, m_size, sf::Vector2f(m_size.x/2, m_size.y/2), m_frameNumber, m_animationNumber);
+	GameObject* clone = new GameObject(getPosition(), m_speed, m_textureName, m_size, sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f), m_frameNumber, m_animationNumber);
 	clone->m_collider = m_collider;
 	clone->m_layer = m_layer;
 
@@ -193,8 +193,8 @@ GameObject* GameObject::Clone()
 sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size)
 {
 	//pixel array creation
-	const int W = size.x;
-	const int H = size.y;
+	const int W = (int)size.x;
+	const int H = (int)size.y;
 
 	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
 

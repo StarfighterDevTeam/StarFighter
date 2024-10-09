@@ -1,7 +1,7 @@
 #ifndef ESCORTSHIP_H_INCLUDED
 #define ESCORTSHIP_H_INCLUDED
 
-#include "AIShip.h";
+#include "AIShip.h"
 
 class EscortShip : public AIShip
 {

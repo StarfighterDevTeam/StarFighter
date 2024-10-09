@@ -375,7 +375,7 @@ void Ship::HitWithGravitation(GameObject* object)
 	const float dx = target->m_position.x - m_position.x;
 	const float dy = target->m_position.y - m_position.y;
 	const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
-	const float speed_deg = (angle * 180 / M_PI);
+	const float speed_deg = (angle * 180.f / M_PI);
 
 	//Apply gravitation only if object is trying to get away from the attractor
 	if ((this == (*CurrentGame).m_playerShip || m_roe == ROE_FireAtWill) && m_radius > object->m_radius && abs(GetAngleDegToTargetPosition(object->m_position, speed_deg, m_position)) > 90)

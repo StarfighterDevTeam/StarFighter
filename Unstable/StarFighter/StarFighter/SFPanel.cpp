@@ -152,11 +152,11 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 
 	//title text
 	m_title_text.setCharacterSize(20);
-	m_title_text.setColor(_yellow);
+	m_title_text.setFillColor(_yellow);
 
 	//body text
 	m_text.setCharacterSize(18);
-	m_text.setColor(_white);
+	m_text.setFillColor(_white);
 }
 
 SFPanel::~SFPanel()

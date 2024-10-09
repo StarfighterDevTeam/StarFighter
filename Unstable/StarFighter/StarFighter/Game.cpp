@@ -1,6 +1,8 @@
 #include "Game.h"
 #define stringify(x)  #x
 
+#include "AsteroidField.h"
+
 const char* ColliderTypeValues[] =
 {
 	stringify(BackgroundObject),
@@ -17,7 +19,7 @@ Game::Game(RenderWindow* window)
 	m_window_has_focus = true;
 
 	m_window = window;
-	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y);
 	m_mainScreen.setSmooth(true);
 
 	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
@@ -817,7 +819,7 @@ void Game::DebugDrawGameObjectsStats()
 		sf::Text text;
 		text.setFont(*m_font[Font_Arial]);
 		text.setCharacterSize(20);
-		text.setColor(sf::Color::White);
+		text.setFillColor(sf::Color::White);
 
 		text.setPosition(sf::Vector2f(50, 50 * (1 + i)));
 

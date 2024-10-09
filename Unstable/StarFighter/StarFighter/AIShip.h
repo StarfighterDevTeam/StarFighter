@@ -6,8 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
-
-#include "Ship.h";
+#include "Ship.h"
 
 #define AMBUSH_ENGAGEMENT_DISTANCE			(REF_WINDOW_RESOLUTION_X * 0.5)
 #define FIREATWILL_ENGAGEMENT_DISTANCE		(REF_WINDOW_RESOLUTION_X * 2)

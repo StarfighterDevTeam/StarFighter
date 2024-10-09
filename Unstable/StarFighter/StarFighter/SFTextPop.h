@@ -13,13 +13,13 @@ public:
 	~SFTextPop() {};
 	void Update(Time deltaTime) override;
 
-	float m_distance_not_faded;
-	float m_distance_faded;
-	float m_total_pop_time;
+	float m_distance_not_faded = 0.f;
+	float m_distance_faded = 0.f;
+	float m_total_pop_time = 0.f;
 	sf::Clock m_timer_clock;
-	Uint8 m_alpha;
-	GameObject* m_target;
-	float m_offset_positionY;
+	Uint8 m_alpha = 0;
+	GameObject* m_target = nullptr;
+	float m_offset_positionY = 0.f;
 };
 
 #endif // SFTEXTPOP_H_INCLUDED

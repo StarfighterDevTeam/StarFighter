@@ -61,10 +61,10 @@ public:
 	
 	sf::Text m_title_text;
 	sf::Text m_text;
-	bool m_visible;
-	SFPanelTypes m_panel_type;
-	Player* m_playerShip;
-	SFActionBox* m_actions;
+	bool m_visible = true;
+	SFPanelTypes m_panel_type = SFPanelTypes::SFPanel_None;
+	Player* m_playerShip = nullptr;
+	SFActionBox* m_actions = nullptr;
 };
 
 #endif // SFPANEL_H_INCLUDED

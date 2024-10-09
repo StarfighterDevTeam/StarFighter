@@ -1,4 +1,5 @@
 #include "SpatialObject.h"
+#include "Marker.h"
 
 extern Game* CurrentGame;
 

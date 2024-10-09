@@ -50,7 +50,7 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_t
 	m_id_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_id_text.setStyle(sf::Text::Bold);
 	m_id_text.setCharacterSize(18);
-	m_id_text.setColor(sf::Color::White);
+	m_id_text.setFillColor(sf::Color::White);
 	m_id_text.setString("[" + to_string(m_planet_id) + "]");
 }
 

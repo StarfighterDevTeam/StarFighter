@@ -65,7 +65,7 @@ void Marker::SetMarkerType(MarkerType marker_type)
 		}
 	}
 
-	m_distance_text.setColor(text_color);
+	m_distance_text.setFillColor(text_color);
 	for (int i = 0; i < 8; i++)
 		m_targeting_rect[i].setFillColor(targeting_rect_color);
 
@@ -90,14 +90,14 @@ void Marker::Update(sf::Time deltaTime)
 	if (m_onScreen == false)
 	{
 		//orientation of the marker
-		const float dx = m_marker_target->getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5;
-		const float dy = m_marker_target->getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5;
+		const float dx = m_marker_target->getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5f;
+		const float dy = m_marker_target->getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5f;
 		const float angle = GetAngleRadFromVector(sf::Vector2f(dx, -dy));
 		setRotation(angle * 180 / M_PI);
 
 		//position of the marker
 		sf::Vector2f position;
-		const float offset = m_size.y * 0.5 + 10;
+		const float offset = m_size.y * 0.5f + 10.f;
 		
 		//compute the line equation to the target and stich it to the adequate screen border
 		const float a = REF_WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_X;//as in y=ax+b

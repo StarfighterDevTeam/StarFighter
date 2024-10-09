@@ -231,3 +231,4 @@ pip-log.txt
 Unstable/StarFighter/.vs/StarFighter/v17/Browse.VC.db
 Unstable/StarFighter/.vs/StarFighter/v17/HierarchyCache.v1.txt
 Unstable/StarFighter/.vs/StarFighter/v17/Browse.VC.db
+*.db

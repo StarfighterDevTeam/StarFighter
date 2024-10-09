@@ -4,7 +4,7 @@ SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f 
 {
 	setFont(*font);
 	setCharacterSize(size);
-	setColor(color);
+	setFillColor(color);
 	setPosition(position);
 
 	m_visible = true;
@@ -60,8 +60,7 @@ void SFGauge::setVisible(bool text_visible, bool rectangle_visible)
 
 void SFGauge::setString(string& str)
 {
-	printf("string : %s", str);
-	m_SFText.setString("hello");
+	m_SFText.setString(str);
 }
 
 void SFGauge::setPosition(sf::Vector2f position, sf::Vector2f offset)

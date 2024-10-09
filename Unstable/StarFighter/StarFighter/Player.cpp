@@ -59,7 +59,7 @@ void Player::Update(sf::Time deltaTime)
 	//turn with mouse
 	if (m_cursor && (*CurrentGame).m_window_has_focus)
 		m_cursor->m_position = m_position + sf::Vector2f((*CurrentGame).m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -((*CurrentGame).m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
-	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180 / M_PI;
+	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180.f / M_PI;
 	const float delta_heading = computeDeltaAngleInDegrees(m_heading, aim_heading);
 	if (m_inputs_direction.x == 0)
 	{
@@ -667,13 +667,13 @@ void Player::DebugDrawMissions()
 		body_text.setStyle(sf::Text::Bold);
 		
 		if (mission->m_status == MissionStatus_Current)
-			body_text.setColor(sf::Color::White);
+			body_text.setFillColor(sf::Color::White);
 		else if (mission->m_status == MissionStatus_Accepted)
-			body_text.setColor(sf::Color::Blue);
+			body_text.setFillColor(sf::Color::Blue);
 		else if (mission->m_status == MissionStatus_Complete)
-			body_text.setColor(sf::Color::Green);
+			body_text.setFillColor(sf::Color::Green);
 		else if (mission->m_status == MissionStatus_Failed)
-			body_text.setColor(sf::Color::Red);
+			body_text.setFillColor(sf::Color::Red);
 
 		body_text.setString(mission->m_body_text);
 		body_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 350, offset_y));
@@ -690,7 +690,7 @@ void Player::DebugDrawMoney()
 	money_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	money_text.setCharacterSize(20);
 	money_text.setStyle(sf::Text::Bold);
-	money_text.setColor(sf::Color::White);
+	money_text.setFillColor(sf::Color::White);
 
 	money_text.setString(to_string(m_money) + " ¤");
 	money_text.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 120, REF_WINDOW_RESOLUTION_Y - 50));

@@ -32,10 +32,10 @@ public:
 	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
 	~SFText() {};
 	virtual void Update(Time deltaTime);
-	bool m_visible;
-	PlayerTeams m_team;
-	TeamAlliances m_alliance;
-	bool m_garbageMe;
+	bool m_visible = true;
+	PlayerTeams m_team = PlayerBlue;
+	TeamAlliances m_alliance = Alliance1;
+	bool m_garbageMe = false;
 };
 
 class SFRectangle : public sf::RectangleShape
@@ -44,10 +44,10 @@ public:
 	SFRectangle() {};
 	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team);
 	~SFRectangle() {};
-	bool m_visible;
-	PlayerTeams m_team;
-	TeamAlliances m_alliance;
-	bool m_garbageMe;
+	bool m_visible = true;
+	PlayerTeams m_team = PlayerBlue;
+	TeamAlliances m_alliance = Alliance1;
+	bool m_garbageMe = false;
 };
 
 class SFGauge : public sf::RectangleShape

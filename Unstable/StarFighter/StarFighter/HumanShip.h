@@ -1,7 +1,7 @@
 #ifndef ONLINESHIP_H_INCLUDED
 #define ONLINESHIP_H_INCLUDED
 
-#include "EscortShip.h";
+#include "EscortShip.h"
 
 class HumanShip : public Ship
 {
