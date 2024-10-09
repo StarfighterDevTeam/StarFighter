@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "Globals.h"
 
-#define SQRT2BY2 0.707 // racine(2) / 2
+#define SQRT2BY2 0.707 // racine(2) * 0.5f
 
 using namespace sf;
 

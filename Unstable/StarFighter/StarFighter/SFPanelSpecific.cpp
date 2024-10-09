@@ -30,18 +30,18 @@ SFPanelSpecific::SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Pla
 
 	//size and position of panel
 	setSize(size);
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x * 0.5f, size.y * 0.5f);
 	sf::Vector2f position = sf::Vector2f(540, 540);
 	setPosition(position.x, position.y);
 
 	//positioning of panel's content
 	float text_height = 0;
-	text_height += m_title_text.getGlobalBounds().height / 2;
-	m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	text_height += m_title_text.getGlobalBounds().height * 0.5f;
+	m_title_text.setPosition(getPosition().x - getSize().x * 0.5f + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y * 0.5f + text_height);
 
 	//options texts
 	text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
-	m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x * 0.5f + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y * 0.5f + text_height));
 }
 
 SFPanelSpecific::~SFPanelSpecific()

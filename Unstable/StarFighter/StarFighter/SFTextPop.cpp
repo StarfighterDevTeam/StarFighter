@@ -39,7 +39,7 @@ void SFTextPop::Update(Time deltaTime)
 
 	if (m_target)
 	{
-		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset_positionY - (total_pop_distance / m_total_pop_time * m_timer_clock.getElapsedTime().asSeconds())));
+		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width * 0.5f, m_target->getPosition().y - m_target->m_size.y * 0.5f + m_offset_positionY - (total_pop_distance / m_total_pop_time * m_timer_clock.getElapsedTime().asSeconds())));
 	}
 	else
 	{

@@ -63,12 +63,12 @@ struct StarSector
 {
 public:
 	//StarSector(){ m_hazard_level = 1; };
-	StarSector(sf::Vector2i index){ m_index = index; }
+	StarSector(sf::Vector2i index){ m_index = index;}
 	StarSector(sf::Vector2i index, int id) : StarSector(index) {m_id = id;}
 
 	sf::Vector2i m_index;
-	int m_hazard_level;
-	int m_id;
+	int m_hazard_level = 1;
+	int m_id = -1;
 };
 
 struct Game
@@ -115,8 +115,8 @@ public:
 
 	//SFX
 	int LoadSFX();
-	void PlaySFX(SFX_Bank sfx_name);
-	void SetSFXVolume(bool activate_sfx);
+	void PlaySFX(SFX_Bank sFX_name);
+	void SetSFXVolume(bool activate_sFX);
 
 	sf::SoundBuffer m_soundBuffers[1];
 	sf::Sound m_sounds[1];
@@ -161,8 +161,8 @@ public:
 	int m_nb_sectors_managed_y;
 
 	GameObject* m_background;
-	vector<CircleDisplay*> m_gravity_circles;
-	vector<CircleDisplay*> m_shield_circles;
+	vector<CircleDisplay *> m_gravity_circles;
+	vector<CircleDisplay *> m_shield_circles;
 
 	vector<StarSector> m_sectorsKnown;//all sectors encountered by the player
 	vector<sf::Vector2i> m_sectorsManaged;//all sectors that are close enough to need an updated

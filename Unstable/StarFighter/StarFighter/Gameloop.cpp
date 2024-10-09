@@ -74,8 +74,8 @@ void Gameloop::UpdateCamera(sf::Time deltaTime)
 	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * deltaTime.asSeconds()));
 
 	//Map border constraints
-	const float x = (*CurrentGame).m_view.getSize().x / 2;
-	const float y = (*CurrentGame).m_view.getSize().y / 2;
+	const float x = (*CurrentGame).m_view.getSize().x * 0.5f;
+	const float y = (*CurrentGame).m_view.getSize().y * 0.5f;
 	const float a = (*CurrentGame).m_playerShip->m_position.x;
 	const float b = (*CurrentGame).m_playerShip->m_position.y;
 	if (a < x)
@@ -261,9 +261,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 	sf::Vector2i found_index = found_sector.second;
 
 	//create mission
-	float distance = RandomizeFloatBetweenValues(REF_WINDOW_RESOLUTION_X * 1.5, REF_WINDOW_RESOLUTION_X * 1.8);
+	float distance = RandomizeFloatBetweenValues(REF_WINDOW_RESOLUTION_X * 1.5f, REF_WINDOW_RESOLUTION_X * 1.8f);
 	float angle = GetAngleRadFromVector(sf::Vector2f(1.f * (found_index.x - owner->m_sector_index.x), 1.f * (found_index.y - owner->m_sector_index.y)));
-	angle += RandomizeFloatBetweenValues(-0.3, 0.3);
+	angle += RandomizeFloatBetweenValues(-0.3f, 0.3f);
 	
 	switch (mission_type)
 	{
@@ -294,15 +294,15 @@ Mission* Gameloop::CreateMission(Planet* owner)
 
 			ship->m_scripted_destination = new sf::Vector2f(destination_sector.first->m_position);
 			sf::Vector2f destination_vector = sf::Vector2f(destination_sector.first->m_position.x - ship->m_position.x, destination_sector.first->m_position.y - ship->m_position.y);
-			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180 / M_PI;
+			ship->m_heading = GetAngleRadFromVector(destination_vector) * 180.f / M_PI_F;
 
 			//convoy escorts
-			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200, -200)));
-			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(-200, -200)));
+			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(200.f, -200.f)));
+			ship->m_scripted_allied_ships.push_back(CreateEscortShip(Ship_Alpha, found_index, ship->m_heading, Hostility_Ally, ROE_Ambush, ship, sf::Vector2f(-200.f, -200.f)));
 
 			//enemy "trap" beacon
-			float path_ratio = RandomizeFloatBetweenValues(0.3, 0.7);
-			float perpAngle = angle + M_PI_2 * RandomizeSign();
+			float path_ratio = RandomizeFloatBetweenValues(0.3f, 0.7f);
+			float perpAngle = angle + M_PI_2_F * RandomizeSign();
 			
 			sf::Vector2f beacon_position = sf::Vector2f(ship->m_position.x + path_ratio * (destination_sector.first->m_position.x - ship->m_position.x), ship->m_position.y + path_ratio * (destination_sector.first->m_position.y - ship->m_position.y));
 			sf::Vector2i beacon_sector_index = GameObject::GetStarSectorIndexAtPosition(beacon_position);
@@ -312,9 +312,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, perpAngle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += 0.08;
+				angle += 0.08f;
 
-				AIShip* ship = new AIShip(Ship_Alpha, beacon->m_sector_index + offset, (perpAngle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
+				AIShip* ship = new AIShip(Ship_Alpha, beacon->m_sector_index + offset, (perpAngle * 180.f / M_PI_F) + 180.f, Hostility_Enemy, ROE_FireAtWill);
 				beacon->m_ships_to_create.push_back(ship);
 			}
 			
@@ -327,9 +327,9 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += 0.08;
+				angle += 0.08f;
 
-				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_FireAtWill);
+				AIShip* ship = new AIShip(Ship_Alpha, found_index + offset, (angle * 180.f / M_PI_F) + 180.f, Hostility_Enemy, ROE_FireAtWill);
 				beacon->m_ships_to_create.push_back(ship);
 			}
 				
@@ -342,12 +342,12 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += 0.08;
+				angle += 0.08f;
 
 				if (e == 0)
-					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush);
+					ship = CreateAIShip(Ship_Cruiser, found_index + offset, (angle * 180.f / M_PI_F) + 180.f, Hostility_Enemy, ROE_Ambush);
 				else
-					ship->m_scripted_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush));
+					ship->m_scripted_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180.f / M_PI_F) + 180.f, Hostility_Enemy, ROE_Ambush));
 			}
 
 			return new Mission(mission_type, ship, owner);
@@ -359,12 +359,12 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			{
 				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
-				angle += 0.08;
+				angle += 0.08f;
 
 				if (e == 0)
-					ship = CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush);
+					ship = CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180.f / M_PI_F) + 180.f, Hostility_Enemy, ROE_Ambush);
 				else
-					ship->m_scripted_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180 / M_PI) + 180, Hostility_Enemy, ROE_Ambush));
+					ship->m_scripted_allied_ships.push_back(CreateAIShip(Ship_Alpha, found_index + offset, (angle * 180.f / M_PI_F) + 180.f, Hostility_Enemy, ROE_Ambush));
 			}
 
 			return new Mission(mission_type, ship, owner);
@@ -396,11 +396,14 @@ Mission* Gameloop::CreateMission(Planet* owner)
 				(*CurrentGame).m_asteroidFields.push_back(field);
 			}
 
-			AIShip* ship = CreateAIShip(Ship_Convoy, field->m_free_space, RandomizeFloatBetweenValues(0, 359.9), Hostility_Ally, ROE_Freeze);
+			AIShip* ship = CreateAIShip(Ship_Convoy, field->m_free_space, RandomizeFloatBetweenValues(0.f, 359.9f), Hostility_Ally, ROE_Freeze);
 
 			return new Mission(mission_type, ship, owner);
 		}
 	}
+
+	assert(0);//mission type not coded
+	return NULL;
 }
 
 bool Gameloop::IsSectorNearAnExistingMission(sf::Vector2i sector_index)

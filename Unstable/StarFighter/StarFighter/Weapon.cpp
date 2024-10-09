@@ -16,7 +16,7 @@ Weapon::Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type,
 	m_rate_of_fire_timer = 0;
 
 	m_locked_target = NULL;
-	m_locking_target_clock = 0;
+	m_locking_target_clock = 0.f;
 
 	m_lock_rectangle.setOutlineColor(sf::Color::Green);
 	m_lock_rectangle.setOutlineThickness(-2);
@@ -26,16 +26,16 @@ Weapon::Weapon(SpatialObject* owner, WeaponType weapon_type, AmmoType ammo_type,
 	{
 		case Weapon_Laser:
 		{
-			m_rate_of_fire = 0.2;
-			m_range = REF_WINDOW_RESOLUTION_X * 0.6;
+			m_rate_of_fire = 0.2f;
+			m_range = REF_WINDOW_RESOLUTION_X * 0.6f;
 			m_damage = 1;
 			m_energy_cost = 1;
 			break;
 		}
 		case Weapon_Missile:
 		{
-			m_rate_of_fire = 0.8;
-			m_range = REF_WINDOW_RESOLUTION_X * 4;
+			m_rate_of_fire = 0.8f;
+			m_range = REF_WINDOW_RESOLUTION_X * 4.f;
 			m_damage = 5;
 			m_energy_cost = 2;
 			break;
@@ -56,8 +56,8 @@ Ammo* Weapon::Fire()
 	m_rate_of_fire_timer = m_rate_of_fire;
 
 	//position offset
-	ammo->m_position.x += ammo->m_size.y * 0.5 * cos((m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
-	ammo->m_position.y -= ammo->m_size.y * 0.5 * sin((m_heading + m_heading_offset) * M_PI / 180 + M_PI_2);
+	ammo->m_position.x += ammo->m_size.y * 0.5f * cos((m_heading + m_heading_offset) * M_PI_F / 180.f + M_PI_2_F);
+	ammo->m_position.y -= ammo->m_size.y * 0.5f * sin((m_heading + m_heading_offset) * M_PI_F / 180.f + M_PI_2_F);
 
 	return ammo;
 }
@@ -65,8 +65,8 @@ Ammo* Weapon::Fire()
 void Weapon::Update(sf::Time deltaTime, float aim_heading)
 {
 	//position offset
-	m_position.x = m_owner->m_position.x + cos(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y + sin(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
-	m_position.y = m_owner->m_position.y + sin(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.y - cos(-aim_heading * M_PI / 180 + M_PI_2) * m_weapon_offset.x;
+	m_position.x = m_owner->m_position.x + cos(-aim_heading * M_PI_F / 180.f + M_PI_2_F) * m_weapon_offset.y + sin(-aim_heading * M_PI_F / 180.f + M_PI_2_F) * m_weapon_offset.x;
+	m_position.y = m_owner->m_position.y + sin(-aim_heading * M_PI_F / 180.f + M_PI_2_F) * m_weapon_offset.y - cos(-aim_heading * M_PI_F / 180.f + M_PI_2_F) * m_weapon_offset.x;
 
 	//heading
 	m_heading = aim_heading + m_heading_offset;
@@ -89,7 +89,7 @@ bool Weapon::IsTargetAligned(SpatialObject* target, float angle_tolerance)
 {
 	const float dx = target->m_position.x - m_position.x;
 	const float dy = target->m_position.y - m_position.y;
-	if (dx*dx + dy*dy <= m_range * m_range && abs(GetAngleDegToTargetPosition(m_position, m_heading, target->m_position)) <= angle_tolerance)
+	if (dx * dx + dy * dy <= m_range * m_range && abs(GetAngleDegToTargetPosition(m_position, m_heading, target->m_position)) <= angle_tolerance)
 		return true;
 	else
 		return false;

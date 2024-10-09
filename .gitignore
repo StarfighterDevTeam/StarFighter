@@ -220,13 +220,5 @@ pip-log.txt
 *.opendb
 *.db-wal
 *.db-shm
-*.db
 *.vsidx
-*.vsidx
-*.db
-*.vsidx
-*.db
-*.db
-*.db
 Unstable/StarFighter/.vs/
-*.db

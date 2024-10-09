@@ -19,17 +19,17 @@ Game::Game(RenderWindow* window)
 	m_window_has_focus = true;
 
 	m_window = window;
-	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y);
+	m_mainScreen.create((unsigned int)REF_WINDOW_RESOLUTION_X, (unsigned int)REF_WINDOW_RESOLUTION_Y);
 	m_mainScreen.setSmooth(true);
 
 	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
 	m_scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
-	m_screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+	m_screen_size = sf::Vector2i((int)WINDOW_RESOLUTION_X, (int)WINDOW_RESOLUTION_Y);
 
-	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
 	m_view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
-	m_zoom = 1.3;
+	m_zoom = 1.3f;
 
 	//default value
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
@@ -60,15 +60,15 @@ Game::Game(RenderWindow* window)
 	PlayMusic(Music_Main);
 
 	//background
-	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
-	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f), sf::Vector2f(0.f, 0.f), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
 	addToScene(m_background, BackgroundLayer, BackgroundObject, false);
 
 	SetSectorsNbSectorsManaged();
 
 	//DEBUG
-	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
-	m_sector_debug_onscreen = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), sf::Color::Green, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
+	m_sector_debug_current = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f), sf::Vector2f(0.f, 0.f), sf::Color::Blue, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
+	m_sector_debug_onscreen = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f), sf::Vector2f(0.f, 0.f), sf::Color::Green, sf::Vector2f(STAR_SECTOR_SIZE, STAR_SECTOR_SIZE), 3);
 
 	//Network
 	m_is_server = false;
@@ -81,13 +81,13 @@ Game::Game(RenderWindow* window)
 
 void Game::SetSectorsNbSectorsManaged()
 {
-	m_nb_sectors_managed_x = (REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 4;
-	m_nb_sectors_managed_x *= m_zoom;
+	m_nb_sectors_managed_x = (int)(REF_WINDOW_RESOLUTION_X / STAR_SECTOR_SIZE) + 4;
+	m_nb_sectors_managed_x = (int)(m_nb_sectors_managed_x * m_zoom);
 	if (m_nb_sectors_managed_x % 2 == 0)
 		m_nb_sectors_managed_x++;
 
-	m_nb_sectors_managed_y = (REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 4;
-	m_nb_sectors_managed_y *= m_zoom;
+	m_nb_sectors_managed_y = (int)(REF_WINDOW_RESOLUTION_Y / STAR_SECTOR_SIZE) + 4;
+	m_nb_sectors_managed_y = (int)(m_nb_sectors_managed_y * m_zoom);
 	if (m_nb_sectors_managed_y % 2 == 0)
 		m_nb_sectors_managed_y++;
 }
@@ -108,9 +108,9 @@ Game::~Game()
 		delete ship;
 }
 
-void Game::SetSFXVolume(bool activate_sfx)
+void Game::SetSFXVolume(bool activate_sFX)
 {
-	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sFX);
 }
 
 int Game::LoadSFX()
@@ -126,10 +126,10 @@ int Game::LoadSFX()
 	return 0;
 }
 
-void Game::PlaySFX(SFX_Bank sfx_name)
+void Game::PlaySFX(SFX_Bank sFX_name)
 {
 	if (m_SFX_Activated)
-		m_sounds[sfx_name].play();
+		m_sounds[sFX_name].play();
 }
 
 void Game::SetMusicVolume(bool activate_music)
@@ -307,19 +307,19 @@ void Game::UpdateScene(Time deltaTime)
 	//zoom / zoom back
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
 	{
-		m_zoom += 0.1;
+		m_zoom += 0.1f;
 		//printf("zoom: %f\n", m_zoom);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
 	{
-		m_zoom -= 0.1;
+		m_zoom -= 0.1f;
 		//printf("zoom: %f\n", m_zoom);
 	}
 
 	//we need an odd number of sectors on X and Y axis
 	SetSectorsNbSectorsManaged();
 
-	Bound(m_zoom, 1, 5);
+	Bound(m_zoom, 1.f, 5.f);
 	
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
 	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
@@ -372,7 +372,7 @@ void Game::UpdateObjects(Time deltaTime)
 		addToScene(object, object->m_layer, object->m_collider, false);
 
 		if (object != player && object != m_background)//set position of objects on screen relative to the player
-			object->SetPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+			object->SetPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 	}
 	m_temp_sceneGameObjects.clear();
 
@@ -402,42 +402,42 @@ void Game::drawScene()
 		}
 		else if (i == GravitationLayer)
 		{
-			for (CircleDisplay* circle : m_gravity_circles)
+			for (CircleDisplay * circle : m_gravity_circles)
 			{
 				GameObject* object = circle->m_target_object;
 
 				object->setScale(1.f / m_zoom, 1.f / m_zoom);
-				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f));
 
 				circle->setScale(1.f / m_zoom, 1.f / m_zoom);
 				circle->setPosition(object->getPosition());
 
 				m_mainScreen.draw(*circle);
 
-				object->setScale(1, 1);
-				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+				object->setScale(1.f, 1.f);
+				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 
-				circle->setScale(1, 1);
+				circle->setScale(1.f, 1.f);
 			}
 		}
 		else if (i == ShieldLayer)
 		{
-			for (CircleDisplay* circle : m_shield_circles)
+			for (CircleDisplay * circle : m_shield_circles)
 			{
 				GameObject* object = circle->m_target_object;
 
 				object->setScale(1.f / m_zoom, 1.f / m_zoom);
-				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f));
 
 				circle->setScale(1.f / m_zoom, 1.f / m_zoom);
 				circle->setPosition(object->getPosition());
 
 				m_mainScreen.draw(*circle);
 
-				object->setScale(1, 1);
-				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+				object->setScale(1.f, 1.f);
+				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 
-				circle->setScale(1, 1);
+				circle->setScale(1.f, 1.f);
 			}
 		}
 		else
@@ -446,13 +446,13 @@ void Game::drawScene()
 			{
 				object->setScale(1.f / m_zoom, 1.f / m_zoom);
 				if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
-					object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5));
+					object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f));
 
 				object->Draw(m_mainScreen);
 
-				object->setScale(1, 1);
+				object->setScale(1.f, 1.f);
 				if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
-					object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+					object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 
 			}
 		}
@@ -468,7 +468,7 @@ void Game::drawScene()
 	m_mainScreen.display();
 	sf::Sprite temp(m_mainScreen.getTexture());
 	temp.scale(m_scale_factor.x, m_scale_factor.y);
-	temp.setPosition(sf::Vector2f(0, 0));
+	temp.setPosition(sf::Vector2f(0.f, 0.f));
 	m_window->clear();
 	m_window->draw(temp);
 }
@@ -640,7 +640,7 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	SFText* text_feedback = new SFText(m_font[font], 16, color, sf::Vector2f(position.x, position.y), team);
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, distance_not_faded, distance_faded, total_pop_time, follow_target, offset_positionY);
 	pop_feedback->setString(text);
-	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
+	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width * 0.5f, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
 }
@@ -794,7 +794,7 @@ void Game::DebugDrawSectors()
 			sector_debug = m_sector_debug_onscreen;
 
 		SetStarSectorIndex(sector_debug, sector.m_index);
-		sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+		sector_debug->setPosition(sf::Vector2f(sector_debug->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(sector_debug->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 		sector_debug->Draw(m_mainScreen);
 	}
 }
@@ -821,7 +821,7 @@ void Game::DebugDrawGameObjectsStats()
 		text.setCharacterSize(20);
 		text.setFillColor(sf::Color::White);
 
-		text.setPosition(sf::Vector2f(50, 50 * (1 + i)));
+		text.setPosition(sf::Vector2f(50.f, 50.f * (1.f + 1.f * i)));
 
 		if (i == 0)
 			text.setString("Spatial objects updated: " + to_string(a));

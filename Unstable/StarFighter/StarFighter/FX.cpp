@@ -43,10 +43,10 @@ FX::FX(FXType FX_type, sf::Vector2f position)
 		}
 	}
 
-	Init(position, sf::Vector2f(0, 0), textureName, textureSize, frameNumber, animationNumber);
+	Init(position, sf::Vector2f(0.f, 0.f), textureName, textureSize, frameNumber, animationNumber);
 	
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
-	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 }
 
 FX::~FX()

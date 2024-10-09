@@ -6,7 +6,7 @@ using namespace sf;
 
 Ship::Ship() : Destructible()
 {
-	m_inputs_direction = sf::Vector2f(0, 0);
+	m_inputs_direction = sf::Vector2f(0.f, 0.f);
 	m_isOrbiting = NULL;
 	m_orbit_angle = 0;
 	m_range_max = 0;
@@ -34,30 +34,30 @@ Ship::Ship() : Destructible()
 
 	m_health_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
 	m_health_container_rect.setSize(sf::Vector2f(150, 10));
-	m_health_container_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5, m_health_container_rect.getSize().y * 0.5));
+	m_health_container_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5f, m_health_container_rect.getSize().y * 0.5f));
 	m_health_container_rect.setOutlineThickness(1);
 	m_health_container_rect.setOutlineColor(sf::Color::White);
 
 	m_health_rect.setFillColor(sf::Color(0, 200, 0, 255));
-	m_health_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5, m_health_container_rect.getSize().y * 0.5));
+	m_health_rect.setOrigin(sf::Vector2f(m_health_container_rect.getSize().x * 0.5f, m_health_container_rect.getSize().y * 0.5f));
 
 	m_shield_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
 	m_shield_container_rect.setSize(sf::Vector2f(150, 10));
-	m_shield_container_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5, m_shield_container_rect.getSize().y * 0.5));
+	m_shield_container_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5f, m_shield_container_rect.getSize().y * 0.5f));
 	m_shield_container_rect.setOutlineThickness(1);
 	m_shield_container_rect.setOutlineColor(sf::Color::White);
 
 	m_shield_rect.setFillColor(sf::Color(0, 0, 200, 255));
-	m_shield_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5, m_shield_container_rect.getSize().y * 0.5));
+	m_shield_rect.setOrigin(sf::Vector2f(m_shield_container_rect.getSize().x * 0.5f, m_shield_container_rect.getSize().y * 0.5f));
 
 	m_energy_container_rect.setFillColor(sf::Color(10, 10, 10, 255));
 	m_energy_container_rect.setSize(sf::Vector2f(150, 10));
-	m_energy_container_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5, m_energy_container_rect.getSize().y * 0.5));
+	m_energy_container_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5f, m_energy_container_rect.getSize().y * 0.5f));
 	m_energy_container_rect.setOutlineThickness(1);
 	m_energy_container_rect.setOutlineColor(sf::Color::White);
 
 	m_energy_rect.setFillColor(sf::Color(255, 255, 0, 255));
-	m_energy_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5, m_energy_container_rect.getSize().y * 0.5));
+	m_energy_rect.setOrigin(sf::Vector2f(m_energy_container_rect.getSize().x * 0.5f, m_energy_container_rect.getSize().y * 0.5f));
 }
 
 Ship::~Ship()
@@ -77,9 +77,9 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 
 	m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();
 
-	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration, m_heading * M_PI / 180);
+	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration, m_heading * M_PI_F / 180.f);
 
-	sf::Vector2f braking_vector = sf::Vector2f(0, 0);
+	sf::Vector2f braking_vector = sf::Vector2f(0.f, 0.f);
 	float current_inertia_angle = GetAngleRadFromVector(m_speed);
 
 	if (inputs_direction.y > 0)
@@ -109,9 +109,9 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 		const float dx = m_position.x - planet->m_position.x;
 		const float dy = m_position.y - planet->m_position.y;
 
-		if (dx*dx + dy*dy <= (planet->m_gravity_range + m_size.y * 0.5) * (planet->m_gravity_range + m_size.y * 0.5))//range for leaving orbit
+		if (dx *dx + dy *dy <= (planet->m_gravity_range + m_size.y * 0.5f) * (planet->m_gravity_range + m_size.y * 0.5f))//range for leaving orbit
 		{
-			if (m_isOrbiting != NULL || dx*dx + dy*dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
+			if (m_isOrbiting != NULL || dx *dx + dy *dy <= planet->m_gravity_range * planet->m_gravity_range)//range for entering orbit
 			{
 				/*
 				if (m_isOrbiting == NULL || m_acceleration != 0)
@@ -128,7 +128,7 @@ void Ship::UpdateOrbit(sf::Time deltaTime)
 				m_orbit_angle -= deltaTime.asSeconds() * m_orbit_cw * 2 * M_PI * 1 / planet->m_gravity_period;
 				BoundAngle(m_orbit_angle, 2 * M_PI);
 
-				//m_speed = sf::Vector2f(0, 0);
+				//m_speed = sf::Vector2f(0.f, 0.f);
 				sf::Vector2f position;
 				position.x = planet->m_position.x + planet->m_gravity_range * cos(m_orbit_angle);
 				position.y = planet->m_position.y + planet->m_gravity_range * sin(m_orbit_angle);
@@ -287,7 +287,7 @@ void Ship::UpdateShieldRegen(sf::Time deltaTime)
 
 		double intpart;
 		m_shield_regen_buffer = modf(m_shield_regen_buffer, &intpart);
-		m_shield += intpart;
+		m_shield += (int)intpart;
 
 		if (m_shield > m_shield_max)
 			m_shield = m_shield_max;
@@ -302,7 +302,7 @@ void Ship::UpdateEnergyRegen(sf::Time deltaTime)
 
 		double intpart;
 		m_energy_regen_buffer = modf(m_energy_regen_buffer, &intpart);
-		m_energy += intpart;
+		m_energy += (int)intpart;
 
 		if (m_energy > m_energy_max)
 			m_energy = m_energy_max;
@@ -316,13 +316,13 @@ void Ship::SetPosition(sf::Vector2f position)
 	m_shield_circle->setPosition(getPosition());
 	m_gravitation_circle->setPosition(getPosition());
 
-	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50));
+	m_health_container_rect.setPosition(sf::Vector2f(getPosition().x, getPosition().y - 50.f));
 	m_health_rect.setPosition(sf::Vector2f(m_health_container_rect.getPosition().x, m_health_container_rect.getPosition().y));
 	
-	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5 - m_health_container_rect.getOutlineThickness() - m_health_container_rect.getSize().y * 0.5));
+	m_shield_container_rect.setPosition(sf::Vector2f(getPosition().x, m_health_container_rect.getPosition().y - m_health_container_rect.getSize().y * 0.5f - m_health_container_rect.getOutlineThickness() - m_health_container_rect.getSize().y * 0.5f));
 	m_shield_rect.setPosition(sf::Vector2f(m_shield_container_rect.getPosition().x, m_shield_container_rect.getPosition().y));
 	
-	m_energy_container_rect.setPosition(sf::Vector2f(getPosition().x, m_shield_container_rect.getPosition().y - m_shield_container_rect.getSize().y * 0.5 - m_shield_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5));
+	m_energy_container_rect.setPosition(sf::Vector2f(getPosition().x, m_shield_container_rect.getPosition().y - m_shield_container_rect.getSize().y * 0.5f - m_shield_container_rect.getOutlineThickness() - m_shield_container_rect.getSize().y * 0.5f));
 	m_energy_rect.setPosition(sf::Vector2f(m_energy_container_rect.getPosition().x, m_energy_container_rect.getPosition().y));
 }
 
@@ -375,15 +375,15 @@ void Ship::HitWithGravitation(GameObject* object)
 	const float dx = target->m_position.x - m_position.x;
 	const float dy = target->m_position.y - m_position.y;
 	const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
-	const float speed_deg = (angle * 180.f / M_PI);
+	const float speed_deg = (angle * 180.f / M_PI_F);
 
 	//Apply gravitation only if object is trying to get away from the attractor
 	if ((this == (*CurrentGame).m_playerShip || m_roe == ROE_FireAtWill) && m_radius > object->m_radius && abs(GetAngleDegToTargetPosition(object->m_position, speed_deg, m_position)) > 90)
 	{
-		const float dist_sqr = dx*dx + dy*dy;
+		const float dist_sqr = dx *dx + dy *dy;
 		const float range = m_gravitation_range;
 
-		const float strenght = Lerp(dist_sqr, (range * 0.5) * (range * 0.5), (range)* (range), 0, m_gravitation_strength);
+		const float strenght = Lerp(dist_sqr, (range * 0.5f) * (range * 0.5f), (range) * (range), 0.f, m_gravitation_strength);
 		sf::Vector2f gravity = GetVectorFromLengthAndAngle(strenght, angle);
 
 		target->m_speed += gravity;

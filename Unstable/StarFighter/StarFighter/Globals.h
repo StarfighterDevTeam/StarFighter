@@ -12,6 +12,10 @@
 #include <fstream>
 #include <iostream>
 
+#define M_PI_F       3.14159265358979323846f   // pi
+#define M_PI_2_F     1.57079632679489661923f   // pi/2
+#define M_PI_4_F     0.785398163397448309616f  // pi/4
+
 using namespace sf;
 
 std::string makePath(const std::string& srcPath);
@@ -52,12 +56,12 @@ struct Vector2int
 #define TEXTURE_SIZE_LIMITATION						8187
 
 #define PIXEL_PERFECT_COLLISION							true
-#define GRAZE_DISTANCE									30
+#define GRAZE_DISTANCE									30.f
 #define RECTANGLE_INSIDE_ALPHA							100
 
 //MUSIC
-#define DEFAULT_MUSIC_VOLUME						50
-#define DEFAULT_SFX_VOLUME							100
+#define DEFAULT_MUSIC_VOLUME						50.f
+#define DEFAULT_SFX_VOLUME							100.f
 #define MUSIC_FADE_IN_TIME						2.f
 #define MUSIC_FADE_OUT_TIME						2.f
 

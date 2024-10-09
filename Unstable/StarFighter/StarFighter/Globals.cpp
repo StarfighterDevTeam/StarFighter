@@ -77,9 +77,9 @@ int RandomizeIntBetweenValues(int min_value, int max_value)
 
 int RandomizeIntBetweenFloats(float min_value, float max_value)
 {
-	int min = floor (min_value + 0.5);
-	int max = floor (max_value + 0.5);
-	int random_value = rand() % (max - min +1);
+	int min = (int)floor(min_value + 0.5);
+	int max = (int)floor(max_value + 0.5);
+	int random_value = rand() % (max - min + 1);
 	random_value += min;
 
 	return random_value;
@@ -185,8 +185,8 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 	if (value > input_max)
 		return output_max;
 
-	float ratio = (1 - cos(value * M_PI)) / 2;
-	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI)) / 2;"
+	float ratio = (1.f - cos(value * M_PI_F)) * 0.5f;
+	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI_F)) * 0.5f;"
 
 	float ouput = output_min + ratio * (output_max - output_min);
 
@@ -210,7 +210,7 @@ sf::Color GrayScaleColor(sf::Color input_color, float ratio)
 
 float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
 {
-	float angle = GetAngleRadFromVector(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI;
+	float angle = GetAngleRadFromVector(sf::Vector2f(target_position.x - ref_position.x, target_position.y - ref_position.y)) * 180.f / M_PI_F;
 	float delta_angle = ref_rotation_in_deg - angle;
 	if (delta_angle > 180)
 		delta_angle -= 180.f * 2;
@@ -238,7 +238,7 @@ float GetAngleRadFromVector(sf::Vector2f vector)
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
+	angle += M_PI_2_F;
 
 	return angle;//PI = down, PI/2 = right, 0=up
 }
@@ -275,9 +275,9 @@ void ScaleVectorInt(sf::Vector2i* vector, int target_value)
 	if (vector->x == 0 && vector->y == 0)
 		return;
 
-	float p = 1.f * target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
-	vector->x *= p;
-	vector->y *= p;
+	float p = 1.f * target_value / (float)sqrt(vector->x * vector->x + vector->y * vector->y);
+	vector->x = (int)(vector->x * p);
+	vector->y = (int)(vector->y * p);
 }
 
 float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
@@ -352,13 +352,13 @@ void BoundAngle(float& input, float max_angle)
 
 bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size)
 {
-	const float a = coordinates.x + bounds.x / 2;
-	const float b = coordinates.x - bounds.x / 2;
+	const float a = coordinates.x + bounds.x * 0.5f;
+	const float b = coordinates.x - bounds.x * 0.5f;
 
 	const float x = area_size.x;
 
-	const float c = coordinates.y + bounds.y / 2;
-	const float d = coordinates.y - bounds.y / 2;
+	const float c = coordinates.y + bounds.y * 0.5f;
+	const float d = coordinates.y - bounds.y * 0.5f;
 
 	const float y = area_size.y;
 

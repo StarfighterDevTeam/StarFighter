@@ -24,8 +24,8 @@ AsteroidField::AsteroidField(int sector_index_bottom, int sector_index_left, int
 		if (index != m_free_space && RandomizeFloatBetweenValues(0, 1) < 0.6)
 		{
 			Asteroid* asteroid = AsteroidField::CreateAsteroid(index, (AsteroidType)RandomizeIntBetweenValues(0, NB_ASTEROID_TYPES - 1));
-			asteroid->m_position.x += RandomizeFloatBetweenValues(-STAR_SECTOR_SIZE * 0.25, STAR_SECTOR_SIZE * 0.25);
-			asteroid->m_position.y += RandomizeFloatBetweenValues(-STAR_SECTOR_SIZE * 0.25, STAR_SECTOR_SIZE * 0.25);
+			asteroid->m_position.x += RandomizeFloatBetweenValues(-1.f * STAR_SECTOR_SIZE * 0.25f, 1.f * STAR_SECTOR_SIZE * 0.25f);
+			asteroid->m_position.y += RandomizeFloatBetweenValues(-1.f * STAR_SECTOR_SIZE * 0.25f, 1.f * STAR_SECTOR_SIZE * 0.25f);
 			m_asteroids.push_back(asteroid);
 		}
 	}

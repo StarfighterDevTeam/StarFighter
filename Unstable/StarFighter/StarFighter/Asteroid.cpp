@@ -23,7 +23,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 1;
 			m_health_max = 1;
 			m_chance_of_loot = 0;
-			m_speed_max = RandomizeIntBetweenValues(30, 100);
+			m_speed_max = RandomizeFloatBetweenValues(30.f, 100.f);
 			break;
 		}
 		case Asteroid_XS:
@@ -33,7 +33,7 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 2;
 			m_health_max = 1;
 			m_chance_of_loot = 0;
-			m_speed_max = RandomizeIntBetweenValues(30, 100);
+			m_speed_max = RandomizeFloatBetweenValues(30.f, 100.f);
 			break;
 		}
 		case Asteroid_S:
@@ -43,47 +43,47 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 			m_collision_damage = 4;
 			m_health_max = 4;
 			m_chance_of_loot = 0;
-			m_speed_max = RandomizeIntBetweenValues(30, 100);
+			m_speed_max = RandomizeFloatBetweenValues(30.f, 100.f);
 			break;
 		}
 		case Asteroid_M:
 		{
 			textureName = "2D/asteroid_M.png";
-			textureSize = sf::Vector2f(120, 120);
+			textureSize = sf::Vector2f(120.f, 120.f);
 			m_collision_damage = 8;
 			m_health_max = 16;
-			m_chance_of_loot = 0.01;
-			m_speed_max = RandomizeIntBetweenValues(20, 80);
+			m_chance_of_loot = 0.01f;
+			m_speed_max = RandomizeFloatBetweenValues(20.f, 80.f);
 			break;
 		}
 		case Asteroid_L:
 		{
 			textureName = "2D/asteroid_L.png";
-			textureSize = sf::Vector2f(200, 224);
+			textureSize = sf::Vector2f(200.f, 224.f);
 			m_collision_damage = 8;
 			m_health_max = 32;
-			m_chance_of_loot = 0.05;
-			m_speed_max = RandomizeIntBetweenValues(20, 80);
+			m_chance_of_loot = 0.05f;
+			m_speed_max = RandomizeFloatBetweenValues(20.f, 80.f);
 			break;
 		}
 		case Asteroid_XL:
 		{
 			textureName = "2D/asteroid_XL.png";
-			textureSize = sf::Vector2f(240, 300);
+			textureSize = sf::Vector2f(240.f, 300.f);
 			m_collision_damage = 16;
 			m_health_max = 64;
-			m_chance_of_loot = 0.1;
-			m_speed_max = RandomizeIntBetweenValues(10, 40);
+			m_chance_of_loot = 0.1f;
+			m_speed_max = RandomizeFloatBetweenValues(10.f, 40.f);
 			break;
 		}
 		case Asteroid_XXL:
 		{
 			textureName = "2D/asteroid_XXL.png";
-			textureSize = sf::Vector2f(280, 304);
+			textureSize = sf::Vector2f(280.f, 304.f);
 			m_collision_damage = 16;
 			m_health_max = 64;
-			m_chance_of_loot = 0.1;
-			m_speed_max = RandomizeIntBetweenValues(10, 40);
+			m_chance_of_loot = 0.1f;
+			m_speed_max = RandomizeFloatBetweenValues(10.f, 40.f);
 			break;
 		}
 	}
@@ -92,8 +92,8 @@ Asteroid::Asteroid(sf::Vector2i sector_index, AsteroidType asteroid_type) : Dest
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
-	m_rotation_speed = RandomizeFloatBetweenValues(3, 15) * RandomizeSign();
-	m_heading = RandomizeFloatBetweenValues(0, 359.9);
+	m_rotation_speed = RandomizeFloatBetweenValues(3.f, 15.f) * RandomizeSign();
+	m_heading = RandomizeFloatBetweenValues(0.f, 359.9f);
 	//m_speed = sf::Vector2f(RandomizeFloatBetweenValues(-1, 1), RandomizeFloatBetweenValues(-1, 1));
 	//ScaleVector(&m_speed, m_speed_max);
 

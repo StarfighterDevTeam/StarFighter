@@ -16,14 +16,14 @@ Player::Player(sf::Vector2i sector_index) : HumanShip(sector_index, true)
 	//Star Hunter
 	(*CurrentGame).m_playerShip = this;
 
-	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+	setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
 
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(6, m_size.y * 0.5), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(-6, m_size.y * 0.5), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5 + 8, 0), 0));
-	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5 - 8, 0), 0));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(6.f, m_size.y * 0.5f), 0.f));
+	m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserGreen, AllyFire, PlayerFireLayer, sf::Vector2f(-6.f, m_size.y * 0.5f), 0.f));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(m_size.x * 0.5f + 8.f, 0.f), 0.f));
+	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5f - 8.f, 0.f), 0.f));
 
-	m_cursor = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/cursor.png", sf::Vector2f(32, 32));
+	m_cursor = new GameObject(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), "2D/cursor.png", sf::Vector2f(32.f, 32.f));
 	(*CurrentGame).addToScene(m_cursor, FeedbacksLayer, BackgroundObject, false);
 
 	InitShip();
@@ -43,7 +43,7 @@ void Player::Update(sf::Time deltaTime)
 	//controls
 	UpdateInputStates();
 
-	m_inputs_direction = sf::Vector2f(0, 0);
+	m_inputs_direction = sf::Vector2f(0.f, 0.f);
 	if ((*CurrentGame).m_window_has_focus)
 	{
 		m_inputs_direction = InputGuy::getDirections();
@@ -59,7 +59,7 @@ void Player::Update(sf::Time deltaTime)
 	//turn with mouse
 	if (m_cursor && (*CurrentGame).m_window_has_focus)
 		m_cursor->m_position = m_position + sf::Vector2f((*CurrentGame).m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -((*CurrentGame).m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
-	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180.f / M_PI;
+	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180.f / M_PI_F;
 	const float delta_heading = computeDeltaAngleInDegrees(m_heading, aim_heading);
 	if (m_inputs_direction.x == 0)
 	{
@@ -277,7 +277,7 @@ void Player::UpdateMissions()
 								if (ship->m_roe != ROE_Freeze)
 								{
 									//arrived at destination?
-									if (ship->m_scripted_destination != NULL && GetDistanceSquaredBetweenPositions(ship->m_position, *ship->m_scripted_destination) < (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5) * (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5))
+									if (ship->m_scripted_destination != NULL && GetDistanceSquaredBetweenPositions(ship->m_position, *ship->m_scripted_destination) < (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5f) * (PLANET_ORBIT_RANGE + PLANET_RADIUS - ship->m_size.y * 0.5f))
 									{
 										UnmarkThis(ship, true);
 										ship->m_garbageMe = true;
@@ -291,7 +291,7 @@ void Player::UpdateMissions()
 
 									}
 									//too far from convoy = freeze convoy movement
-									else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
+									else if (GetDistanceSquaredBetweenPositions(m_position, object->m_position) > REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5f)
 									{
 										ship->SetROE(ROE_Freeze);
 										tmp_marked_objectives.push_back(ship);

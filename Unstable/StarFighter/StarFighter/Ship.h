@@ -57,8 +57,8 @@ public :
 	float m_energy_regen;
 	float m_gravitation_range;
 	float m_gravitation_strength;
-	CircleDisplay* m_shield_circle;
-	CircleDisplay* m_gravitation_circle;
+	CircleDisplay * m_shield_circle;
+	CircleDisplay * m_gravitation_circle;
 
 	void Replenish();
 

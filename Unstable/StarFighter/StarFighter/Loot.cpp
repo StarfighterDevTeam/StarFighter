@@ -11,7 +11,7 @@ Loot::Loot(int money) : SpatialObject()
 	m_collider = LootObject;
 	m_speed_max = 200;
 
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/crystal.png", sf::Vector2f(32, 32), 1, 1);
+	Init(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), "2D/crystal.png", sf::Vector2f(32, 32), 1, 1);
 }
 
 Loot::~Loot()

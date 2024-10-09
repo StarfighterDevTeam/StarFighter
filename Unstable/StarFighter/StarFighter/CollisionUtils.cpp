@@ -21,7 +21,7 @@ namespace Collision
 			if (x > tex->getSize().x || y > tex->getSize().y)
 				return 0;
 
-			return mask[x + y*tex->getSize().x];
+			return mask[x + y *tex->getSize().x];
 		}
 
 		sf::Uint8* GetMask(const sf::Texture* tex) {
@@ -39,12 +39,12 @@ namespace Collision
 		}
 
 		sf::Uint8* CreateMask(const sf::Texture* tex, const sf::Image& img) {
-			sf::Uint8* mask = new sf::Uint8[tex->getSize().y*tex->getSize().x];
+			sf::Uint8* mask = new sf::Uint8[tex->getSize().y *tex->getSize().x];
 
 			for (unsigned int y = 0; y < tex->getSize().y; y++)
 			{
 				for (unsigned int x = 0; x < tex->getSize().x; x++)
-					mask[x + y*tex->getSize().x] = img.getPixel(x, y).a;
+					mask[x + y *tex->getSize().x] = img.getPixel(x, y).a;
 			}
 
 			Bitmasks.insert(std::pair<const sf::Texture*, sf::Uint8*>(tex, mask));
@@ -104,14 +104,14 @@ namespace Collision
 	sf::Vector2f GetSpriteCenter(const sf::Sprite& Object)
 	{
 		sf::FloatRect AABB = Object.getGlobalBounds();
-		return sf::Vector2f(AABB.left + AABB.width / 2.f, AABB.top + AABB.height / 2.f);
+		return sf::Vector2f(AABB.left + AABB.width * 0.5f, AABB.top + AABB.height * 0.5f);
 	}
 
 	sf::Vector2f GetSpriteSize(const sf::Sprite& Object)
 	{
 		sf::IntRect OriginalSize = Object.getTextureRect();
 		sf::Vector2f Scale = Object.getScale();
-		return sf::Vector2f(OriginalSize.width*Scale.x, OriginalSize.height*Scale.y);
+		return sf::Vector2f(OriginalSize.width * Scale.x, OriginalSize.height * Scale.y);
 	}
 
 	bool CircleTest(const sf::Sprite& Object1, const sf::Sprite& Object2) {
@@ -142,11 +142,11 @@ namespace Collision
 
 		void ProjectOntoAxis(const sf::Vector2f& Axis, float& Min, float& Max) // Project all four points of the OBB onto the given axis and return the dotproducts of the two outermost points
 		{
-			Min = (Points[0].x*Axis.x + Points[0].y*Axis.y);
+			Min = (Points[0].x *Axis.x + Points[0].y *Axis.y);
 			Max = Min;
 			for (int j = 1; j < 4; j++)
 			{
-				float Projection = (Points[j].x*Axis.x + Points[j].y*Axis.y);
+				float Projection = (Points[j].x *Axis.x + Points[j].y *Axis.y);
 
 				if (Projection<Min)
 					Min = Projection;

@@ -9,7 +9,7 @@ HumanShip::HumanShip(sf::Vector2i sector_index, bool is_local_player) : Ship()
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);
 
 	string textureName = is_local_player == true ? "2D/ship_alpha_blue.png" : "2D/ship_alpha_green.png";
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(68, 84), 3, 1);
+	Init(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), textureName, sf::Vector2f(68, 84), 3, 1);
 
 	//Flight model
 	m_speed_max = 800;

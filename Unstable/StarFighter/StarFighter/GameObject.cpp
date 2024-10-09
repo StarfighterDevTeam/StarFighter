@@ -77,17 +77,17 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 {
 	m_animationNumber = animationNumber;
 	m_frameNumber = frameNumber;
-	m_size.x = ((*texture).getSize().x / frameNumber);
-	m_size.y = ((*texture).getSize().y / animationNumber);
+	m_size.x = 1.f * ((*texture).getSize().x / frameNumber);
+	m_size.y = 1.f * ((*texture).getSize().y / animationNumber);
 	m_defaultAnimation.setSpriteSheet(*texture);
 
 	for (int j = 0; j < animationNumber; j++)
 	{
 		for (int i = 0; i < frameNumber; i++)
 		{
-			int x = ((*texture).getSize().x / frameNumber)*(i);
-			int y = ((*texture).getSize().y / animationNumber)*(j);
-			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
+			int x = ((*texture).getSize().x / frameNumber) *(i);
+			int y = ((*texture).getSize().y / animationNumber) *(j);
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, (int)m_size.x, (int)m_size.y));
 		}
 	}
 	
@@ -107,7 +107,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x * frameNumber, size.y * animationNumber);
+	sf::Texture* texture = loader->loadTexture(textureName, (int)size.x * frameNumber, (int)size.y * animationNumber);
 	m_textureName = textureName;
 
 	setOrigin(size.x * 0.5f, size.y * 0.5f);
@@ -208,7 +208,7 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 	//inside stroke
 	for (int i = 0; i < W * H * 4; i += 4)
 	{
-		if (stroke_size < 1 || (i / 4) <= W * (stroke_size) || (i / 4) >(H - 1 * (stroke_size))*W || (i / 4) % W <= 0 + ((stroke_size)-1) || (i / 4) % W >= (W - 1 * (stroke_size))) // A
+		if (stroke_size < 1 || (i / 4) <= W * (stroke_size) || (i / 4) >(H - 1 * (stroke_size)) *W || (i / 4) % W <= 0 + ((stroke_size)-1) || (i / 4) % W >= (W - 1 * (stroke_size))) // A
 		{
 			pixels[i + 3] = 255;
 		}
@@ -244,7 +244,7 @@ int GameObject::GetPixelDistanceFromEdge(int pixel_index, int width, int height)
 
 int GameObject::GaussianBlurDistribution(int x)
 {
-	return x*x;
+	return x *x;
 }
 
 void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size)
@@ -253,17 +253,17 @@ void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int h
 	{
 		for (int i = 0; i < width * height * 4; i += 4)
 		{
-			if ((i / 4) <= width * blur_radius || (i / 4) >(height - 1 * blur_radius)*width || (i / 4) % width <= 0 + (blur_radius - 1) || (i / 4) % width >= (width - 1 * blur_radius))
+			if ((i / 4) <= width * blur_radius || (i / 4) >(height - 1 * blur_radius) *width || (i / 4) % width <= 0 + (blur_radius - 1) || (i / 4) % width >= (width - 1 * blur_radius))
 			{
 				int nominator = GaussianBlurDistribution(GetPixelDistanceFromEdge(i, width, height));
 				int denominator = GaussianBlurDistribution(blur_radius + 1);
 				pixels[i + 3] = (Uint8)(ceil(1.f * nominator / denominator * 255)); // Alpha
 			}
-			else if ((i / 4) <= width * (blur_radius + stroke_size) || (i / 4) >(height - 1 * (blur_radius + stroke_size))*width || (i / 4) % width <= 0 + ((blur_radius + stroke_size) - 1) || (i / 4) % width >= (width - 1 * (blur_radius + stroke_size)))
+			else if ((i / 4) <= width * (blur_radius + stroke_size) || (i / 4) >(height - 1 * (blur_radius + stroke_size)) *width || (i / 4) % width <= 0 + ((blur_radius + stroke_size) - 1) || (i / 4) % width >= (width - 1 * (blur_radius + stroke_size)))
 			{
 				//stroke: do nothing
 			}
-			else if ((i / 4) <= width * (2 * blur_radius + stroke_size) || (i / 4) >(height - 1 * (2 * blur_radius + stroke_size))*width || (i / 4) % width <= 0 + ((2 * blur_radius + stroke_size) - 1) || (i / 4) % width >= (width - 1 * (2 * blur_radius + stroke_size)))
+			else if ((i / 4) <= width * (2 * blur_radius + stroke_size) || (i / 4) >(height - 1 * (2 * blur_radius + stroke_size)) *width || (i / 4) % width <= 0 + ((2 * blur_radius + stroke_size) - 1) || (i / 4) % width >= (width - 1 * (2 * blur_radius + stroke_size)))
 			{
 				int nominator = GaussianBlurDistribution((blur_radius - 1) - (GetPixelDistanceFromEdge(i, width, height) - stroke_size - blur_radius - 1));
 				int denominator = GaussianBlurDistribution(blur_radius + 1);

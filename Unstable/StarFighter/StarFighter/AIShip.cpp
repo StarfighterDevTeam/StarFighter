@@ -39,19 +39,19 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_regen = 1.5;
 
 			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_green.png" : "2D/ship_alpha_red.png";
-			textureSize = sf::Vector2f(68, 84);
+			textureSize = sf::Vector2f(68.f, 84.f);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5f)));
 			break;
 		}
 		case Ship_AlphaBlack:
 		{
-			m_speed_max = 500;
-			m_acceleration_max = 1000;
-			m_turn_speed = 160;
-			m_braking_max = 3000;
-			m_idle_decelleration = 1000;
+			m_speed_max = 500.f;
+			m_acceleration_max = 1000.f;
+			m_turn_speed = 160.f;
+			m_braking_max = 3000.f;
+			m_idle_decelleration = 1000.f;
 
 			m_health_max = 10;
 			m_shield_max = 10;
@@ -59,19 +59,19 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_regen = 1.5;
 
 			textureName = hostility == Hostility_Ally ? "2D/ship_alpha_blue.png" : "2D/ship_alpha_black.png";
-			textureSize = sf::Vector2f(68, 84);
+			textureSize = sf::Vector2f(68.f, 84.f);
 			frameNumber = 3;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, weapon_collider, AIShipFireLayer, sf::Vector2f(0, textureSize.y * 0.5)));
+			m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, weapon_collider, AIShipFireLayer, sf::Vector2f(0.f, textureSize.y * 0.5f)));
 			break;
 		}
 		case Ship_Sigma:
 		{
-			m_speed_max = 1000;
-			m_acceleration_max = 1500;
-			m_turn_speed = 200;
-			m_braking_max = 3000;
-			m_idle_decelleration = 1000;
+			m_speed_max = 1000.f;
+			m_acceleration_max = 1500.f;
+			m_turn_speed = 200.f;
+			m_braking_max = 3000.f;
+			m_idle_decelleration = 1000.f;
 
 			m_health_max = 50;
 			m_shield_max = 0;
@@ -81,17 +81,17 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_collision_damage = 10;
 
 			textureName = hostility == Hostility_Ally ? "2D/ship_sigma_blue.png" : "2D/ship_sigma_red.png";
-			textureSize = sf::Vector2f(39, 52);
+			textureSize = sf::Vector2f(39.f, 52.f);
 			frameNumber = 3;
 			break;
 		}
 		case Ship_Cruiser:
 		{
-			m_speed_max = 200;
-			m_acceleration_max = 2000;
-			m_turn_speed = 30;
-			m_braking_max = 3000;
-			m_idle_decelleration = 1000;
+			m_speed_max = 200.f;
+			m_acceleration_max = 2000.f;
+			m_turn_speed = 30.f;
+			m_braking_max = 3000.f;
+			m_idle_decelleration = 1000.f;
 
 			m_health_max = 200;
 			m_shield_max = 100;
@@ -99,32 +99,32 @@ AIShip::AIShip(ShipType ship_type, sf::Vector2i sector_index, float heading, Hos
 			m_shield_regen = 1.5;
 
 			textureName = hostility == Hostility_Ally ? "2D/ship_cruiser_blue.png" : "2D/ship_cruiser_red.png";
-			textureSize = sf::Vector2f(288, 390);
+			textureSize = sf::Vector2f(288.f, 390.f);
 			frameNumber = 1;
 
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(8, textureSize.y * 0.5)));
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-8, textureSize.y * 0.5)));
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(textureSize.x * 0.5 - 8, textureSize.y * 0.25)));
-			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-textureSize.x * 0.5 + 8, textureSize.y * 0.25)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(8.f, textureSize.y * 0.5f)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-8.f, textureSize.y * 0.5f)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(textureSize.x * 0.5f - 8.f, textureSize.y * 0.25f)));
+			m_weapons.push_back(new Weapon(this, Weapon_Laser, Ammo_LaserRed, weapon_collider, AIShipFireLayer, sf::Vector2f(-textureSize.x * 0.5f + 8.f, textureSize.y * 0.25f)));
 
 			m_gravitation_range = REF_WINDOW_RESOLUTION_X;
-			m_gravitation_strength = 70;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
+			m_gravitation_strength = 70.f;//fine_tuned for player m_speed_max = 800; m_acceleration_max = 2000;
 
 			break;
 		}
 		case Ship_Convoy:
 		{
-			m_speed_max = 100;
-			m_acceleration_max = 500;
-			m_turn_speed = 50;
-			m_braking_max = 3000;
-			m_idle_decelleration = 1000;
+			m_speed_max = 100.f;
+			m_acceleration_max = 500.f;
+			m_turn_speed = 50.f;
+			m_braking_max = 3000.f;
+			m_idle_decelleration = 1000.f;
 
 			m_health_max = 100;
 			m_shield_max = 0;
 
 			textureName = hostility == Hostility_Ally ? "2D/ship_convoy_blue.png" : "2D/ship_convoy_red.png";
-			textureSize = sf::Vector2f(75, 126);
+			textureSize = sf::Vector2f(75.f, 126.f);
 			frameNumber = 1;
 
 			break;
@@ -174,7 +174,7 @@ void AIShip::Update(sf::Time deltaTime)
 				m_target = KeepTarget(MaxBetweenValues(m_range_max, AMBUSH_ENGAGEMENT_DISTANCE));//distance max to keep track of the current target
 
 			if (m_target == NULL)
-				m_target = (*CurrentGame).GetTargetableEnemyShip(this, m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE, 360);
+				m_target = (*CurrentGame).GetTargetableEnemyShip(this, m_roe == ROE_Ambush ? AMBUSH_ENGAGEMENT_DISTANCE : FIREATWILL_ENGAGEMENT_DISTANCE, 360.f);
 
 			if (m_target == NULL && m_roe != m_native_ROE)//no target is sight => go back to native Rule of engagement
 				SetROE(m_native_ROE);
@@ -184,7 +184,7 @@ void AIShip::Update(sf::Time deltaTime)
 	}
 
 	//Move to forced destination
-	if (m_position != m_move_destination && m_inputs_direction == sf::Vector2f(0, 0))
+	if (m_position != m_move_destination && m_inputs_direction == sf::Vector2f(0.f, 0.f))
 	{
 		GoTo(m_move_destination, deltaTime, m_inputs_direction);
 		TurnTo(m_move_destination, deltaTime, m_inputs_direction);
@@ -195,7 +195,7 @@ void AIShip::Update(sf::Time deltaTime)
 	{
 		const float dx = m_position.x - m_target->m_position.x;
 		const float dy = m_position.y - m_target->m_position.y;
-		if (dx*dx + dy*dy > m_range_max * m_range_max)
+		if (dx *dx + dy *dy > m_range_max * m_range_max)
 		{
 			//move to range position with same approch angle as current angle to target
 			const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
@@ -228,7 +228,7 @@ void AIShip::Update(sf::Time deltaTime)
 	ApplyFlightModel(deltaTime, m_inputs_direction);
 
 	//reset inputs for next frame
-	m_inputs_direction = sf::Vector2f(0, 0);//x == 1 == right; y == -1 == speed-up
+	m_inputs_direction = sf::Vector2f(0.f, 0.f);//x == 1 == right; y == -1 == speed-up
 	
 	//Gravity circle to be drawn
 	if (m_gravitation_range > 0 && m_roe == ROE_FireAtWill)
@@ -360,7 +360,7 @@ void AIShip::GoTo(sf::Vector2f position, sf::Time deltaTime, sf::Vector2f& input
 
 	bool speed_up_authorized;
 	if (m_collision_damage == 0 || m_weapons.empty() == false)//shooter profile
-		speed_up_authorized = dx*dx + dy*dy > m_speed.x*m_speed.x + m_speed.y*m_speed.y;//authorize to speed if destination is very far relative to the current speed
+		speed_up_authorized = dx *dx + dy *dy > m_speed.x *m_speed.x + m_speed.y *m_speed.y;//authorize to speed if destination is very far relative to the current speed
 	else//melee profile
 		speed_up_authorized = true;
 
@@ -388,7 +388,7 @@ void AIShip::Draw(RenderTarget& screen)
 
 	if (m_position != m_move_destination)
 	{
-		sf::Vector2f destination = sf::Vector2f(m_move_destination.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_move_destination.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5);
+		sf::Vector2f destination = sf::Vector2f(m_move_destination.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(m_move_destination.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f);
 		DebugDrawSegment(getPosition(), destination, sf::Color::Magenta, (*CurrentGame).m_mainScreen);
 	}
 }
@@ -455,7 +455,7 @@ void AIShip::UpdateAlliedShips()
 		{
 			const float dx = allied_ship->m_position.x - m_position.x;
 			const float dy = allied_ship->m_position.y - m_position.y;
-			if (dx*dx + dy*dy < REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5)
+			if (dx *dx + dy *dy < REF_WINDOW_RESOLUTION_X * 0.5 * REF_WINDOW_RESOLUTION_X * 0.5f)
 			{
 				//already a forced ally?
 				bool found = false;

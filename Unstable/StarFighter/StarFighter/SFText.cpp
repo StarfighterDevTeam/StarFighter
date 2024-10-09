@@ -22,7 +22,7 @@ void SFText::Update(Time deltaTime)
 SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team)
 {
 	setSize(size);
-	setOrigin(size.x / 2, size.y/2);
+	setOrigin(size.x * 0.5f, size.y/2);
 	setFillColor(color);
 	setOutlineThickness(outline_thickness);
 	setOutlineColor(outline_color);

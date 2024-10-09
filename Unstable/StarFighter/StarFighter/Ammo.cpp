@@ -54,7 +54,7 @@ Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, floa
 		}
 	}
 
-	m_speed = GetVectorFromLengthAndAngle(m_speed_min, (heading + 180) * M_PI / 180);
+	m_speed = GetVectorFromLengthAndAngle(m_speed_min, (heading + 180.f) * M_PI_F / 180.f);
 	m_lifespan = range / m_speed_max;
 
 	Init(position, m_speed, textureName, textureSize, frameNumber, animationNumber);
@@ -62,7 +62,7 @@ Ammo::Ammo(SpatialObject* owner, AmmoType ammo_type, sf::Vector2f position, floa
 	m_heading = heading;
 	
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
-	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 	setRotation(m_heading);
 }
 
@@ -94,7 +94,7 @@ void Ammo::Update(sf::Time deltaTime)
 			{
 				const float dx = m_locked_target->m_position.x - m_position.x;
 				const float dy = m_locked_target->m_position.y - m_position.y;
-				if (dx*dx + dy*dy > m_radar_homing_range * m_radar_homing_range || abs(GetAngleDegToTargetPosition(m_position, m_heading, m_locked_target->m_position)) > m_radar_homing_angle_max)
+				if (dx *dx + dy *dy > m_radar_homing_range * m_radar_homing_range || abs(GetAngleDegToTargetPosition(m_position, m_heading, m_locked_target->m_position)) > m_radar_homing_angle_max)
 					m_locked_target = NULL;
 			}
 		}
@@ -129,7 +129,7 @@ void Ammo::Update(sf::Time deltaTime)
 			}
 		}
 
-		m_speed = GetVectorFromLengthAndAngle(speed, (m_heading + 180) * M_PI / 180);
+		m_speed = GetVectorFromLengthAndAngle(speed, (m_heading + 180.f) * M_PI_F / 180.f);
 		NormalizeVector(&m_speed, m_speed_max);
 
 		GameObject::Update(deltaTime);
@@ -158,15 +158,15 @@ void Ammo::Bounce(GameObject* target)
 	float incoming_angle = 180 + m_heading;
 	BoundAngle(incoming_angle, 360);
 
-	const float radius_angle = GetAngleRadFromVector(sf::Vector2f(dx, dy)) * 180 / M_PI;;
+	const float radius_angle = GetAngleRadFromVector(sf::Vector2f(dx, dy)) * 180.f / M_PI_F;
 
 	const int cross_product = dx * m_speed.x + dy * m_speed.y > 0 ? -1 : 1;
 
 	m_heading = radius_angle + cross_product * (radius_angle - incoming_angle);
 
 	//instant repositioning at collision point
-	m_position = target->m_position + GetVectorFromLengthAndAngle(target->GetRadius(true) + m_size.y * 0.5, (radius_angle - 180) * M_PI / 180);
-	SetPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	m_position = target->m_position + GetVectorFromLengthAndAngle(target->GetRadius(true) + m_size.y * 0.5f, (radius_angle - 180.f) * M_PI_F / 180.f);
+	SetPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 	setRotation(m_heading);
 }
 

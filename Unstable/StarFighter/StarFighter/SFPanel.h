@@ -64,7 +64,7 @@ public:
 	bool m_visible = true;
 	SFPanelTypes m_panel_type = SFPanelTypes::SFPanel_None;
 	Player* m_playerShip = nullptr;
-	SFActionBox* m_actions = nullptr;
+	SFActionBox * m_actions = nullptr;
 };
 
 #endif // SFPANEL_H_INCLUDED

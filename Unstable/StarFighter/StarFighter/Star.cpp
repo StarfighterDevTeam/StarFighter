@@ -22,7 +22,7 @@ void Star::Update(sf::Time deltaTime)
 			m_pulse_clock -= m_pulse_periodicity;
 		}
 		
-		setColor(sf::Color(255, 255, 255, m_color.a * (1 - 0.20 * cos(m_pulse_clock * 2 * M_PI / m_pulse_periodicity))));
+		setColor(sf::Color(255, 255, 255, (sf::Uint8)(m_color.a * (1.f - 0.20f * cos(m_pulse_clock * 2.f * M_PI_F / m_pulse_periodicity)))));
 	}
 
 	GameObject::Update(deltaTime);

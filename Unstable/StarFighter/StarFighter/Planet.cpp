@@ -25,14 +25,14 @@ Planet::Planet(sf::Vector2i sector_index, Hostility hostility, int nb_missions_t
 	
 	(*CurrentGame).m_planet_ids[m_planet_id] = this;
 
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/planet.png", sf::Vector2f(PLANET_RADIUS * 2, PLANET_RADIUS * 2), 1, NB_PLANET_TYPES);
+	Init(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), "2D/planet.png", sf::Vector2f(PLANET_RADIUS * 2, PLANET_RADIUS * 2), 1, NB_PLANET_TYPES);
 	SetAnimationLine(RandomizeIntBetweenValues(0, NB_PLANET_TYPES - 1));
 	m_heading = 0;
 
 	(*CurrentGame).SetStarSectorIndex(this, sector_index);//after Init to keep m_removeMe = true if needed
 
 	//update position and rotation "manually" because they won't be updated during the frame of their creation
-	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5));
+	setPosition(sf::Vector2f(m_position.x - (*CurrentGame).m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(m_position.y - (*CurrentGame).m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 	setRotation(m_heading);
 
 	//gravity
@@ -89,7 +89,7 @@ void Planet::SetPosition(sf::Vector2f position)
 	GameObject::SetPosition(position);
 
 	m_orbit_circle.setPosition(getPosition());
-	m_id_text.setPosition(sf::Vector2f(getPosition().x - m_id_text.getGlobalBounds().width * 0.5, getPosition().y - m_id_text.getCharacterSize() * 0.65));
+	m_id_text.setPosition(sf::Vector2f(getPosition().x - m_id_text.getGlobalBounds().width * 0.5f, getPosition().y - m_id_text.getCharacterSize() * 0.65f));
 }
 
 bool Planet::CheckMarkingConditions()

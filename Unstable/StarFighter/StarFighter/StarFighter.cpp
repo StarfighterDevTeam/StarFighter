@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 {
 	//Init SFML Window
 	printf("Initializing SFML Window");
-	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
+	sf::RenderWindow renderWindow(sf::VideoMode((unsigned int)WINDOW_RESOLUTION_X, (unsigned  int)WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 
 	ShowCursor(false);
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 	renderWindow.setTitle("StarFighter Engine");
 
 	//Random seed
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 		
 	//Game initialization
 	CurrentGame = new Game(&renderWindow);

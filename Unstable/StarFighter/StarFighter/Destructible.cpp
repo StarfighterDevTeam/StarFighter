@@ -48,7 +48,7 @@ void Destructible::GetHitByAmmo(GameObject* ammo, bool send_network_packet)
 		m_health -= damage;
 		if (m_health < 0)
 			m_health = 0;
-		m_hit_feedback_timer = 0.05;
+		m_hit_feedback_timer = 0.05f;
 
 		//Death?
 		if (m_health <= 0)
@@ -65,9 +65,9 @@ void Destructible::GetHitByObject(GameObject* object)
 		//calculate the "exact" point of collision for FX placement
 		const float dx = object->m_position.x - m_position.x;
 		const float dy = object->m_position.y - m_position.y;
-		const float overlap = object->m_radius + m_radius - sqrt(dx*dx + dy*dy);
+		const float overlap = object->m_radius + m_radius - sqrt(dx * dx + dy * dy);
 		sf::Vector2f collision_vector = sf::Vector2f(dx, dy);
-		ScaleVector(&collision_vector, m_radius - overlap * 0.5);
+		ScaleVector(&collision_vector, m_radius - overlap * 0.5f);
 
 		FX* new_FX = new FX(FX_Hit, m_position + collision_vector);
 		(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
@@ -76,8 +76,8 @@ void Destructible::GetHitByObject(GameObject* object)
 		m_health -= damage;
 		if (m_health < 0)
 			m_health = 0;
-		m_hit_feedback_timer = 0.05;
-		m_hit_immunity_timer = 0.5;
+		m_hit_feedback_timer = 0.05f;
+		m_hit_immunity_timer = 0.5f;
 
 		if (m_health <= 0)
 			Death();
@@ -123,7 +123,7 @@ Loot* Destructible::CreateLoot(int money)
 	Loot* loot = new Loot(money);
 	loot->m_position = m_position;
 	loot->m_sector_index = GameObject::GetStarSectorIndexAtPosition(m_position);
-	loot->m_speed = sf::Vector2f(m_speed.x * 0.2, m_speed.y * 0.2);
+	loot->m_speed = sf::Vector2f(m_speed.x * 0.2f, m_speed.y * 0.2f);
 
 	if ((*CurrentGame).StoreObjectIfNecessary(loot) == false)
 		(*CurrentGame).addToScene(loot, loot->m_layer, loot->m_collider, true);

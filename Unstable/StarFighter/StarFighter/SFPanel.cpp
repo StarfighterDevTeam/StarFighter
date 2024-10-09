@@ -33,11 +33,11 @@ SFActionBox::SFActionBox(sf::Font* font)
 
 		assert(!filename.empty());
 
-		m_boxes[i] = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), filename, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+		m_boxes[i] = GameObject(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), filename, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH * 0.5f, INTERACTION_BUTTON_HEIGHT * 0.5f));
 
 		m_texts[i].setFont(*font);
 		m_texts[i].setCharacterSize(18);
-		m_texts[i].setColor(Color::White);
+		m_texts[i].setFillColor(Color::White);
 	}
 }
 
@@ -53,7 +53,7 @@ void SFActionBox::SetPosition(sf::Vector2f position)
 	{
 		if (!m_texts[i].getString().isEmpty())
 		{
-			m_boxes[i].setPosition(position.x + m_boxes[i].m_size.x / 2, position.y + m_boxes[i].m_size.y / 2 + (m_boxes[i].m_size.y / 2 + INTERACTION_INTERBLOCK) * j);
+			m_boxes[i].setPosition(position.x + m_boxes[i].m_size.x * 0.5f, position.y + m_boxes[i].m_size.y * 0.5f + (m_boxes[i].m_size.y * 0.5f + INTERACTION_INTERBLOCK) * j);
 			m_texts[i].setPosition(m_boxes[i].getPosition().x + m_boxes[i].m_size.x + INTERACTION_BUTTON_MARGIN, m_boxes[i].getPosition().y - m_texts[i].getGlobalBounds().height/2 - 3);//because fuck this
 			j++;
 		}	
@@ -75,7 +75,7 @@ void SFActionBox::Draw(sf::RenderTexture& screen)
 //ACTION BOX WITH SELECTION
 SFActionBoxWithSelection::SFActionBoxWithSelection()
 {
-	m_box = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+	m_box = GameObject(sf::Vector2f(0.f, 0.f), sf::Vector2f(0.f, 0.f), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH * 0.5f, INTERACTION_BUTTON_HEIGHT * 0.5f));
 	m_selected_index = -1;
 }
 
@@ -84,7 +84,7 @@ void SFActionBoxWithSelection::AddOption(string option_name, sf::Font* font)
 	sf::Text new_option;
 	new_option.setFont(*font);
 	new_option.setCharacterSize(18);
-	new_option.setColor(sf::Color::White);
+	new_option.setFillColor(sf::Color::White);
 	new_option.setString(option_name);
 
 	m_texts.push_back(new_option);
@@ -106,10 +106,10 @@ void SFActionBoxWithSelection::SetPosition(sf::Vector2f position)
 		{
 			if (m_selected_index == j)
 			{
-				m_box.setPosition(position.x + m_box.m_size.x / 2, position.y + m_box.m_size.y / 2 + (m_box.m_size.y / 2 + INTERACTION_INTERBLOCK) * j);
+				m_box.setPosition(position.x + m_box.m_size.x * 0.5f, position.y + m_box.m_size.y * 0.5f + (m_box.m_size.y * 0.5f + INTERACTION_INTERBLOCK) * j);
 			}
 
-			m_texts[i].setPosition(position.x + m_box.m_size.x + m_box.m_size.x / 2 + INTERACTION_BUTTON_MARGIN, position.y + m_texts[i].getGlobalBounds().height / 2 + (m_box.m_size.y / 2 + INTERACTION_INTERBLOCK) * j);
+			m_texts[i].setPosition(position.x + m_box.m_size.x + m_box.m_size.x * 0.5f + INTERACTION_BUTTON_MARGIN, position.y + m_texts[i].getGlobalBounds().height * 0.5f + (m_box.m_size.y * 0.5f + INTERACTION_INTERBLOCK) * j);
 			j++;
 		}
 	}
@@ -122,7 +122,7 @@ void SFActionBoxWithSelection::Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(m_box);
 	}
-	for (int i = 0; i < optionsVectorSize; i++)
+	for (size_t i = 0; i < optionsVectorSize; i++)
 	{
 		if (!m_texts[i].getString().isEmpty())
 		{
@@ -145,7 +145,7 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
 
 	setSize(size);
-	setOrigin(sf::Vector2f(size.x / 2, size.y / 2));
+	setOrigin(sf::Vector2f(size.x * 0.5f, size.y * 0.5f));
 	setFillColor(sf::Color(10, 10, 10, 230));//dark grey
 	setOutlineThickness(2);
 	setOutlineColor(_darkblue);//dark blue-green
