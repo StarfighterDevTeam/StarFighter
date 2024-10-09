@@ -58,7 +58,7 @@ void Player::Update(sf::Time deltaTime)
 
 	//turn with mouse
 	if (m_cursor && (*CurrentGame).m_window_has_focus)
-		m_cursor->m_position = m_position + (*CurrentGame).m_zoom * sf::Vector2f((*CurrentGame).m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -((*CurrentGame).m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
+		m_cursor->m_position = ((*CurrentGame).computePositionOnScreen((*CurrentGame).m_mouse_pos));
 	
 	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180.f / M_PI_F;
 	const float delta_heading = computeDeltaAngleInDegrees(m_heading, aim_heading);

@@ -926,3 +926,9 @@ NetworkStatus Game::UpdateNetworkConnexion()
 
 	return m_network_status;
 }
+
+sf::Vector2f Game::computePositionOnScreen(const sf::Vector2f position) const
+{
+	sf::Vector2f positionOnScreen = m_playerShip->m_position + m_zoom * sf::Vector2f(m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -(m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
+	return positionOnScreen;
+}

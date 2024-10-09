@@ -222,3 +222,4 @@ pip-log.txt
 *.db-shm
 *.vsidx
 Unstable/StarFighter/.vs/
+Unstable/StarFighter/enc_temp_folder/
