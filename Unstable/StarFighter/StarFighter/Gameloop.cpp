@@ -310,7 +310,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 
 			for (int e = 0; e < 3; e++)
 			{
-				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, perpAngle);
+				sf::Vector2f vector = GetVectorFromLengthAndRadAngle(distance, perpAngle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 				angle += 0.08f;
 
@@ -325,7 +325,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			Beacon* beacon = CreateBeacon(found_index, (SpatialObject*)(*CurrentGame).m_playerShip, true);
 			for (int e = 0; e < 3; e++)
 			{
-				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
+				sf::Vector2f vector = GetVectorFromLengthAndRadAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 				angle += 0.08f;
 
@@ -340,7 +340,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			AIShip* ship;
 			for (int e = 0; e < 3; e++)
 			{
-				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
+				sf::Vector2f vector = GetVectorFromLengthAndRadAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 				angle += 0.08f;
 
@@ -357,7 +357,7 @@ Mission* Gameloop::CreateMission(Planet* owner)
 			AIShip* ship;
 			for (int e = 0; e < 5; e++)
 			{
-				sf::Vector2f vector = GetVectorFromLengthAndAngle(distance, angle);
+				sf::Vector2f vector = GetVectorFromLengthAndRadAngle(distance, angle);
 				sf::Vector2i offset = sf::Vector2i((int)(-vector.x / STAR_SECTOR_SIZE), (int)(-vector.y / STAR_SECTOR_SIZE));
 				angle += 0.08f;
 

@@ -109,7 +109,7 @@ void BoundAbsoluteValue(float& input, float max_value);
 void BoundAngle(float& input, float max_angle);
 bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 void DebugDrawSegment(sf::Vector2f point_a, sf::Vector2f point_b, sf::Color color, RenderTarget& screen);
-sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle);
+sf::Vector2f GetVectorFromLengthAndRadAngle(const float length, const float angle);
 float computeDeltaAngleInDegrees(const float angle1, const float angle2);
 
 struct Vector2iComp

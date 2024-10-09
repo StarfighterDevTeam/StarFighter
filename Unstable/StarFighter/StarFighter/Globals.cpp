@@ -369,7 +369,7 @@ bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f ar
 	return is_inside_area;
 }
 
-sf::Vector2f GetVectorFromLengthAndAngle(const float length, const float angle)
+sf::Vector2f GetVectorFromLengthAndRadAngle(const float length, const float angle)
 {
 	sf::Vector2f vector;
 	vector.x = -length * sin(angle);

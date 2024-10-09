@@ -345,8 +345,6 @@ void Game::UpdateScene(Time deltaTime)
 
 void Game::UpdateObjects(Time deltaTime)
 {
-	GameObject* player = (GameObject*)m_playerShip;
-
 	//Update objects and delete "garbage" objects
 	m_playerShip->Update(deltaTime);
 	for (GameObject* object : m_sceneGameObjects)
@@ -371,12 +369,12 @@ void Game::UpdateObjects(Time deltaTime)
 	{
 		addToScene(object, object->m_layer, object->m_collider, false);
 
-		if (object != player && object != m_background)//set position of objects on screen relative to the player
-			object->SetPosition(sf::Vector2f(object->m_position.x - player->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - player->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
+		if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
+			object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 	}
 	m_temp_sceneGameObjects.clear();
 
-	player->UpdateMarkers(deltaTime);
+	m_playerShip->UpdateMarkers(deltaTime);
 
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();

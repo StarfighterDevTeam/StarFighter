@@ -77,15 +77,15 @@ void Ship::ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction)
 
 	m_heading += inputs_direction.x * m_turn_speed * deltaTime.asSeconds();
 
-	sf::Vector2f acceleration_vector = GetVectorFromLengthAndAngle(m_acceleration, m_heading * M_PI_F / 180.f);
+	sf::Vector2f acceleration_vector = GetVectorFromLengthAndRadAngle(m_acceleration, m_heading * M_PI_F / 180.f);
 
 	sf::Vector2f braking_vector = sf::Vector2f(0.f, 0.f);
 	float current_inertia_angle = GetAngleRadFromVector(m_speed);
 
 	if (inputs_direction.y > 0)
-		braking_vector = GetVectorFromLengthAndAngle(m_braking_max, current_inertia_angle);
+		braking_vector = GetVectorFromLengthAndRadAngle(m_braking_max, current_inertia_angle);
 	else if (inputs_direction.y == 0)
-		braking_vector = GetVectorFromLengthAndAngle(m_idle_decelleration, current_inertia_angle);
+		braking_vector = GetVectorFromLengthAndRadAngle(m_idle_decelleration, current_inertia_angle);
 
 	braking_vector.x = abs(m_speed.x) > abs(braking_vector.x) ? braking_vector.x : -m_speed.x;//braking cannot exceed speed (that would make us go backward)
 	braking_vector.y = abs(m_speed.y) > abs(braking_vector.y) ? braking_vector.y : -m_speed.y;
@@ -237,7 +237,7 @@ void Ship::GetHitByObject(GameObject* object)
 			const float dy = m_position.y -object->m_position.y;
 			const float angle = GetAngleRadFromVector(sf::Vector2f(dx, dy));
 
-			FX* new_FX = new FX(FX_HitShield, m_position + GetVectorFromLengthAndAngle(m_shield_range, angle));
+			FX* new_FX = new FX(FX_HitShield, m_position + GetVectorFromLengthAndRadAngle(m_shield_range, angle));
 			(*CurrentGame).addToScene(new_FX, FX_Layer, BackgroundObject, true);
 		}
 	//shield destroyed
@@ -384,7 +384,7 @@ void Ship::HitWithGravitation(GameObject* object)
 		const float range = m_gravitation_range;
 
 		const float strenght = Lerp(dist_sqr, (range * 0.5f) * (range * 0.5f), (range) * (range), 0.f, m_gravitation_strength);
-		sf::Vector2f gravity = GetVectorFromLengthAndAngle(strenght, angle);
+		sf::Vector2f gravity = GetVectorFromLengthAndRadAngle(strenght, angle);
 
 		target->m_speed += gravity;
 		NormalizeVector(&target->m_speed, target->m_speed_max);

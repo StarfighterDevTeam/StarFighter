@@ -99,7 +99,7 @@ void Player::Update(sf::Time deltaTime)
 	if (m_shield > 0)
 		(*CurrentGame).m_shield_circles.push_back(m_shield_circle);
 
-	Ship::Update(deltaTime);
+	HumanShip::Update(deltaTime);
 
 	//update energy
 	UpdateEnergyRegen(deltaTime);
@@ -393,7 +393,7 @@ void Player::Draw(RenderTarget& screen)
 			marked_object->m_marker_mission->Draw(screen);
 	}
 			
-	Ship::Draw(screen);
+	HumanShip::Draw(screen);
 
 	if (m_visible)
 	{

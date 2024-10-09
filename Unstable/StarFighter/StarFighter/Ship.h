@@ -24,8 +24,8 @@ public :
 
 	//Star Hunter
 	void ApplyFlightModel(sf::Time deltaTime, sf::Vector2f inputs_direction);
-	void Update(sf::Time deltaTime) override;
-	void Draw(RenderTarget& screen) override;
+	virtual void Update(sf::Time deltaTime) override;
+	virtual void Draw(RenderTarget& screen) override;
 	void SetPosition(sf::Vector2f position) override;
 	void GetHitByAmmo(GameObject* ammo, bool send_network_packet = true) override;
 	void GetHitByObject(GameObject* object) override;
