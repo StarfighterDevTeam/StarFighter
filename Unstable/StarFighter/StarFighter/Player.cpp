@@ -56,8 +56,8 @@ void Player::Update(sf::Time deltaTime)
 
 	//turn with mouse
 	if (m_cursor && (*CurrentGame).m_window_has_focus)
-		m_cursor->m_position = ((*CurrentGame).computePositionOnScreen((*CurrentGame).m_mouse_pos));
-	
+		m_cursor->m_position = (*CurrentGame).m_playerShip->m_position + (*CurrentGame).m_zoom * sf::Vector2f((*CurrentGame).m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -((*CurrentGame).m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
+
 	const float aim_heading = -GetAngleRadFromVector(sf::Vector2f(getPosition().x - (*CurrentGame).m_mouse_pos.x, getPosition().y - (*CurrentGame).m_mouse_pos.y)) * 180.f / M_PI_F;
 	const float delta_heading = computeDeltaAngleInDegrees(m_heading, aim_heading);
 	if (m_inputs_direction.x == 0)
@@ -1082,6 +1082,7 @@ void Player::Reset()
 	m_weapons.push_back(new Weapon(this, Weapon_Missile, Ammo_Missile, AllyFire, PlayerFireLayer, sf::Vector2f(-m_size.x * 0.5f - 8.f, 0.f), 0.f));
 
 	m_position = sf::Vector2f(0.f, 0.f);
+	m_speed = sf::Vector2f(0.f, 0.f);
 
 	InitShip();
 
