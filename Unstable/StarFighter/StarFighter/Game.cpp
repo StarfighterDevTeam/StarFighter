@@ -29,7 +29,7 @@ Game::Game(RenderWindow* window)
 	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
 	m_view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
-	m_zoom = 1.3f;
+	m_zoom = 2.0f;//1.3f
 
 	//default value
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
@@ -318,11 +318,11 @@ void Game::UpdateScene(Time deltaTime)
 		//printf("zoom: %f\n", m_zoom);
 	}
 
+	Bound(m_zoom, 1.f, 5.f);
+
 	//we need an odd number of sectors on X and Y axis
 	SetSectorsNbSectorsManaged();
 
-	Bound(m_zoom, 1.f, 5.f);
-	
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
 	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
 
@@ -407,7 +407,7 @@ void Game::drawScene()
 				GameObject* object = circle->m_target_object;
 
 				object->setScale(1.f / m_zoom, 1.f / m_zoom);
-				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f));
+				object->SetPosition(computePositionOnScreen(object->m_position));
 
 				circle->setScale(1.f / m_zoom, 1.f / m_zoom);
 				circle->setPosition(object->getPosition());
@@ -415,7 +415,7 @@ void Game::drawScene()
 				m_mainScreen.draw(*circle);
 
 				object->setScale(1.f, 1.f);
-				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
+				object->SetPosition(computePositionOnScreen(object->m_position));
 
 				circle->setScale(1.f, 1.f);
 			}
@@ -427,7 +427,7 @@ void Game::drawScene()
 				GameObject* object = circle->m_target_object;
 
 				object->setScale(1.f / m_zoom, 1.f / m_zoom);
-				object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f));
+				object->SetPosition(computePositionOnScreen(object->m_position));
 
 				circle->setScale(1.f / m_zoom, 1.f / m_zoom);
 				circle->setPosition(object->getPosition());
@@ -435,7 +435,7 @@ void Game::drawScene()
 				m_mainScreen.draw(*circle);
 
 				object->setScale(1.f, 1.f);
-				object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
+				object->SetPosition(computePositionOnScreen(object->m_position));
 
 				circle->setScale(1.f, 1.f);
 			}
@@ -443,12 +443,31 @@ void Game::drawScene()
 		else if (i == BackgroundLayer)
 		{
 			m_background->setScale(1.f / m_zoom, 1.f / m_zoom);
-			m_background->SetPosition(computePositionOnScreen(m_background->m_position));
 
-			m_background->Draw(m_mainScreen);
+			//compute the number of background tiles required to fill the screen at any moment, following player's position. We need an odd number of tiles, minimum 3.
+			int background_tiles_required_x = (int)round(REF_WINDOW_RESOLUTION_X * m_zoom / m_background->m_size.x + 0.5f);
+			if (background_tiles_required_x % 2 == 0)
+				background_tiles_required_x++;
+			background_tiles_required_x = max(background_tiles_required_x, 3);
+
+			int background_tiles_required_y = (int)round(REF_WINDOW_RESOLUTION_Y * m_zoom / m_background->m_size.y + 0.5f);
+			if (background_tiles_required_y % 2 == 0)
+				background_tiles_required_y++;
+			background_tiles_required_y = max(background_tiles_required_y, 3);
+
+			const int current_background_tile_x = (m_playerShip->m_position.x + (m_playerShip->m_position.x > 0.f ? 1.f : -1.f) * m_background->m_size.x * 0.5f) / m_background->m_size.x;
+			const int current_background_tile_y = (m_playerShip->m_position.y + (m_playerShip->m_position.y > 0.f ? 1.f : -1.f) * m_background->m_size.y * 0.5f) / m_background->m_size.y;
+
+			for (int background_tile_iter_x = current_background_tile_x - (background_tiles_required_x / 2); background_tile_iter_x <= current_background_tile_x + (background_tiles_required_x / 2); background_tile_iter_x++)
+			{
+				for (int background_tile_iter_y = current_background_tile_y - (background_tiles_required_y / 2); background_tile_iter_y <= current_background_tile_y + (background_tiles_required_y / 2); background_tile_iter_y++)
+				{
+					m_background->SetPosition(computePositionOnScreen(sf::Vector2f(m_background->m_size.x * background_tile_iter_x, m_background->m_size.y * background_tile_iter_y)));
+					m_background->Draw(m_mainScreen);
+				}
+			}
 
 			m_background->setScale(1.f, 1.f);
-			m_background->SetPosition(computePositionOnScreen(m_background->m_position));
 		}
 		else
 		{
@@ -827,7 +846,7 @@ void Game::DebugDrawGameObjectsStats()
 			if (object->m_layer != StarLayer && object != m_playerShip && object != m_background)
 				c++;
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		sf::Text text;
 		text.setFont(*m_font[Font_Arial]);
@@ -861,6 +880,9 @@ void Game::DebugDrawGameObjectsStats()
 
 		if (i == 6)
 			text.setString("Known sectors: " + to_string(m_sectorsKnown.size()));
+
+		if (i == 7)
+			text.setString("m_position: " + to_string((int)m_playerShip->m_position.x) + " ; " + to_string((int)m_playerShip->m_position.y));
 
 		m_mainScreen.draw(text);
 	}
