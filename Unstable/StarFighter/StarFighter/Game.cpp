@@ -60,8 +60,10 @@ Game::Game(RenderWindow* window)
 	PlayMusic(Music_Main);
 
 	//background
-	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f), sf::Vector2f(0.f, 0.f), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
-	m_background->setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
+	//m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f), sf::Vector2f(0.f, 0.f), sf::Color::Black, sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f), sf::Vector2f(0.f, 0.f), "2D/Blue Nebula 5 - 3000x3000.png", sf::Vector2f(3000.f, 3000.f));
+	m_background->setColor(sf::Color(255, 255, 255, 150));
+	m_background->m_position = sf::Vector2f(0.f, 0.f);
 	addToScene(m_background, BackgroundLayer, BackgroundObject, false);
 
 	SetSectorsNbSectorsManaged();
@@ -369,7 +371,7 @@ void Game::UpdateObjects(Time deltaTime)
 	{
 		addToScene(object, object->m_layer, object->m_collider, false);
 
-		if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
+		if (object != m_playerShip)//set position of objects on screen relative to the player
 			object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
 	}
 	m_temp_sceneGameObjects.clear();
@@ -438,20 +440,33 @@ void Game::drawScene()
 				circle->setScale(1.f, 1.f);
 			}
 		}
+		else if (i == BackgroundLayer)
+		{
+			m_background->setScale(1.f / m_zoom, 1.f / m_zoom);
+			m_background->SetPosition(computePositionOnScreen(m_background->m_position));
+
+			m_background->Draw(m_mainScreen);
+
+			m_background->setScale(1.f, 1.f);
+			m_background->SetPosition(computePositionOnScreen(m_background->m_position));
+		}
 		else
 		{
 			for (GameObject* object : m_sceneGameObjectsLayered[i])
 			{
+				if (object == m_background)
+					continue;
+
 				object->setScale(1.f / m_zoom, 1.f / m_zoom);
+
 				if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
-					object->SetPosition(sf::Vector2f((object->m_position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f));
+					object->SetPosition(computePositionOnScreen(object->m_position));
 
 				object->Draw(m_mainScreen);
-
+				
 				object->setScale(1.f, 1.f);
 				if (object != m_playerShip && object != m_background)//set position of objects on screen relative to the player
-					object->SetPosition(sf::Vector2f(object->m_position.x - m_playerShip->m_position.x + REF_WINDOW_RESOLUTION_X * 0.5f, -(object->m_position.y - m_playerShip->m_position.y) + REF_WINDOW_RESOLUTION_Y * 0.5f));
-
+					object->SetPosition(computePositionOnScreen(object->m_position));
 			}
 		}
 	}
@@ -932,7 +947,8 @@ NetworkStatus Game::UpdateNetworkConnexion()
 
 sf::Vector2f Game::computePositionOnScreen(const sf::Vector2f position) const
 {
-	sf::Vector2f positionOnScreen = m_playerShip->m_position + m_zoom * sf::Vector2f(m_mouse_pos.x - REF_WINDOW_RESOLUTION_X * 0.5f, -(m_mouse_pos.y - REF_WINDOW_RESOLUTION_Y * 0.5f));
+	sf::Vector2f positionOnScreen = sf::Vector2f((position.x - m_playerShip->m_position.x) / m_zoom + REF_WINDOW_RESOLUTION_X * 0.5f, -(position.y - m_playerShip->m_position.y) / m_zoom + REF_WINDOW_RESOLUTION_Y * 0.5f);
+	
 	return positionOnScreen;
 }
 
