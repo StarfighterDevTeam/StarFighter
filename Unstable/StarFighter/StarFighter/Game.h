@@ -6,6 +6,9 @@
 #include <vector>
 #include "TextUtils.h"
 #include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
