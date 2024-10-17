@@ -52,7 +52,7 @@ public:
 class SFPanel : public sf::RectangleShape
 {
 public:
-	SFPanel(){};
+	SFPanel() = default;
 	SFPanel(sf::Vector2f size, SFPanelTypes panel_type);
 	~SFPanel();
 	virtual void Update(sf::Time deltaTime);

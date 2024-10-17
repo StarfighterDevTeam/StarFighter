@@ -52,7 +52,7 @@ public:
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2u size, int stroke_size = 0);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, int radius, int stroke_size = 0);
-	GameObject();
+	GameObject() = default;
 	
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, int frameNumber = 1, int animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, int frameNumber, int animationNumber, sf::Uint8* pixels);

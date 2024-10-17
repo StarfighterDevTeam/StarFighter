@@ -28,10 +28,11 @@ enum TeamAlliances
 class SFText : public Text
 {
 public:
-	SFText() {};
+	SFText() = default;
 	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
 	~SFText() {};
 	virtual void update(Time deltaTime);
+
 	bool m_visible;
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
@@ -41,9 +42,10 @@ public:
 class SFRectangle : public sf::RectangleShape
 {
 public:
-	SFRectangle() {};
+	SFRectangle() = default;
 	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team);
 	~SFRectangle() {};
+
 	bool m_visible;
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
@@ -53,7 +55,7 @@ public:
 class SFGauge : public sf::RectangleShape
 {
 public:
-	SFGauge() {};
+	SFGauge() = default;
 	SFGauge(SFText text, SFRectangle rectangle);
 	~SFGauge() {};
 	bool m_visible;

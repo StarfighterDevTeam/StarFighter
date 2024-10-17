@@ -32,11 +32,6 @@ string GameObject::getName()
 	return *(s1.end() - 1);
 }
 
-GameObject::GameObject()
-{
-
-}
-
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
 	//are we already playing this animation?
@@ -82,8 +77,8 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 {
 	m_animationNumber = animationNumber;
 	m_frameNumber = frameNumber;
-	m_size.x = 1.f * ((*texture).getSize().x / frameNumber);
-	m_size.y = 1.f * ((*texture).getSize().y / animationNumber);
+	m_size.x = (1.f * (*texture).getSize().x / frameNumber);
+	m_size.y = (1.f * (*texture).getSize().y / animationNumber);
 
 	m_collider_type = GameObjectType::BackgroundObject;
 	m_defaultAnimation.setSpriteSheet(*texture);

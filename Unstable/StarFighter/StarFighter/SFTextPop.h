@@ -8,7 +8,7 @@ using namespace sf;
 class SFTextPop : public SFText
 {
 public:
-	SFTextPop() {};
+	SFTextPop() = default;
 	SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target, float offset_positionY);
 	~SFTextPop() {};
 	void update(Time deltaTime) override;
