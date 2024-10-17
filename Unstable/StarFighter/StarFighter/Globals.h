@@ -26,6 +26,10 @@ std::string StringCut(std::string str, const size_t length);
 	#define PLAYER_SAVE_FILE						"Saves/SaveFile.txt"
 #endif
 
+#define M_PI_FLT       3.14159265358979323846f   // pi
+#define M_PI_2_FLT     1.57079632679489661923f   // pi/2
+#define M_PI_4_FLT     0.785398163397448309616f  // pi/4
+
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080
 
@@ -44,14 +48,14 @@ std::string StringCut(std::string str, const size_t length);
 #define TEXTURE_SIZE_LIMITATION						8187
 
 #define PIXEL_PERFECT_COLLISION							true
-#define GRAZE_DISTANCE									30
+#define GRAZE_DISTANCE									30.f
 #define RECTANGLE_INSIDE_ALPHA							100
 
 //MUSIC
-#define DEFAULT_MUSIC_VOLUME						50
-#define DEFAULT_SFX_VOLUME							100
-#define MUSIC_FADE_IN_TIME						2.f
-#define MUSIC_FADE_OUT_TIME						2.f
+#define DEFAULT_MUSIC_VOLUME						50.f
+#define DEFAULT_SFX_VOLUME							100.f
+#define MUSIC_FADE_IN_TIME							2.f
+#define MUSIC_FADE_OUT_TIME							2.f
 
 //TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10
@@ -107,8 +111,8 @@ void SetVectorRotation(sf::Vector2f* vector, float angle_rad);
 bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x = NULL, float *i_y = NULL);
 float DistancePointToSement(float p0_x, float p0_y, float p_1x, float p_1y, float p_2x, float p_2y, float *i_x = NULL, float *i_y = NULL);
 
-sf::Uint8* CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size = 0);
-sf::Uint8* CreateCircleWithStroke(float radius, sf::Color color, int stroke_size = 0);
+sf::Uint8* CreateRectangleWithStroke(sf::Vector2u size, sf::Color color, int stroke_size = 0);
+sf::Uint8* CreateCircleWithStroke(int radius, sf::Color color, int stroke_size = 0);
 
 int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);

@@ -77,8 +77,8 @@ int RandomizeIntBetweenValues(int min_value, int max_value)
 
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 {
-	int min = floor (min_max_values.x + 0.5);
-	int max = floor (min_max_values.y + 0.5);
+	int min = (int)floor(min_max_values.x + 0.5);
+	int max = (int)floor(min_max_values.y + 0.5);
 	int random_value = rand() % (max - min +1);
 	random_value += min;
 
@@ -87,7 +87,7 @@ int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values)
 {
-	float random_value = (float) ((double) rand() / RAND_MAX);
+	float random_value = (float)((double) rand() / RAND_MAX);
 	random_value *= (min_max_values.y - min_max_values.x);
 	random_value += min_max_values.x;
 
@@ -189,11 +189,11 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 	if (value > input_max)
 		return output_max;
 
-	float ratio = (value - input_min) / (input_max - input_min);
-	float cos_ratio = (1 - cos(ratio * M_PI)) / 2;
+	const float ratio = (value - input_min) / (input_max - input_min);
+	const float cos_ratio = (1.f - cos(ratio * M_PI_FLT)) / 2;
 	//for stiffer curves, use "cos_ratio = (1 - cos(ratio * ratio * M_PI)) / 2;"
 
-	float ouput = output_min + cos_ratio * (output_max - output_min);
+	const float ouput = output_min + cos_ratio * (output_max - output_min);
 
 	return ouput;
 }
@@ -292,24 +292,24 @@ void GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, flo
 		*output_angle = -*output_angle;
 	}
 
-	*output_angle += M_PI_2;
+	*output_angle += M_PI_2_FLT;
 }
 
 float GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
 {
 	float angle = GetAngleRadBetweenPositions(target_position, ref_position);
-	float delta_angle = angle - (ref_rotation_in_deg * M_PI / 180.f);
+	float delta_angle = angle - (ref_rotation_in_deg * M_PI_FLT / 180.f);
 	if (delta_angle > M_PI)
-		delta_angle -= M_PI * 2;
+		delta_angle -= M_PI_FLT * 2.f;
 	else if (delta_angle < -M_PI)
-		delta_angle += M_PI * 2;
+		delta_angle += M_PI_FLT * 2.f;
 
 	return delta_angle;
 }
 
 float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
 {
-	float angle = GetAngleRadBetweenPositions(target_position, ref_position) * 180.f / M_PI;
+	const float angle = GetAngleRadBetweenPositions(target_position, ref_position) * 180.f / M_PI_FLT;
 	float delta_angle = angle - ref_rotation_in_deg;
 	if (delta_angle > 180)
 		delta_angle -= 180.f * 2;
@@ -338,8 +338,7 @@ float GetAngleRadForVector(sf::Vector2f vector)
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
-	//angle = (fmod(angle, 2 * M_PI));
+	angle += M_PI_2_FLT;
 
 	return angle;
 }
@@ -390,7 +389,7 @@ float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f positi
 		angle = -angle;
 	}
 
-	angle += M_PI_2;
+	angle += M_PI_2_FLT;
 
 	return angle;
 }
@@ -569,7 +568,7 @@ int GaussianBlurDistribution(int x)
 	return x*x;
 }
 
-sf::Uint8* CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size)
+sf::Uint8* CreateRectangleWithStroke(sf::Vector2u size, sf::Color color, int stroke_size)
 {
 	//pixel array creation
 	const int W = size.x;
@@ -600,7 +599,7 @@ sf::Uint8* CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int str
 	return pixels;
 }
 
-sf::Uint8* CreateCircleWithStroke(float radius, sf::Color color, int stroke_size)
+sf::Uint8* CreateCircleWithStroke(int radius, sf::Color color, int stroke_size)
 {
 	//pixel array creation
 	const int W = radius * 2;
@@ -610,11 +609,11 @@ sf::Uint8* CreateCircleWithStroke(float radius, sf::Color color, int stroke_size
 
 	for (int i = 0; i < W * H * 4; i += 4)
 	{
-		int x = (i / 4) % W;
-		int y = (i / 4) / W;
-		int dx = W / 2 - x;
-		int dy = H / 2 - y;
-		float delta = sqrt(dx * dx + dy * dy);// -radius * radius;
+		const int x = (i / 4) % W;
+		const int y = (i / 4) / W;
+		const int dx = W / 2 - x;
+		const int dy = H / 2 - y;
+		const float delta = (float)sqrt(dx * dx + dy * dy);// -radius * radius;
 
 		if (stroke_size > 0 && delta <= radius - stroke_size)
 		{

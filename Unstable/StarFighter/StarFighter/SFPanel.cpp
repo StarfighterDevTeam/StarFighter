@@ -33,11 +33,11 @@ SFActionBox::SFActionBox(sf::Font* font)
 
 		assert(!filename.empty());
 
-		m_boxes[i] = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), filename, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+		m_boxes[i] = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), filename, sf::Vector2u(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(0.5f * INTERACTION_BUTTON_WIDTH, 0.5f * INTERACTION_BUTTON_HEIGHT));
 
 		m_texts[i].setFont(*font);
 		m_texts[i].setCharacterSize(18);
-		m_texts[i].setColor(Color::White);
+		m_texts[i].setFillColor(Color::White);
 	}
 }
 
@@ -75,7 +75,7 @@ void SFActionBox::Draw(sf::RenderTexture& screen)
 //ACTION BOX WITH SELECTION
 SFActionBoxWithSelection::SFActionBoxWithSelection()
 {
-	m_box = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+	m_box = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2u(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(0.5f * INTERACTION_BUTTON_WIDTH, 0.5f * INTERACTION_BUTTON_HEIGHT));
 	m_selected_index = -1;
 }
 
@@ -84,7 +84,7 @@ void SFActionBoxWithSelection::AddOption(string option_name, sf::Font* font)
 	sf::Text new_option;
 	new_option.setFont(*font);
 	new_option.setCharacterSize(18);
-	new_option.setColor(sf::Color::White);
+	new_option.setFillColor(sf::Color::White);
 	new_option.setString(option_name);
 
 	m_texts.push_back(new_option);
@@ -117,7 +117,7 @@ void SFActionBoxWithSelection::SetPosition(sf::Vector2f position)
 
 void SFActionBoxWithSelection::Draw(sf::RenderTexture& screen)
 {
-	size_t optionsVectorSize = m_texts.size();
+	int optionsVectorSize = (int)m_texts.size();
 	if (optionsVectorSize > 0)
 	{
 		screen.draw(m_box);
@@ -152,11 +152,11 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 
 	//title text
 	m_title_text.setCharacterSize(20);
-	m_title_text.setColor(_yellow);
+	m_title_text.setFillColor(_yellow);
 
 	//body text
 	m_text.setCharacterSize(18);
-	m_text.setColor(_white);
+	m_text.setFillColor(_white);
 }
 
 SFPanel::~SFPanel()

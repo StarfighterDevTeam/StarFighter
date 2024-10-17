@@ -47,18 +47,18 @@ enum GameObjectType {
 class GameObject : public AnimatedSprite
 {
 public:
-	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
-	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size = 0);
-	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size = 0);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2u size, int stroke_size = 0);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, int radius, int stroke_size = 0);
 	GameObject();
 	
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, int frameNumber = 1, int animationNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, int frameNumber, int animationNumber, sf::Uint8* pixels);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber = 1, int animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size = 0);
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size = 0);
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2u size, int stroke_size = 0);
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, int radius, int stroke_size = 0);
 
 	~GameObject();
 

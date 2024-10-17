@@ -25,7 +25,7 @@ int main()
 	renderWindow.setTitle("StarFighter Engine");
 
 	//Random seed
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	//Game initialization
 	CurrentGame = new Game(&renderWindow);

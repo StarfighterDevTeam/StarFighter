@@ -4,7 +4,7 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 {
 	setFont(*text->getFont());
 	setCharacterSize(text->getCharacterSize());
-	setColor(text->getColor());
+	setFillColor(text->getFillColor());
 	setPosition(sf::Vector2f(text->getPosition().x, text->getPosition().y + offset_positionY));
 
 	m_visible = text->m_visible;
@@ -60,6 +60,6 @@ void SFTextPop::update(Time deltaTime)
 			m_visible = false;
 		}
 
-		setColor(Color(getColor().r, getColor().g, getColor().b, m_alpha));
+		setFillColor(Color(getFillColor().r, getFillColor().g, getFillColor().b, m_alpha));
 	}
 }

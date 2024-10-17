@@ -8,18 +8,18 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 {
 	sf::Uint8* pixels = CreateGlowFrame(parent, color, glow_thickness, stroke_size);
 
-	const int W = parent->m_size.x + glow_thickness * 2;
-	const int H = parent->m_size.y + glow_thickness * 2;
+	const int W = (int)parent->m_size.x + glow_thickness * 2;
+	const int H = (int)parent->m_size.y + glow_thickness * 2;
 
-	Init(parent->getPosition(), sf::Vector2f(0, 0), m_textureName, sf::Vector2f(W, H), 1, 1, pixels);
+	Init(parent->getPosition(), sf::Vector2f(0, 0), m_textureName, sf::Vector2u(W, H), 1, 1, pixels);
 }
 
 sf::Uint8* Glow::CreateGlowFrame(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size)
 {
 	assert(parent != NULL);
 
-	const int W = parent->m_size.x + glow_thickness * 2;
-	const int H = parent->m_size.y + glow_thickness * 2;
+	const int W = (int)parent->m_size.x + glow_thickness * 2;
+	const int H = (int)parent->m_size.y + glow_thickness * 2;
 
 	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
 
@@ -61,8 +61,8 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 		frames_number = 1;
 
 	//size of one frame
-	const int W = parent->m_size.x + glow_thickness * 2;
-	const int H = parent->m_size.y + glow_thickness * 2;
+	const int W = (int)parent->m_size.x + glow_thickness * 2;
+	const int H = (int)parent->m_size.y + glow_thickness * 2;
 
 	//hardware limitation: TEXTURE_SIZE_LIMITATION x TEXTURE_SIZE_LIMITATION
 	if (W*frames_number > TEXTURE_SIZE_LIMITATION)
@@ -113,8 +113,8 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 			//"growing" part of the animation
 			int thickness = (int)(floor(1.f * (glow_thickness - glow_min_thickness) * i / unique_frames_number));
 			sf::Uint8* pixels_frame = CreateGlowFrame(parent, m_color, glow_min_thickness + thickness, stroke_size);
-			int size_x = parent->m_size.x + (glow_min_thickness + thickness) * 2;
-			int size_y = parent->m_size.y + (glow_min_thickness + thickness) * 2;
+			int size_x = (int)parent->m_size.x + (glow_min_thickness + thickness) * 2;
+			int size_y = (int)parent->m_size.y + (glow_min_thickness + thickness) * 2;
 			int x_offset = glow_thickness - glow_min_thickness - thickness;
 			int x = (i - 1)*W + x_offset;
 			int y = glow_thickness - glow_min_thickness - thickness;

@@ -27,12 +27,12 @@ void Ship::Init()
 	m_is_asking_SFPanel = SFPanel_None;
 }
 
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	this->Init();
 }
 
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size)
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size) : GameObject(position, speed, textureName, size)
 {
 	this->Init();
 }

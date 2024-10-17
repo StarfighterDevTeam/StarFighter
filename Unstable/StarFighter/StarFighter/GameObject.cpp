@@ -1,12 +1,12 @@
 #include "GameObject.h"
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber, animationNumber);
 	setOrigin(origin.x, origin.y);
 }
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size);
 }
@@ -16,12 +16,12 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	Init(position, speed, texture, 1);
 }
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size)
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2u size, int stroke_size)
 {
 	Init(position, speed, color, size, stroke_size);
 }
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size)
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, int radius, int stroke_size)
 {
 	Init(position, speed, color, radius, stroke_size);
 }
@@ -82,8 +82,8 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 {
 	m_animationNumber = animationNumber;
 	m_frameNumber = frameNumber;
-	m_size.x = ((*texture).getSize().x / frameNumber);
-	m_size.y = ((*texture).getSize().y / animationNumber);
+	m_size.x = 1.f * ((*texture).getSize().x / frameNumber);
+	m_size.y = 1.f * ((*texture).getSize().y / animationNumber);
 
 	m_collider_type = GameObjectType::BackgroundObject;
 	m_defaultAnimation.setSpriteSheet(*texture);
@@ -94,7 +94,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 		{
 			int x = ((*texture).getSize().x / frameNumber)*(i);
 			int y = ((*texture).getSize().y / animationNumber)*(j);
-			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, (int)m_size.x, (int)m_size.y));
 		}
 	}
 	
@@ -112,31 +112,31 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_rotation_speed = 0.f;
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, int frameNumber, int animationNumber)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
 	m_textureName = textureName;
 
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(0.5f * size.x, 0.5f * size.y);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, int frameNumber, int animationNumber, sf::Uint8* pixels)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber, pixels);
 	m_textureName = textureName;
 
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(0.5f * size.x, 0.5f * size.y);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size, float stroke_size)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2u size, int stroke_size)
 {
 	sf::Uint8* pixels = CreateRectangleWithStroke(size, color, stroke_size);
 	ostringstream ss;
@@ -147,21 +147,21 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 	sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y, pixels);
 	Init(position, speed, texture, 1, 1);
 
-	setOrigin(size.x / 2, size.y / 2);
+	setOrigin(0.5f * size.x, 0.5f * size.y);
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, float radius, float stroke_size)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, int radius, int stroke_size)
 {
 	sf::Uint8* pixels = CreateCircleWithStroke(radius, color, stroke_size);
 	ostringstream ss;
-	ss << "circle_" << (int)radius * 2 << "x" << (int)radius * 2 << "_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
+	ss << "circle_" << (int)radius * 2 << "x" << radius * 2 << "_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
 	string textureName = ss.str();
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(textureName, radius * 2, radius * 2, pixels);
 	Init(position, speed, texture, 1, 1);
 
-	setOrigin(radius, radius);
+	setOrigin(1.f * radius, 1.f * radius);
 }
 
 GameObject::~GameObject()
@@ -224,9 +224,10 @@ void GameObject::SetConditionalColor(sf::Color color, bool condition)
 
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x/2, this->m_size.y/2), this->m_frameNumber, this->m_animationNumber);
+	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, sf::Vector2u((int)this->m_size.x, (int)this->m_size.y), sf::Vector2f(0.5f * this->m_size.x, 0.5f * this->m_size.y), this->m_frameNumber, this->m_animationNumber);
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
+	clone->m_size = this->m_size;
 
 	return clone;
 }

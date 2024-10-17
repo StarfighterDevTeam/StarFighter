@@ -17,7 +17,7 @@ Game::Game(RenderWindow* window)
 	m_window_has_focus = true;
 
 	m_window = window;
-	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y);
 	m_mainScreen.setSmooth(true);
 
 	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
@@ -492,14 +492,12 @@ void Game::cleanGarbage()
 	dt.restart();
 
 	// On traite les demandes de changements de type
-	size_t sceneGameObjectsLayeredTempSize[NBVAL_Layer];
 	for (int layer = 0; layer < NBVAL_Layer; layer++)
 	{
 		TransferGameObjectLayeredTempToSceneObjectsLayered((LayerType)layer);
 		m_sceneGameObjectsLayeredTemp[layer].clear();
 	}
 
-	size_t sceneGameObjectsTypedTempSize[NBVAL_GameObject];
 	for (int type = 0; type < NBVAL_GameObject; type++)
 	{
 		TransferGameObjectTypedTempToSceneObjectsTyped((GameObjectType)type);
