@@ -216,3 +216,4 @@ pip-log.txt
 
 # Librairies
 !/Libraries/**
+/Unstable/StarFighter/.vs
