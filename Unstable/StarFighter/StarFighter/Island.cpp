@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y, int skin, Seaport* seaport) : GameEntity(sf::Vector2f(width * WATERTILE_SIZE, height * WATERTILE_SIZE), UI_WaterTile)
+Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y, int skin, Seaport* seaport) : GameEntity(sf::Vector2f(1.f * width * WATERTILE_SIZE, 1.f * height * WATERTILE_SIZE), UI_WaterTile)
 {
 	m_upcorner_x = upcorner_x;
 	m_upcorner_y = upcorner_y;

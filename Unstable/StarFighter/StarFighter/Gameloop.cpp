@@ -43,7 +43,7 @@ Gameloop::Gameloop()
 
 	m_pause_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_pause_text.setCharacterSize(50);
-	m_pause_text.setColor(sf::Color::Black);
+	m_pause_text.setFillColor(sf::Color::Black);
 	m_pause_text.setString("P A U S E");
 	m_pause_text.setPosition(sf::Vector2f(WINDOW_RESOLUTION_X * 0.5f, WINDOW_RESOLUTION_Y * 0.5f));
 
@@ -161,7 +161,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	//	//position on "radar"
 	//	(*it)->m_position = (*it)->m_tile->m_position;
 	//	(*it)->UpdatePosition();
-	//	(*it)->m_text.setPosition(sf::Vector2f((*it)->m_text.getPosition().x, (*it)->m_text.getPosition().y - (*it)->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
+	//	(*it)->m_text.setPosition(sf::Vector2f((*it)->m_text.getPosition().x, (*it)->m_text.getPosition().y - (*it)->m_text.getGlobalBounds().height * 0.5f - WATERTILE_SIZE * 0.5f - 10));
 	//}
 
 	//Canceling weapon target
@@ -1061,7 +1061,7 @@ void Gameloop::UpdateTargetRoom(Weapon* weapon, Room* room_hovered)
 				}
 				else
 				{
-					m_contextual_order->SetContextualOrder(Order_TargetHull, sf::Vector2f(hull_pos_feedback_x, (hull_pos_feedback_ymin + hull_pos_feedback_ymax) * 0.5), weapon->m_health > 0);
+					m_contextual_order->SetContextualOrder(Order_TargetHull, sf::Vector2f(hull_pos_feedback_x, (hull_pos_feedback_ymin + hull_pos_feedback_ymax) * 0.5f), weapon->m_health > 0);
 				}
 
 				if ((*CurrentGame).m_mouse_click == Mouse_RightClick)
@@ -1445,8 +1445,8 @@ Reward* Gameloop::GenerateReward(string rewardID, Location* location, Ship* othe
 		//chance of failing?
 		if (location != NULL && location->m_type == Location_SeaMonster)
 		{
-			int monster_strenght = (int)Lerp(location->m_depth, SEAMONSTER_DEPTH_MIN, SEAMONSTER_DEPTH_MAX, 0, gauge_max);
-			if (monster_strenght > gauge || RandomizeFloatBetweenValues(0, 1) < SEAMONSTER_LOSE_PROBABILITY)
+			int monster_strenght = (int)Lerp(1.f * location->m_depth, 1.f * SEAMONSTER_DEPTH_MIN, 1.f * SEAMONSTER_DEPTH_MAX, 0.f, 1.f * gauge_max);
+			if (monster_strenght > gauge || RandomizeFloatBetweenValues(0.f, 1.f) < SEAMONSTER_LOSE_PROBABILITY)
 			{
 				//lose combat against monster
 				int delta = monster_strenght / gauge;
@@ -1484,11 +1484,11 @@ Reward* Gameloop::GenerateReward(string rewardID, Location* location, Ship* othe
 
 						if (gauge_max == 0)
 						{
-							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8f, 1.2f) * cooldown);
 						}
 						else
 						{
-							value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+							value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8f, 1.2f) * cooldown);
 						}
 					}
 
@@ -1538,7 +1538,9 @@ Reward* Gameloop::GenerateReward(string rewardID, Location* location, Ship* othe
 			{
 				line++;
 			}
-		}	
+		}
+
+		return NULL;
 	}
 	else
 	{
@@ -1713,7 +1715,7 @@ void Gameloop::UpdateShips(sf::Time deltaTime)
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Enemy)
 							{
-								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost, ship_in_combat_range->GetEstimatedCombatStrength());
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, cost <= m_warship->m_moves_max, cost, (int)ship_in_combat_range->GetEstimatedCombatStrength());
 							}
 							else if (ship_in_combat_range->m_alliance == Alliance_Ally)
 							{
@@ -1774,9 +1776,9 @@ void Gameloop::UpdateShips(sf::Time deltaTime)
 			{
 				ostringstream ss;
 				ss << "\n\n\n";
-				ss << ship->m_DMS.m_degree_y << "°" << ship->m_DMS.m_minute_y << "' " << (int)ship->m_DMS.m_second_y << "\"\N";
+				ss << ship->m_DMS.m_degree_y << "°" << ship->m_DMS.m_minute_y << "' " << (int)ship->m_DMS.m_second_y << "\"N";
 				ss << "\n";
-				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"\E";
+				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"E";
 				ship->m_text.setString(ss.str());
 			}
 		}
@@ -2157,7 +2159,7 @@ void Gameloop::UpdateBullets(sf::Time deltaTime)
 					int x = (*it)->m_target_tile->m_coord_x;
 					int y = (*it)->m_target_tile->m_coord_y;
 
-					int radius = (*it)->m_radius - 1;
+					int radius = (int)(*it)->m_radius - 1;
 
 					int a = x - radius;
 					int b = x + radius;
@@ -2396,7 +2398,7 @@ void Gameloop::UpdateMap(sf::Time deltaTime)
 					if (tile->m_location->m_type == Location_Seaport)
 					{
 						Seaport* seaport = (Seaport*)tile->m_location;
-						seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
+						seaport->m_text.setPosition(sf::Vector2f(seaport->m_text.getPosition().x, seaport->m_text.getPosition().y - seaport->m_text.getGlobalBounds().height * 0.5f - WATERTILE_SIZE * 0.5f - 10));
 					}
 				}
 
@@ -2479,7 +2481,7 @@ void Gameloop::UpdateMenus(sf::Time deltaTime)
 	if (hovered != NULL && hovered->m_UI_type == UI_Commodity)
 	{
 		Commodity* commodity = (Commodity*)hovered;
-		m_help_interface.Init(commodity->m_display_name, commodity->m_description, sf::Vector2f(commodity->m_position.x - RESOURCES_ICON_SIZE * 0.5, commodity->m_position.y + RESOURCES_ICON_SIZE * 0.5));
+		m_help_interface.Init(commodity->m_display_name, commodity->m_description, sf::Vector2f(commodity->m_position.x - 1.f * RESOURCES_ICON_SIZE * 0.5f, commodity->m_position.y + 1.f * RESOURCES_ICON_SIZE * 0.5f));
 	}
 	else if (hovered != NULL && hovered->m_UI_type == UI_Resource)
 	{
@@ -2488,17 +2490,17 @@ void Gameloop::UpdateMenus(sf::Time deltaTime)
 		if (resource->m_type == Resource_Fidelity)
 		{
 			string description = "Crew fidelity is important, as low fidelity will sometimes occasion mutiny.";
-			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5f, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5f * 0.5f + 16.f));
 		}
 		else if (resource->m_type == Resource_Days)
 		{
 			string description = "Days are passing, and the Royal Navy might just be closing on you very soon.";
-			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5 * 0.5 + 16));
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - resource->m_shape_container.getSize().x * 0.5f, resource->m_position.y + resource->m_shape_container.getSize().y * 0.5f * 0.5f + 16.f));
 		}
 		else
 		{
 			string description = "Your holds of resources.";
-			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
+			m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - 1.f * RESOURCES_ICON_SIZE * 0.5f, resource->m_position.y + 1.f * RESOURCES_ICON_SIZE * 0.5f + 6.f));
 		}
 	}
 	else if (hovered != NULL && hovered->m_UI_type == UI_Rudder)
@@ -2507,7 +2509,7 @@ void Gameloop::UpdateMenus(sf::Time deltaTime)
 		string display_name = (*CurrentGame).m_dico_ship_systems[rudder->m_tile->m_system];
 		string activated = m_warship->IsSystemOperational(System_Navigation, rudder->m_tile) == true ? "operated" : "not operated";
 		string description = "Status: " + activated + "\n+" + std::to_string((int)(100 * NAVIGATION_DODGE_CHANCE)) + "% dodge chance (if operated by a crew member).\nThe operating crew also adds his Nagivation skill % to dodge chances.";
-		m_help_interface.Init(display_name, description, sf::Vector2f(rudder->m_position.x - ROOMTILE_SIZE * 0.5, rudder->m_position.y + ROOMTILE_SIZE * 0.5));
+		m_help_interface.Init(display_name, description, sf::Vector2f(rudder->m_position.x - 1.f * ROOMTILE_SIZE * 0.5f, rudder->m_position.y + 1.f * ROOMTILE_SIZE * 0.5f));
 	}
 	else if (hovered != NULL && hovered->m_UI_type == UI_Engine)
 	{
@@ -2515,7 +2517,7 @@ void Gameloop::UpdateMenus(sf::Time deltaTime)
 		string display_name = (*CurrentGame).m_dico_ship_systems[engine->m_tile->m_system];
 		string activated = m_warship->IsSystemOperational(System_Engine, engine->m_tile) == true ? "operated" : "not operated";
 		string description = "Status: " + activated + "\nCharges the Flee thrusters (if operated by a crew member).\nWhen fully charged, right-click on the Engine to flee an ungoing combat.\n\n+" + std::to_string((int)(100 * ENGINE_DODGE_CHANCE)) + "% dodge chance per engine (if operated by a crew member).\nThe operating crew also adds his Engine skill % to dodge chances.";
-		m_help_interface.Init(display_name, description, sf::Vector2f(engine->m_position.x - ROOMTILE_SIZE * 0.5, engine->m_position.y + ROOMTILE_SIZE * 0.5));
+		m_help_interface.Init(display_name, description, sf::Vector2f(engine->m_position.x - ROOMTILE_SIZE * 0.5f, engine->m_position.y + ROOMTILE_SIZE * 0.5f));
 	}
 	else if (hovered != NULL && hovered->m_UI_type == UI_Weapon)
 	{
@@ -2536,13 +2538,13 @@ void Gameloop::UpdateMenus(sf::Time deltaTime)
 			description += "\n\nShrapnel aims at random into a target room, dealing spread damage to crew members, but not to the hull.";
 		}
 
-		m_help_interface.Init(display_name, description, sf::Vector2f(weapon->m_position.x - ROOMTILE_SIZE * 0.5, weapon->m_position.y + ROOMTILE_SIZE * 0.5));
+		m_help_interface.Init(display_name, description, sf::Vector2f(weapon->m_position.x - 1.f * ROOMTILE_SIZE * 0.5f, weapon->m_position.y + 1.f * ROOMTILE_SIZE * 0.5f));
 	}
 	else if (hovered != NULL && hovered->m_UI_type == UI_ResourceUpkeep)
 	{
 		Resource* resource = (Resource*)hovered;
 		string description = "Crew upkeep costs resources every day.\nEach day passed with the upkeep paid increase crew fidelity.\nUpkeep costs unpaid decrease crew fidelity.";
-		m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - RESOURCES_ICON_SIZE * 0.5, resource->m_position.y + RESOURCES_ICON_SIZE * 0.5 + 6));
+		m_help_interface.Init(resource->m_display_name, description, sf::Vector2f(resource->m_position.x - 1.f * RESOURCES_ICON_SIZE * 0.5f, resource->m_position.y + 1.f * RESOURCES_ICON_SIZE * 0.5f + 6.f));
 	}
 	else if (m_help_interface.m_panel != NULL)
 	{
@@ -2643,12 +2645,12 @@ void Gameloop::UpdateMenus(sf::Time deltaTime)
 							//cannot kill more than unboarded
 							for (int k = 0; k < -reward->m_resources[i].second; k++)
 							{
-								if (m_warship->m_crew_unboarding.size() > k)
+								if ((int)m_warship->m_crew_unboarding.size() > k)
 								{
 									m_warship->m_reward_interface.m_crew_killed.push_back(m_warship->m_crew_unboarding[k]);
 								}
 							}
-							reward->m_resources[i].second = -m_warship->m_reward_interface.m_crew_killed.size();
+							reward->m_resources[i].second = -(int)m_warship->m_reward_interface.m_crew_killed.size();
 						}
 						else//crew recruited
 						{

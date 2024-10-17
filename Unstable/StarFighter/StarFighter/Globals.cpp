@@ -43,7 +43,7 @@ int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values)
 	double random_rate = ((double) rand() / RAND_MAX);
 	random_rate *= (min_max_values.y - min_max_values.x);
 	random_rate += min_max_values.x;
-	int i = (int) ((random_rate*value) + 0.5);
+	int i = (int) ((random_rate*value) + 0.5f);
 
 	return i;
 }
@@ -77,8 +77,8 @@ int RandomizeIntBetweenValues(int min_value, int max_value)
 
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 {
-	int min = floor (min_max_values.x + 0.5);
-	int max = floor (min_max_values.y + 0.5);
+	int min = (int)floor(min_max_values.x + 0.5f);
+	int max = (int)floor(min_max_values.y + 0.5f);
 	int random_value = rand() % (max - min +1);
 	random_value += min;
 
@@ -213,7 +213,7 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 	if (value > input_max)
 		return output_max;
 
-	float ratio = (1 - cos(value * M_PI)) / 2;
+	float ratio = (1.f - cos(value * M_PI_F)) * 0.5f;
 	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI)) / 2;"
 
 	float ouput = output_min + ratio * (output_max - output_min);
@@ -263,11 +263,11 @@ void GetAngleForVector(sf::Vector2f vector, float& angle)
 		{
 			if (vector.x >= 0)
 			{
-				angle = (atan(vector.y / vector.x) * 180.f / M_PI) + 90.f;
+				angle = (atan(vector.y / vector.x) * 180.f / M_PI_F) + 90.f;
 			}
 			else
 			{
-				angle = (atan(vector.y / vector.x) * 180.f / M_PI) + 90.f + 180.f;
+				angle = (atan(vector.y / vector.x) * 180.f / M_PI_F) + 90.f + 180.f;
 			}
 		}
 	}

@@ -16,7 +16,7 @@ void WeatherInterface::Init(const Weather* weather)
 	m_weather = weather;
 
 	//icons
-	const float texture_size = 64.f;
+	const int texture_size = 64;
 	Texture* texture_sunny = TextureLoader::getInstance()->loadTexture("2D/weather_sunny.png", texture_size, texture_size);
 	Texture* texture_mostlysunny = TextureLoader::getInstance()->loadTexture("2D/weather_mostlysunny.png", texture_size, texture_size);
 	Texture* texture_cloudy = TextureLoader::getInstance()->loadTexture("2D/weather_cloudy.png", texture_size, texture_size);
@@ -28,9 +28,9 @@ void WeatherInterface::Init(const Weather* weather)
 	//background panel
 	m_panel = new GameEntity(UI_None);
 	m_panel->m_shape_container.setSize(sf::Vector2f(WEATHER_INTERFACE_PANEL_SIZE_X, WEATHER_INTERFACE_PANEL_SIZE_Y));
-	m_panel->m_shape_container.setOrigin(sf::Vector2f(WEATHER_INTERFACE_PANEL_SIZE_X * 0.5f, WEATHER_INTERFACE_PANEL_SIZE_Y * 0.5));
+	m_panel->m_shape_container.setOrigin(sf::Vector2f(WEATHER_INTERFACE_PANEL_SIZE_X * 0.5f, WEATHER_INTERFACE_PANEL_SIZE_Y * 0.5f));
 	m_panel->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
-	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5, REF_WINDOW_RESOLUTION_Y - WEATHER_INTERFACE_PANEL_SIZE_Y * 0.5));
+	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X * 0.5f, REF_WINDOW_RESOLUTION_Y - WEATHER_INTERFACE_PANEL_SIZE_Y * 0.5f));
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
 
 	//weather forecasts
@@ -39,14 +39,14 @@ void WeatherInterface::Init(const Weather* weather)
 		//winds
 		m_winds[i] = new GameEntity(UI_WeatherWind);
 		m_winds[i]->setAnimation(texture_wind, 1, 1);
-		m_winds[i]->setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.5 + texture_size * (0.5 + i),
-			m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5 - texture_size * (0.5 + 1)));
+		m_winds[i]->setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.5f + texture_size * (0.5f + i),
+			m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5f - texture_size * (0.5f + 1)));
 
 		m_winds[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_winds[i]->m_text.setCharacterSize(14);
-		m_winds[i]->m_text.setColor(sf::Color::Cyan);
+		m_winds[i]->m_text.setFillColor(sf::Color::Cyan);
 		m_winds[i]->m_text.setStyle(sf::Text::Bold);
-		m_winds[i]->m_text.setPosition(sf::Vector2f(m_winds[i]->getPosition().x - m_winds[i]->m_size.x * 0.5 + 2, m_winds[i]->getPosition().y - texture_size * 0.5 - 2));
+		m_winds[i]->m_text.setPosition(sf::Vector2f(m_winds[i]->getPosition().x - m_winds[i]->m_size.x * 0.5f + 2, m_winds[i]->getPosition().y - texture_size * 0.5f - 2));
 
 		//conditions
 		m_conditions[i] = new GameEntity(UI_WeatherCondition);
@@ -86,8 +86,8 @@ void WeatherInterface::Init(const Weather* weather)
 		}
 
 		m_conditions[i]->setAnimation(texture_condition, 1, 1);
-		m_conditions[i]->setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.5 + texture_size * (0.5 + i),
-			m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5 - texture_size * 0.5));
+		m_conditions[i]->setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.5f + texture_size * (0.5f + i),
+			m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5f - texture_size * 0.5f));
 	}
 }
 
@@ -130,8 +130,8 @@ void WeatherInterface::Update()
 			ss_wind << " NW";
 
 		m_winds[i]->m_text.setString(ss_wind.str());
-		m_winds[i]->m_text.setPosition(sf::Vector2f(m_winds[i]->getPosition().x - m_winds[i]->m_size.x * 0.5 + (texture_size - m_winds[i]->m_text.getGlobalBounds().width) * 0.5,
-			m_winds[i]->getPosition().y - texture_size * 0.5 - 2));
+		m_winds[i]->m_text.setPosition(sf::Vector2f(m_winds[i]->getPosition().x - m_winds[i]->m_size.x * 0.5f + (texture_size - m_winds[i]->m_text.getGlobalBounds().width) * 0.5f,
+			m_winds[i]->getPosition().y - texture_size * 0.5f - 2));
 	}
 }
 

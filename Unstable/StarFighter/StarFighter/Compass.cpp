@@ -8,7 +8,7 @@ Compass::Compass()
 	m_cadran = new GameEntity(UI_Compass);
 	m_cadran->m_shape_container.setSize(sf::Vector2f(COMPASS_CADRAN_SIZE_X, COMPASS_CADRAN_SIZE_Y));
 	m_cadran->m_shape_container.setOrigin(sf::Vector2f(COMPASS_CADRAN_SIZE_X * 0.5f, COMPASS_CADRAN_SIZE_Y * 0.5f));
-	m_cadran->m_shape_container.setPosition(sf::Vector2f(COMPASS_OFFSET_X + COMPASS_CADRAN_SIZE_X * 0.5, COMPASS_OFFSET_Y - COMPASS_CADRAN_SIZE_Y * 0.5f));
+	m_cadran->m_shape_container.setPosition(sf::Vector2f(COMPASS_OFFSET_X + COMPASS_CADRAN_SIZE_X * 0.5f, COMPASS_OFFSET_Y - COMPASS_CADRAN_SIZE_Y * 0.5f));
 	m_cadran->m_shape_container.setFillColor(sf::Color(255, 255, 255, 255));
 	m_cadran->m_shape_container.setOutlineThickness(4.f);
 	m_cadran->m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
@@ -46,7 +46,7 @@ Compass::Compass()
 		{
 			m_degree_markers[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 			m_degree_markers[i]->m_text.setCharacterSize(16);
-			m_degree_markers[i]->m_text.setColor(sf::Color::Black);
+			m_degree_markers[i]->m_text.setFillColor(sf::Color::Black);
 			m_degree_markers[i]->m_text.setString(ss.str());
 
 			ostringstream ss2;
@@ -81,7 +81,7 @@ Compass::Compass()
 			m_cardinal_pts[i / 9] = new GameEntity(UI_None);
 			m_cardinal_pts[i / 9]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 			m_cardinal_pts[i / 9]->m_text.setCharacterSize(20);
-			m_cardinal_pts[i / 9]->m_text.setColor(sf::Color::Black);
+			m_cardinal_pts[i / 9]->m_text.setFillColor(sf::Color::Black);
 			m_cardinal_pts[i / 9]->m_text.setString(ss2.str());
 		}
 

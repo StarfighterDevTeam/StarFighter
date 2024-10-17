@@ -38,7 +38,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//DMS coordinates display
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(24);
-	m_text.setColor(sf::Color::Black);
+	m_text.setFillColor(sf::Color::Black);
 
 	//ROOMS
 	//left
@@ -202,8 +202,8 @@ void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
 		//flip the sprite according to the direction
 		UpdateAnimation();
 
-		m_speed.x = CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
-		m_speed.y = -CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
+		m_speed.x = CRUISE_SPEED * sin(m_angle * M_PI_F / 180.f);
+		m_speed.y = -CRUISE_SPEED * cos(m_angle * M_PI_F / 180.f);
 	}
 
 	//travel management (needs to be refreshed? arrived?)
@@ -283,9 +283,9 @@ void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
 		//UI
 		ostringstream ss;
 		ss << "\n\n\n";
-		ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << (int)m_DMS.m_second_y << "\"\N";
+		ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << (int)m_DMS.m_second_y << "\"N";
 		ss << "\n";
-		ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << (int)m_DMS.m_second_x << "\"\E";
+		ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << (int)m_DMS.m_second_x << "\"E";
 		m_text.setString(ss.str());
 
 		//Compass UI update

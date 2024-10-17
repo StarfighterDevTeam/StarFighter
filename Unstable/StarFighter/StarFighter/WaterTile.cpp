@@ -6,7 +6,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
-	m_position = sf::Vector2f(WATERTILE_OFFSET_X + coord_x * WATERTILE_SIZE, WATERTILE_OFFSET_Y + (NB_WATERTILE_Y - coord_y) * WATERTILE_SIZE);
+	m_position = sf::Vector2f(1.f * (WATERTILE_OFFSET_X + coord_x * WATERTILE_SIZE), 1.f * (WATERTILE_OFFSET_Y + (NB_WATERTILE_Y - coord_y) * WATERTILE_SIZE));
 	m_type = type;
 	m_zone = zone;
 	m_DMS.SetCoord(zone_coord_x, coord_x, 0, zone_coord_y, coord_y, 0);
@@ -38,7 +38,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
-	m_text.setColor(sf::Color::White);
+	m_text.setFillColor(sf::Color::White);
 	m_text.SetPosition(m_position);
 }
 

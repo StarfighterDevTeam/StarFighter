@@ -132,9 +132,9 @@ void GameEntity::setAnimation(sf::Texture *texture, int frameNumber, int animati
 	m_animationNumber = animationNumber;
 	m_frameNumber = frameNumber;
 
-	m_size.x = ((*texture).getSize().x / frameNumber);
-	m_size.y = ((*texture).getSize().y / animationNumber);
-	setOrigin(sf::Vector2f(m_size.x / 2, m_size.y / 2));
+	m_size.x = (1.f * (*texture).getSize().x / frameNumber);
+	m_size.y = (1.f * (*texture).getSize().y / animationNumber);
+	setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
 
 	m_defaultAnimation.setSpriteSheet(*texture);
 
@@ -144,7 +144,7 @@ void GameEntity::setAnimation(sf::Texture *texture, int frameNumber, int animati
 		{
 			int x = ((*texture).getSize().x / frameNumber)*(i);
 			int y = ((*texture).getSize().y / animationNumber)*(j);
-			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, (int)m_size.x, (int)m_size.y));
 		}
 	}
 

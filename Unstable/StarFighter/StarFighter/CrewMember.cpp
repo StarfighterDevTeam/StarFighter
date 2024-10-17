@@ -116,7 +116,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 
 	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	//m_text.setCharacterSize(20);
-	//m_text.setColor(sf::Color::White);
+	//m_text.setFillColor(sf::Color::White);
 	//m_text.setString(dico_crew[type]);
 
 	m_lifebar = new GameEntity(UI_None);
@@ -395,7 +395,7 @@ void CrewMember::UpdateLifeBar()
 
 	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
 
-	float threshold[3] = { 0.7, 0.5, 0.3 };
+	float threshold[3] = { 0.7f, 0.5f, 0.3f };
 	if (life_ratio >= threshold[1])
 	{
 		m_lifebar->m_shape.setFillColor(sf::Color::Green);
@@ -534,7 +534,7 @@ bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 	while (m_open_list_pathfind.empty() == false && tileB->m_parent == NULL)
 	{
 		//choose next best tile to compute
-		size_t min_G_value = 0;
+		int min_G_value = 0;
 		RoomTile* next_tile = NULL;
 		for (list<RoomTile*>::iterator it = m_open_list_pathfind.begin(); it != m_open_list_pathfind.end(); it++)
 		{
@@ -640,6 +640,8 @@ bool CrewMember::ImprisonInTile(RoomTile* prison_cell)
 	m_tile = prison_cell;
 	m_position = prison_cell->m_position;
 	m_speed = sf::Vector2f(0, 0);
+
+	return true;
 }
 
 float CrewMember::UpdateAndGetMeleeRof()

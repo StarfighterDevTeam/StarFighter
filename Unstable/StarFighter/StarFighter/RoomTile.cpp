@@ -56,7 +56,7 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 
 	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	//m_text.setCharacterSize(14);
-	//m_text.setColor(sf::Color::Black);
+	//m_text.setFillColor(sf::Color::Black);
 }
 
 RoomTile::~RoomTile()

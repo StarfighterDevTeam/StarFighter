@@ -87,7 +87,7 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 	m_narrative_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_narrative_text.setCharacterSize(18);
 	m_narrative_text.setStyle(sf::Text::Bold);
-	m_narrative_text.setColor(sf::Color::White);
+	m_narrative_text.setFillColor(sf::Color::White);
 	m_narrative_text.setString(ss_survivors.str());
 	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWOVERBOARDINTERFACE_SIZE_X * 0.5f + 20, offset_y));
 
@@ -115,7 +115,7 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 	m_drowning_bar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_drowning_bar->m_text.setCharacterSize(18);
 	m_drowning_bar->m_text.setStyle(sf::Text::Bold);
-	m_drowning_bar->m_text.setColor(sf::Color::White);
+	m_drowning_bar->m_text.setFillColor(sf::Color::White);
 	m_drowning_bar->m_text.setString(ss_slots.str());
 	m_drowning_bar->m_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWOVERBOARDINTERFACE_SIZE_X * 0.5f + 20, offset_y - m_drowning_bar->m_text.getCharacterSize() * 0.5f));
 
@@ -160,9 +160,9 @@ bool CrewOverboardInterface::Update(sf::Time deltaTime)
 
 					m_crew_interface.Init(*it);
 					m_crew_interface.Update();
-					float pos_x = (*it)->m_position.x + CREWMEMBER_SIZE * 0.5 + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5 + OVERBOARD_CREW_CARD_OFFSET;
-					float pos_y = (*it)->m_position.y + m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5;
-					pos_y = Minf(pos_y, REF_WINDOW_RESOLUTION_Y * 0.95 - m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5);
+					float pos_x = (*it)->m_position.x + CREWMEMBER_SIZE * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 1.f * OVERBOARD_CREW_CARD_OFFSET;
+					float pos_y = (*it)->m_position.y + m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5f - CREWMEMBER_SIZE * 0.5f;
+					pos_y = Minf(pos_y, 1.f * REF_WINDOW_RESOLUTION_Y * 0.95f - m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5f);
 					m_crew_interface.SetPosition(sf::Vector2f(pos_x, pos_y));
 				}
 				
@@ -193,7 +193,7 @@ bool CrewOverboardInterface::Update(sf::Time deltaTime)
 	}
 
 	//end = exit
-	if (m_drowning_timer <= 0 || m_rescued.size() >= m_slots_avaible)
+	if (m_drowning_timer <= 0 || (int)m_rescued.size() >= m_slots_avaible)
 	{
 		//kill leftovers
 		for (int j = 0; j < 2; j++)

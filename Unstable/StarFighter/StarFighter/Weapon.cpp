@@ -120,7 +120,7 @@ void Weapon::Update(Time deltaTime)
 	float life_ratio = 1.0f * health / m_health_max;
 	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
 
-	float threshold[3] = { 0.7, 0.5, 0.3 };
+	float threshold[3] = { 0.7f, 0.5f, 0.3f };
 	if (life_ratio >= threshold[1])
 	{
 		m_lifebar->m_shape.setFillColor(sf::Color::Green);

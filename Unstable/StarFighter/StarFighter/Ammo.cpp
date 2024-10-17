@@ -65,8 +65,8 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 
 	setAnimation(texture, 1, 1);
 
-	float tile_size = ROOMTILE_SIZE;
-	float angle_rad = angle * M_PI / 180.f;
+	float tile_size = 1.f * ROOMTILE_SIZE;
+	float angle_rad = angle * M_PI_F / 180.f;
 	m_speed = sf::Vector2f(m_initial_speed * sin(angle_rad), - m_initial_speed * cos(angle_rad));
 	float weapon_offset_x = (tile_size + m_size.x) * 0.5f * sin(angle_rad);
 	float weapon_offset_y = -(tile_size + m_size.y) * 0.5f * cos(angle_rad);

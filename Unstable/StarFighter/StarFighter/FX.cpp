@@ -40,7 +40,7 @@ FX* FX::Clone()
 {
 	FX* new_FX = new FX(m_type);
 	new_FX->m_texturename = m_texturename;
-	Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, m_size.x, m_size.y);
+	Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, (int)m_size.x, (int)m_size.y);
 	new_FX->setAnimation(texture, m_frameNumber, m_animationNumber);
 
 	return new_FX;

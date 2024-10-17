@@ -405,11 +405,11 @@ void Ship::GetAngleForSpeed(float& angle)
 		{
 			if (m_speed.x >= 0)
 			{
-				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f;
+				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI_F) + 90.f;
 			}
 			else
 			{
-				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f + 180.f;
+				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI_F) + 90.f + 180.f;
 			}
 		}
 	}
@@ -942,8 +942,8 @@ void Ship::BuildShip()
 
 void Ship::CenterRoomPositions(bool is_enemy)
 {
-	float room_offset_x = is_enemy == false ? ROOMTILE_OFFSET_X : ROOMTILE_ENEMY_OFFSET_X;
-	float room_offset_y = is_enemy == false ? ROOMTILE_OFFSET_Y : ROOMTILE_ENEMY_OFFSET_Y;
+	float room_offset_x = is_enemy == false ? 1.f * ROOMTILE_OFFSET_X : 1.f * ROOMTILE_ENEMY_OFFSET_X;
+	float room_offset_y = is_enemy == false ? 1.f * ROOMTILE_OFFSET_Y : 1.f * ROOMTILE_ENEMY_OFFSET_Y;
 
 	room_offset_x -= 1.f * m_rooms_size.x / 2 * ROOMTILE_SIZE;
 	room_offset_y -= 1.f * m_rooms_size.y / 2 * ROOMTILE_SIZE;
@@ -1362,8 +1362,8 @@ void Ship::ApplyAlphaToShip(Uint8 alpha)
 		sf::Color c = (*it)->m_shape_container.getOutlineColor();
 		(*it)->m_shape_container.setOutlineColor(sf::Color(c.r, c.g, c.b, alpha));
 
-		sf::Color c4 = (*it)->m_text.getColor();
-		(*it)->m_text.setColor(sf::Color(c4.r, c4.g, c4.b, alpha));
+		sf::Color c4 = (*it)->m_text.getFillColor();
+		(*it)->m_text.setFillColor(sf::Color(c4.r, c4.g, c4.b, alpha));
 
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
@@ -1614,7 +1614,7 @@ int Ship::GetShortestPathLength(WaterTile* tileA, WaterTile* tileB)
 	while (m_open_list_pathfind.empty() == false && tileB->m_parent == NULL)
 	{
 		//choose next best tile to compute
-		size_t min_G_value = 0;
+		int min_G_value = 0;
 		WaterTile* next_tile = NULL;
 		for (list<WaterTile*>::iterator it = m_open_list_pathfind.begin(); it != m_open_list_pathfind.end(); it++)
 		{
@@ -1690,7 +1690,7 @@ void Ship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	while (m_open_list_pathfind.empty() == false && tileB->m_parent == NULL)
 	{
 		//choose next best tile to compute
-		size_t min_G_value = 0;
+		int min_G_value = 0;
 		WaterTile* next_tile = NULL;
 		for (list<WaterTile*>::iterator it = m_open_list_pathfind.begin(); it != m_open_list_pathfind.end(); it++)
 		{
@@ -2132,7 +2132,7 @@ bool Ship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* tile
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
-				printf("FAILED\n", coord_x, coord_y);
+				printf("FAILED: %d, %d\n", coord_x, coord_y);
 				return true;
 			}
 
@@ -2192,7 +2192,7 @@ int Ship::GetDistanceToWaterTile(WaterTile* tile)
 {
 	int diff_x = tile->m_coord_x - m_DMS.m_minute_x;
 	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
-	float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y);
+	float distance_f = 1.f * sqrt(diff_x * diff_x + diff_y * diff_y);
 
 	int distance_i = (int)distance_f;
 

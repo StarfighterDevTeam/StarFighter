@@ -25,7 +25,7 @@ int main()
 	renderWindow.setTitle("Pirates of the Seven Seas");
 
 	//Random seed
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	//Game initialization
 	CurrentGame = new Game(renderWindow);

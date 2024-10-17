@@ -83,7 +83,7 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 	m_narrative_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_narrative_text.setCharacterSize(18);
 	m_narrative_text.setStyle(sf::Text::Bold);
-	m_narrative_text.setColor(sf::Color::White);
+	m_narrative_text.setFillColor(sf::Color::White);
 	m_narrative_text.setString(ss_prisoners.str());
 	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - m_narrative_text.getGlobalBounds().width * 0.5f, offset_y));
 

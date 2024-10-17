@@ -8,7 +8,7 @@ ContextualOrder::ContextualOrder() : GameEntity(UI_None)
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
-	m_text.setColor(sf::Color::Black);
+	m_text.setFillColor(sf::Color::Black);
 
 	m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
 
@@ -166,7 +166,7 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 			setAnimation(texture, 1, 1);
 		}
 		
-		m_text.setColor(text_color);
+		m_text.setFillColor(text_color);
 		m_text.setString(ss_order.str());
 
 		m_shape.setSize(sf::Vector2f(m_text.getGlobalBounds().width + 12 + 20, m_text.getCharacterSize() + 8.f));
@@ -175,8 +175,8 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 	}
 
 	//position
-	setPosition(sf::Vector2f(position.x, position.y + (WATERTILE_SIZE - CONTEXTUAL_ORDER_SIZE) * 0.5 - 4));
-	m_text.setPosition(sf::Vector2f(position.x - m_text.getGlobalBounds().width * 0.5, position.y - (WATERTILE_SIZE * 0.5) - 2));
+	setPosition(sf::Vector2f(position.x, position.y + (WATERTILE_SIZE - CONTEXTUAL_ORDER_SIZE) * 0.5f - 4));
+	m_text.setPosition(sf::Vector2f(position.x - m_text.getGlobalBounds().width * 0.5f, position.y - (WATERTILE_SIZE * 0.5f) - 2));
 	m_shape.setPosition(sf::Vector2f(m_text.getPosition().x - (6 + 20), m_text.getPosition().y));
-	m_mouse_click->setPosition(sf::Vector2f(m_text.getPosition().x - (6 + 20) * 0.5, m_text.getPosition().y + m_shape.getSize().y * 0.5));
+	m_mouse_click->setPosition(sf::Vector2f(m_text.getPosition().x - (6 + 20) * 0.5f, m_text.getPosition().y + m_shape.getSize().y * 0.5f));
 }

@@ -42,27 +42,27 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 
 	//background panel
 	m_panel = new GameEntity(UI_None);
-	m_panel->m_shape_container.setSize(sf::Vector2f(DOCKYARDINTERFACE_SIZE_X, DOCKYARDINTERFACE_SIZE_Y));
-	m_panel->m_shape_container.setOrigin(sf::Vector2f(DOCKYARDINTERFACE_SIZE_X * 0.5, DOCKYARDINTERFACE_SIZE_Y * 0.5));
+	m_panel->m_shape_container.setSize(sf::Vector2f(1.f * DOCKYARDINTERFACE_SIZE_X, 1.f * DOCKYARDINTERFACE_SIZE_Y));
+	m_panel->m_shape_container.setOrigin(sf::Vector2f(1.f * DOCKYARDINTERFACE_SIZE_X * 0.5f, 1.f * DOCKYARDINTERFACE_SIZE_Y * 0.5f));
 	m_panel->m_shape_container.setFillColor(sf::Color::Black);
 	m_panel->m_shape_container.setOutlineThickness(2);
 	m_panel->m_shape_container.setOutlineColor(sf::Color::Black);
-	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - CREWUNBOARDINTERFACE_SIZE_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+	m_panel->m_shape_container.setPosition(sf::Vector2f(1.f * REF_WINDOW_RESOLUTION_X - 1.f * CREWUNBOARDINTERFACE_SIZE_X * 0.5f, 1.f * REF_WINDOW_RESOLUTION_Y * 0.5f));
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
 	
 	//narrative text
 	string ss_narrative = "Welcome to your dockyard.\nPlease suit yourself and buy all what you need for your ship (with left-click).";
 	
-	float offset_y = m_panel->m_position.y - DOCKYARDINTERFACE_SIZE_Y * 0.5;
+	float offset_y = m_panel->m_position.y - 1.f * DOCKYARDINTERFACE_SIZE_Y * 0.5f;
 	offset_y += 20;
 	m_narrative_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_narrative_text.setCharacterSize(18);
 	m_narrative_text.setStyle(sf::Text::Bold);
-	m_narrative_text.setColor(sf::Color::White);
+	m_narrative_text.setFillColor(sf::Color::White);
 	m_narrative_text.setString(ss_narrative);
-	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5 + 20, offset_y));
+	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - 1.f * CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20.f, offset_y));
 
-	offset_y += m_narrative_text.getGlobalBounds().height + 50;
+	offset_y += m_narrative_text.getGlobalBounds().height + 50.f;
 
 	//array of items
 	for (vector<string>::iterator it = m_location->m_upgrades.begin(); it != m_location->m_upgrades.end(); it++)
@@ -70,20 +70,20 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 		ShopItem* item = new ShopItem(*it);
 
 		//container
-		item->m_upgrade->m_shape_container.setSize(sf::Vector2f(SHOP_ITEM_CONTAINER_SIZE_X, SHOP_ITEM_CONTAINER_SIZE_Y));
-		item->m_upgrade->m_shape_container.setOrigin(sf::Vector2f(item->m_upgrade->m_shape_container.getSize().x * 0.5, item->m_upgrade->m_shape_container.getSize().y * 0.5));
+		item->m_upgrade->m_shape_container.setSize(sf::Vector2f(1.f * SHOP_ITEM_CONTAINER_SIZE_X, 1.f * SHOP_ITEM_CONTAINER_SIZE_Y));
+		item->m_upgrade->m_shape_container.setOrigin(sf::Vector2f(item->m_upgrade->m_shape_container.getSize().x * 0.5f, item->m_upgrade->m_shape_container.getSize().y * 0.5f));
 		item->m_upgrade->m_shape_container.setFillColor(sf::Color::Black);
 		item->m_upgrade->m_shape_container.setOutlineThickness(2);
 		item->m_upgrade->m_shape_container.setOutlineColor(sf::Color::White);
-		item->m_upgrade->m_shape_container.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_upgrade->m_shape_container.getSize().x * 0.5, offset_y + SHOP_ITEM_CONTAINER_SIZE_Y * 0.5));
+		item->m_upgrade->m_shape_container.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_upgrade->m_shape_container.getSize().x * 0.5f, offset_y + 1.f * SHOP_ITEM_CONTAINER_SIZE_Y * 0.5f));
 
 		//icon container
-		item->m_upgrade->m_shape.setSize(sf::Vector2f(UPGRADE_ICON_SIZE, UPGRADE_ICON_SIZE));
-		item->m_upgrade->m_shape.setOrigin(sf::Vector2f(item->m_upgrade->m_shape.getSize().x * 0.5, item->m_upgrade->m_shape.getSize().y * 0.5));
+		item->m_upgrade->m_shape.setSize(sf::Vector2f(1.f * UPGRADE_ICON_SIZE, 1.f * UPGRADE_ICON_SIZE));
+		item->m_upgrade->m_shape.setOrigin(sf::Vector2f(item->m_upgrade->m_shape.getSize().x * 0.5f, item->m_upgrade->m_shape.getSize().y * 0.5f));
 		item->m_upgrade->m_shape.setFillColor(sf::Color::Black);
 		item->m_upgrade->m_shape.setOutlineThickness(2);
 		item->m_upgrade->m_shape.setOutlineColor(sf::Color::White);
-		item->m_upgrade->m_shape.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_upgrade->m_shape.getSize().x * 0.5 + 8, item->m_upgrade->m_shape_container.getPosition().y));
+		item->m_upgrade->m_shape.setPosition(sf::Vector2f(m_narrative_text.getPosition().x + item->m_upgrade->m_shape.getSize().x * 0.5f + 8, item->m_upgrade->m_shape_container.getPosition().y));
 
 		//icon
 		Texture* texture = TextureLoader::getInstance()->loadTexture(item->m_upgrade->m_texture_name, UPGRADE_ICON_SIZE, UPGRADE_ICON_SIZE);
@@ -94,21 +94,21 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 		item->m_upgrade->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		item->m_upgrade->m_text.setCharacterSize(20);
 		item->m_upgrade->m_text.setStyle(sf::Text::Bold);
-		item->m_upgrade->m_text.setColor(sf::Color::White);
+		item->m_upgrade->m_text.setFillColor(sf::Color::White);
 		item->m_upgrade->m_text.setString(item->m_upgrade->m_display_name);
-		item->m_upgrade->m_text.setPosition(sf::Vector2f(item->m_upgrade->m_shape.getPosition().x + item->m_upgrade->m_shape.getSize().x * 0.5 + 12, item->m_upgrade->getPosition().y - item->m_upgrade->m_text.getCharacterSize() * 0.65));
+		item->m_upgrade->m_text.setPosition(sf::Vector2f(item->m_upgrade->m_shape.getPosition().x + item->m_upgrade->m_shape.getSize().x * 0.5f + 12.f, item->m_upgrade->getPosition().y - item->m_upgrade->m_text.getCharacterSize() * 0.65f));
 
 		//cost
 		Texture* texture_gold = TextureLoader::getInstance()->loadTexture("2D/icon_gold.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
 		item->m_cost->setAnimation(texture_gold, 1, 1);
-		item->m_cost->setPosition(sf::Vector2f(item->m_upgrade->m_shape_container.getPosition().x + item->m_upgrade->m_shape_container.getSize().x * 0.5 - 100, item->m_upgrade->getPosition().y));
+		item->m_cost->setPosition(sf::Vector2f(item->m_upgrade->m_shape_container.getPosition().x + item->m_upgrade->m_shape_container.getSize().x * 0.5f - 100.f, item->m_upgrade->getPosition().y));
 
 		item->m_cost->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		item->m_cost->m_text.setCharacterSize(16);
 		item->m_cost->m_text.setStyle(sf::Text::Bold);
-		item->m_cost->m_text.setColor(sf::Color::White);
+		item->m_cost->m_text.setFillColor(sf::Color::White);
 		item->m_cost->m_text.setString(to_string(item->m_upgrade->m_cost));
-		item->m_cost->m_text.setPosition(sf::Vector2f(item->m_cost->getPosition().x + RESOURCES_ICON_SIZE * 0.5 + 8, item->m_cost->getPosition().y - item->m_cost->m_text.getCharacterSize() * 0.65));
+		item->m_cost->m_text.setPosition(sf::Vector2f(item->m_cost->getPosition().x + 1.f * RESOURCES_ICON_SIZE * 0.5f + 8.f, item->m_cost->getPosition().y - item->m_cost->m_text.getCharacterSize() * 0.65f));
 		
 		m_items.push_back(item);
 
@@ -118,19 +118,19 @@ void DockyardInterface::Init(Ship* ship, Location* location)
 	//leave button
 	offset_y += m_narrative_text.getGlobalBounds().height + m_narrative_text.getCharacterSize();
 	m_leave_button = new GameEntity(UI_None);
-	m_leave_button->m_shape_container.setSize(sf::Vector2f(RESOURCES_BUTTON_SIZE_X, RESOURCES_BUTTON_SIZE_Y));
-	m_leave_button->m_shape_container.setOrigin(sf::Vector2f(RESOURCES_BUTTON_SIZE_X * 0.5, RESOURCES_BUTTON_SIZE_Y * 0.5));
+	m_leave_button->m_shape_container.setSize(sf::Vector2f(1.f * RESOURCES_BUTTON_SIZE_X, 1.f * RESOURCES_BUTTON_SIZE_Y));
+	m_leave_button->m_shape_container.setOrigin(sf::Vector2f(1.f * RESOURCES_BUTTON_SIZE_X * 0.5f, 1.f * RESOURCES_BUTTON_SIZE_Y * 0.5f));
 	m_leave_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
 	m_leave_button->m_shape_container.setOutlineThickness(2);
 	m_leave_button->m_shape_container.setOutlineColor(sf::Color::White);
-	m_leave_button->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.25, offset_y));
+	m_leave_button->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.25f, offset_y));
 
 	m_leave_button->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_leave_button->m_text.setCharacterSize(16);
 	m_leave_button->m_text.setStyle(sf::Text::Bold);
-	m_leave_button->m_text.setColor(sf::Color::White);
+	m_leave_button->m_text.setFillColor(sf::Color::White);
 	m_leave_button->m_text.setString("Leave");
-	m_leave_button->m_text.setPosition(sf::Vector2f(m_leave_button->m_shape_container.getPosition().x - m_leave_button->m_text.getGlobalBounds().width * 0.5, offset_y - m_leave_button->m_text.getCharacterSize() * 0.65));
+	m_leave_button->m_text.setPosition(sf::Vector2f(m_leave_button->m_shape_container.getPosition().x - m_leave_button->m_text.getGlobalBounds().width * 0.5f, offset_y - m_leave_button->m_text.getCharacterSize() * 0.65f));
 }
 
 string DockyardInterface::Update(sf::Time deltaTime)
@@ -144,26 +144,26 @@ string DockyardInterface::Update(sf::Time deltaTime)
 		//update cost's text color if not enough money to buy
 		if (m_ship->m_resources[Resource_Gold] < (*it)->m_upgrade->m_cost)
 		{
-			(*it)->m_cost->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+			(*it)->m_cost->m_text.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
 		}
 		else
 		{
-			(*it)->m_cost->m_text.setColor(sf::Color::White);
+			(*it)->m_cost->m_text.setFillColor(sf::Color::White);
 		}
 
 		//update text color if required upgrade not owned
 		if (m_ship->HasUpgradeRequiredFor((*it)->m_upgrade->m_type) == false)
 		{
-			(*it)->m_upgrade->m_text.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+			(*it)->m_upgrade->m_text.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
 		}
 		else if (m_ship->HasUpgrade((*it)->m_upgrade->m_type) == true)
 		{
-			(*it)->m_upgrade->m_text.setColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
-			(*it)->m_cost->m_text.setColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
+			(*it)->m_upgrade->m_text.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
+			(*it)->m_cost->m_text.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 		}
 		else
 		{
-			(*it)->m_upgrade->m_text.setColor(sf::Color::White);
+			(*it)->m_upgrade->m_text.setFillColor(sf::Color::White);
 		}
 
 		//hovering
@@ -225,19 +225,19 @@ void DockyardInterface::InitDetail(Upgrade* upgrade)
 {
 	m_detail_panel = new GameEntity(UI_None);
 	m_detail_panel->m_shape_container.setSize(sf::Vector2f(DOCKYARDINTERFACE_DETAIL_SIZE_X, DOCKYARDINTERFACE_DETAIL_SIZE_Y));
-	m_detail_panel->m_shape_container.setOrigin(sf::Vector2f(m_detail_panel->m_shape_container.getSize().x * 0.5, m_detail_panel->m_shape_container.getSize().y * 0.5));
+	m_detail_panel->m_shape_container.setOrigin(sf::Vector2f(m_detail_panel->m_shape_container.getSize().x * 0.5f, m_detail_panel->m_shape_container.getSize().y * 0.5f));
 	m_detail_panel->m_shape_container.setFillColor(sf::Color::Black);
 	m_detail_panel->m_shape_container.setOutlineThickness(2);
 	m_detail_panel->m_shape_container.setOutlineColor(sf::Color::White);
-	m_detail_panel->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x + m_detail_panel->m_shape_container.getSize().x * 0.5, m_items[0]->m_upgrade->getPosition().y - m_items[0]->m_upgrade->m_shape_container.getSize().y * 0.5 + m_detail_panel->m_shape_container.getSize().y * 0.5));
+	m_detail_panel->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x + m_detail_panel->m_shape_container.getSize().x * 0.5f, m_items[0]->m_upgrade->getPosition().y - m_items[0]->m_upgrade->m_shape_container.getSize().y * 0.5f + m_detail_panel->m_shape_container.getSize().y * 0.5f));
 	m_detail_panel->m_position = m_detail_panel->m_shape_container.getPosition();
 
 	m_detail_title.setString(upgrade->m_display_name);
 	m_detail_title.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_detail_title.setCharacterSize(16);
 	m_detail_title.setStyle(sf::Text::Bold);
-	m_detail_title.setColor((*CurrentGame).m_dico_colors[Color_Green_System]);
-	m_detail_title.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5 + 8, m_detail_panel->m_position.y - m_detail_panel->m_shape_container.getSize().y * 0.5 + 8));
+	m_detail_title.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);
+	m_detail_title.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5f + 8, m_detail_panel->m_position.y - m_detail_panel->m_shape_container.getSize().y * 0.5f + 8));
 
 	string description = upgrade->m_description;
 	description = StringCut(description, 44);
@@ -245,8 +245,8 @@ void DockyardInterface::InitDetail(Upgrade* upgrade)
 	m_detail_body.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_detail_body.setCharacterSize(16);
 	m_detail_body.setStyle(sf::Text::Bold);
-	m_detail_body.setColor(sf::Color::White);
-	m_detail_body.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5 + 8, m_detail_title.getPosition().y + m_detail_title.getCharacterSize() + 10));
+	m_detail_body.setFillColor(sf::Color::White);
+	m_detail_body.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5f + 8, m_detail_title.getPosition().y + m_detail_title.getCharacterSize() + 10));
 
 	if (upgrade->m_upgrade_required.compare("0") != 0)
 	{
@@ -261,7 +261,7 @@ void DockyardInterface::InitDetail(Upgrade* upgrade)
 				m_detail_requirement.setFont(*(*CurrentGame).m_font[Font_Arial]);
 				m_detail_requirement.setCharacterSize(16);
 				m_detail_requirement.setStyle(sf::Text::Bold);
-				m_detail_requirement.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5 + 8, m_detail_body.getPosition().y + m_detail_body.getGlobalBounds().height + 10));
+				m_detail_requirement.setPosition(sf::Vector2f(m_detail_panel->m_position.x - m_detail_panel->m_shape_container.getSize().x * 0.5f + 8, m_detail_body.getPosition().y + m_detail_body.getGlobalBounds().height + 10));
 				
 				//set color (red = upgrade required not owned)
 				bool found = false;
@@ -269,14 +269,14 @@ void DockyardInterface::InitDetail(Upgrade* upgrade)
 				{
 					if ((*it)[Upgrade_ID].compare((*it2)->m_type) == 0)
 					{
-						m_detail_requirement.setColor(sf::Color::White);
+						m_detail_requirement.setFillColor(sf::Color::White);
 						found = true;
 						break;
 					}
 				}
 				if (found == false)
 				{
-					m_detail_requirement.setColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
+					m_detail_requirement.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Impossible]);
 				}
 				
 				break;

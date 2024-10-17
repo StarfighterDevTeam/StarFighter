@@ -25,7 +25,7 @@ void CrewUnboardInterface::Destroy()
 
 	m_panel = NULL;
 
-	for (int i = 0; i < m_crew_slots.size(); i++)
+	for (int i = 0; i < (int)m_crew_slots.size(); i++)
 	{
 		delete m_crew_slots[i];
 	}
@@ -67,11 +67,11 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 	//background panel
 	m_panel = new GameEntity(UI_None);
 	m_panel->m_shape_container.setSize(sf::Vector2f(CREWUNBOARDINTERFACE_SIZE_X, CREWUNBOARDINTERFACE_SIZE_Y));
-	m_panel->m_shape_container.setOrigin(sf::Vector2f(CREWUNBOARDINTERFACE_SIZE_X * 0.5, CREWUNBOARDINTERFACE_SIZE_Y * 0.5));
+	m_panel->m_shape_container.setOrigin(sf::Vector2f(CREWUNBOARDINTERFACE_SIZE_X * 0.5f, CREWUNBOARDINTERFACE_SIZE_Y * 0.5f));
 	m_panel->m_shape_container.setFillColor(sf::Color::Black);
 	m_panel->m_shape_container.setOutlineThickness(2);
 	m_panel->m_shape_container.setOutlineColor(sf::Color::Black);
-	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - CREWUNBOARDINTERFACE_SIZE_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
+	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - CREWUNBOARDINTERFACE_SIZE_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
 	
 	//narrative text
@@ -114,17 +114,17 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 		}
 	}
 	
-	float offset_y = m_panel->m_position.y - CREWUNBOARDINTERFACE_SIZE_Y * 0.5;
-	offset_y += 20;
+	float offset_y = m_panel->m_position.y - 1.f * CREWUNBOARDINTERFACE_SIZE_Y * 0.5f;
+	offset_y += 20.f;
 	m_narrative_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_narrative_text.setCharacterSize(18);
 	m_narrative_text.setStyle(sf::Text::Bold);
-	m_narrative_text.setColor(sf::Color::White);
+	m_narrative_text.setFillColor(sf::Color::White);
 	m_narrative_text.setString(ss_narrative.str());
-	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5 + 20, offset_y));
+	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - 1.f * CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20.f, offset_y));
 
-	float prisoners_offset_x = m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20;
-	offset_y += 90;
+	float prisoners_offset_x = m_panel->m_position.x - 1.f * CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20.f;
+	offset_y += 90.f;
 	
 	//crew unboarding
 	if (location != NULL)
@@ -136,23 +136,23 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 		m_crew_slot_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_crew_slot_text.setCharacterSize(18);
 		m_crew_slot_text.setStyle(sf::Text::Bold);
-		m_crew_slot_text.setColor(sf::Color::White);
+		m_crew_slot_text.setFillColor(sf::Color::White);
 		m_crew_slot_text.setString(ss_slots.str());
-		m_crew_slot_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20, offset_y - m_crew_slot_text.getCharacterSize() * 0.5f));
+		m_crew_slot_text.setPosition(sf::Vector2f(m_panel->m_position.x - 1.f * CREWUNBOARDINTERFACE_SIZE_X * 0.5f + 20.f, offset_y - m_crew_slot_text.getCharacterSize() * 0.5f));
 
 		//crew slots
-		offset_y += m_crew_slot_text.getCharacterSize() + 20;
+		offset_y += 1.f * m_crew_slot_text.getCharacterSize() + 20.f;
 		int crew_per_line = 10;
 		
 		for (int i = 0; i < m_slots_avaible; i++)
 		{
-			float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5) + ((i % crew_per_line) * (CREWMEMBER_SIZE + 10));
-			float pos_y = offset_y + ((i / crew_per_line) * (CREWMEMBER_SIZE + 10));
+			float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5f) + 1.f * ((i % crew_per_line) * (CREWMEMBER_SIZE + 10.f));
+			float pos_y = offset_y + (1.f * (i / crew_per_line) * (CREWMEMBER_SIZE + 10.f));
 			offset_y = Maxf(offset_y, pos_y);
 
 			GameEntity* crew_slot = new GameEntity(UI_None);
-			crew_slot->m_shape_container.setSize(sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE));
-			crew_slot->m_shape_container.setOrigin(sf::Vector2f(CREWMEMBER_SIZE * 0.5, CREWMEMBER_SIZE * 0.5));
+			crew_slot->m_shape_container.setSize(sf::Vector2f(1.f * CREWMEMBER_SIZE, 1.f * CREWMEMBER_SIZE));
+			crew_slot->m_shape_container.setOrigin(sf::Vector2f(1.f * CREWMEMBER_SIZE * 0.5f, 1.f * CREWMEMBER_SIZE * 0.5f));
 			crew_slot->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 			crew_slot->m_shape_container.setOutlineThickness(2);
 			crew_slot->m_shape_container.setOutlineColor(sf::Color::Black);
@@ -163,7 +163,7 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 	}
 
 	//choices
-	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
+	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30.f;
 	string choicesID[NB_CHOICES_MAX];
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
@@ -207,7 +207,7 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location, Ship* other_ship
 		}
 
 		m_choices[k].Init(k, choicesID[i]);
-		m_choices[k].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (k * CHOICE_PANEL_SIZE_Y)));
+		m_choices[k].SetPosition(sf::Vector2f(prisoners_offset_x + 1.f * CHOICE_PANEL_SIZE_X * 0.5f + 50.f + 1.f * CREWINTERFACE_SIZE_X, offset_y + 1.f * (k * CHOICE_PANEL_SIZE_Y)));
 		k++;
 	}
 }
@@ -239,8 +239,8 @@ Choice* CrewUnboardInterface::Update(sf::Time deltaTime)
 			m_crew_interface.Init((*it));
 			m_crew_interface.Update();
 
-			float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20;
-			m_crew_interface.SetPosition(sf::Vector2f(pos_x, (m_choices[0].m_picture->getPosition().y - CHOICE_PANEL_SIZE_Y * 0.5 + CREWINTERFACE_SIZE_Y * 0.5)));// +m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5));
+			float pos_x = m_panel->m_position.x - 1.f * PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20.f;
+			m_crew_interface.SetPosition(sf::Vector2f(pos_x, (m_choices[0].m_picture->getPosition().y - 1.f * CHOICE_PANEL_SIZE_Y * 0.5f + 1.f * CREWINTERFACE_SIZE_Y * 0.5f)));// +m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5f - CREWMEMBER_SIZE * 0.5f));
 		}
 		else if ((*it)->IsHoveredByMouse() == false && m_crew_interface.m_crew == *it)
 		{
@@ -328,7 +328,7 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 
 bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
 {
-	if (crew->m_is_prisoner == false && m_unboarded.size() < m_slots_avaible)
+	if (crew->m_is_prisoner == false && (int)m_unboarded.size() < m_slots_avaible)
 	{
 		for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 		{

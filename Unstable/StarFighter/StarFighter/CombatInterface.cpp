@@ -75,57 +75,57 @@ void CombatInterface::Init(Ship* ship)
 	Texture* texture_sonar = TextureLoader::getInstance()->loadTexture("2D/icon_sonar.png", 30, 30);
 	Texture* texture_combat = TextureLoader::getInstance()->loadTexture("2D/icon_combat.png", 30, 30);
 
-	float offset = ship->m_alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
+	float offset = ship->m_alliance == Alliance_Player ? 1.f * COMBAT_LIFEBAR_OFFSET_X : 1.f * COMBAT_LIFEBAR_ENEMY_OFFSET_X;
 
 	//ship name & info
 	m_ship_name = new GameEntity(UI_None);
 	m_ship_name->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_ship_name->m_text.setCharacterSize(20);
-	m_ship_name->m_text.setColor(sf::Color::Black);
+	m_ship_name->m_text.setFillColor(sf::Color::Black);
 	m_ship_name->m_text.setString(ship->m_display_name);
-	m_ship_name->m_text.setPosition(sf::Vector2f(offset - m_ship_name->m_text.getGlobalBounds().width * 0.5f, COMBAT_INTERFACE_OFFSET_Y));
+	m_ship_name->m_text.setPosition(sf::Vector2f(offset - m_ship_name->m_text.getGlobalBounds().width * 0.5f, 1.f * COMBAT_INTERFACE_OFFSET_Y));
 
 	m_ship_info = new GameEntity(UI_None);
 	m_ship_info->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_ship_info->m_text.setCharacterSize(18);
 	m_ship_info->m_text.setStyle(sf::Text::Italic);
-	m_ship_info->m_text.setColor(sf::Color::Black);
+	m_ship_info->m_text.setFillColor(sf::Color::Black);
 	m_ship_info->m_text.setString((*CurrentGame).m_dico_ship_class[ship->m_type]);
-	m_ship_info->m_text.setPosition(sf::Vector2f(offset - m_ship_info->m_text.getGlobalBounds().width * 0.5f, COMBAT_INTERFACE_OFFSET_Y + m_ship_info->m_text.getCharacterSize() + 8.f));
+	m_ship_info->m_text.setPosition(sf::Vector2f(offset - m_ship_info->m_text.getGlobalBounds().width * 0.5f, 1.f * COMBAT_INTERFACE_OFFSET_Y + m_ship_info->m_text.getCharacterSize() + 8.f));
 	
 	//life bar
 	m_lifebar = new GameEntity(UI_None);
-	m_lifebar->m_shape_container.setSize(sf::Vector2f(COMBAT_LIFEBAR_SIZE_X, COMBAT_LIFEBAR_SIZE_Y));
-	m_lifebar->m_shape_container.setOrigin(sf::Vector2f(COMBAT_LIFEBAR_SIZE_X * 0.5f, COMBAT_LIFEBAR_SIZE_Y * 0.5f));
-	m_lifebar->m_shape_container.setPosition(sf::Vector2f(offset, COMBAT_INTERFACE_OFFSET_Y + 50 + COMBAT_LIFEBAR_SIZE_Y));
+	m_lifebar->m_shape_container.setSize(sf::Vector2f(1.f * COMBAT_LIFEBAR_SIZE_X, 1.f * COMBAT_LIFEBAR_SIZE_Y));
+	m_lifebar->m_shape_container.setOrigin(sf::Vector2f(1.f * COMBAT_LIFEBAR_SIZE_X * 0.5f, 1.f * COMBAT_LIFEBAR_SIZE_Y * 0.5f));
+	m_lifebar->m_shape_container.setPosition(sf::Vector2f(offset, 1.f * COMBAT_INTERFACE_OFFSET_Y + 50.f + 1.f * COMBAT_LIFEBAR_SIZE_Y));
 	m_lifebar->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 	m_lifebar->m_shape_container.setOutlineThickness(2.f);
 	m_lifebar->m_shape_container.setOutlineColor(sf::Color::Black);
 	sf::Vector2f lifebar_pos = m_lifebar->m_shape_container.getPosition();
 
-	m_lifebar->m_shape.setSize(sf::Vector2f(COMBAT_LIFEBAR_SIZE_X, COMBAT_LIFEBAR_SIZE_Y));
-	m_lifebar->m_shape.setOrigin(sf::Vector2f(COMBAT_LIFEBAR_SIZE_X * 0.5f, COMBAT_LIFEBAR_SIZE_Y * 0.5f));
+	m_lifebar->m_shape.setSize(sf::Vector2f(1.f * COMBAT_LIFEBAR_SIZE_X, 1.f * COMBAT_LIFEBAR_SIZE_Y));
+	m_lifebar->m_shape.setOrigin(sf::Vector2f(1.f * COMBAT_LIFEBAR_SIZE_X * 0.5f, 1.f * COMBAT_LIFEBAR_SIZE_Y * 0.5f));
 	m_lifebar->m_shape.setPosition(lifebar_pos);
 	m_lifebar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Green_Lifebar]);
 
 	m_lifebar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_lifebar->m_text.setCharacterSize(14);
-	m_lifebar->m_text.setColor(sf::Color::Black);
+	m_lifebar->m_text.setFillColor(sf::Color::Black);
 
 	m_lifebar->m_position = lifebar_pos;
 
 	//flood bar
 	m_floodbar = new GameEntity(UI_None);
-	m_floodbar->m_shape_container.setSize(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
-	m_floodbar->m_shape_container.setOrigin(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X * 0.5f, COMBAT_FLOODBAR_SIZE_Y * 0.5f));
-	m_floodbar->m_shape_container.setPosition(sf::Vector2f(offset, m_lifebar->m_shape_container.getPosition().y + (COMBAT_LIFEBAR_SIZE_Y + COMBAT_FLOODBAR_SIZE_Y + m_lifebar->m_shape_container.getOutlineThickness()) * 0.5f));
+	m_floodbar->m_shape_container.setSize(sf::Vector2f(1.f * COMBAT_FLOODBAR_SIZE_X, 1.f * COMBAT_FLOODBAR_SIZE_Y));
+	m_floodbar->m_shape_container.setOrigin(sf::Vector2f(1.f * COMBAT_FLOODBAR_SIZE_X * 0.5f, 1.f * COMBAT_FLOODBAR_SIZE_Y * 0.5f));
+	m_floodbar->m_shape_container.setPosition(sf::Vector2f(offset, m_lifebar->m_shape_container.getPosition().y + (1.f * COMBAT_LIFEBAR_SIZE_Y + 1.f * COMBAT_FLOODBAR_SIZE_Y + m_lifebar->m_shape_container.getOutlineThickness()) * 0.5f));
 	m_floodbar->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 	m_floodbar->m_shape_container.setOutlineThickness(2.f);
 	m_floodbar->m_shape_container.setOutlineColor(sf::Color::Black);
 	sf::Vector2f floodbar_pos = m_floodbar->m_shape_container.getPosition();
 
-	m_floodbar->m_shape.setSize(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
-	m_floodbar->m_shape.setOrigin(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X * 0.5f, COMBAT_FLOODBAR_SIZE_Y * 0.5f));
+	m_floodbar->m_shape.setSize(sf::Vector2f(1.f * COMBAT_FLOODBAR_SIZE_X, 1.f * COMBAT_FLOODBAR_SIZE_Y));
+	m_floodbar->m_shape.setOrigin(sf::Vector2f(1.f * COMBAT_FLOODBAR_SIZE_X * 0.5f, 1.f * COMBAT_FLOODBAR_SIZE_Y * 0.5f));
 	m_floodbar->m_shape.setPosition(floodbar_pos);
 	m_floodbar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
 
@@ -136,32 +136,32 @@ void CombatInterface::Init(Ship* ship)
 	//crew bar
 	m_crewbar = new GameEntity(UI_None);
 	m_crewbar->setAnimation(texture_crew, 1, 1);
-	m_crewbar->setPosition(sf::Vector2f(offset - COMBAT_LIFEBAR_SIZE_X * 0.5f + 16, floodbar_pos.y + COMBAT_LIFEBAR_SIZE_Y * 0.5f + 16));
+	m_crewbar->setPosition(sf::Vector2f(offset - 1.f * COMBAT_LIFEBAR_SIZE_X * 0.5f + 16.f, floodbar_pos.y + 1.f * COMBAT_LIFEBAR_SIZE_Y * 0.5f + 16.f));
 
 	m_crewbar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_crewbar->m_text.setCharacterSize(20);
-	m_crewbar->m_text.setColor(sf::Color::White);
-	m_crewbar->m_text.setPosition(sf::Vector2f(m_crewbar->getPosition().x + m_crewbar->m_size.x * 0.5 + 4, m_crewbar->getPosition().y - 14));
+	m_crewbar->m_text.setFillColor(sf::Color::White);
+	m_crewbar->m_text.setPosition(sf::Vector2f(m_crewbar->getPosition().x + m_crewbar->m_size.x * 0.5f + 4.f, m_crewbar->getPosition().y - 14.f));
 
 	//combat strength
 	m_combatStrength = new GameEntity(UI_Combat);
 	m_combatStrength->setAnimation(texture_combat, 1, 1);
-	m_combatStrength->setPosition(sf::Vector2f(m_crewbar->m_text.getPosition().x + spacing_x + m_combatStrength->m_size.x * 0.5, m_crewbar->getPosition().y));
+	m_combatStrength->setPosition(sf::Vector2f(m_crewbar->m_text.getPosition().x + spacing_x + m_combatStrength->m_size.x * 0.5f, m_crewbar->getPosition().y));
 
 	m_combatStrength->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_combatStrength->m_text.setCharacterSize(20);
-	m_combatStrength->m_text.setColor(sf::Color::White);
-	m_combatStrength->m_text.setPosition(sf::Vector2f(m_combatStrength->getPosition().x + m_combatStrength->m_size.x * 0.5 + 2, m_crewbar->m_text.getPosition().y));
+	m_combatStrength->m_text.setFillColor(sf::Color::White);
+	m_combatStrength->m_text.setPosition(sf::Vector2f(m_combatStrength->getPosition().x + m_combatStrength->m_size.x * 0.5f + 2.f, m_crewbar->m_text.getPosition().y));
 
 	//sonar range
 	m_sonar = new GameEntity(UI_Sonar);
 	m_sonar->setAnimation(texture_sonar, 1, 1);
-	m_sonar->setPosition(sf::Vector2f(m_combatStrength->m_text.getPosition().x + spacing_x + m_sonar->m_size.x * 0.5, m_crewbar->getPosition().y));
+	m_sonar->setPosition(sf::Vector2f(m_combatStrength->m_text.getPosition().x + spacing_x + m_sonar->m_size.x * 0.5f, m_crewbar->getPosition().y));
 
 	m_sonar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_sonar->m_text.setCharacterSize(20);
-	m_sonar->m_text.setColor(sf::Color::White);
-	m_sonar->m_text.setPosition(sf::Vector2f(m_sonar->getPosition().x + m_sonar->m_size.x * 0.5 + 2, m_crewbar->m_text.getPosition().y));
+	m_sonar->m_text.setFillColor(sf::Color::White);
+	m_sonar->m_text.setPosition(sf::Vector2f(m_sonar->getPosition().x + m_sonar->m_size.x * 0.5f + 2.f, m_crewbar->m_text.getPosition().y));
 
 	//distance interface
 	//m_distance_line = new GameEntity(UI_None);
@@ -203,7 +203,7 @@ void CombatInterface::Init(Ship* ship)
 	//
 	//		m_distance_ships[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	//		m_distance_ships[i]->m_text.setCharacterSize(20);
-	//		m_distance_ships[i]->m_text.setColor(sf::Color::Black);
+	//		m_distance_ships[i]->m_text.setFillColor(sf::Color::Black);
 	//		m_distance_ships[i]->m_text.setPosition(m_distance_ships[i]->m_position);
 	//	}
 	//}
@@ -214,7 +214,7 @@ void CombatInterface::Update()
 	if (m_ship == NULL)
 		return;
 
-	float threshold[3] = { 0.7, 0.5, 0.3 };
+	float threshold[3] = { 0.7f, 0.5f, 0.3f };
 
 	//size of life bar
 	Bound(m_ship->m_health, 0, m_ship->m_health_max);

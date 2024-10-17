@@ -1,6 +1,12 @@
 #include "Game.h"
 #define stringify(x)  #x
 
+#include "FX.h"
+#include "SFTextPop.h"
+#include "RoomTile.h"
+#include "Ammo.h"
+#include "WaterZone.h"
+
 const char* GameObjectTypeValues[] =
 {
 	stringify(BackgroundObject),
@@ -16,7 +22,7 @@ Game::Game(RenderWindow& window)
 	m_mouse_click = Mouse_None;
 
 	m_window = &window;
-	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y);
 	m_mainScreen.setSmooth(true);
 
 	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
@@ -259,7 +265,7 @@ Game::~Game()
 
 void Game::SetSFXVolume(bool activate_sfx)
 {
-	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[0].setVolume(1.f * DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()
@@ -269,8 +275,8 @@ int Game::LoadSFX()
 
 	m_sounds[0].setBuffer(m_soundBuffers[0]);
 
-	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
-	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	m_sounds[0].setVolume(1.f * DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	//soundsSwitch.setVolume(1.f * DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
 	return 0;
 }
@@ -283,7 +289,7 @@ void Game::PlaySFX(SFX_Bank sfx_name)
 
 void Game::SetMusicVolume(bool activate_music)
 {
-	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
+	m_curMusic.setVolume(1.f * DEFAULT_MUSIC_VOLUME * activate_music);
 }
 
 void Game::PlayMusic(Music_Bank music, string specific_filename)

@@ -46,13 +46,13 @@ void WeaponInterface::Init(CrewMember* crew)
 	m_display_name.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_display_name.setCharacterSize(18);
 	m_display_name.setStyle(sf::Text::Bold);
-	m_display_name.setColor(sf::Color::Black);
+	m_display_name.setFillColor(sf::Color::Black);
 	m_display_name.setString(m_crew->m_display_name);
 	m_display_name.setPosition(sf::Vector2f(CREWINTERFACE_SIZE_X * 0.5f - m_display_name.getGlobalBounds().width * 0.5f, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
 
 	//portrait
 	m_portrait = new GameEntity(UI_None);
-	Texture* texture = TextureLoader::getInstance()->loadTexture(m_crew->m_texture_big_name, CREWINTERFACE_PORTRAIT_SIZE, CREWINTERFACE_PORTRAIT_SIZE);
+	Texture* texture = TextureLoader::getInstance()->loadTexture(m_crew->m_texture_big_name, (int)CREWINTERFACE_PORTRAIT_SIZE, (int)CREWINTERFACE_PORTRAIT_SIZE);
 	m_portrait->setAnimation(texture, 1, 1);
 	offset_y += texture->getSize().y * 0.5f + 28.f;
 	m_portrait->m_position = sf::Vector2f(CREWINTERFACE_SIZE_X * 0.5f, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y);
@@ -69,7 +69,7 @@ void WeaponInterface::Init(CrewMember* crew)
 	m_type_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_type_text.setCharacterSize(16);
 	m_type_text.setStyle(sf::Text::Italic);
-	m_type_text.setColor(sf::Color::Black);
+	m_type_text.setFillColor(sf::Color::Black);
 	m_type_text.setString((*CurrentGame).m_dico_crew_types[m_crew->m_type]);
 	m_type_text.setPosition(sf::Vector2f(CREWINTERFACE_SIZE_X * 0.5f - m_type_text.getGlobalBounds().width * 0.5f, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
 
@@ -78,7 +78,7 @@ void WeaponInterface::Init(CrewMember* crew)
 	m_race_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_race_text.setCharacterSize(16);
 	m_race_text.setStyle(sf::Text::Italic);
-	m_race_text.setColor(sf::Color::Black);
+	m_race_text.setFillColor(sf::Color::Black);
 	m_race_text.setString((*CurrentGame).m_dico_crew_races[m_crew->m_race]);
 	m_race_text.setPosition(sf::Vector2f(CREWINTERFACE_SIZE_X * 0.5f - m_race_text.getGlobalBounds().width * 0.5f, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
 
@@ -101,14 +101,14 @@ void WeaponInterface::Init(CrewMember* crew)
 	m_lifebar->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_lifebar->m_text.setCharacterSize(14);
 	m_lifebar->m_text.setStyle(sf::Text::Bold);
-	m_lifebar->m_text.setColor(sf::Color::Black);
+	m_lifebar->m_text.setFillColor(sf::Color::Black);
 
 	//status
 	offset_y += 14.f;
 	m_status_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_status_text.setCharacterSize(16);
 	//m_status_text.setStyle(sf::Text::Bold);
-	m_status_text.setColor(sf::Color::Black);
+	m_status_text.setFillColor(sf::Color::Black);
 	m_status_text.setPosition(sf::Vector2f(0, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
 
 	//skills
@@ -119,7 +119,7 @@ void WeaponInterface::Init(CrewMember* crew)
 		m_skillbar_names[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_skillbar_names[i].setCharacterSize(16);
 		m_skillbar_names[i].setStyle(sf::Text::Italic);
-		m_skillbar_names[i].setColor(sf::Color::Black);
+		m_skillbar_names[i].setFillColor(sf::Color::Black);
 		m_skillbar_names[i].setString((*CurrentGame).m_dico_crew_skills[i]);
 		m_skillbar_names[i].setPosition(sf::Vector2f(CREWINTERFACE_TEXT_OFFSET_X, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
 
@@ -140,7 +140,7 @@ void WeaponInterface::Init(CrewMember* crew)
 
 		m_skillbars[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_skillbars[i]->m_text.setCharacterSize(14);
-		m_skillbars[i]->m_text.setColor(sf::Color::Black);
+		m_skillbars[i]->m_text.setFillColor(sf::Color::Black);
 	}
 }
 
@@ -159,7 +159,7 @@ void WeaponInterface::Update()
 
 	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * CREWINTERFACE_LIFEBAR_SIZE_X, CREWINTERFACE_LIFEBAR_SIZE_Y));
 
-	float threshold[3] = { 0.7, 0.5, 0.3 };
+	float threshold[3] = { 0.7f, 0.5f, 0.3f };
 	if (life_ratio >= threshold[1])
 	{
 		m_lifebar->m_shape.setFillColor(sf::Color::Green);
@@ -188,17 +188,17 @@ void WeaponInterface::Update()
 	else if (tile->m_is_pierced == true && tile->m_health < tile->m_health_max)
 	{
 		status = "Repairing hull";
-		m_status_text.setColor(sf::Color::Black);
+		m_status_text.setFillColor(sf::Color::Black);
 	}
 	else if (tile->m_system_tile != NULL && tile->m_system_tile->m_weapon != NULL && tile->m_system_tile->m_weapon->m_health > 0)
 	{
 		status = "Gunner";
-		m_status_text.setColor(sf::Color::Red);
+		m_status_text.setFillColor(sf::Color::Red);
 	}
 	else
 	{
 		status = "Idle";
-		m_status_text.setColor(sf::Color::Black);
+		m_status_text.setFillColor(sf::Color::Black);
 	}
 
 	m_status_text.setString(status);

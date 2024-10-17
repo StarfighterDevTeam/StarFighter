@@ -65,7 +65,7 @@ void SFTextPop::Update(Time deltaTime)
 			m_alpha = 0;
 		}
 
-		setColor(Color(getColor().r, getColor().g, getColor().b, m_alpha));
+		setFillColor(Color(getFillColor().r, getFillColor().g, getFillColor().b, m_alpha));
 	}
 }
 
@@ -78,7 +78,7 @@ SFTextPop* SFTextPop::CreateSFTextPop(const Font& font, unsigned int size, Uint3
 	text->setFont(font);
 	text->setCharacterSize(size);
 	text->setStyle(style);
-	text->setColor(color);
+	text->setFillColor(color);
 	text->setString(text_string);
 	text->setPosition(sf::Vector2f(target->m_position.x - text->getGlobalBounds().width * 0.5f, target->m_position.y - (target->m_shape_container.getSize().y * 0.5f) - offset_positionY));
 

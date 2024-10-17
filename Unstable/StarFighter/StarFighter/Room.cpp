@@ -13,7 +13,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type,
 	m_is_flooded = false;
 	m_alliance = alliance;
 
-	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
+	m_size = sf::Vector2f(1.f * ROOMTILE_SIZE * width, 1.f * ROOMTILE_SIZE * height);
 	m_position.x = ROOMTILE_OFFSET_X + (-0.5f + upcorner_x + width * 0.5f) * ROOMTILE_SIZE;
 	m_position.y = ROOMTILE_OFFSET_X + (-0.5f + upcorner_y + height * 0.5f) * ROOMTILE_SIZE;
 
@@ -38,7 +38,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type,
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
-	m_text.setColor(sf::Color::White);
+	m_text.setFillColor(sf::Color::White);
 	m_text.setString((*CurrentGame).m_dico_room_types[type]);
 	m_text.SetPosition(m_position);
 }

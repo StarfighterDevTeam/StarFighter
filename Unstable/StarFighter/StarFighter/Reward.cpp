@@ -2,6 +2,8 @@
 
 extern Game* CurrentGame;
 
+#include "Location.h"
+
 Reward::Reward()
 {
 	m_DMS_location = NULL;
