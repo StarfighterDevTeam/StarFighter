@@ -330,26 +330,26 @@ void Ship::UpdateStrategical(Time deltaTime, DMS_Coord warshipDMS)
 	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
-		int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
+		int minutes = (int)(m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION);
 		m_DMS.m_minute_x += minutes;
 		m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
 	}
 	else if (m_DMS.m_second_x < 0)
 	{
-		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
+		int minutes = (int)((-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION) + 1;
 		m_DMS.m_minute_x -= minutes;
 		m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
 	}
 
 	if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
 	{
-		int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
+		int minutes = (int)(m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION);
 		m_DMS.m_minute_y += minutes;
 		m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
 	}
 	else if (m_DMS.m_second_y < 0)
 	{
-		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
+		int minutes = (int)((-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION) + 1;
 		m_DMS.m_minute_y -= minutes;
 		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
 	}
@@ -2192,7 +2192,7 @@ int Ship::GetDistanceToWaterTile(WaterTile* tile)
 {
 	int diff_x = tile->m_coord_x - m_DMS.m_minute_x;
 	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
-	float distance_f = 1.f * sqrt(diff_x * diff_x + diff_y * diff_y);
+	float distance_f = (float)sqrt(diff_x * diff_x + diff_y * diff_y);
 
 	int distance_i = (int)distance_f;
 
@@ -2219,9 +2219,9 @@ float Ship::GetDistanceSquaredInSecondsDMS(WaterTile* tile)
 
 float Ship::GetDistanceFloatToWaterTile(WaterTile* tile)
 {
-	int diff_x = NB_WATERTILE_SUBDIVISION * (tile->m_coord_x - m_DMS.m_minute_x) - m_DMS.m_second_x;
-	int diff_y = NB_WATERTILE_SUBDIVISION * (tile->m_coord_y - m_DMS.m_minute_y) - m_DMS.m_second_y;
-	float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y) * 1.f / NB_WATERTILE_SUBDIVISION;
+	float diff_x = 1.f * NB_WATERTILE_SUBDIVISION * (tile->m_coord_x - m_DMS.m_minute_x) - m_DMS.m_second_x;
+	float diff_y = 1.f * NB_WATERTILE_SUBDIVISION * (tile->m_coord_y - m_DMS.m_minute_y) - m_DMS.m_second_y;
+	float distance_f = (float)sqrt(diff_x * diff_x + diff_y * diff_y) / NB_WATERTILE_SUBDIVISION;
 
 	return distance_f;
 }

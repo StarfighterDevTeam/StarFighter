@@ -253,26 +253,26 @@ void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
 		//sexadecimal position system
 		if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 		{
-			int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
+			int minutes = (int)(m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION);
 			m_DMS.m_minute_x += minutes;
 			m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
 		}
 		else if (m_DMS.m_second_x < 0)
 		{
-			int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
+			int minutes = (int)((-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION) + 1;
 			m_DMS.m_minute_x -= minutes;
 			m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
 		}
 
 		if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
 		{
-			int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
+			int minutes = (int)(m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION);
 			m_DMS.m_minute_y += minutes;
 			m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
 		}
 		else if (m_DMS.m_second_y < 0)
 		{
-			int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
+			int minutes = (int)((-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION) + 1;
 			m_DMS.m_minute_y -= minutes;
 			m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
 		}
