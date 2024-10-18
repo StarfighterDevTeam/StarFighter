@@ -25,12 +25,21 @@ void PlayerShip::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+	m_DontGarbageMe = true;
 
 	//PIRATE specific
 	m_curForwardSpeed = 10.f;
 	m_targetForwardSpeed = m_curForwardSpeed;
 	m_turnSpeed = 0.1f;
 	m_targetHeadingDegrees = 180.f;
+
+	//setPosition(sf::Vector2f(0, 0));
+	setPosition(MapTile::MapTileCoordToPosition(sf::Vector2u(10, 10)));
+
+	//debug
+	SFText* tileText = new SFText((*CurrentGame).m_font[Font_Arial], 24, sf::Color(Color::White), getPosition(), PlayerTeams::PlayerBlue);
+	(*CurrentGame).addToFeedbacks(tileText);
+	m_textCurTileDebug = tileText;
 }
 
 PlayerShip::PlayerShip(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -66,6 +75,19 @@ void PlayerShip::update(const float DTIME)
 		m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
 		m_movingX = inputs_direction.x != 0;
 		m_movingY = inputs_direction.y != 0;
+	}
+
+	//Current tile
+	if (m_curTile)
+		m_curTile->setColor(sf::Color::White);
+
+	m_curTile = MapTile::PositionToMapTile(getPosition());
+	m_curTile->setColor(sf::Color::Green);
+
+	if (m_textCurTileDebug)
+	{
+		m_textCurTileDebug->setString(to_string(m_curTile->m_coord_x) + " ; " + to_string(m_curTile->m_coord_y));
+		m_textCurTileDebug->setPosition(sf::Vector2f(getPosition().x - 18.f, getPosition().y - 1.f * MAP_TILE_SIZE));
 	}
 
 	//Ship heading

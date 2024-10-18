@@ -19,6 +19,11 @@
 #include "SFTextPop.h"
 
 class PlayerShip;
+class MapTile;
+
+#define	MAP_TILE_SIZE		64
+#define	NB_MAP_TILES_X		60
+#define	NB_MAP_TILES_Y		60
 
 enum SFX_Bank
 {
@@ -120,6 +125,9 @@ public:
 
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
+
+	//PIRATE
+	std::vector<std::vector<MapTile*> > m_mapTiles;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

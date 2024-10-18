@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+#include "MapTile.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -60,11 +61,15 @@ public :
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 
+	//PIRATE
 	float m_curForwardSpeed = 0.f;
 	float m_targetForwardSpeed = 0.f;
 	float m_turnSpeed;
 	float m_curHeadingDegrees = 0.f;//in degrees
 	float m_targetHeadingDegrees = 0.f;//in degrees
+
+	MapTile* m_curTile = nullptr;
+	SFText* m_textCurTileDebug = nullptr;
 
 private:
 	bool m_moving;

@@ -14,15 +14,11 @@ using namespace sf;
 
 enum LayerType {
 	BackgroundLayer,
-	PortalLayer,
+	MapTileLayer,
 	PlayerStroboscopicLayer,
-	ExplosionLayer,
-	EnemyObjectLayer,
-	AuraLayer,
-	FeedbacksLayer,
-	FriendlyFireLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
+	FeedbacksLayer,
 
 	PanelLayer,
 	HudObject,
