@@ -226,7 +226,7 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 
 void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type)
 {
-	assert(((int)new_layer >= 0 && (int)new_layer < NBVAL_Layer) && (new_type >= 0 && new_type < NBVAL_GameObject));
+	assert(((int)new_layer >= 0 && (int)new_layer < NBVAL_Layer) && ((int)new_type >= 0 && (int)new_type < NBVAL_GameObject));
 	{
 		m_sceneGameObjectsLayeredTemp[(int)new_layer].push_back(object);
 		m_sceneGameObjectsTypedTemp[(int)new_type].push_back(object);
@@ -508,13 +508,13 @@ void Game::cleanGarbage()
 	const size_t garbageSize = m_garbage.size();
 	const size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	//Size layer
-	size_t sceneGameObjectsLayeredSize[NBVAL_Layer];
+	size_t sceneGameObjectsLayeredSize[NBVAL_Layer] = {0};
 	for (int layer = 0; layer < NBVAL_Layer; layer++)
 	{
 		sceneGameObjectsLayeredSize[layer] = m_sceneGameObjectsLayered[layer].size();
 	}
 	//Size ind type
-	size_t sceneGameObjectsTypedSize[NBVAL_GameObject];
+	size_t sceneGameObjectsTypedSize[NBVAL_GameObject] = {0};
 	for (int layer = 0; layer < NBVAL_GameObject; layer++)
 	{
 		sceneGameObjectsTypedSize[layer] = m_sceneGameObjectsTyped[layer].size();
