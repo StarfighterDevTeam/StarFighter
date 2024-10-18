@@ -101,7 +101,7 @@
     <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
     <ClCompile Include="SFTextPop.cpp" />
-    <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="PlayerShip.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
@@ -123,7 +123,7 @@
     <ClInclude Include="SFPanelSpecific.h" />
     <ClInclude Include="SFText.h" />
     <ClInclude Include="SFTextPop.h" />
-    <ClInclude Include="Ship.h" />
+    <ClInclude Include="PlayerShip.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />

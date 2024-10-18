@@ -6,7 +6,7 @@
 #include <sstream>
 #include "Game.h"
 #include "FileLoadUtils.h"
-#include "Ship.h"
+#include "PlayerShip.h"
 
 class Gameloop
 {

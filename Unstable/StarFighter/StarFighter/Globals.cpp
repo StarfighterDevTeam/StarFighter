@@ -226,7 +226,7 @@ float GetAngleAbsDeltaToTarget(float angle_input, float angle_target)
 	return abs(delta);
 }
 
-void Bound(float& input, float min, float max)
+float Bound(const float input, float min, float max)
 {
 	if (min > max)
 	{
@@ -236,10 +236,12 @@ void Bound(float& input, float min, float max)
 	}
 
 	if (input < min)
-		input = min;
+		return min;
 
 	if (input > max)
-		input = max;
+		return max;
+
+	return input;
 }
 
 void BoundAngle(float& input, float max_angle)
@@ -660,4 +662,15 @@ bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f ar
 	}
 
 	return is_inside_area;
+}
+
+float ComputeDeltaAngleInDegrees(const float angleDegreesA, const float angleDegreesB)
+{
+	const float deltaAngle = angleDegreesB - angleDegreesA;
+	if (deltaAngle >= 180)
+		return deltaAngle - 360.f;
+	else if (deltaAngle <= -180)
+		return deltaAngle + 360.f;
+	else
+		return deltaAngle;
 }

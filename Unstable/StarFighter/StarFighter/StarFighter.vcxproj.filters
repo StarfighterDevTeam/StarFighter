@@ -45,7 +45,7 @@
     <ClCompile Include="CollisionUtils.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Ship.cpp">
+    <ClCompile Include="PlayerShip.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
@@ -104,7 +104,7 @@
     <ClInclude Include="CollisionUtils.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Ship.h">
+    <ClInclude Include="PlayerShip.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Stroboscopic.h">

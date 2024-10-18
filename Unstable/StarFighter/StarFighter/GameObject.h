@@ -35,11 +35,11 @@ enum GameObjectType {
 	PortalObject,
 	ShopObject,
 	LootObject,
-	PlayerShip,
-	FakePlayerShip,
-	FriendlyFire,
-	Neutral,
-	EnemyFire,
+	PlayerShipObject,
+	FakePlayerShipObject,
+	FriendlyFireObject,
+	NeutralObject,
+	EnemyFireObject,
 	EnemyObject,
 	NBVAL_GameObject
 };

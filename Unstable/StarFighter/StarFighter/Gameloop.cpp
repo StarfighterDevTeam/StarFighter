@@ -10,8 +10,8 @@ Gameloop::Gameloop()
 	(*CurrentGame).m_map_size = m_background->m_size;
 
 	//ship
-	(*CurrentGame).m_playerShip = new Ship(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "2D/pirate_ship_100_136.png", sf::Vector2u(100, 136));
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	(*CurrentGame).m_playerShip = new PlayerShip(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "2D/pirate_ship_100_136.png", sf::Vector2u(100, 136));
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShipObject);
 }
 
 Gameloop::~Gameloop()

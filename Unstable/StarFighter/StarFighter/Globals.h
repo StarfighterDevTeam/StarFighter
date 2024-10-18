@@ -12,6 +12,8 @@
 #include <fstream>
 #include <iostream>
 
+#define GAME_SPEED			500.f
+
 using namespace sf;
 
 std::string makePath(const std::string& srcPath);
@@ -88,7 +90,7 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
 bool IsInsideAngleCoverage(float angle_input, float angle_coverage, float angle_target);
-void Bound(float& input, float min, float max);
+float Bound(const float input, float min, float max);
 void BoundAngle(float& input, float max_angle);
 bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 
@@ -110,6 +112,7 @@ sf::Vector2f RotateVector(sf::Vector2f vector, float angle_rad);
 void SetVectorRotation(sf::Vector2f* vector, float angle_rad);
 bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x = NULL, float *i_y = NULL);
 float DistancePointToSement(float p0_x, float p0_y, float p_1x, float p_1y, float p_2x, float p_2y, float *i_x = NULL, float *i_y = NULL);
+float ComputeDeltaAngleInDegrees(const float angleDegreesA, const float angleDegreesB);
 
 sf::Uint8* CreateRectangleWithStroke(sf::Vector2u size, sf::Color color, int stroke_size = 0);
 sf::Uint8* CreateCircleWithStroke(int radius, sf::Color color, int stroke_size = 0);

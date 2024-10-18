@@ -1,5 +1,5 @@
-#ifndef SHIP_H_INCLUDED
-#define SHIP_H_INCLUDED
+#ifndef PLAYERSHIP_H_INCLUDED
+#define PLAYERSHIP_H_INCLUDED
 
 #include "Globals.h"
 #include "GameObject.h"
@@ -31,22 +31,15 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
-class Ship : public GameObject
+class PlayerShip : public GameObject
 {
 public :
-	Ship();
-	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size);
+	PlayerShip();
+	PlayerShip(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	PlayerShip(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2u size);
 	void Init();
-	virtual ~Ship();
+	virtual ~PlayerShip();
 	void update(const float DTIME) override;
-	
-	void ManageHudControls(sf::Vector2f inputs_directions);
-	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void IdleDecelleration(const float DTIME);
-	bool ScreenBorderContraints();
-	void MaxSpeedConstraints();
-	void UpdateRotation();
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
@@ -59,13 +52,19 @@ public :
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 
-	static int Ship::SaveShip(Ship* ship);
-	static bool Ship::LoadShip(Ship* ship);
+	static int PlayerShip::SaveShip(Ship* ship);
+	static bool PlayerShip::LoadShip(Ship* ship);
 
 	sf::Clock m_stroboscopic_effect_clock;
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	float m_curForwardSpeed = 0.f;
+	float m_targetForwardSpeed = 0.f;
+	float m_turnSpeed;
+	float m_curHeadingDegrees = 0.f;//in degrees
+	float m_targetHeadingDegrees = 0.f;//in degrees
 
 private:
 	bool m_moving;
@@ -73,4 +72,4 @@ private:
 	bool m_movingY;
 };
 
-#endif // SHIP_H_INCLUDED
+#endif // PLAYERSHIP_H_INCLUDED

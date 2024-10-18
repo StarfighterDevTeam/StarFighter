@@ -73,16 +73,15 @@ int main()
 			}
 		}
 
-		if ((*CurrentGame).m_window_has_focus == true)
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && (*CurrentGame).m_window_has_focus)
 			{
 				renderWindow.close();
 			}
 			else
 			{
 				//Resolution switch
-				if (InputGuy::isChangingResolution())
+				if (InputGuy::isChangingResolution() && (*CurrentGame).m_window_has_focus)
 				{
 					resolution = (WindowResolutions)(((int)resolution + 1) % (NBVAL_RESOLUTIONS - 1));
 					switch (resolution)

@@ -18,7 +18,7 @@
 #include "SFPanel.h"
 #include "SFTextPop.h"
 
-class Ship;
+class PlayerShip;
 
 enum SFX_Bank
 {
@@ -78,7 +78,7 @@ public:
 	float m_vspeed;
 	sf::Vector2f m_scale_factor;
 
-	Ship* m_playerShip;
+	PlayerShip* m_playerShip;
 	bool m_pause;
 	bool m_window_has_focus;
 
