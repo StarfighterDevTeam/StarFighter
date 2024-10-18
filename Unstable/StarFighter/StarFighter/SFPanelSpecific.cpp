@@ -49,7 +49,7 @@ SFPanelSpecific::~SFPanelSpecific()
 	
 }
 
-void SFPanelSpecific::Update(sf::Time deltaTime)
+void SFPanelSpecific::Update(const float DTIME)
 {
 	
 }

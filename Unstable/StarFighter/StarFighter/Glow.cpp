@@ -140,7 +140,7 @@ Glow::~Glow()
 	
 }
 
-void Glow::update(sf::Time deltaTime)
+void Glow::update(const float DTIME)
 {
-	AnimatedSprite::update(deltaTime);
+	AnimatedSprite::update(DTIME);
 }

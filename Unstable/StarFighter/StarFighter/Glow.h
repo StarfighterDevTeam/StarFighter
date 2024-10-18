@@ -14,7 +14,7 @@ public :
 
 	static sf::Uint8* CreateGlowFrame(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size = 0);
 	virtual ~Glow();
-	void update(sf::Time deltaTime) override;
+	void update(const float DTIME) override;
 
 	sf::Color m_color;
 	Uint8 m_glow_radius;

@@ -8,7 +8,7 @@ class SFPanelSpecific : public SFPanel
 public:
 	SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip);
 	~SFPanelSpecific();
-	virtual void Update(sf::Time deltaTime);
+	virtual void Update(const float DTIME);
 	virtual void Draw(sf::RenderTexture& screen);
 
 	SFActionBoxWithSelection* m_actions_with_selection;

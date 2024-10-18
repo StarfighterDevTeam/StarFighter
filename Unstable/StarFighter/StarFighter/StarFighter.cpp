@@ -31,7 +31,7 @@ int main()
 	CurrentGame = new Game(&renderWindow);
 
 	//Elapsed time
-	sf::Time dt;
+	float DTIME = 0.f;
 	sf::Clock deltaClock;
 
 	//Loading InGame state
@@ -126,12 +126,12 @@ int main()
 					renderWindow.setTitle("StarFighter Engine");
 				}
 
-				dt = deltaClock.restart();
+				DTIME = deltaClock.restart().asSeconds();
 
-				if (dt.asSeconds() < 0.3f)
+				if (DTIME < 0.3f)
 				{
 					//Update
-					gameloop->Update(dt);
+					gameloop->Update(DTIME);
 
 					//Draw
 					gameloop->Draw();

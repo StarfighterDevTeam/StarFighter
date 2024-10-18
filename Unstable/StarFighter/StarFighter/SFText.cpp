@@ -14,7 +14,7 @@ SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f 
 	m_GarbageMe = false;
 }
 
-void SFText::update(Time deltaTime)
+void SFText::update(const float DTIME)
 {
 	//see override function in class SFTextPop
 }

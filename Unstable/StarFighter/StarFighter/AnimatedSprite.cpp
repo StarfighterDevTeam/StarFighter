@@ -23,10 +23,10 @@
 
 #include "AnimatedSprite.hpp"
 
-AnimatedSprite::AnimatedSprite(sf::Time frameTime, bool paused, bool looped) :
-m_animation(NULL), m_frameTime(frameTime), m_currentFrame(0), m_isPaused(paused), m_isLooped(looped), m_texture(NULL)
+AnimatedSprite::AnimatedSprite(const float frameTime, bool paused, bool looped) :
+m_animation(NULL), m_frameTime(frameTime), m_currentFrame(0), m_isPaused(paused), m_isLooped(looped), m_texture(NULL), m_currentTime(0), m_colorTimer(0)
 {
-
+	
 }
 
 void AnimatedSprite::setAnimation(const Animation& animation, bool keep_frame_index)
@@ -40,7 +40,7 @@ void AnimatedSprite::setAnimation(const Animation& animation, bool keep_frame_in
 	}
 }
 
-void AnimatedSprite::setFrameTime(sf::Time time)
+void AnimatedSprite::setFrameTime(const float time)
 {
 	m_frameTime = time;
 }
@@ -74,7 +74,7 @@ void AnimatedSprite::setLooped(bool looped)
 	m_isLooped = looped;
 }
 
-void AnimatedSprite::setColor(const sf::Color& color, sf::Time color_timer)
+void AnimatedSprite::setColor(const sf::Color& color, const float color_timer)
 {
 	// Update the vertices' color
 	m_vertices[0].color = color;
@@ -82,10 +82,10 @@ void AnimatedSprite::setColor(const sf::Color& color, sf::Time color_timer)
 	m_vertices[2].color = color;
 	m_vertices[3].color = color;
 
-	if (color_timer > sf::seconds(0))
+	if (color_timer > 0)
 	{
 		m_color = color;
-		m_color_timer = color_timer;
+		m_colorTimer = color_timer;
 	}
 }
 
@@ -121,7 +121,7 @@ bool AnimatedSprite::isPlaying() const
 	return !m_isPaused;
 }
 
-sf::Time AnimatedSprite::getFrameTime() const
+float AnimatedSprite::getFrameTime() const
 {
 	return m_frameTime;
 }
@@ -150,22 +150,21 @@ void AnimatedSprite::setFrame(std::size_t newFrame, bool resetTime)
 	}
 
 	if (resetTime)
-		m_currentTime = sf::Time::Zero;
+		m_currentTime = 0.f;
 }
 
-void AnimatedSprite::update(sf::Time deltaTime)
+void AnimatedSprite::update(const float DTIME)
 {
 	// if not paused and we have a valid animation
 	if (!m_isPaused && m_animation)
 	{
 		// add delta time
-		m_currentTime += deltaTime;
+		m_currentTime += DTIME;
 
 		// if current time is bigger then the frame time advance one frame
 		if (m_currentTime >= m_frameTime)
 		{
-			// reset time, but keep the remainder
-			m_currentTime = sf::microseconds(m_currentTime.asMicroseconds() % m_frameTime.asMicroseconds());
+			m_currentTime -= m_frameTime;
 
 			// get next Frame index
 			if (m_currentFrame + 1 < m_animation->getSize())

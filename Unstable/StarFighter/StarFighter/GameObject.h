@@ -62,8 +62,8 @@ public:
 
 	~GameObject();
 
-	virtual void update(sf::Time deltaTime);
-	virtual void updateAnimation(sf::Time deltaTime);
+	virtual void update(const float DTIME);
+	virtual void updateAnimation(const float DTIME);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
 
 	bool m_visible;

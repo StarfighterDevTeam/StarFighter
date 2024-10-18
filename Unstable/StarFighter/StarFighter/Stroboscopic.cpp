@@ -26,9 +26,9 @@ Stroboscopic::~Stroboscopic()
 	m_alpha = 255;
 }
 
-void Stroboscopic::update(sf::Time deltaTime)
+void Stroboscopic::update(const float DTIME)
 {
-	Uint8 decay = (Uint8)(ceil(deltaTime.asSeconds() * 255 / m_decay_time.asSeconds()));
+	Uint8 decay = (Uint8)(ceil(DTIME * 255 / m_decay_time.asSeconds()));
 	if (m_alpha - decay > 0)
 	{
 		m_alpha -= decay;
@@ -41,5 +41,5 @@ void Stroboscopic::update(sf::Time deltaTime)
 
 	setColor(Color(255, 255, 255, m_alpha));
 
-	AnimatedSprite::update(deltaTime);
+	AnimatedSprite::update(DTIME);
 }

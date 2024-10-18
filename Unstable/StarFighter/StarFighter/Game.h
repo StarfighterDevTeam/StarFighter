@@ -66,7 +66,7 @@ public:
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
 	void changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type);
 
-	void updateScene(Time deltaTime);
+	void updateScene(const float DTIME);
 	void drawScene();
 	void colisionChecksV2();
 	void cleanGarbage();
@@ -84,7 +84,7 @@ public:
 
 	sf::Vector2f m_mouse_pos;
 	MouseAction m_mouse_click;
-	void GetMouseInputs(sf::Time deltaTime);
+	void GetMouseInputs(const float DTIME);
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;
@@ -116,7 +116,7 @@ public:
 
 	void SetMusicVolume(bool activate_music);
 	void PlayMusic(Music_Bank music, string specific_filename = "");
-	void ManageMusicTransitions(sf::Time deltaTime);
+	void ManageMusicTransitions(const float DTIME);
 
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;

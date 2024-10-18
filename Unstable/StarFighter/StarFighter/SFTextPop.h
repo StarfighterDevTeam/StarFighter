@@ -11,7 +11,7 @@ public:
 	SFTextPop() = default;
 	SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target, float offset_positionY);
 	~SFTextPop() {};
-	void update(Time deltaTime) override;
+	void update(const float DTIME) override;
 
 	float m_distance_not_faded;
 	float m_distance_faded;

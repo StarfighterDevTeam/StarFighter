@@ -167,7 +167,7 @@ GameObject::~GameObject()
 	//delete this->weapon_loot;
 }
 
-void GameObject::update(sf::Time deltaTime)
+void GameObject::update(const float DTIME)
 {
 	m_previous_speed = m_speed;
 
@@ -175,20 +175,20 @@ void GameObject::update(sf::Time deltaTime)
 	newspeed = m_speed;
 	
 	//Basic movement (initial vector)
-	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*DTIME;
+	newposition.y = getPosition().y + (newspeed.y)*DTIME;
 
 	setPosition(newposition.x, newposition.y);
 
 	if (m_frameNumber > 1)
 	{
-		AnimatedSprite::update(deltaTime);
+		AnimatedSprite::update(DTIME);
 	}
 }
 
-void GameObject::updateAnimation(sf::Time deltaTime)
+void GameObject::updateAnimation(const float DTIME)
 {
-	AnimatedSprite::update(deltaTime);
+	AnimatedSprite::update(DTIME);
 }
 
 void GameObject::setGhost(bool ghost)

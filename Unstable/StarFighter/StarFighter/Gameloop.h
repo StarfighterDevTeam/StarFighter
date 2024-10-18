@@ -14,9 +14,9 @@ public:
 	Gameloop();
 	~Gameloop();
 	
-	void Update(sf::Time deltaTime);
+	void Update(const float DTIME);
 	void Draw();
-	void UpdateCamera(sf::Time deltaTime);
+	void UpdateCamera(const float DTIME);
 
 	GameObject* m_background;
 

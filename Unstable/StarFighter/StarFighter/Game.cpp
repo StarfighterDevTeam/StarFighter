@@ -120,7 +120,7 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 	m_asking_music_fade_out = true;
 }
 
-void Game::ManageMusicTransitions(sf::Time deltaTime)
+void Game::ManageMusicTransitions(const float DTIME)
 {
 	if (!m_Music_Activated)
 		return;
@@ -128,7 +128,7 @@ void Game::ManageMusicTransitions(sf::Time deltaTime)
 	//fade out previous music
 	if (m_asking_music_fade_out)
 	{
-		float volume_change = 100.f / MUSIC_FADE_OUT_TIME * deltaTime.asSeconds();
+		float volume_change = 100.f / MUSIC_FADE_OUT_TIME * DTIME;
 		if (m_music_fader - volume_change > 0)
 		{
 			m_music_fader -= volume_change;
@@ -148,7 +148,7 @@ void Game::ManageMusicTransitions(sf::Time deltaTime)
 	//fade in new music
 	if (!m_asking_music_fade_out && m_music_fader < 100)
 	{
-		float volume_change = 100.f / MUSIC_FADE_IN_TIME * deltaTime.asSeconds();
+		float volume_change = 100.f / MUSIC_FADE_IN_TIME * DTIME;
 		if (m_music_fader + volume_change < 100)
 		{
 			m_music_fader += volume_change;
@@ -233,7 +233,7 @@ void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, Gam
 	}
 }
 
-void Game::updateScene(Time deltaTime)
+void Game::updateScene(const float DTIME)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
@@ -253,7 +253,7 @@ void Game::updateScene(Time deltaTime)
 		if (this->m_sceneGameObjects[i] == NULL)
 			continue;
 
-		this->m_sceneGameObjects[i]->update(deltaTime);
+		this->m_sceneGameObjects[i]->update(DTIME);
 	}
 
 	//SFTextPop (text feedbacks)
@@ -263,14 +263,14 @@ void Game::updateScene(Time deltaTime)
 		if (m_sceneFeedbackSFTexts[i] == NULL)
 			continue;
 
-		m_sceneFeedbackSFTexts[i]->update(deltaTime);
+		m_sceneFeedbackSFTexts[i]->update(DTIME);
 	}
 
 	//Collect the dust
 	collectGarbage();
 
 	//Update music transitions
-	ManageMusicTransitions(deltaTime);
+	ManageMusicTransitions(DTIME);
 
 	//Update view
 	m_mainScreen.setView(m_view);
@@ -767,7 +767,7 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	addToFeedbacks(pop_feedback);
 }
 
-void Game::GetMouseInputs(sf::Time deltaTime)
+void Game::GetMouseInputs(const float DTIME)
 {
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
 	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);

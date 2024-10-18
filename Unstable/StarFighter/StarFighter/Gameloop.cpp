@@ -19,13 +19,13 @@ Gameloop::~Gameloop()
 	delete m_background;
 }
 
-void Gameloop::Update(sf::Time deltaTime)
+void Gameloop::Update(const float DTIME)
 {
-	(*CurrentGame).GetMouseInputs(deltaTime);
+	(*CurrentGame).GetMouseInputs(DTIME);
 
-	(*CurrentGame).updateScene(deltaTime);
+	(*CurrentGame).updateScene(DTIME);
 
-	UpdateCamera(deltaTime);
+	UpdateCamera(DTIME);
 }
 
 void Gameloop::Draw()
@@ -33,9 +33,9 @@ void Gameloop::Draw()
 	(*CurrentGame).drawScene();
 }
 
-void Gameloop::UpdateCamera(sf::Time deltaTime)
+void Gameloop::UpdateCamera(const float DTIME)
 {
-	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * deltaTime.asSeconds()));
+	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * DTIME, (*CurrentGame).m_playerShip->m_speed.y * DTIME));
 
 	//Map border constraints
 	const float x = (*CurrentGame).m_view.getSize().x / 2;

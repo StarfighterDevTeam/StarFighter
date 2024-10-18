@@ -31,7 +31,7 @@ public:
 	SFText() = default;
 	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
 	~SFText() {};
-	virtual void update(Time deltaTime);
+	virtual void update(const float DTIME);
 
 	bool m_visible;
 	PlayerTeams m_team;

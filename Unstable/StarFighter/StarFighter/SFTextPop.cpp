@@ -31,7 +31,7 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 	}
 }
 
-void SFTextPop::update(Time deltaTime)
+void SFTextPop::update(const float DTIME)
 {
 	float total_pop_distance = m_distance_not_faded + m_distance_faded;
 	float pop_time_not_faded = m_total_pop_time * (m_distance_not_faded / (m_distance_not_faded + m_distance_faded));
@@ -43,12 +43,12 @@ void SFTextPop::update(Time deltaTime)
 	}
 	else
 	{
-		setPosition(sf::Vector2f(getPosition().x, getPosition().y - (total_pop_distance / m_total_pop_time * deltaTime.asSeconds())));
+		setPosition(sf::Vector2f(getPosition().x, getPosition().y - (total_pop_distance / m_total_pop_time * DTIME)));
 	}
 
 	if (m_timer_clock.getElapsedTime().asSeconds() > pop_time_not_faded)
 	{
-		Uint8 decay_ = (Uint8)(ceil(deltaTime.asSeconds() * 255 / pop_time_faded));
+		Uint8 decay_ = (Uint8)(ceil(DTIME * 255 / pop_time_faded));
 		if (m_alpha - decay_ > 0)
 		{
 			m_alpha -= decay_;

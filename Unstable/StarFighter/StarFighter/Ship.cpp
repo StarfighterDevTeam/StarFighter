@@ -47,7 +47,7 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
-void Ship::update(sf::Time deltaTime)
+void Ship::update(const float DTIME)
 {
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
@@ -73,16 +73,16 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
+	IdleDecelleration(DTIME);
 	UpdateRotation();
 
-	GameObject::update(deltaTime);
+	GameObject::update(DTIME);
 
 	//HUD
 	m_is_asking_SFPanel = SFPanel_None;
 	if (m_SFTargetPanel)
 	{
-		m_SFTargetPanel->Update(deltaTime);
+		m_SFTargetPanel->Update(DTIME);
 	}
 
 	ScreenBorderContraints();	
@@ -123,12 +123,12 @@ bool Ship::ScreenBorderContraints()
 	return touched_screen_border;
 }
 
-void Ship::IdleDecelleration(sf::Time deltaTime)
+void Ship::IdleDecelleration(const float DTIME)
 {
 	//idle decceleration
 	if (!m_movingX)
 	{
-		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
+		m_speed.x -= m_speed.x*DTIME* SHIP_DECCELERATION_COEF / 100.f;
 
 		if (abs(m_speed.x) < SHIP_MIN_SPEED)
 			m_speed.x = 0;
@@ -136,7 +136,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 	if (!m_movingY)
 	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
+		m_speed.y -= m_speed.y*DTIME*SHIP_DECCELERATION_COEF / 100.f;
 
 		if (abs(m_speed.y) < SHIP_MIN_SPEED)
 			m_speed.y = 0;

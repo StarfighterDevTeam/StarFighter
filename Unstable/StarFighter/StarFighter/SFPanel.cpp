@@ -176,7 +176,7 @@ bool SFPanel::IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape&
 	return boundsA.intersects(boundsB);
 }
 
-void SFPanel::Update(sf::Time deltaTime)
+void SFPanel::Update(const float DTIME)
 {
 	//see override function in specific types of SFPanels
 }

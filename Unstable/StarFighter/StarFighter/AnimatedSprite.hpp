@@ -38,34 +38,34 @@
 class AnimatedSprite : public sf::Drawable, public sf::Transformable
 {
 public:
-	explicit AnimatedSprite(sf::Time frameTime = sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES), bool paused = false, bool looped = true);
+	explicit AnimatedSprite(const float frameTime = TIME_BETWEEN_ANIMATION_FRAMES, bool paused = false, bool looped = true);
 
-	void update(sf::Time deltaTime);
+	void update(const float DTIME);
 	void setAnimation(const Animation& animation, bool keep_frame_index = false);
-	void setFrameTime(sf::Time time);
+	void setFrameTime(const float time);
 	void play();
 	void play(const Animation& animation, bool keep_frame_index = false);
 	void pause();
 	void stop();
 	void setLooped(bool looped);
-	void setColor(const sf::Color& color, sf::Time color_timer = sf::seconds(0));
+	void setColor(const sf::Color& color, const float color_timer = 0.f);
 	const Animation* getAnimation() const;
 	sf::FloatRect getLocalBounds() const;
 	sf::FloatRect getGlobalBounds() const;
 	bool isLooped() const;
 	bool isPlaying() const;
-	sf::Time getFrameTime() const;
+	float getFrameTime() const;
 	void setFrame(std::size_t newFrame, bool resetTime = true);
 	std::size_t m_currentFrame;
 	sf::Color m_color;
-	sf::Time m_color_timer;
+	float m_colorTimer;
 	const sf::IntRect& getTextureRect() const;
 	const sf::Texture* getTexture()	const;
 
 private:
 	const Animation* m_animation;
-	sf::Time m_frameTime;
-	sf::Time m_currentTime;
+	float m_frameTime;
+	float m_currentTime;
 
 	bool m_isPaused;
 	bool m_isLooped;
