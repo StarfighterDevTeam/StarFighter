@@ -28,10 +28,10 @@ void PlayerShip::Init()
 	m_DontGarbageMe = true;
 
 	//PIRATE specific
-	m_curForwardSpeed = 10.f;
+	m_curForwardSpeed = 30.f;
 	m_targetForwardSpeed = m_curForwardSpeed;
-	m_turnSpeed = 0.1f;
-	m_targetHeadingDegrees = 180.f;
+	m_turnSpeed = 0.8f;
+	m_targetHeadingDegrees = 135.f;
 
 	//setPosition(sf::Vector2f(0, 0));
 	setPosition(MapTile::MapTileCoordToPosition(sf::Vector2u(10, 10)));

@@ -18,7 +18,7 @@ public:
 	void Draw();
 	void UpdateCamera(const float DTIME);
 
-	GameObject* m_background;
+	GameObject* m_background = nullptr;
 
 private:
 	sf::RenderWindow* mainWindow;

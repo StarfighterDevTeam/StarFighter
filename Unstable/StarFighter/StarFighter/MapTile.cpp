@@ -26,8 +26,8 @@ MapTile::MapTile(int coord_x, int coord_y, TileType type) : GameObject(MapTile::
 
 MapTile* MapTile::PositionToMapTile(sf::Vector2f position)
 {
-	const int tileCoord_x = (position.x + 0.5f * MAP_TILE_SIZE) / MAP_TILE_SIZE;
-	const int tileCoord_y = (position.y + 0.5f * MAP_TILE_SIZE) / MAP_TILE_SIZE;
+	const int tileCoord_x = (int)(position.x + 0.5f * MAP_TILE_SIZE) / MAP_TILE_SIZE;
+	const int tileCoord_y = (int)(position.y + 0.5f * MAP_TILE_SIZE) / MAP_TILE_SIZE;
 	MapTile* tile = (*CurrentGame).m_mapTiles[tileCoord_x][tileCoord_y];
 	return tile;
 }
