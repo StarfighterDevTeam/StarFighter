@@ -92,7 +92,7 @@ public:
 	void GetMouseInputs(const float DTIME);
 
 	sf::View m_view;
-	sf::Vector2f m_map_size;
+	sf::Vector2f m_mapSize;
 
 	//Utiliary methods
 	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);

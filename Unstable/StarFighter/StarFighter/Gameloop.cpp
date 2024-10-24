@@ -19,13 +19,14 @@ Gameloop::Gameloop()
 			const int nb_background_tiles = (background_size / MAP_TILE_SIZE);
 			if (mapTileIndex_y % (background_size / MAP_TILE_SIZE) == 0)
 			{
-				GameObject* background = new GameObject(sf::Vector2f(0.5f * background_size - 0.5f * MAP_TILE_SIZE + 1.f * (mapTileIndex_x / nb_background_tiles) * background_size, 0.5f * background_size - 0.5f * MAP_TILE_SIZE + 1.f * (mapTileIndex_y / nb_background_tiles) * background_size), sf::Vector2f(0, 0), "2D/water_640_640.jpg", sf::Vector2u(background_size, background_size));
+				GameObject* background = new GameObject(sf::Vector2f(0.5f * background_size + 1.f * (mapTileIndex_x / nb_background_tiles) * background_size, 0.5f * background_size + 1.f * (mapTileIndex_y / nb_background_tiles) * background_size), sf::Vector2f(0, 0), "2D/water_640_640.jpg", sf::Vector2u(background_size, background_size));
 				(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 				background->m_DontGarbageMe = true;
 			}
 		}
 		(*CurrentGame).m_mapTiles.push_back(mapTilesIter_x);
 	}
+	(*CurrentGame).m_mapSize = sf::Vector2f(1.f * NB_MAP_TILES_X * MAP_TILE_SIZE, 1.f * NB_MAP_TILES_X * MAP_TILE_SIZE);
 
 	//background
 	//m_background = new GameObject(sf::Vector2f(512 - 0.5f * MAP_TILE_SIZE, 512 - 0.5f * MAP_TILE_SIZE), sf::Vector2f(0, 0), "2D/water.jpg", sf::Vector2u(1024, 1024));

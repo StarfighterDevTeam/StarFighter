@@ -29,7 +29,7 @@ Game::Game(RenderWindow* window)
 	//view.zoom(0.3f);
 
 	//default value
-	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_mapSize = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
 	//fonts
 	m_font[Font_Terminator] = new sf::Font();
@@ -670,7 +670,7 @@ void Game::collectGarbage()
 		if (!(**it).m_isOnScene)
 		{
 			//objects that are spawning out of screen are not deleted
-			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= m_map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= m_map_size.y))
+			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= m_mapSize.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= m_mapSize.y))
 			{
 				(**it).m_isOnScene = true;
 			}
@@ -679,8 +679,8 @@ void Game::collectGarbage()
 		//Content that went on scene and then exited have to be deleted
 		if (!(**it).m_DontGarbageMe && (**it).m_isOnScene)
 		{
-			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > m_map_size.x
-				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > m_map_size.y)
+			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > m_mapSize.x
+				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > m_mapSize.y)
 			{
 				m_garbage.push_back(*it);
 				continue;

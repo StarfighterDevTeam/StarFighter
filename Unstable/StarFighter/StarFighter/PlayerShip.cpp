@@ -77,19 +77,6 @@ void PlayerShip::update(const float DTIME)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	//Current tile
-	if (m_curTile)
-		m_curTile->setColor(sf::Color::White);
-
-	m_curTile = MapTile::PositionToMapTile(getPosition());
-	m_curTile->setColor(sf::Color::Green);
-
-	if (m_textCurTileDebug)
-	{
-		m_textCurTileDebug->setString(to_string(m_curTile->m_coord_x) + " ; " + to_string(m_curTile->m_coord_y));
-		m_textCurTileDebug->setPosition(sf::Vector2f(getPosition().x - 18.f, getPosition().y - 1.f * MAP_TILE_SIZE));
-	}
-
 	//Ship heading
 	float deltaHeading = ComputeDeltaAngleInDegrees(m_curHeadingDegrees, m_targetHeadingDegrees);
 	float deltaHeadingClamped = Bound(deltaHeading, -DTIME * m_turnSpeed * GAME_SPEED, DTIME * m_turnSpeed * GAME_SPEED);
@@ -110,7 +97,30 @@ void PlayerShip::update(const float DTIME)
 		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
+	//Apply speed and rotation to move the object to its new position
 	GameObject::update(DTIME);
+
+	//Map borders constraints
+	if (getPosition().x < 0)
+		setPosition(sf::Vector2f(0, getPosition().y));
+	if (getPosition().x >= (*CurrentGame).m_mapSize.x)
+		setPosition(sf::Vector2f((*CurrentGame).m_mapSize.x - 1, getPosition().y));
+	if (getPosition().y < 0)
+		setPosition(sf::Vector2f(getPosition().x, 0));
+	if (getPosition().y >= (*CurrentGame).m_mapSize.y)
+		setPosition(sf::Vector2f(getPosition().x, (*CurrentGame).m_mapSize.y - 1));
+
+	//Current tile
+	if (m_curTile)
+		m_curTile->setColor(sf::Color::White);//reset highlight of the previous tile
+	m_curTile = MapTile::PositionToMapTile(getPosition());//compute current tile from position
+	m_curTile->setColor(sf::Color::Green);//highlight the new current tile
+
+	if (m_textCurTileDebug)
+	{
+		m_textCurTileDebug->setString(to_string(m_curTile->m_coord_x) + " ; " + to_string(m_curTile->m_coord_y));
+		m_textCurTileDebug->setPosition(sf::Vector2f(getPosition().x - 18.f, getPosition().y - 1.f * MAP_TILE_SIZE));
+	}
 
 	//HUD
 	m_is_asking_SFPanel = SFPanel_None;
