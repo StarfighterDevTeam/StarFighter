@@ -71,6 +71,11 @@ public :
 	MapTile* m_curTile = nullptr;
 	SFText* m_textCurTileDebug = nullptr;
 
+	float m_maxSailRange = 100.f;
+	float m_maxVisionRange = 120.f;
+	sf::CircleShape m_sailRangeFeedback = sf::CircleShape();
+	sf::CircleShape m_visionRangeFeedback = sf::CircleShape();
+
 private:
 	bool m_moving;
 	bool m_movingX;

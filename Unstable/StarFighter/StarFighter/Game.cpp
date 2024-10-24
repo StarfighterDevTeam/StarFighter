@@ -191,6 +191,11 @@ void Game::addToFeedbacks(RectangleShape* feedback)
 	m_sceneFeedbackBars.push_back(feedback);
 }
 
+void Game::addToFeedbacks(CircleShape* feedback)
+{
+	m_sceneFeedbackCircles.push_back(feedback);
+}
+
 void Game::addToFeedbacks(Text* text)
 {
 	m_sceneFeedbackTexts.push_back(text);
@@ -212,6 +217,11 @@ void Game::addToFeedbacks(SFText* text)
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
 	m_sceneFeedbackBars.remove(feedback);
+}
+
+void Game::removeFromFeedbacks(CircleShape* feedback)
+{
+	m_sceneFeedbackCircles.remove(feedback);
 }
 
 void Game::removeFromFeedbacks(Text* text)
@@ -285,6 +295,13 @@ void Game::drawScene()
 		if (i == FeedbacksLayer)
 		{
 			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
+			{
+				if (*it == NULL)
+					continue;
+
+				m_mainScreen.draw(*(*it));
+			}
+			for (std::list<CircleShape*>::iterator it = this->m_sceneFeedbackCircles.begin(); it != this->m_sceneFeedbackCircles.end(); it++)
 			{
 				if (*it == NULL)
 					continue;

@@ -32,9 +32,21 @@ void PlayerShip::Init()
 	m_targetForwardSpeed = m_curForwardSpeed;
 	m_turnSpeed = 0.8f;
 	m_targetHeadingDegrees = 135.f;
+	m_maxSailRange = 400.f;
+	m_maxVisionRange = 500.f;
 
-	//setPosition(sf::Vector2f(0, 0));
 	setPosition(MapTile::MapTileCoordToPosition(sf::Vector2u(10, 10)));
+
+	//range feedbacks
+	m_sailRangeFeedback.setFillColor(sf::Color(0, 0, 0, 0));
+	m_sailRangeFeedback.setOutlineColor(sf::Color::Cyan);
+	m_sailRangeFeedback.setOutlineThickness(2.f);
+	(*CurrentGame).addToFeedbacks(&m_sailRangeFeedback);
+
+	m_visionRangeFeedback.setFillColor(sf::Color(0, 0, 0, 0));
+	m_visionRangeFeedback.setOutlineColor(sf::Color::Magenta);
+	m_visionRangeFeedback.setOutlineThickness(2.f);
+	(*CurrentGame).addToFeedbacks(&m_visionRangeFeedback);
 
 	//debug
 	SFText* tileText = new SFText((*CurrentGame).m_font[Font_Arial], 24, sf::Color(Color::White), getPosition(), PlayerTeams::PlayerBlue);
@@ -121,6 +133,15 @@ void PlayerShip::update(const float DTIME)
 		m_textCurTileDebug->setString(to_string(m_curTile->m_coord_x) + " ; " + to_string(m_curTile->m_coord_y));
 		m_textCurTileDebug->setPosition(sf::Vector2f(getPosition().x - 18.f, getPosition().y - 1.f * MAP_TILE_SIZE));
 	}
+
+	//Range feedbacks
+	m_sailRangeFeedback.setRadius(m_maxSailRange);
+	m_sailRangeFeedback.setOrigin(sf::Vector2f(m_sailRangeFeedback.getRadius(), m_sailRangeFeedback.getRadius()));
+	m_sailRangeFeedback.setPosition(getPosition());
+
+	m_visionRangeFeedback.setRadius(m_maxVisionRange);
+	m_visionRangeFeedback.setOrigin(sf::Vector2f(m_visionRangeFeedback.getRadius(), m_visionRangeFeedback.getRadius()));
+	m_visionRangeFeedback.setPosition(getPosition());
 
 	//HUD
 	m_is_asking_SFPanel = SFPanel_None;

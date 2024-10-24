@@ -62,10 +62,12 @@ public:
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
+	void addToFeedbacks(CircleShape* feedback);
 	void addToFeedbacks(Text* text);
 	void addToFeedbacks(SFText* text);
 	void addToFeedbacks(SFPanel* panel);
 	void removeFromFeedbacks(RectangleShape* feedback);
+	void removeFromFeedbacks(CircleShape* feedback);
 	void removeFromFeedbacks(Text* text);
 	void removeFromFeedbacks(SFPanel* panel);
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
@@ -139,6 +141,7 @@ private:
 
 	RenderWindow* m_window;
 	std::list<RectangleShape*> m_sceneFeedbackBars;
+	std::list<CircleShape*> m_sceneFeedbackCircles;
 	std::list<Text*> m_sceneFeedbackTexts;
 	std::list<SFPanel*> m_sceneFeedbackSFPanels;
 	std::vector<SFText*> m_sceneFeedbackSFTexts;
