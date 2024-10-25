@@ -69,6 +69,7 @@ public :
 	float m_targetHeadingDegrees = 0.f;//in degrees
 
 	MapTile* m_curTile = nullptr;
+	MapTile* m_mouseTile = nullptr;
 	SFText* m_textCurTileDebug = nullptr;
 
 	float m_maxSailRange = 100.f;

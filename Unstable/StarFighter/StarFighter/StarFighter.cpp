@@ -63,25 +63,25 @@ int main()
 			}
 			else if (event.type == sf::Event::GainedFocus)
 			{
-				(*CurrentGame).m_window_has_focus = true;
+				(*CurrentGame).m_windowHasFocus = true;
 				printf("Window focus gained\n");
 			}
 			else if (event.type == sf::Event::LostFocus)
 			{
-				(*CurrentGame).m_window_has_focus = false;
+				(*CurrentGame).m_windowHasFocus = false;
 				printf("Window focus lost\n");
 			}
 		}
 
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && (*CurrentGame).m_window_has_focus)
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && (*CurrentGame).m_windowHasFocus)
 			{
 				renderWindow.close();
 			}
 			else
 			{
 				//Resolution switch
-				if (InputGuy::isChangingResolution() && (*CurrentGame).m_window_has_focus)
+				if (InputGuy::isChangingResolution() && (*CurrentGame).m_windowHasFocus)
 				{
 					resolution = (WindowResolutions)(((int)resolution + 1) % (NBVAL_RESOLUTIONS - 1));
 					switch (resolution)

@@ -24,21 +24,25 @@ MapTile::MapTile(int coord_x, int coord_y, TileType type) : GameObject(MapTile::
 }
 
 
-MapTile* MapTile::PositionToMapTile(sf::Vector2f position)
+MapTile* MapTile::PositionToMapTile(const sf::Vector2f position)
 {
-	const int tileCoord_x = (int)(position.x / MAP_TILE_SIZE);
-	const int tileCoord_y = (int)(position.y / MAP_TILE_SIZE);
+	sf::Vector2f positionClamped = position;
+	positionClamped.x = Bound(position.x, 0, (*CurrentGame).m_mapSize.x - 1);
+	positionClamped.y = Bound(position.y, 0, (*CurrentGame).m_mapSize.y - 1);
+
+	const int tileCoord_x = (int)(positionClamped.x / MAP_TILE_SIZE);
+	const int tileCoord_y = (int)(positionClamped.y / MAP_TILE_SIZE);
 	MapTile* tile = (*CurrentGame).m_mapTiles[tileCoord_x][tileCoord_y];
 	return tile;
 }
 
-sf::Vector2f MapTile::MapTileToPosition(MapTile* pTile)
+sf::Vector2f MapTile::MapTileToPosition(const MapTile* pTile)
 {
 	const sf::Vector2f position = sf::Vector2f(1.f * MAP_TILE_SIZE * (0.5f + pTile->m_coord_x), 1.f * MAP_TILE_SIZE * (0.5f + pTile->m_coord_y));
 	return position;
 }
 
-sf::Vector2f MapTile::MapTileCoordToPosition(sf::Vector2u coord)
+sf::Vector2f MapTile::MapTileCoordToPosition(const sf::Vector2u coord)
 {
 	const sf::Vector2f position = sf::Vector2f(1.f * MAP_TILE_SIZE * (0.5f + coord.x), 1.f * MAP_TILE_SIZE * (0.5f + coord.y));
 	return position;

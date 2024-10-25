@@ -21,9 +21,9 @@ public :
 	int m_coord_y = 0;
 	TileType m_type = TileType::Water;
 
-	static MapTile* PositionToMapTile(sf::Vector2f position);
-	static sf::Vector2f MapTileToPosition(MapTile* pTile);
-	static sf::Vector2f MapTileCoordToPosition(sf::Vector2u coord);
+	static MapTile* PositionToMapTile(const sf::Vector2f position);
+	static sf::Vector2f MapTileToPosition(const MapTile* pTile);
+	static sf::Vector2f MapTileCoordToPosition(const sf::Vector2u coord);
 
 private:
 	sf::RectangleShape m_rect;

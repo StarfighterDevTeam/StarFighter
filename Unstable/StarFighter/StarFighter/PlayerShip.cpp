@@ -77,7 +77,7 @@ void PlayerShip::SetControllerType(ControlerType contoller)
 void PlayerShip::update(const float DTIME)
 {
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
-	if ((*CurrentGame).m_window_has_focus)
+	if ((*CurrentGame).m_windowHasFocus)
 	{
 		inputs_direction = InputGuy::getDirections();
 	}
@@ -134,6 +134,15 @@ void PlayerShip::update(const float DTIME)
 		m_textCurTileDebug->setPosition(sf::Vector2f(getPosition().x - 18.f, getPosition().y - 1.f * MAP_TILE_SIZE));
 	}
 
+	//Mouse tile
+	sf::Vector2f clampedMousePos = (*CurrentGame).m_mousePos;//clamp mouse position to windows borders
+	clampedMousePos.x = Bound((*CurrentGame).m_mousePos.x, getPosition().x - REF_WINDOW_RESOLUTION_X * 0.5f + 1, getPosition().x + REF_WINDOW_RESOLUTION_X * 0.5f - 1);
+	clampedMousePos.y = Bound((*CurrentGame).m_mousePos.y, getPosition().y - REF_WINDOW_RESOLUTION_Y * 0.5f + 1, getPosition().y + REF_WINDOW_RESOLUTION_Y * 0.5f - 1);
+	if (m_mouseTile)
+		m_mouseTile->setColor(sf::Color::White);
+	m_mouseTile = MapTile::PositionToMapTile(clampedMousePos);
+	m_mouseTile->setColor(sf::Color::Red);
+
 	//Range feedbacks
 	m_sailRangeFeedback.setRadius(m_maxSailRange);
 	m_sailRangeFeedback.setOrigin(sf::Vector2f(m_sailRangeFeedback.getRadius(), m_sailRangeFeedback.getRadius()));
@@ -164,7 +173,7 @@ void PlayerShip::PlayStroboscopicEffect(Time effect_duration, Time time_between_
 
 void PlayerShip::UpdateInputStates()
 {
-	if ((*CurrentGame).m_window_has_focus)
+	if ((*CurrentGame).m_windowHasFocus)
 	{
 		GetInputState(InputGuy::isFiring(), Action_Firing);
 	}

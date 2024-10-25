@@ -87,10 +87,10 @@ public:
 
 	PlayerShip* m_playerShip;
 	bool m_pause;
-	bool m_window_has_focus;
+	bool m_windowHasFocus;
 
-	sf::Vector2f m_mouse_pos;
-	MouseAction m_mouse_click;
+	sf::Vector2f m_mousePos;
+	MouseAction m_mouseClick;
 	void GetMouseInputs(const float DTIME);
 
 	sf::View m_view;
