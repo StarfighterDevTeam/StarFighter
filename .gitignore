@@ -15,6 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+.vexp/
 
 # External tool builders
 .externalToolBuilders/
@@ -181,6 +182,9 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+# VSCode
+.vscode/
 
 
 #############
