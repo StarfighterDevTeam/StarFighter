@@ -9,13 +9,13 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playership) : SFInventoryPan
 	m_item_stats_panel = NULL;
 	m_item_stats_panel_compare = NULL;
 
-	m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+	m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 	m_actions->SetString("Quit", ActionButton_B);
 
+	//m_text's font is already set by the SFInventoryPanel base constructor
 	m_title_text2.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_title_text2.setCharacterSize(m_title_text.getCharacterSize());
 	m_title_text2.setColor(m_title_text.getColor());
-	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 	//texts
 	if (playership)

@@ -18,7 +18,6 @@ class Aura : public FX
 {
 public:
 	Aura(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber = 1);
-	void Init(std::string textureName, sf::Vector2f dsize, int frameNumber);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	Aura* Clone();
 

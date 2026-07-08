@@ -28,6 +28,7 @@ Ship::Ship(string textureName, sf::Vector2f size, string fake_textureName, sf::V
 	m_disableRecall = false;
 	m_disableSpecial = false;
 	m_graze_count = 0;
+	m_graze_count_buffer = 0;
 	m_graze_level = 0;
 	m_disable_bots = true;
 	m_is_asking_scene_transition = false;
@@ -171,35 +172,68 @@ bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, 
 	return false;
 }
 
+//Shared by ManageGrazingFeedback/ManageSpecialFeedback: fills a feedback ring's vertex positions and colors.
+//The per-point unit-circle cos/sin values only depend on the point index and the angular offset (always
+//either 0 or 90 degrees, one per caller), never on the ship's position, the ring radius, or time - so instead
+//of recomputing GRAZING_FEEDBACK_CIRCLE_POINTS*2 cos/sin calls every single frame, they're computed once ever
+//and cached, and only the (cheap) translation by getPosition() is redone per frame.
+void Ship::UpdateFeedbackRing(sf::Vertex* points, float radius, bool angleOffset90, float angleToFill, float emptyAngleLimitDeg, sf::Color fillColor, float fillPulseFreqMultiplier, float fillPulseAmplitudeNumerator)
+{
+	static float cosTable[2][GRAZING_FEEDBACK_CIRCLE_POINTS];
+	static float sinTable[2][GRAZING_FEEDBACK_CIRCLE_POINTS];
+	static bool tablesInitialized = false;
+
+	if (!tablesInitialized)
+	{
+		for (int t = 0; t < 2; t++)
+		{
+			float baseOffset = t == 0 ? 0.f : 90.f;
+			for (int j = 0; j < GRAZING_FEEDBACK_CIRCLE_POINTS; j++)
+			{
+				float tableAngle = baseOffset + 360.f * j / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
+				cosTable[t][j] = cos(-M_PI_2 + tableAngle * M_PI / 180);
+				sinTable[t][j] = sin(-M_PI_2 + tableAngle * M_PI / 180);
+			}
+		}
+		tablesInitialized = true;
+	}
+
+	int table = angleOffset90 ? 1 : 0;
+	float baseOffsetDeg = angleOffset90 ? 90.f : 0.f;
+	float thickness = 2;
+	float elapsedSeconds = m_graze_sinus_clock.getElapsedTime().asSeconds();
+	sf::Vector2f position = getPosition();
+
+	for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
+	{
+		int j = i / 2;
+		float angle = baseOffsetDeg + 360.f * j / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
+		float r = radius + (i % 2) * thickness;
+
+		points[i].position.x = position.x + r * cosTable[table][j];
+		points[i].position.y = position.y + r * sinTable[table][j];
+
+		//color
+		if (angleToFill > 1.f / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1) && angle <= angleToFill)
+		{
+			float s = 0.50 + fillPulseAmplitudeNumerator * abs(sin(fillPulseFreqMultiplier * elapsedSeconds)) / 4;
+			points[i].color = sf::Color(fillColor.r, fillColor.g, fillColor.b, (sf::Uint8)(200 * s));
+		}
+		else if (angle <= emptyAngleLimitDeg)
+		{
+			float s = 0.25 + 3 * abs(sin(4 * elapsedSeconds)) / 4;
+			points[i].color = sf::Color(255, 255, 255, (sf::Uint8)(20 * s));
+		}
+	}
+}
+
 void Ship::ManageGrazingFeedback()
 {
 	if (m_shield_max > 0 && m_shield < m_shield_max && m_collision_timer <= 0)
 	{
-		float radius = GRAZE_DISTANCE;
 		float angle_to_fill = 360.f * m_graze_count / (GRAZING_COUNT_TO_REGEN_SHIELD * (m_shield + 1));
-		float thickness = 2;
 
-		//position
-		for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
-		{
-			float angle = 360.f * (i / 2) / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
-
-			m_graze_percent_points[i].position.x = getPosition().x + (radius + (i % 2) * thickness) * cos(- M_PI_2 + angle * M_PI / 180);
-			m_graze_percent_points[i].position.y = getPosition().y + (radius + (i % 2) * thickness) * sin(- M_PI_2 + angle * M_PI / 180);
-
-			//color
-			if (angle_to_fill > 1.f / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1) && angle <= angle_to_fill)
-			{
-				float s = 0.50 + 3 * abs(sin(m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
-				m_graze_percent_points[i].color = sf::Color(0, 0, 255, 200 * s);
-			}
-				
-			else
-			{
-				float s = 0.25 + 3 * abs(sin(4 * m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
-				m_graze_percent_points[i].color = sf::Color(255, 255, 255, 20 * s);
-			}
-		}
+		UpdateFeedbackRing(m_graze_percent_points, GRAZE_DISTANCE, false, angle_to_fill, 360.f, sf::Color(0, 0, 255), 1.f, 3.f);
 	}
 	else
 	{
@@ -211,37 +245,16 @@ void Ship::ManageGrazingFeedback()
 
 void Ship::ManageSpecialFeedback()
 {
-	float angle_to_fill;
 	if ((m_jump_cooldown > 0 && m_jump_cooldown < SHIP_JUMPING_COOLDOWN) || (m_cloak_cooldown > 0 && m_cloak_cooldown < SHIP_CLOAK_COOLDOWN))
 	{
-		float radius = GRAZE_DISTANCE - 8;
-		float thickness = 2;
+		float angle_to_fill = 0.f;
 
 		if (m_jump_cooldown > 0)
 			angle_to_fill = 90 + 180.f * (float)(SHIP_JUMPING_COOLDOWN - m_jump_cooldown) / SHIP_JUMPING_COOLDOWN;
 		else if (m_cloak_cooldown > 0)
 			angle_to_fill = 90 + 180.f * (float)(SHIP_CLOAK_COOLDOWN - m_cloak_cooldown) / SHIP_CLOAK_COOLDOWN;
 
-		//position
-		for (int i = 0; i < GRAZING_FEEDBACK_CIRCLE_POINTS * 2; i++)
-		{
-			float angle = 90 + 360.f * (i / 2) / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1);
-
-			m_special_percent_points[i].position.x = getPosition().x + (radius + (i % 2) * thickness) * cos(-M_PI_2 + angle * M_PI / 180);
-			m_special_percent_points[i].position.y = getPosition().y + (radius + (i % 2) * thickness) * sin(-M_PI_2 + angle * M_PI / 180);
-
-			//color
-			if (angle_to_fill > 1.f / (GRAZING_FEEDBACK_CIRCLE_POINTS - 1) && angle <= angle_to_fill)
-			{
-				float s = 0.50 + 1 * abs(sin(2 * m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
-				m_special_percent_points[i].color = sf::Color(223, 183, 19, 200 * s);
-			}
-			else if (angle <= 270)
-			{
-				float s = 0.25 + 3 * abs(sin(4 * m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4;
-				m_special_percent_points[i].color = sf::Color(255, 255, 255, 20 * s);
-			}
-		}
+		UpdateFeedbackRing(m_special_percent_points, GRAZE_DISTANCE - 8, true, angle_to_fill, 270.f, sf::Color(223, 183, 19), 2.f, 1.f);
 	}
 	else
 	{
@@ -355,6 +368,15 @@ bool Ship::IsVisible()
 	}
 }
 
+//extracted out of ManageFiring for readability; theta is expected in radians.
+//(note: this same formula also exists in Bot.cpp/Enemy.cpp for enemy weapons - left untouched here since
+//extracting a single cross-file shared helper is deferred to its own pass)
+void Ship::UpdateWeaponCurrentOffset(Weapon* weapon, float theta)
+{
+	weapon->m_weapon_current_offset.x = weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (- weapon->m_fire_direction);
+	weapon->m_weapon_current_offset.y = weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (- weapon->m_fire_direction);
+}
+
 bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	bool firing = m_visible == true && m_collision_timer <= 0 && m_disable_inputs == false && m_disable_fire == false && m_release_to_fire == false && m_HUD_state != HUD_OpeningEquipment && m_recall_text->m_visible == false && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY
@@ -365,7 +387,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		//UPDATE WEAPON POSITION
 		float target_angle = getRotation();//calculating the angle we want to face, if any
-		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
+		if (m_weapon->m_target_homing == HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
 			target_angle = fmod(- (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 
 		float current_angle = getRotation();
@@ -388,8 +410,7 @@ bool Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			//calcule weapon offset
 			theta *= M_PI / 180;//switching to radians
-			m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x * cos(theta) + m_size.y / 2 * sin(theta) * (- m_weapon->m_fire_direction);
-			m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.x * sin(theta) - m_size.y / 2 * cos(theta) * (- m_weapon->m_fire_direction);
+			UpdateWeaponCurrentOffset(m_weapon, theta);
 
 			//transmitting the angle to the weapon, which will pass it to the bullets
 			m_weapon->m_shot_angle = theta;
@@ -483,22 +504,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		//DIALOG
 		if (m_HUD_state == HUD_Dialog && m_SFHudPanel)
 		{
-			//waiting for player input to continue
-			if (m_SFTargetPanel && m_SFTargetPanel->GetDuration() == 0)
-			{
-				//meanwhile, close HUD menu if open and go back to normal hyperspeed
-				if (m_SFHudPanel->GetCursor()->m_visible == true)
-				{
-					(*CurrentGame).m_hyperspeedMultiplier = 1;
-					m_SFHudPanel->SetCursorVisible_v2(false);
-				}
-
-				//press A to continue
-				if  (m_inputs_states[Action_Firing] == Input_Tap)
-				{
-					ContinueDialog();
-				}
-			}
+			ManageDialogInputs();
 		}
 		//Enemy blocking movement?
 		else if (m_input_blocker)
@@ -506,244 +512,210 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			m_speed = sf::Vector2f(0, 0);
 			return;
 		}
-		//EQUIPMENT HUD
-		//else if (m_HUD_state == HUD_OpeningEquipment && m_SFHudPanel)
-		//{
-		//	//Cursor movement
-		//	m_SFHudPanel->SetCursorVisible_v2(true);
-		//
-		//	//Freeze cursor if throwing item, otherwise move it
-		//	if (m_SFHudPanel->GetCursor()->m_currentAnimationIndex < Cursor_Focus1_8 || m_SFHudPanel->GetCursor()->m_currentAnimationIndex > Cursor_Focus8_8)
-		//		MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
-		//
-		//
-		//	//Weapon firing
-		//	bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
-		//
-		//	//Closing hud
-		//	if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-		//	{
-		//		m_HUD_state = HUD_Idle;
-		//		if (m_SFHudPanel)
-		//		{
-		//			m_SFHudPanel->SetCursorVisible_v2(false);
-		//		}
-		//	}
-		//}
-		////TRADE (BUY/SELL)
-		//else if (m_HUD_state == HUD_Trade && m_SFTargetPanel)
-		//{
-		//	//Cursor movement
-		//	MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
-		//
-		//
-		//	//exit
-		//	if (m_inputs_states[Action_Slowmotion] == Input_Tap)
-		//	{
-		//		m_HUD_state = HUD_ShopMainMenu;
-		//		m_SFTargetPanel->SetCursorVisible_v2(false);
-		//	}
-		//}
 		//STELLAR MAP
 		else if (m_HUD_state == HUD_ShopStellarMap)
 		{
-			//Cursor movement
-			MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
-
-			//Teleportation
-			//if (m_SFTargetPanel->GetTeleportationCost() > 0 && m_money >= m_SFTargetPanel->GetTeleportationCost())
-			//{
-			//	if (m_inputs_states[Action_Firing] == Input_Tap)
-			//	{
-			//		Teleport(m_SFTargetPanel->GetTeleportationDestination());
-			//		m_money -= m_SFTargetPanel->GetTeleportationCost();
-			//		SavePlayerMoneyAndHealth(this);
-			//		m_HUD_state = HUD_Idle;
-			//	}
-			//}
-
-			//Center view
-			if (m_inputs_states[Action_Hyperspeeding] == Input_Tap)
-			{
-				CenterMapView();
-			}
-
-			//exit
-			if (m_inputs_states[Action_Braking] == Input_Tap)
-			{
-				m_HUD_state = HUD_ShopMainMenu;
-				m_SFTargetPanel->SetCursorVisible_v2(true);
-			}
+			ManageStellarMapInputs(deltaTime, inputs_direction);
 		}
 		//UPGRADES PANEL
 		else if (m_HUD_state == HUD_Upgrades && m_SFTargetPanel)
-		{	
-			//A: buy upgrade
-			if (m_inputs_states[Action_Firing] == Input_Tap)
-			{
-				m_SFTargetPanel->BuyUpgrade();
-			}
-			
-			//exit
-			if (m_inputs_states[Action_Braking] == Input_Tap)
-			{
-				m_HUD_state = HUD_ShopMainMenu;
-				m_SFTargetPanel->SetCursorVisible_v2(false);
-			}
+		{
+			ManageUpgradesPanelInputs();
 		}
 		else//Idle combat, shop menu, portal menu (where ship can continue to move)
 		{
-			//Opening hud
-			//if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-			//{
-			//	m_HUD_state = HUD_OpeningEquipment;
-			//	m_SFHudPanel->SetCursorVisible_v2(true);
-			//	
-			//	if (!m_disableSlowmotion)
-			//	{
-			//		(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
-			//	}
-			//
-			//	m_actions_states[Action_Firing] = false;
-			//}
-
-			//Moving
-			m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
-			m_movingX = inputs_direction.x != 0;
-			m_movingY = inputs_direction.y != 0;
-			if (m_recall_text->m_visible == false)
-			{
-				ManageAcceleration(inputs_direction);
-			}
-
-			//IDLE (COMBAT)
-			if (m_HUD_state == HUD_Idle)
-			{
-				//Recalling back to last hub
-				UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
-
-				if (m_actions_states[Action_Recalling] == true && m_respawnSceneName.empty() == false)
-					Recalling();
-				else
-					m_recall_text->m_visible = false;
-
-				//Slow_motion and hyperspeed
-				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
-
-				//jump
-				if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_jump_cooldown <= 0 && m_collision_timer <=0)
-					Jump();
-
-				if (m_jump_timer == 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
-					if (m_moving == true)
-					{
-						ScaleVector(&m_speed, SHIP_JUMPING_SPEED);
-						m_jump_timer -= deltaTime.asSeconds();
-					}
-
-				//cloak
-				if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_cloak_cooldown <= 0 && m_collision_timer <= 0)
-					Cloak();
-
-				//bomb
-				//else if ((*CurrentGame).m_is_in_hub == false && m_bombs > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && !m_actions_states[Action_Recalling] && !m_immune)
-				//{
-				//	Bomb();
-				//}
-				
-				if (!m_actions_states[Action_Recalling])
-					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;//resetting hyperspeed
-
-				//Auto fire option (F key)
-				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
-				{
-					//Bots automatic fire option
-					if (m_inputs_states[Action_AutomaticFire] == Input_Tap)
-						m_automatic_fire = !m_automatic_fire;
-
-					for (Bot* bot : m_bot_list)
-						bot->m_automatic_fire = m_automatic_fire;
-				}
-
-				//Firing button
-				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire);
-
-				//Weapon firing
-				bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
-
-				//Bots firing
-				for (Bot* bot : m_bot_list)
-					bot->Fire(deltaTime, hyperspeedMultiplier, firing);
-
-				//Braking and speed malus on firing
-				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
-				//brake speed malus
-				if (m_jump_timer <= 0)
-				{
-					if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
-					{
-						m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
-						m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
-					}
-				}
-			}
-			//PORTAL
-			else if (m_HUD_state == HUD_PortalInteraction)
-			{
-				//Up and down in options, IF LEVEL CHOOSER IS AVAILABLE
-				//if (m_SFTargetPanel)
-				//{
-				//	if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
-				//	{
-				//		m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
-				//	}
-				//	else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
-				//	{
-				//		m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
-				//	}
-				//}
-
-				//Weapon firing
-				bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
-
-				//Bots firing
-				for (Bot* bot : m_bot_list)
-					bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
-
-				//brake speed malus
-				if (m_jump_timer <= 0)
-				{
-					if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
-					{
-						m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
-						m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
-					}
-				}
-				
-				//Entering portal
-				if (m_inputs_states[Action_Firing] == Input_Tap)
-				{
-					m_is_asking_scene_transition = true;//this triggers transition in InGameState update
-					//m_immune = true;
-				}
-			}
-			//SHOP MAIN
-			else if (m_HUD_state == HUD_ShopMainMenu && m_SFTargetPanel)
-			{
-				//A: Enter shop
-				if (m_inputs_states[Action_Firing] == Input_Tap)
-				{
-					m_HUD_state = HUD_Upgrades;
-				}
-				//X: Enter stellar map
-				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap)
-				{
-					m_HUD_state = HUD_ShopStellarMap;
-				}
-			}
+			ManageActiveGameplayInputs(deltaTime, hyperspeedMultiplier, inputs_direction);
 		}
-		
+
 		IdleDecelleration(deltaTime);
+	}
+}
+
+void Ship::ManageDialogInputs()
+{
+	//waiting for player input to continue
+	if (m_SFTargetPanel && m_SFTargetPanel->GetDuration() == 0)
+	{
+		//meanwhile, close HUD menu if open and go back to normal hyperspeed
+		if (m_SFHudPanel->GetCursor()->m_visible == true)
+		{
+			(*CurrentGame).m_hyperspeedMultiplier = 1;
+			m_SFHudPanel->SetCursorVisible_v2(false);
+		}
+
+		//press A to continue
+		if  (m_inputs_states[Action_Firing] == Input_Tap)
+		{
+			ContinueDialog();
+		}
+	}
+}
+
+void Ship::ManageStellarMapInputs(sf::Time deltaTime, sf::Vector2f inputs_direction)
+{
+	//Cursor movement
+	MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
+
+	//Center view
+	if (m_inputs_states[Action_Hyperspeeding] == Input_Tap)
+	{
+		CenterMapView();
+	}
+
+	//exit
+	if (m_inputs_states[Action_Braking] == Input_Tap)
+	{
+		m_HUD_state = HUD_ShopMainMenu;
+		m_SFTargetPanel->SetCursorVisible_v2(true);
+	}
+}
+
+void Ship::ManageUpgradesPanelInputs()
+{
+	//A: buy upgrade
+	if (m_inputs_states[Action_Firing] == Input_Tap)
+	{
+		m_SFTargetPanel->BuyUpgrade();
+	}
+
+	//exit
+	if (m_inputs_states[Action_Braking] == Input_Tap)
+	{
+		m_HUD_state = HUD_ShopMainMenu;
+		m_SFTargetPanel->SetCursorVisible_v2(false);
+	}
+}
+
+void Ship::ManageActiveGameplayInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction)
+{
+	//Moving
+	m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
+	m_movingX = inputs_direction.x != 0;
+	m_movingY = inputs_direction.y != 0;
+	if (m_recall_text->m_visible == false)
+	{
+		ManageAcceleration(inputs_direction);
+	}
+
+	//IDLE (COMBAT)
+	if (m_HUD_state == HUD_Idle)
+	{
+		ManageIdleCombatInputs(deltaTime, hyperspeedMultiplier);
+	}
+	//PORTAL
+	else if (m_HUD_state == HUD_PortalInteraction)
+	{
+		ManagePortalInteractionInputs(deltaTime, hyperspeedMultiplier);
+	}
+	//SHOP MAIN
+	else if (m_HUD_state == HUD_ShopMainMenu && m_SFTargetPanel)
+	{
+		ManageShopMainMenuInputs();
+	}
+}
+
+void Ship::ManageIdleCombatInputs(sf::Time deltaTime, float hyperspeedMultiplier)
+{
+	//Recalling back to last hub
+	UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
+
+	if (m_actions_states[Action_Recalling] == true && m_respawnSceneName.empty() == false)
+		Recalling();
+	else
+		m_recall_text->m_visible = false;
+
+	//Slow_motion and hyperspeed
+	UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
+
+	//jump
+	if (m_can_jump == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_jump_cooldown <= 0 && m_collision_timer <=0)
+		Jump();
+
+	if (m_jump_timer == 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+		if (m_moving == true)
+		{
+			ScaleVector(&m_speed, SHIP_JUMPING_SPEED);
+			m_jump_timer -= deltaTime.asSeconds();
+		}
+
+	//cloak
+	if (m_can_cloak == true && m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_disableSpecial == false && m_cloak_cooldown <= 0 && m_collision_timer <= 0)
+		Cloak();
+
+	if (!m_actions_states[Action_Recalling])
+		(*CurrentGame).m_hyperspeedMultiplier = 1.0f;//resetting hyperspeed
+
+	//Auto fire option (F key)
+	if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
+	{
+		//Bots automatic fire option
+		if (m_inputs_states[Action_AutomaticFire] == Input_Tap)
+			m_automatic_fire = !m_automatic_fire;
+
+		for (Bot* bot : m_bot_list)
+			bot->m_automatic_fire = m_automatic_fire;
+	}
+
+	//Firing button
+	UpdateAction(Action_Firing, Input_Hold, !m_disable_fire);
+
+	//Weapon firing
+	bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
+
+	//Bots firing
+	for (Bot* bot : m_bot_list)
+		bot->Fire(deltaTime, hyperspeedMultiplier, firing);
+
+	//Braking and speed malus on firing
+	UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
+	//brake speed malus
+	if (m_jump_timer <= 0)
+	{
+		if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
+		{
+			m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
+			m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
+		}
+	}
+}
+
+void Ship::ManagePortalInteractionInputs(sf::Time deltaTime, float hyperspeedMultiplier)
+{
+	//Weapon firing
+	bool firing = ManageFiring(deltaTime, hyperspeedMultiplier);
+
+	//Bots firing
+	for (Bot* bot : m_bot_list)
+		bot->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, firing);
+
+	//brake speed malus
+	if (m_jump_timer <= 0)
+	{
+		if (firing == true || (m_actions_states[Action_Braking] == Input_Tap || m_actions_states[Action_Braking] == Input_Hold))
+		{
+			m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
+			m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
+		}
+	}
+
+	//Entering portal
+	if (m_inputs_states[Action_Firing] == Input_Tap)
+	{
+		m_is_asking_scene_transition = true;//this triggers transition in InGameState update
+	}
+}
+
+void Ship::ManageShopMainMenuInputs()
+{
+	//A: Enter shop
+	if (m_inputs_states[Action_Firing] == Input_Tap)
+	{
+		m_HUD_state = HUD_Upgrades;
+	}
+	//X: Enter stellar map
+	else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap)
+	{
+		m_HUD_state = HUD_ShopStellarMap;
 	}
 }
 
@@ -782,7 +754,11 @@ void Ship::ManageJump(sf::Time deltaTime)
 	if (m_jump_cooldown > 0 && m_jump_ghost_timer <= 0)
 		m_jump_cooldown -= deltaTime.asSeconds();
 
-	if (m_jump_timer > 0 && m_jump_timer < 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+	//NB: m_jump_timer is only ever set by Jump() (to 1.f * SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED) and only ever
+	//decreases afterwards, so it never exceeds that value - no need to upper-bound this check against it. Doing so
+	//used to leave m_jump_timer stuck forever whenever Jump() was triggered with no direction held (see ManageInputs),
+	//since nothing else would ever decrement it, which in turn permanently disabled IdleDecelleration().
+	if (m_jump_timer > 0)//jumping
 	{
 		PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01), m_ghost_timer > 0 ? GHOST_ALPHA_VALUE : 255);
 
@@ -1072,9 +1048,9 @@ void Ship::Respawn(bool no_save)
 	m_upgrades_short.clear();
 	m_SFHudPanel->UpdateUpgradeIcons();
 
-	m_max_speed = 750;
-	m_deceleration = 2000;
-	m_acceleration = 800;
+	m_max_speed = SHIP_MAX_SPEED_X;
+	m_deceleration = SHIP_DECCELERATION_COEF;
+	m_acceleration = SHIP_ACCELERATION_X;
 
 	m_armor_max = 3;
 	m_armor = m_armor_max;
@@ -1118,9 +1094,12 @@ void Ship::SetVisibility(bool visible)
 
 void Ship::Death(bool give_money)
 {
-	FX* myFX = m_FX_death->Clone();
-	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	(*CurrentGame).addToScene(myFX, true);
+	if (m_FX_death != NULL)
+	{
+		FX* myFX = m_FX_death->Clone();
+		myFX->setPosition(this->getPosition().x, this->getPosition().y);
+		(*CurrentGame).addToScene(myFX, true);
+	}
 
 	SetVisibility(false);
 	m_graze_count = 0;
@@ -1236,13 +1215,12 @@ void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 	//shield regen with grazing
 	if (m_shield_max > 0 && m_shield < m_shield_max)
 	{
-		static double graze_count_buffer = 0;
-		graze_count_buffer += GRAZE_PER_SECOND_AND_PER_BULLET * deltaTime.asSeconds() * hyperspeedMultiplier;
+		m_graze_count_buffer += GRAZE_PER_SECOND_AND_PER_BULLET * deltaTime.asSeconds() * hyperspeedMultiplier;
 
-		if (graze_count_buffer > 1)
+		if (m_graze_count_buffer > 1)
 		{
 			double intpart;
-			graze_count_buffer = modf(graze_count_buffer, &intpart);
+			m_graze_count_buffer = modf(m_graze_count_buffer, &intpart);
 			m_graze_count += intpart;
 
 			//regen shield
@@ -1468,7 +1446,7 @@ int Ship::SavePlayerScenes(Ship* ship)
 	assert(ship != NULL);
 
 	ofstream data(string(getSavesPath()) + SCENES_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
+	if (data)  // si l'ouverture a rï¿½ussi
 	{
 		// instructions
 		for (map<string, int>::iterator it = ship->m_knownScenes.begin(); it != ship->m_knownScenes.end(); it++)
@@ -1482,7 +1460,7 @@ int Ship::SavePlayerScenes(Ship* ship)
 
 		data.close();  // on ferme le fichier
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "Failed to open SCENES SAVE FILE !" << endl;
 	}
@@ -1499,7 +1477,7 @@ string Ship::LoadPlayerScenes(Ship* ship)
 
 	std::ifstream  data(string(getSavesPath()) + SCENES_SAVE_FILE, ios::in);
 
-	if (data) // si ouverture du fichier réussie
+	if (data) // si ouverture du fichier rï¿½ussie
 	{
 		std::string line;
 		while (std::getline(data, line))
@@ -1516,12 +1494,12 @@ string Ship::LoadPlayerScenes(Ship* ship)
 
 		data.close();  // on ferme le fichier
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "DEBUG: Failed to open PLAYER SAVE FILE !" << endl;
 	}
 
-	printf("DEBUG: Loaded %d known scenes from profile. Respawn scene: %s.\n", ship->m_knownScenes.size(), return_current_scene.c_str());
+	printf("DEBUG: Loaded %d known scenes from profile. Respawn scene: %s.\n", (int)ship->m_knownScenes.size(), return_current_scene.c_str());
 
 	return return_current_scene;
 }
@@ -1532,7 +1510,7 @@ int Ship::SavePlayerMoneyAndHealth(Ship* ship)
 	assert(ship != NULL);
 
 	ofstream data(string(getSavesPath()) + MONEY_AND_HEALTH_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
+	if (data)  // si l'ouverture a rï¿½ussi
 	{
 		data << "Money " << ship->m_money << endl;
 		data << "Health " << ship->m_armor << endl;
@@ -1543,7 +1521,7 @@ int Ship::SavePlayerMoneyAndHealth(Ship* ship)
 
 		data.close();  // on ferme le fichier
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
 	}
@@ -1558,36 +1536,35 @@ bool Ship::LoadPlayerMoneyAndHealth(Ship* ship)
 
 	std::ifstream  data(string(getSavesPath()) + MONEY_AND_HEALTH_SAVE_FILE, ios::in);
 
-	if (data) // si ouverture du fichier réussie
+	if (data) // si ouverture du fichier rï¿½ussie
 	{
 		std::string line;
-		int i = 0;
+		//matched by label rather than line index, so this stays correct even if SavePlayerMoneyAndHealth's
+		//fields are ever reordered or a new one is inserted between existing ones
 		while (std::getline(data, line))
 		{
-			string ss;
+			string key;
 			string value;
-			std::istringstream(line) >> ss >> value;
+			std::istringstream(line) >> key >> value;
 
-			if (i == 0)
+			if (key.compare("Money") == 0)
 				ship->m_money = stoi(value);
-			else if (i == 1)
+			else if (key.compare("Health") == 0)
 				ship->m_armor = stoi(value);
-			else if (i == 2)
+			else if (key.compare("Shield") == 0)
 				ship->m_shield = stoi(value);
-			else if (i == 3)
+			else if (key.compare("Graze") == 0)
 				ship->m_graze_count = stoi(value);
-			else if (i == 4)
+			else if (key.compare("Level") == 0)
 				ship->m_level = stoi(value);
-			else if (i == 5)
+			else if (key.compare("Crystal") == 0)
 				ship->m_crystals = stoi(value);
-		
-			i++;
 		}
-		
+
 		data.close();  // on ferme le fichier
 		return true;
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "DEBUG: No MONEY SAVE FILE found. A new file is going to be created.\n" << endl;
 		return false;
@@ -1600,7 +1577,7 @@ int Ship::SavePlayerUpgrades(Ship* ship)
 	assert(ship != NULL);
 
 	ofstream data(string(getSavesPath()) + PLAYER_UPGRADES_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
+	if (data)  // si l'ouverture a rï¿½ussi
 	{
 		for (vector<string>::iterator it = ship->m_upgrades.begin(); it != ship->m_upgrades.end(); it++)
 		{
@@ -1610,7 +1587,7 @@ int Ship::SavePlayerUpgrades(Ship* ship)
 
 		data.close();  // on ferme le fichier
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "DEBUG: No save file found for player upgrades. A new file is going to be created.\n" << endl;
 	}
@@ -1625,7 +1602,7 @@ bool Ship::LoadPlayerUpgrades(Ship* ship)
 
 	std::ifstream  data(string(getSavesPath()) + PLAYER_UPGRADES_SAVE_FILE, ios::in);
 
-	if (data) // si ouverture du fichier réussie
+	if (data) // si ouverture du fichier rï¿½ussie
 	{
 		ship->m_upgrades.clear();
 
@@ -1646,7 +1623,7 @@ bool Ship::LoadPlayerUpgrades(Ship* ship)
 
 		return true;
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "DEBUG: No ITEMS SAVE FILE found. A new file is going to be created.\n" << endl;
 		return false;
@@ -1751,6 +1728,11 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses,
 	}
 }
 
+void Ship::RecomputeComboCountMax()
+{
+	m_combo_count_max = COMBO_COUNT_FIRST_LEVEL * pow(1 + COMBO_LEVEL_COUNT_MULTIPLIER, m_combo_level);
+}
+
 void Ship::AddComboCount(int value)
 {
 	if (value == 0)
@@ -1768,7 +1750,7 @@ void Ship::AddComboCount(int value)
 			{
 				value -= (m_combo_count_max - m_combo_count);
 				m_combo_level++;
-				m_combo_count_max = COMBO_COUNT_FIRST_LEVEL * pow(1 + COMBO_LEVEL_COUNT_MULTIPLIER, m_combo_level);
+				RecomputeComboCountMax();
 				m_combo_count = 0;
 			}
 			else
@@ -1789,7 +1771,7 @@ void Ship::AddComboCount(int value)
 				{
 					value -= (m_combo_count + 1);
 					m_combo_level--;
-					m_combo_count_max = COMBO_COUNT_FIRST_LEVEL * pow(1 + COMBO_LEVEL_COUNT_MULTIPLIER, m_combo_level);
+					RecomputeComboCountMax();
 					m_combo_count = m_combo_count_max - 1;
 				}
 				else
@@ -1884,40 +1866,12 @@ void Ship::SetUpgrade(string upgrade_name)
 	}
 	
 	//apply effect
-	if (upgrade_name.compare("Upgrade_hp_1") == 0)
+	if (upgrade_name.compare("Upgrade_hp_1") == 0 || upgrade_name.compare("Upgrade_hp_2") == 0 || upgrade_name.compare("Upgrade_hp_3") == 0 || upgrade_name.compare("Upgrade_hp_4") == 0 || upgrade_name.compare("Upgrade_hp_5") == 0)
 	{
 		m_armor_max++;
 		m_armor++;
 	}
-	else if (upgrade_name.compare("Upgrade_hp_2") == 0)
-	{
-		m_armor_max++;
-		m_armor++;
-	}
-	else if (upgrade_name.compare("Upgrade_hp_3") == 0)
-	{
-		m_armor_max++;
-		m_armor++;
-	}
-	else if (upgrade_name.compare("Upgrade_hp_4") == 0)
-	{
-		m_armor_max++;
-		m_armor++;
-	}
-	else if (upgrade_name.compare("Upgrade_hp_5") == 0)
-	{
-		m_armor_max++;
-		m_armor++;
-	}
-	else if (upgrade_name.compare("Upgrade_shield_1") == 0)
-		m_shield_max++;
-	else if (upgrade_name.compare("Upgrade_shield_2") == 0)
-		m_shield_max++;
-	else if (upgrade_name.compare("Upgrade_shield_3") == 0)
-		m_shield_max++;
-	else if (upgrade_name.compare("Upgrade_shield_4") == 0)
-		m_shield_max++;
-	else if (upgrade_name.compare("Upgrade_shield_5") == 0)
+	else if (upgrade_name.compare("Upgrade_shield_1") == 0 || upgrade_name.compare("Upgrade_shield_2") == 0 || upgrade_name.compare("Upgrade_shield_3") == 0 || upgrade_name.compare("Upgrade_shield_4") == 0 || upgrade_name.compare("Upgrade_shield_5") == 0)
 		m_shield_max++;
 	else if (upgrade_name.compare("Upgrade_laser_1") == 0)
 		SetWeapon("laser1");
@@ -2146,7 +2100,17 @@ void Ship::RandomizeUpgrades(Shop* target_shop)
 
 	for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
 	{
-		target_shop->m_upgrades[i] = random_upgrades[i];
-		target_shop->m_sold_out[i] = false;
+		//not enough eligible upgrades left to fill every shop slot (e.g. late-game once most upgrades are
+		//already owned) - mark the remaining slots as sold out instead of reading random_upgrades out of bounds
+		if (i < (int)random_upgrades.size())
+		{
+			target_shop->m_upgrades[i] = random_upgrades[i];
+			target_shop->m_sold_out[i] = false;
+		}
+		else
+		{
+			target_shop->m_upgrades[i] = "";
+			target_shop->m_sold_out[i] = true;
+		}
 	}
 }

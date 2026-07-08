@@ -16,11 +16,13 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	m_key_repeat = false;
 	m_display_name = "Bot";
 	m_target = NULL;
+	m_weapon = NULL;
 }
 
 Bot::~Bot()
 {
-	delete m_weapon;
+	if (m_weapon != NULL)
+		delete m_weapon;
 }
 
 void Bot::setTarget (GameObject* target)
@@ -87,7 +89,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 	{
 		//UPDATE WEAPON POSITION
 		float target_angle = getRotation();//calculating the angle we want to face, if any
-		if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
+		if (m_weapon->m_target_homing == HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
 			target_angle = fmod(- (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 
 		float current_angle = getRotation();
@@ -140,7 +142,7 @@ Bot* Bot::Clone()
 	bot->m_display_name = this->m_display_name;
 	bot->m_vspeed = this->m_vspeed;
 	bot->m_spread = this->m_spread;
-	bot->m_weapon = this->m_weapon->Clone();
+	bot->m_weapon = this->m_weapon != NULL ? this->m_weapon->Clone() : NULL;
 	bot->m_damage = this->m_damage;
 	bot->m_armor = this->m_armor;
 	bot->m_armor_max = this->m_armor_max;

@@ -8,12 +8,11 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playership) : SFPanel(
 	m_playership = playership;
 	m_selected_index = 0;
 
-	m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+	m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 	m_actions->SetString("Quit", ActionButton_B);
 	m_actions->SetString("Buy", ActionButton_A);
 
-	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	SetTitleAndTextFont((*CurrentGame).m_font[Font_Arial]);
 
 	//texts
 	m_title_text.setString("Use your money to buy upgrades for your ship");
@@ -117,6 +116,12 @@ SFUpgradesPanel::SFUpgradesPanel(sf::Vector2f size, Ship* playership) : SFPanel(
 	m_money_text.setPosition(sf::Vector2f(getPosition().x + getSize().x / 2 - INTERACTION_PANEL_MARGIN_SIDES - 150, getPosition().y - getSize().y / 2 + text_height));
 }
 
+SFUpgradesPanel::~SFUpgradesPanel()
+{
+	for (int i = 0; i < NB_UPGRADE_CHOICES; i++)
+		delete m_upgrade_picture[i];
+}
+
 void SFUpgradesPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//select upgrade
@@ -138,7 +143,7 @@ void SFUpgradesPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 			m_upgrade_container[i].setFillColor(COLOR_DARKGREY);
 
 		//sold out or insufficient money?
-		m_unavailable_mask[i].m_visible = i != m_selected_index && (m_sold_out[i] == true || m_playership->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[m_selected_index]][UPGRADE_PRICE]));
+		m_unavailable_mask[i].m_visible = i != m_selected_index && (m_sold_out[i] == true || m_playership->m_money < stoi((*CurrentGame).m_upgradesConfig[m_playership->m_targetShop->m_upgrades[i]][UPGRADE_PRICE]));
 		m_sold_out_text[i].m_visible = m_sold_out[i];
 
 		if (m_sold_out[i] == true)

@@ -246,7 +246,7 @@ public:
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	GameObject();
 
-	~GameObject();
+	virtual ~GameObject();
 
 	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
 	virtual void updateAnimation(sf::Time deltaTime);
@@ -315,6 +315,9 @@ public:
 
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+	//squared-distance variants: avoid the sqrt for hot paths that only need to compare a distance against a threshold
+	static float GetSquaredDistanceBetweenObjects(GameObject* object1, GameObject* object2);
+	static float GetSquaredDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 	static float GetVectorLength(sf::Vector2f vector);
 	static float GetAngleRadForVector(sf::Vector2f vector);
 	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
@@ -345,9 +348,13 @@ public:
 
 protected:
 	sf::Vector2f m_initial_position;
-	
+
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
+	std::vector<Animation*> m_animationLines; //cache of per-line Animations built lazily by setAnimationLine; owned here and freed in ~GameObject
+
+	//shared by update()/Background::update()/FX::update(): clamps hyperspeedMultiplier to <=1, scales m_speed and returns the resulting next position (does not apply it)
+	sf::Vector2f ComputeHyperspeedMovement(sf::Time deltaTime, float hyperspeedMultiplier, float extraYSpeed = 0.f);
 
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber = 1);

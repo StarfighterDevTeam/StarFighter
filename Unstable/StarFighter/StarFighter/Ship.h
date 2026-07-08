@@ -5,16 +5,17 @@
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
-#define SHIP_ACCELERATION_X         20.0f
-#define SHIP_ACCELERATION_Y         20.0f
-#define SHIP_DECCELERATION_COEF		1000.0f
-#define SHIP_MAX_SPEED_X            500.0f
-#define SHIP_MAX_SPEED_Y            500.0f
+#define SHIP_ACCELERATION_X         800.0f
+#define SHIP_ACCELERATION_Y         800.0f
+#define SHIP_DECCELERATION_COEF		2000.0f
+#define SHIP_MAX_SPEED_X            750.0f
+#define SHIP_MAX_SPEED_Y            750.0f
 #define SHIP_MIN_SPEED_X            50.0f
 #define SHIP_MIN_SPEED_Y            50.0f
-#define SHIP_ARMOR					600
-#define SHIP_SHIELD					1000
-#define SHIP_SHIELD_REGEN			1
+// Unused, stale — from an earlier HP-based armor/shield scale; Respawn() now uses small integer values (m_armor_max, m_shield_max) instead
+//#define SHIP_ARMOR					600
+//#define SHIP_SHIELD					1000
+//#define SHIP_SHIELD_REGEN			1
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
 class Loot;
@@ -104,6 +105,13 @@ public :
 	void UpdateInputStates();
 	void UpdateHUDStates();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
+	void ManageDialogInputs();
+	void ManageStellarMapInputs(sf::Time deltaTime, sf::Vector2f inputs_direction);
+	void ManageUpgradesPanelInputs();
+	void ManageActiveGameplayInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
+	void ManageIdleCombatInputs(sf::Time deltaTime, float hyperspeedMultiplier);
+	void ManagePortalInteractionInputs(sf::Time deltaTime, float hyperspeedMultiplier);
+	void ManageShopMainMenuInputs();
 	void ManageImmunity(sf::Time deltaTime);
 	void ManageGhost(sf::Time deltaTime);
 	void ManageJump(sf::Time deltaTime);
@@ -193,6 +201,7 @@ public :
 	string m_respawnSceneName;
 	sf::Clock m_recall_clock;
 	int m_graze_count;
+	double m_graze_count_buffer;
 	int m_graze_level;
 	sf::Vertex m_graze_percent_points[GRAZING_FEEDBACK_CIRCLE_POINTS * 2];
 	sf::Clock m_graze_sinus_clock;
@@ -247,6 +256,17 @@ private:
 	bool m_moving;
 	bool m_movingX;
 	bool m_movingY;
+
+	//shared by ManageGrazingFeedback/ManageSpecialFeedback: fills a feedback ring's vertex positions and colors.
+	//angleOffset90 selects between the two angular offsets used by those two callers (0 or 90 degrees) so the
+	//per-point unit-circle cos/sin can be cached instead of recomputed every frame.
+	void UpdateFeedbackRing(sf::Vertex* points, float radius, bool angleOffset90, float angleToFill, float emptyAngleLimitDeg, sf::Color fillColor, float fillPulseFreqMultiplier, float fillPulseAmplitudeNumerator);
+
+	//shared by AddComboCount's level-up/level-down branches
+	void RecomputeComboCountMax();
+
+	//extracted out of ManageFiring for readability; theta is expected in radians
+	void UpdateWeaponCurrentOffset(Weapon* weapon, float theta);
 };
 
 #endif // SHIP_H_INCLUDED

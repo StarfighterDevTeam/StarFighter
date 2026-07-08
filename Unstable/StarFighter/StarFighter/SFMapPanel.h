@@ -120,6 +120,7 @@ private:
 	int ComputeTeleportationCost(StellarHub* destination);
 
 	sf::RenderTexture m_texture;
+	sf::Sprite m_map_sprite;
 	sf::Vector2f m_scroll_offset;
 	sf::FloatRect m_map_content_area;
 };

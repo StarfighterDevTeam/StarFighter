@@ -164,7 +164,7 @@ void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime)
 	if (m_multishot > 1)
 	{
 		if (m_dispersion == 360)//treating this particular case to avoid a double bullet on the 360th degree
-			m_dispersion *= (1 - (1 / m_multishot));//ex: 10 shots at 360°, we make it shots at 324° instead (360 - 360/10 to avoid the double bullet)
+			m_dispersion *= (1.0f - (1.0f / m_multishot));//ex: 10 shots at 360ï¿½, we make it shots at 324ï¿½ instead (360 - 360/10 to avoid the double bullet)
 
 		if (m_shot_mode == NoShotMode)
 			FireMultiShot(collider_type);

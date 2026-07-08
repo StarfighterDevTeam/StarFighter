@@ -34,14 +34,17 @@ public:
 		buffer = new char[size];
 		va_list vl;
 		va_start(vl, fmt);
+		va_list vl_retry;
+		va_copy(vl_retry, vl);
 		int nsize = vsnprintf(buffer, size, fmt, vl);
-		if(size<=nsize){ 
+		if(size<=nsize){
 			delete[] buffer;
 			buffer = 0;
-			buffer = new char[nsize+1]; 
-			nsize = vsnprintf(buffer, size, fmt, vl);
+			buffer = new char[nsize+1];
+			nsize = vsnprintf(buffer, nsize+1, fmt, vl_retry);
 		}
 		std::string ret(buffer);
+		va_end(vl_retry);
 		va_end(vl);
 		delete[] buffer;
 		return ret;

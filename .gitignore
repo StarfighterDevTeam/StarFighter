@@ -16,6 +16,8 @@ local.properties
 .settings/
 .loadpath
 .vexp/
+*.vs/
+*/v17/
 
 # External tool builders
 .externalToolBuilders/

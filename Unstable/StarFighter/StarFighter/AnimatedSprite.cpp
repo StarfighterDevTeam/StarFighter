@@ -26,7 +26,12 @@
 AnimatedSprite::AnimatedSprite(sf::Time frameTime, bool paused, bool looped) :
 m_animation(NULL), m_frameTime(frameTime), m_currentFrame(0), m_isPaused(paused), m_isLooped(looped), m_texture(NULL)
 {
-	
+
+}
+
+AnimatedSprite::~AnimatedSprite()
+{
+
 }
 
 void AnimatedSprite::setAnimation(const Animation& animation)
@@ -90,7 +95,8 @@ const Animation* AnimatedSprite::getAnimation() const
 
 sf::FloatRect AnimatedSprite::getLocalBounds() const
 {
-	//What if Animation is NULL ?
+	if (!m_animation)
+		return sf::FloatRect(0.f, 0.f, 0.f, 0.f);
 
 	sf::IntRect rect = m_animation->getFrame(m_currentFrame);
 
@@ -194,6 +200,10 @@ void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) con
 
 const sf::IntRect& AnimatedSprite::getTextureRect() const
 {
+	static const sf::IntRect s_emptyRect(0, 0, 0, 0);
+	if (!m_animation)
+		return s_emptyRect;
+
 	return m_animation->getFrame(m_currentFrame);
 }
 

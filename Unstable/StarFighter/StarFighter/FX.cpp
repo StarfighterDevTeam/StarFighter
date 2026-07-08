@@ -14,20 +14,12 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 
 void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = m_speed;
-
 	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
-
-	//slowmotion
-	newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
 
 	setGhost(hyperspeedMultiplier > 1.0f);
 
-	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
-
+	//slowmotion
+	sf::Vector2f newposition = ComputeHyperspeedMovement(deltaTime, hyperspeedMultiplier, (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed);
 	setPosition(newposition.x, newposition.y);
 
 	if (m_duration > 0)
@@ -62,16 +54,9 @@ Aura::Aura(GameObject* target, std::string textureName, sf::Vector2f size, int f
 	m_layer = FakeShipLayer;
 }
 
-void Aura::Init(std::string textureName, sf::Vector2f size, int frameNumber)
-{
-	m_textureName = textureName;
-	m_size = size;
-	m_frameNumber = frameNumber;
-}
-
 void Aura::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition;
+	sf::Vector2f newposition;
 
 	float angle = m_target->getRotation() / 180 * M_PI;
 	float offset_x = m_offset.x * cos(angle) - m_offset.y * sin(angle);

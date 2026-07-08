@@ -49,6 +49,17 @@ public:
 	GameObject m_crystal;
 	sf::Text m_crystals_text;
 
+	sf::RectangleShape m_black_background;
+
+	//cached values, to avoid rebuilding text strings every frame when nothing changed
+	int m_last_armor;
+	int m_last_armor_max;
+	int m_last_shield;
+	int m_last_shield_max;
+	int m_last_money;
+	int m_last_crystals;
+	string m_last_scene_name;
+	int m_last_level;
 };
 
 #endif // SFHUDPANEL_H_INCLUDED

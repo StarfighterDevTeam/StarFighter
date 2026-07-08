@@ -33,6 +33,11 @@ void Animation::addFrame(sf::IntRect rect)
     m_frames.push_back(rect);
 }
 
+void Animation::reserve(std::size_t frameCount)
+{
+    m_frames.reserve(frameCount);
+}
+
 void Animation::setSpriteSheet(const sf::Texture& texture)
 {
     m_texture = &texture;

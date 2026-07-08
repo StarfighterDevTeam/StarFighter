@@ -39,6 +39,7 @@ class AnimatedSprite : public sf::Drawable, public sf::Transformable
 {
 public:
 	explicit AnimatedSprite(sf::Time frameTime = sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES), bool paused = false, bool looped = true);
+	virtual ~AnimatedSprite();
 
 	void update(sf::Time deltaTime);
 	void setAnimation(const Animation& animation);

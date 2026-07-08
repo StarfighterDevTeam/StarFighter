@@ -198,8 +198,7 @@ SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size,
 
 	//texts
 	m_title_text.setCharacterSize(18);
-	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	SetTitleAndTextFont((*CurrentGame).m_font[Font_Arial]);
 }
 
 SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playership) : SFStellarInfoPanel(hub->getPosition(), size, playership)
@@ -313,6 +312,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 	m_info_panel = NULL;
 	m_teleportation_cost = 0;
 	m_hightlighted_branch = NULL;
+	m_current_hub = NULL;//set in CreateStellarMap_v2 once the hub matching the player's current scene is found
 
 	//panel position and color
 	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
@@ -336,12 +336,11 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 	m_ship.setScale(STELLARMAP_SHIP_MINIATURE_SCALE, STELLARMAP_SHIP_MINIATURE_SCALE);
 
 	//texts
-	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	SetTitleAndTextFont((*CurrentGame).m_font[Font_Arial]);
 	//m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 	//buttons
-	m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+	m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 	m_actions->SetString("Center map", ActionButton_X);
 	m_actions->SetString("Exit", ActionButton_B);
 
@@ -360,6 +359,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 
 	//render texture
 	m_texture.create((unsigned int)size.x, (unsigned int)size.y);
+	m_map_sprite.setTexture(m_texture.getTexture());
 	m_scroll_offset = sf::Vector2f(0, 0);
 
 	//CONSTRUCTION OF THE MAP
@@ -368,7 +368,20 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playership) : SFPanel(size, SFPa
 
 SFMapPanel::~SFMapPanel()
 {
+	delete m_info_panel;
 
+	for (StellarBranch* branch : m_branches)
+	{
+		delete branch->m_hub;
+
+		for (StellarSegment* segment : branch->m_segments)
+			delete segment;
+
+		for (StellarNode* node : branch->m_nodes)
+			delete node;
+
+		delete branch;
+	}
 }
 
 void SFMapPanel::CreateStellarMap_v2()
@@ -525,18 +538,8 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	{
 		if (branch->m_hub != NULL)//check hubs first
 		{
-			branch->m_hub->m_feedback_state = StellarComponent_NormalState;
-			branch->m_hub->setFillColor(sf::Color::Red);
-
-			if (highlighted_branch == NULL && SFPanel::IsCursorCollidingWithRectangle(m_cursor, *branch->m_hub) == true)
-			{
+			if (branch->m_hub->Update(m_cursor, highlighted_branch != NULL))
 				highlighted_branch = branch;
-				branch->m_hub->setFillColor(sf::Color::Yellow);
-			}
-			else
-			{
-				branch->m_hub->setFillColor(sf::Color::Red);
-			}
 		}
 	}
 
@@ -617,13 +620,11 @@ void SFMapPanel::Draw(sf::RenderTexture& screen)
 		}
 
 		m_texture.display();
-		UpdateBranchesPosition(false, false);//undo offset to get match into real coordinates for calculations
-		sf::Sprite temp(m_texture.getTexture());
-		unsigned int sizex = m_texture.getSize().x;
-		float posx = this->getPosition().x;
-		temp.setOrigin(this->getOrigin());
-		temp.setPosition(this->getPosition());
-		screen.draw(temp);
+		//NOTE: branches are left in RenderTexture (fake) coordinates here; the next Update() call
+		//recomputes them into real coordinates before they are read again, so no extra pass is needed.
+		m_map_sprite.setOrigin(this->getOrigin());
+		m_map_sprite.setPosition(this->getPosition());
+		screen.draw(m_map_sprite);
 
 		screen.draw(m_ship);
 		screen.draw(m_cursor);
@@ -652,7 +653,7 @@ string SFMapPanel::GetTeleportationDestination()
 
 void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 {
-	if (!cursor.m_visible)
+	if (!cursor.m_visible || !m_current_hub)
 	{
 		return;
 	}
@@ -694,8 +695,8 @@ void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 }
 
 void SFMapPanel::UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates)
-{ 
-	if (!m_branches.empty())
+{
+	if (!m_branches.empty() && m_current_hub)
 	{
 		size_t branchesVectorSize = m_branches.size();
 		for (size_t i = 0; i < branchesVectorSize; i++)

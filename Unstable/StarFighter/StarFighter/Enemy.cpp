@@ -2,6 +2,11 @@
 
 extern Game* CurrentGame;
 
+//tolerances used to detect an "equal" phase-transition condition on values that accumulate every frame (clocks, rotation),
+//since they very rarely land on the exact configured value due to floating point deltaTime accumulation
+#define CLOCK_CONDITION_TOLERANCE		0.1f
+#define ROTATION_CONDITION_TOLERANCE	2.0f
+
 //DEBUG
 void Enemy::Draw(sf::RenderTexture& screen)
 {
@@ -15,7 +20,7 @@ void Enemy::Draw(sf::RenderTexture& screen)
 
 	//hack
 	//if (m_pattern.m_patternParams.empty() == false)
-	//	m_pattern.m_patternParams[0] = 0;//param 0 = clockwise inutile car on a déjà le signe de speed.  Remplacer par un booléen "randomize speed sign".
+	//	m_pattern.m_patternParams[0] = 0;//param 0 = clockwise inutile car on a dï¿½jï¿½ le signe de speed.  Remplacer par un boolï¿½en "randomize speed sign".
 	//m_pattern.m_patternSpeed = -100;
 
 	//display
@@ -438,7 +443,7 @@ void Enemy::GetDamage(int damage)
 
 	if (m_armor <= 0)
 	{
-		m_armor == 0;
+		m_armor = 0;
 		Death(true);
 	}
 }
@@ -524,7 +529,7 @@ bool Enemy::CheckCondition()
 			}
 			case PhaseClock:
 			{
-				if (m_phaseTimer == cond->m_value)
+				if (fabs(m_phaseTimer - cond->m_value) < CLOCK_CONDITION_TOLERANCE)
 					result = EQUAL_TO;
 				else
 					result = m_phaseTimer > cond->m_value ? GREATER_THAN : LESSER_THAN;
@@ -532,7 +537,7 @@ bool Enemy::CheckCondition()
 			}
 			case EnemyClock:
 			{
-				if (m_enemyTimer == cond->m_value)
+				if (fabs(m_enemyTimer - cond->m_value) < CLOCK_CONDITION_TOLERANCE)
 					result = EQUAL_TO;
 				else
 					result = m_enemyTimer > cond->m_value ? GREATER_THAN : LESSER_THAN;
@@ -579,7 +584,7 @@ bool Enemy::CheckCondition()
 			}
 			case Rotation:
 			{
-				if (getRotation() == cond->m_value)
+				if (fabs(getRotation() - cond->m_value) < ROTATION_CONDITION_TOLERANCE)
 					result = EQUAL_TO;
 				else
 					result = getRotation() > cond->m_value ? GREATER_THAN : LESSER_THAN;
@@ -690,52 +695,32 @@ void Enemy::setPhase(Phase* phase)
 	//WEAPONS
 	//loading phase weapons, keeping existing weapons when they are the same and delay is 0 (which avoids resetting their readyFireTimer)
 	vector<Weapon*> new_weapons_list;
+	vector<bool> claimed_weapons(m_weapons_list.size(), false);//tracks which existing weapons were already carried over to new_weapons_list, to avoid re-scanning it for every candidate
 	for (Weapon* weapon_phase : phase->m_weapons_list)
 	{
 		bool kept = false;
-		for (Weapon* weapon : m_weapons_list)
+		for (size_t i = 0; i < m_weapons_list.size(); i++)
 		{
-			bool found = false;
-			if (weapon_phase->m_display_name.compare(weapon->m_display_name) == 0 && weapon_phase->m_delay == 0)//same kind of weapon?
+			Weapon* weapon = m_weapons_list[i];
+			if (claimed_weapons[i] == false && weapon_phase->m_display_name.compare(weapon->m_display_name) == 0 && weapon_phase->m_delay == 0)//same kind of weapon, not already claimed?
 			{
-				for (Weapon* weapon_kept : new_weapons_list)//not already saved?
-				{
-					if (weapon_kept == weapon)
-					{
-						found = true;
-						break;
-					}
-				}
-
-				if (found == false)
-				{
-					new_weapons_list.push_back(weapon);//save it
-					weapon->m_delay = weapon_phase->m_delay;//copy delay (useful when new delay is 0 so there is a continuity with previous weapons)
-					kept = true;
-					break;
-				}
+				new_weapons_list.push_back(weapon);//save it
+				claimed_weapons[i] = true;
+				weapon->m_delay = weapon_phase->m_delay;//copy delay (useful when new delay is 0 so there is a continuity with previous weapons)
+				kept = true;
+				break;
 			}
 		}
-		
+
 		if (kept == false)
 			new_weapons_list.push_back(weapon_phase->Clone());
 	}
 
 	//clearing old weapons not kept
-	for (Weapon* weapon : m_weapons_list)
+	for (size_t i = 0; i < m_weapons_list.size(); i++)
 	{
-		bool found = false;
-		for (Weapon* new_weapon : new_weapons_list)
-		{
-			if (weapon == new_weapon)
-			{
-				found = true;
-				break;
-			}
-		}
-
-		if (found == false)
-			delete weapon;
+		if (claimed_weapons[i] == false)
+			delete m_weapons_list[i];
 	}
 
 	//clear list and loading new list
@@ -1012,61 +997,63 @@ bool Enemy::IsBoss()
 
 Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 {
-	Weapon* weapon = new Weapon(Enemy::LoadAmmo((*CurrentGame).m_weaponsConfig[name][WEAPON_AMMO]));
-	weapon->m_display_name = (*CurrentGame).m_weaponsConfig[name][WEAPON_DISPLAY_NAME];
+	vector<string>& cfg = (*CurrentGame).m_weaponsConfig[name];//cache the config row once instead of re-looking it up by name for every field below
+
+	Weapon* weapon = new Weapon(Enemy::LoadAmmo(cfg[WEAPON_AMMO]));
+	weapon->m_display_name = cfg[WEAPON_DISPLAY_NAME];
 	weapon->m_fire_direction = fire_direction;
-	weapon->m_rate_of_fire = atof((*CurrentGame).m_weaponsConfig[name][WEAPON_RATE_OF_FIRE].c_str());
+	weapon->m_rate_of_fire = atof(cfg[WEAPON_RATE_OF_FIRE].c_str());
 	weapon->m_shot_mode = NoShotMode;
 
-	weapon->m_ammunition->m_damage = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_DAMAGE]);
-	weapon->m_ammunition->m_ref_speed = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_SPEED]);
+	weapon->m_ammunition->m_damage = stoi(cfg[WEAPON_DAMAGE]);
+	weapon->m_ammunition->m_ref_speed = (float)stoi(cfg[WEAPON_SPEED]);
 	weapon->m_ammunition->m_speed = sf::Vector2f(0, weapon->m_ammunition->m_ref_speed);
-	weapon->m_ammunition->m_range = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_RANGE]);
+	weapon->m_ammunition->m_range = (float)stoi(cfg[WEAPON_RANGE]);
 
-	GeometryPattern* pattern = GeometryPattern::LoadPattern((*CurrentGame).m_weaponsConfig[name], WEAPON_PATTERN);
+	GeometryPattern* pattern = GeometryPattern::LoadPattern(cfg, WEAPON_PATTERN);
 	weapon->m_ammunition->m_pattern.setPattern_v2(pattern);
 	delete pattern;
 
-	weapon->m_multishot = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_MULTISHOT]);
+	weapon->m_multishot = stoi(cfg[WEAPON_MULTISHOT]);
 	if (weapon->m_multishot > 1)
 	{
-		weapon->m_xspread = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_XSPREAD]);
-		weapon->m_dispersion = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_DISPERSION]);
-		if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("0") != 0)
+		weapon->m_xspread = stoi(cfg[WEAPON_XSPREAD]);
+		weapon->m_dispersion = (float)stoi(cfg[WEAPON_DISPERSION]);
+		if (cfg[WEAPON_ALTERNATE].compare("0") != 0)
 		{
-			if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("alternate") == 0)
+			if (cfg[WEAPON_ALTERNATE].compare("alternate") == 0)
 				weapon->m_shot_mode = AlternateShotMode;
-			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("ascending") == 0)
+			else if (cfg[WEAPON_ALTERNATE].compare("ascending") == 0)
 				weapon->m_shot_mode = AscendingShotMode;
-			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("descending") == 0)
+			else if (cfg[WEAPON_ALTERNATE].compare("descending") == 0)
 				weapon->m_shot_mode = DescendingShotMode;
-			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("ascending2") == 0)
+			else if (cfg[WEAPON_ALTERNATE].compare("ascending2") == 0)
 				weapon->m_shot_mode = Ascending2ShotMode;
-			else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_ALTERNATE].compare("descending2") == 0)
+			else if (cfg[WEAPON_ALTERNATE].compare("descending2") == 0)
 				weapon->m_shot_mode = Descending2ShotMode;
 		}
 	}
-			
-	weapon->m_rafale = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_RAFALE]);
+
+	weapon->m_rafale = stoi(cfg[WEAPON_RAFALE]);
 	if (weapon->m_rafale != 0)
 	{
-		weapon->m_rafale_cooldown = atof((*CurrentGame).m_weaponsConfig[name][WEAPON_RAFALE_COOLDOWN].c_str());
-		weapon->m_rafale_locking = (bool)(stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_RAFALE_LOCKING]));
+		weapon->m_rafale_cooldown = atof(cfg[WEAPON_RAFALE_COOLDOWN].c_str());
+		weapon->m_rafale_locking = (bool)(stoi(cfg[WEAPON_RAFALE_LOCKING]));
 
 		if (weapon->m_rafale < 0)
 			weapon->m_ammunition->m_isBeam = true;
 	}
-				
-	weapon->m_textureName = (*CurrentGame).m_weaponsConfig[name][WEAPON_IMAGE_NAME];
-	weapon->m_size = sf::Vector2f((float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_WIDTH]), (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_HEIGHT]));
-	weapon->m_frameNumber = stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_FRAMES]);
-	weapon->m_angle_offset = (float)stoi((*CurrentGame).m_weaponsConfig[name][WEAPON_ANGLE_OFFSET]);
 
-	if ((*CurrentGame).m_weaponsConfig[name][WEAPON_TARGET_HOMING].compare("0") != 0)
+	weapon->m_textureName = cfg[WEAPON_IMAGE_NAME];
+	weapon->m_size = sf::Vector2f((float)stoi(cfg[WEAPON_WIDTH]), (float)stoi(cfg[WEAPON_HEIGHT]));
+	weapon->m_frameNumber = stoi(cfg[WEAPON_FRAMES]);
+	weapon->m_angle_offset = (float)stoi(cfg[WEAPON_ANGLE_OFFSET]);
+
+	if (cfg[WEAPON_TARGET_HOMING].compare("0") != 0)
 	{
-		if ((*CurrentGame).m_weaponsConfig[name][WEAPON_TARGET_HOMING].compare("semi_homing") == 0)
+		if (cfg[WEAPON_TARGET_HOMING].compare("semi_homing") == 0)
 			weapon->m_target_homing = SEMI_HOMING;
-		else if ((*CurrentGame).m_weaponsConfig[name][WEAPON_TARGET_HOMING].compare("homing") == 0)
+		else if (cfg[WEAPON_TARGET_HOMING].compare("homing") == 0)
 			weapon->m_target_homing = HOMING;
 	}
 
@@ -1075,57 +1062,63 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction)
 
 Ammo* Enemy::LoadAmmo(string name)
 {
-	Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_ammoConfig[name][AMMO_IMAGE_NAME],
-		Vector2f((float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_WIDTH]), (float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_HEIGHT])), stoi((*CurrentGame).m_ammoConfig[name][AMMO_FRAMES]), stoi((*CurrentGame).m_ammoConfig[name][AMMO_NB_SKINS]), 0, LoadFX((*CurrentGame).m_ammoConfig[name][AMMO_FX]), (bool)stoi((*CurrentGame).m_ammoConfig[name][AMMO_MISSILE_MODEL]));
+	vector<string>& cfg = (*CurrentGame).m_ammoConfig[name];//cache the config row once instead of re-looking it up by name for every field below
 
-	new_ammo->setAnimationLine(stoi((*CurrentGame).m_ammoConfig[name][AMMO_SKIN]) - 1);
-	new_ammo->m_display_name = (*CurrentGame).m_ammoConfig[name][AMMO_NAME];
-	new_ammo->m_sound_name = (*CurrentGame).m_ammoConfig[name][AMMO_SOUND];
+	Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, 0), cfg[AMMO_IMAGE_NAME],
+		Vector2f((float)stoi(cfg[AMMO_WIDTH]), (float)stoi(cfg[AMMO_HEIGHT])), stoi(cfg[AMMO_FRAMES]), stoi(cfg[AMMO_NB_SKINS]), 0, LoadFX(cfg[AMMO_FX]), (bool)stoi(cfg[AMMO_MISSILE_MODEL]));
 
-	if ((*CurrentGame).m_ammoConfig[name][AMMO_FX].empty() == false)
-		new_ammo->m_explosion->m_display_name = (*CurrentGame).m_ammoConfig[name][AMMO_FX];
+	new_ammo->setAnimationLine(stoi(cfg[AMMO_SKIN]) - 1);
+	new_ammo->m_display_name = cfg[AMMO_NAME];
+	new_ammo->m_sound_name = cfg[AMMO_SOUND];
 
-	new_ammo->m_rotation_speed = (float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_ROTATION_SPEED]);
-	new_ammo->m_area_of_effect = (float)stoi((*CurrentGame).m_ammoConfig[name][AMMO_AREA_OF_EFFECT]);
+	if (cfg[AMMO_FX].empty() == false)
+		new_ammo->m_explosion->m_display_name = cfg[AMMO_FX];
+
+	new_ammo->m_rotation_speed = (float)stoi(cfg[AMMO_ROTATION_SPEED]);
+	new_ammo->m_area_of_effect = (float)stoi(cfg[AMMO_AREA_OF_EFFECT]);
 
 	return new_ammo;
 }
 
 FX* Enemy::LoadFX(string name)
 {
-	FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_FXConfig[name][FX_FILENAME], Vector2f((float)stoi((*CurrentGame).m_FXConfig[name][FX_WIDTH]), (float)stoi((*CurrentGame).m_FXConfig[name][FX_HEIGHT])), (bool)stoi((*CurrentGame).m_FXConfig[name][FX_IS_PERMANENT]), stoi((*CurrentGame).m_FXConfig[name][FX_FRAMES]));
-	myFX->m_display_name = (*CurrentGame).m_FXConfig[name][FX_NAME];
+	vector<string>& cfg = (*CurrentGame).m_FXConfig[name];//cache the config row once instead of re-looking it up by name for every field below
+
+	FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), cfg[FX_FILENAME], Vector2f((float)stoi(cfg[FX_WIDTH]), (float)stoi(cfg[FX_HEIGHT])), (bool)stoi(cfg[FX_IS_PERMANENT]), stoi(cfg[FX_FRAMES]));
+	myFX->m_display_name = cfg[FX_NAME];
 
 	return myFX;
 }
 
 Bot* Enemy::LoadBot(string name)
 {
-	Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), (*CurrentGame).m_botsConfig[name][BOT_IMAGE_NAME], sf::Vector2f((float)stoi((*CurrentGame).m_botsConfig[name][BOT_WIDTH]), (float)stoi((*CurrentGame).m_botsConfig[name][BOT_HEIGHT])));
+	vector<string>& cfg = (*CurrentGame).m_botsConfig[name];//cache the config row once instead of re-looking it up by name for every field below
 
-	((GameObject*)bot)->m_display_name = (*CurrentGame).m_botsConfig[name][BOT_NAME];
-	((GameObject*)bot)->m_armor = stoi((*CurrentGame).m_botsConfig[name][BOT_ARMOR]);
-	((GameObject*)bot)->m_armor_max = stoi((*CurrentGame).m_botsConfig[name][BOT_ARMOR]);
-	((GameObject*)bot)->m_shield = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD]);
-	((GameObject*)bot)->m_shield_max = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD]);
-	((GameObject*)bot)->m_shield_regen = stoi((*CurrentGame).m_botsConfig[name][BOT_SHIELD_REGEN]);
-	((GameObject*)bot)->m_damage = stoi((*CurrentGame).m_botsConfig[name][BOT_DAMAGE]);
-	bot->m_spread = Vector2f((float)stoi((*CurrentGame).m_botsConfig[name][BOT_XSPREAD]), (float)stoi((*CurrentGame).m_botsConfig[name][BOT_YSPREAD]));
+	Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), cfg[BOT_IMAGE_NAME], sf::Vector2f((float)stoi(cfg[BOT_WIDTH]), (float)stoi(cfg[BOT_HEIGHT])));
 
-	GeometryPattern* pattern = GeometryPattern::LoadPattern((*CurrentGame).m_botsConfig[name], BOT_PATTERN);
+	((GameObject*)bot)->m_display_name = cfg[BOT_NAME];
+	((GameObject*)bot)->m_armor = stoi(cfg[BOT_ARMOR]);
+	((GameObject*)bot)->m_armor_max = stoi(cfg[BOT_ARMOR]);
+	((GameObject*)bot)->m_shield = stoi(cfg[BOT_SHIELD]);
+	((GameObject*)bot)->m_shield_max = stoi(cfg[BOT_SHIELD]);
+	((GameObject*)bot)->m_shield_regen = stoi(cfg[BOT_SHIELD_REGEN]);
+	((GameObject*)bot)->m_damage = stoi(cfg[BOT_DAMAGE]);
+	bot->m_spread = Vector2f((float)stoi(cfg[BOT_XSPREAD]), (float)stoi(cfg[BOT_YSPREAD]));
+
+	GeometryPattern* pattern = GeometryPattern::LoadPattern(cfg, BOT_PATTERN);
 	bot->m_pattern.setPattern_v2(pattern);
 	delete pattern;
 
-	bot->m_rotation_speed = stoi((*CurrentGame).m_botsConfig[name][BOT_ROTATION_SPEED]);
+	bot->m_rotation_speed = stoi(cfg[BOT_ROTATION_SPEED]);
 
-	if ((*CurrentGame).m_botsConfig[name][BOT_WEAPON].compare("0") != 0)
-		bot->m_weapon = Enemy::LoadWeapon((*CurrentGame).m_botsConfig[name][BOT_WEAPON], -1);
+	if (cfg[BOT_WEAPON].compare("0") != 0)
+		bot->m_weapon = Enemy::LoadWeapon(cfg[BOT_WEAPON], -1);
 
 	return bot;
 }
 void Enemy::ApplyLevelModifiers()
 {
-	float multiplier_ = ceil(1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100);
+	float multiplier_ = 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100;
 
 	m_armor_max = floor(m_armor_max * multiplier_);
 	m_armor = m_armor_max;
@@ -1137,7 +1130,7 @@ void Enemy::ApplyLevelModifiers()
 	{
 		(*it)->m_ammunition->m_damage = ceil((*it)->m_ammunition->m_damage * multiplier_);
 	}
-	this->setMoney(m_money *= 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100);
+	this->setMoney(m_money * multiplier_);
 
 	m_enemyLevel.setString(to_string(m_level));
 }

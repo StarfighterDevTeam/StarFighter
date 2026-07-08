@@ -7,6 +7,7 @@ class SFUpgradesPanel : public SFPanel
 {
 public:
 	SFUpgradesPanel(sf::Vector2f size, Ship* playership);
+	~SFUpgradesPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 

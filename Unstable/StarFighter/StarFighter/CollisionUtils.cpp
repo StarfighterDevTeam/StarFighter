@@ -18,7 +18,7 @@ namespace Collision
 		}
 
 		sf::Uint8 GetPixel(const sf::Uint8* mask, const sf::Texture* tex, unsigned int x, unsigned int y) {
-			if (x > tex->getSize().x || y > tex->getSize().y)
+			if (x >= tex->getSize().x || y >= tex->getSize().y)
 				return 0;
 
 			return mask[x + y*tex->getSize().x];
@@ -57,9 +57,81 @@ namespace Collision
 
 	BitmaskManager Bitmasks;
 
+	template <typename SpriteLike>
+	class OrientedBoundingBox // Used by BoundingBoxTest and as a cheap pre-check in PixelPerfectTest. Templated so it works both on sf::Sprite and on our GameObject/AnimatedSprite hierarchy (which exposes the same getTransform()/getTextureRect() shape without deriving from sf::Sprite).
+	{
+	public:
+		OrientedBoundingBox(const SpriteLike& Object) // Calculate the four points of the OBB from a transformed (scaled, rotated...) sprite
+		{
+			sf::Transform trans = Object.getTransform();
+			sf::IntRect local = Object.getTextureRect();
+			Points[0] = trans.transformPoint(0.f, 0.f);
+			Points[1] = trans.transformPoint((float)local.width, 0.f);
+			Points[2] = trans.transformPoint((float)local.width, (float)local.height);
+			Points[3] = trans.transformPoint(0.f, (float)local.height);
+		}
+
+		sf::Vector2f Points[4];
+
+		void ProjectOntoAxis(const sf::Vector2f& Axis, float& Min, float& Max) // Project all four points of the OBB onto the given axis and return the dotproducts of the two outermost points
+		{
+			Min = (Points[0].x*Axis.x + Points[0].y*Axis.y);
+			Max = Min;
+			for (int j = 1; j < 4; j++)
+			{
+				float Projection = (Points[j].x*Axis.x + Points[j].y*Axis.y);
+
+				if (Projection<Min)
+					Min = Projection;
+				if (Projection>Max)
+					Max = Projection;
+			}
+		}
+	};
+
+	template <typename SpriteLike>
+	bool BoundingBoxOverlapTest(const SpriteLike& Object1, const SpriteLike& Object2) // Seperating Axis Theorem test, shared by BoundingBoxTest() and PixelPerfectTest()'s cheap pre-check
+	{
+		OrientedBoundingBox<SpriteLike> OBB1(Object1);
+		OrientedBoundingBox<SpriteLike> OBB2(Object2);
+
+		// Create the four distinct axes that are perpendicular to the edges of the two rectangles
+		sf::Vector2f Axes[4] = {
+			sf::Vector2f(OBB1.Points[1].x - OBB1.Points[0].x,
+			OBB1.Points[1].y - OBB1.Points[0].y),
+			sf::Vector2f(OBB1.Points[1].x - OBB1.Points[2].x,
+			OBB1.Points[1].y - OBB1.Points[2].y),
+			sf::Vector2f(OBB2.Points[0].x - OBB2.Points[3].x,
+			OBB2.Points[0].y - OBB2.Points[3].y),
+			sf::Vector2f(OBB2.Points[0].x - OBB2.Points[1].x,
+			OBB2.Points[0].y - OBB2.Points[1].y)
+		};
+
+		for (int i = 0; i < 4; i++) // For each axis...
+		{
+			float MinOBB1, MaxOBB1, MinOBB2, MaxOBB2;
+
+			// ... project the points of both OBBs onto the axis ...
+			OBB1.ProjectOntoAxis(Axes[i], MinOBB1, MaxOBB1);
+			OBB2.ProjectOntoAxis(Axes[i], MinOBB2, MaxOBB2);
+
+			// ... and check whether the outermost projected points of both OBBs overlap.
+			// If this is not the case, the Seperating Axis Theorem states that there can be no collision between the rectangles
+			if (!((MinOBB2 <= MaxOBB1) && (MaxOBB2 >= MinOBB1)))
+				return false;
+		}
+		return true;
+	}
+
 	bool PixelPerfectTest(const GameObject* Object1, const GameObject* Object2, sf::Uint8 AlphaLimit) {
 		sf::FloatRect Intersection;
 		if (Object1->getGlobalBounds().intersects(Object2->getGlobalBounds(), Intersection)) {
+			// Cheap oriented-rectangle rejection before paying for the per-pixel scan below.
+			// This is exact for the full sprite rectangle (a superset of its solid pixels), so it
+			// can only reject pairs that truly cannot have any overlapping solid pixels.
+			if (!BoundingBoxOverlapTest(*Object1, *Object2))
+				return false;
+
 			sf::IntRect O1SubRect = Object1->getTextureRect();
 			sf::IntRect O2SubRect = Object2->getTextureRect();
 
@@ -125,66 +197,7 @@ namespace Collision
 		return (Distance.x * Distance.x + Distance.y * Distance.y <= (Radius1 + Radius2) * (Radius1 + Radius2));
 	}
 
-	class OrientedBoundingBox // Used in the BoundingBoxTest
-	{
-	public:
-		OrientedBoundingBox(const sf::Sprite& Object) // Calculate the four points of the OBB from a transformed (scaled, rotated...) sprite
-		{
-			sf::Transform trans = Object.getTransform();
-			sf::IntRect local = Object.getTextureRect();
-			Points[0] = trans.transformPoint(0.f, 0.f);
-			Points[1] = trans.transformPoint(local.width, 0.f);
-			Points[2] = trans.transformPoint(local.width, local.height);
-			Points[3] = trans.transformPoint(0.f, local.height);
-		}
-
-		sf::Vector2f Points[4];
-
-		void ProjectOntoAxis(const sf::Vector2f& Axis, float& Min, float& Max) // Project all four points of the OBB onto the given axis and return the dotproducts of the two outermost points
-		{
-			Min = (Points[0].x*Axis.x + Points[0].y*Axis.y);
-			Max = Min;
-			for (int j = 1; j < 4; j++)
-			{
-				float Projection = (Points[j].x*Axis.x + Points[j].y*Axis.y);
-
-				if (Projection<Min)
-					Min = Projection;
-				if (Projection>Max)
-					Max = Projection;
-			}
-		}
-	};
-
 	bool BoundingBoxTest(const sf::Sprite& Object1, const sf::Sprite& Object2) {
-		OrientedBoundingBox OBB1(Object1);
-		OrientedBoundingBox OBB2(Object2);
-
-		// Create the four distinct axes that are perpendicular to the edges of the two rectangles
-		sf::Vector2f Axes[4] = {
-			sf::Vector2f(OBB1.Points[1].x - OBB1.Points[0].x,
-			OBB1.Points[1].y - OBB1.Points[0].y),
-			sf::Vector2f(OBB1.Points[1].x - OBB1.Points[2].x,
-			OBB1.Points[1].y - OBB1.Points[2].y),
-			sf::Vector2f(OBB2.Points[0].x - OBB2.Points[3].x,
-			OBB2.Points[0].y - OBB2.Points[3].y),
-			sf::Vector2f(OBB2.Points[0].x - OBB2.Points[1].x,
-			OBB2.Points[0].y - OBB2.Points[1].y)
-		};
-
-		for (int i = 0; i < 4; i++) // For each axis...
-		{
-			float MinOBB1, MaxOBB1, MinOBB2, MaxOBB2;
-
-			// ... project the points of both OBBs onto the axis ...
-			OBB1.ProjectOntoAxis(Axes[i], MinOBB1, MaxOBB1);
-			OBB2.ProjectOntoAxis(Axes[i], MinOBB2, MaxOBB2);
-
-			// ... and check whether the outermost projected points of both OBBs overlap.
-			// If this is not the case, the Seperating Axis Theorem states that there can be no collision between the rectangles
-			if (!((MinOBB2 <= MaxOBB1) && (MaxOBB2 >= MinOBB1)))
-				return false;
-		}
-		return true;
+		return BoundingBoxOverlapTest(Object1, Object2);
 	}
 }

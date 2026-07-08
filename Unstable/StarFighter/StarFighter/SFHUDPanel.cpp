@@ -10,6 +10,23 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 	setOutlineThickness(0);
 	setPosition(SCENE_SIZE_X, 0);
 
+	//cached full-panel background, drawn every frame in Draw() without being rebuilt each time
+	m_black_background.setSize(this->getSize());
+	m_black_background.setOrigin(this->getOrigin());
+	m_black_background.setPosition(this->getPosition());
+	m_black_background.setFillColor(sf::Color(0, 0, 0, 255));
+
+	//sentinel values (armor/shield/money/crystals/level are never negative in-game) so the first
+	//Update() call always rebuilds the displayed texts
+	m_last_armor = -1;
+	m_last_armor_max = -1;
+	m_last_shield = -1;
+	m_last_shield_max = -1;
+	m_last_money = -1;
+	m_last_crystals = -1;
+	m_last_scene_name = "";
+	m_last_level = -1;
+
 	if (playership)
 	{
 		//int gauges and texts (upper part)
@@ -59,10 +76,6 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 
 		m_text.setColor(_white);
 
-		//m_combo_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
-		//m_combo_text.setCharacterSize(18);
-		//m_combo_text.setColor(_white);
-		
 		m_life_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_life_text.setCharacterSize(10);
 		m_life_text.setColor(_white);
@@ -71,34 +84,10 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 		m_shield_text.setCharacterSize(10);
 		m_shield_text.setColor(_white);
 
-		//m_fuel_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
-		//m_fuel_text.setCharacterSize(10);
-		//m_fuel_text.setColor(_white);
-
 		//lower part
 		m_money_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_money_text.setCharacterSize(20);
 		m_money_text.setColor(_white);
-
-		//m_graze_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
-		//m_graze_text.setCharacterSize(14);
-		//m_graze_text.setColor(_white);
-		//
-		//m_hazardscore_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		//m_hazardscore_text.setCharacterSize(14);
-		//m_hazardscore_text.setColor(_white);
-		//
-		//m_hitstaken_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		//m_hitstaken_text.setCharacterSize(14);
-		//m_hitstaken_text.setColor(_white);
-		//
-		//m_beastscore_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		//m_beastscore_text.setCharacterSize(14);
-		//m_beastscore_text.setColor(_white);
-
-		//m_level_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
-		//m_level_text.setCharacterSize(14);
-		//m_level_text.setColor(_white);
 
 		m_scene_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_scene_text.setCharacterSize(14);
@@ -108,17 +97,7 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 		m_framerate_text.setCharacterSize(15);
 		m_framerate_text.setColor(sf::Color::Yellow);
 
-		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-
-		//m_equipment_title.setFont(*(*CurrentGame).m_font[Font_Terminator]);
-		//m_equipment_title.setCharacterSize(14);
-		//m_equipment_title.setColor(sf::Color::White);
-		//m_equipment_title.setString("EQUIPMENT");
-		//
-		//m_inventory_title.setFont(*(*CurrentGame).m_font[Font_Terminator]);
-		//m_inventory_title.setCharacterSize(14);
-		//m_inventory_title.setColor(sf::Color::White);
-		//m_inventory_title.setString("INVENTORY");
+		//m_text's font is already set by the SFInventoryPanel base constructor
 
 		//positioning panel content
 		float text_height = 0;
@@ -132,35 +111,9 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 		m_shieldBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 		m_shieldBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		//text_height += 10 + ARMOR_BAR_SIZE_Y;
-		//m_fuel_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + ARMOR_BAR_SIZE_X / 2, text_height);
-		//m_fuelBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//m_fuelBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//m_fuelBarOverblock.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//
-		//text_height += 10 + ARMOR_BAR_SIZE_Y;
-		//m_xpBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-
 		text_height += INTERACTION_INTERBLOCK + ARMOR_BAR_SIZE_Y;
 		m_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		//text_height = GRID_POSITION_Y - COMBO_BAR_SIZE_Y - 2 * INTERACTION_INTERBLOCK;
-		//m_comboBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//m_comboBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//m_combo_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + COMBO_BAR_SIZE_X + m_combo_text.getGlobalBounds().width / 2 + 8, text_height - 4);
-		//
-		//text_height = GRID_POSITION_Y - INTERACTION_INTERBLOCK;
-		//m_equipment_title.setPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
-		//text_height += m_equipment_title.getCharacterSize() + INTERACTION_INTERLINE*2;
-		//
-		//sf::Vector2f position0 = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//
-		//text_height += INTERACTION_INTERBLOCK + 1 * GRID_SLOT_SIZE;
-		//m_inventory_title.setPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
-		//text_height += m_inventory_title.getCharacterSize() + INTERACTION_INTERLINE * 2;
-		//
-		//sf::Vector2f position1 = sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//
 		text_height += 2 * INTERACTION_INTERBLOCK;// STASH_GRID_NB_LINES * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK;
 		m_money_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
@@ -169,18 +122,6 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 
 		text_height += INTERACTION_SHOP_INTERLINE + m_level_text.getCharacterSize();
 		m_scene_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-
-		//text_height += INTERACTION_SHOP_INTERLINE + m_scene_text.getCharacterSize();
-		//m_graze_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//
-		//text_height += INTERACTION_SHOP_INTERLINE + m_graze_text.getCharacterSize();
-		//m_hazardscore_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//
-		//text_height += INTERACTION_SHOP_INTERLINE + m_hazardscore_text.getCharacterSize();
-		//m_hitstaken_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
-		//
-		//text_height += INTERACTION_SHOP_INTERLINE + m_hitstaken_text.getCharacterSize();
-		//m_beastscore_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += INTERACTION_INTERBLOCK + m_beastscore_text.getCharacterSize();
 		m_framerate_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
@@ -194,24 +135,6 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playership) : SFInventoryPanel(s
 		m_crystals_text.setCharacterSize(15);
 		m_crystals_text.setColor(_white);
 		m_crystals_text.setPosition(sf::Vector2f(m_crystal.getPosition().x + m_crystal.m_size.x * 0.5 + 8, m_crystal.getPosition().y));
-
-		//Create grids
-		//CreateGrids(this, position0, position1, sf::Vector2f(0, 0));
-
-		//Load items displayed
-		//for (int i = 0; i < NBVAL_Equipment; i++)
-		//{
-		//	if (playership->m_equipment[i] != NULL)
-		//	{
-		//		GameObject* capsule = Enemy::CloneEquipmentIntoGameObject(playership->m_equipment[i]);
-		//		m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, i, false);
-		//	}
-		//}
-		//if (playership->m_weapon != NULL)
-		//{
-		//	GameObject* capsule = Enemy::CloneWeaponIntoGameObject(playership->m_weapon);
-		//	m_grids_v2[Trade_EquippedGrid]->InsertObject(capsule, NBVAL_Equipment, false);
-		//}
 
 		//Scene progression bar
 		m_progressionBar.setSize(sf::Vector2f(SCENE_PROGRESSION_BAR_WIDTH, SCENE_PROGRESSION_BAR_HEIGHT));
@@ -305,115 +228,57 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		}
 	}
 
-	//fuel
-	//if (m_playership->m_hyperspeed_fuel_max <= 0)
-	//{
-	//	m_fuelBar.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
-	//	m_fuelBarContainer.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
-	//	m_fuelBarOverblock.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
-	//}
-	//else
-	//{
-	//	m_fuelBar.setSize(sf::Vector2f(1 + (1.0f * m_playership->m_hyperspeed_fuel / m_playership->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X), FUEL_BAR_SIZE_Y));
-	//	m_fuelBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
-	//	if (m_playership->GetNumberOfBombs() > 0 && m_playership->m_hyperspeed_fuel > m_playership->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER)
-	//	{
-	//		m_fuelBarOverblock.setSize(sf::Vector2f(1.0f * m_playership->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER / m_playership->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
-	//		m_fuelBarOverblock.setPosition(sf::Vector2f(m_fuelBar.getPosition().x + m_fuelBar.getSize().x - m_fuelBarOverblock.getSize().x, m_fuelBar.getPosition().y));
-	//	}
-	//	else
-	//	{
-	//		m_fuelBarOverblock.setSize(sf::Vector2f(0, FUEL_BAR_SIZE_Y));
-	//	}
-	//}
-	//
-	////Combo
-	//m_comboBar.setSize(sf::Vector2f((1.0f * m_playership->m_combo_count / m_playership->m_combo_count_max * COMBO_BAR_SIZE_X), COMBO_BAR_SIZE_Y));
-	//ostringstream ss_combo;
-	//ss_combo << "x" << m_playership->m_combo_level << " Combo"; 
-	//m_combo_text.setString(ss_combo.str());
-	
-	//life
-	ostringstream ss_life;
-	ss_life << m_playership->m_armor << "/" << m_playership->m_armor_max;
-	m_life_text.setString(ss_life.str());
+	//life (only rebuild the text when the displayed value actually changes)
+	if (m_playership->m_armor != m_last_armor || m_playership->m_armor_max != m_last_armor_max)
+	{
+		m_last_armor = m_playership->m_armor;
+		m_last_armor_max = m_playership->m_armor_max;
+
+		ostringstream ss_life;
+		ss_life << m_last_armor << "/" << m_last_armor_max;
+		m_life_text.setString(ss_life.str());
+	}
 	m_life_text.setPosition(m_armorBarContainer.getPosition().x + m_armorBarContainer.getSize().x / 2 - m_life_text.getGlobalBounds().width / 2, m_armorBarContainer.getPosition().y + m_life_text.getGlobalBounds().height / 2);
-	
-	//shield
-	ostringstream ss_shield;
-	ss_shield << m_playership->m_shield << "/" << m_playership->m_shield_max;
-	m_shield_text.setString(ss_shield.str());
+
+	//shield (only rebuild the text when the displayed value actually changes)
+	if (m_playership->m_shield != m_last_shield || m_playership->m_shield_max != m_last_shield_max)
+	{
+		m_last_shield = m_playership->m_shield;
+		m_last_shield_max = m_playership->m_shield_max;
+
+		ostringstream ss_shield;
+		ss_shield << m_last_shield << "/" << m_last_shield_max;
+		m_shield_text.setString(ss_shield.str());
+	}
 	m_shield_text.setPosition(m_shieldBarContainer.getPosition().x + m_shieldBarContainer.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBarContainer.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
-	//
-	//ostringstream ss_fuel;
-	//ss_fuel << (int)m_playership->m_hyperspeed_fuel << "/" << m_playership->m_hyperspeed_fuel_max;
-	//m_fuel_text.setString(ss_fuel.str());
-	//m_fuel_text.setPosition(m_fuelBarContainer.getPosition().x + m_fuelBarContainer.getSize().x / 2 - m_fuel_text.getGlobalBounds().width / 2, m_fuelBarContainer.getPosition().y + 1);//because it works :/
-	//
-	////level
-	//ostringstream ss_slash;
-	//ss_slash << "Level " << m_playership->m_level;
-	//if (m_playership->m_level_max > -1)
-	//{
-	//	ss_slash << " / " << m_playership->m_level_max;
-	//}
-	//ss_slash << " (XP: " << m_playership->m_xp << " / " << m_playership->m_xp_max << ")";
-	//m_level_text.setString(ss_slash.str());
-	//
-	//m_xpBar.setSize(sf::Vector2f((1.0f * m_playership->m_xp / m_playership->m_xp_max) * XP_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
-	//m_level_text.setPosition(m_level_text.getPosition().x, m_xpBar.getPosition().y);
 
 	//money
-	ostringstream ss_m;
-	ss_m << m_playership->m_money;
-	m_money_text.setString("$ " + ss_m.str());
+	if (m_playership->m_money != m_last_money)
+	{
+		m_last_money = m_playership->m_money;
+		m_money_text.setString("$ " + to_string(m_last_money));
+	}
 
 	//crystals
-	m_crystals_text.setString(to_string(m_playership->m_crystals));
-
-	//graze (shield regen)
-	//if (m_playership->m_shield_max > 0)
-	//{
-	//	ostringstream ss_g;
-	//	ss_g << m_playership->m_graze_count;
-	//	m_graze_text.setString("Graze: " + ss_g.str() + " / " + to_string(GRAZING_COUNT_TO_REGEN_SHIELD));
-	//}
-	//
-	////score destruction
-	//ostringstream ss_sc;
-	//ss_sc << (*CurrentGame).m_hazard << " / " << (*CurrentGame).m_hazardSpawned;
-	//m_hazardscore_text.setString("Destruction: " + ss_sc.str());
-	//
-	////score hits taken
-	//ostringstream ss_ht;
-	//ss_ht << m_playership->m_hits_taken;
-	//m_hitstaken_text.setString("Hits taken: " + ss_ht.str());
-
-	//Beast score
-	//ostringstream ss_beast;
-	////float quality_graze = m_playership->getShipBeastScore() / MAX_BEAST_SCALE * 100;
-	//float quality_combo = m_playership->m_combo_level;
-	//float quality_hazard = Scene::getSceneBeastScore(m_playership->m_currentScene_hazard) / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
-	//ss_beast.precision(0);
-	//ss_beast << fixed;
-	////ss_beast << "Drop quality: +" << quality_graze + quality_hazard << "%";
-	//ss_beast << "Drop quality: +" << quality_combo + quality_hazard << "% (combo +" << quality_combo << "%, hazard +" << quality_hazard << "%)";
-	//m_beastscore_text.setString(ss_beast.str());
+	if (m_playership->m_crystals != m_last_crystals)
+	{
+		m_last_crystals = m_playership->m_crystals;
+		m_crystals_text.setString(to_string(m_last_crystals));
+	}
 
 	//scene name
-	if (!m_playership->m_currentScene_name.empty())
+	if (!m_playership->m_currentScene_name.empty() && (m_playership->m_currentScene_name != m_last_scene_name || m_playership->m_level != m_last_level))
 	{
-		ostringstream ss_bg;
-		ss_bg << m_playership->m_currentScene_name;
-		//if ((*CurrentGame).m_direction != NO_DIRECTION)
-		//	ss_bg << " (" << m_playership->m_currentScene_hazard + 1 << ")";
+		m_last_scene_name = m_playership->m_currentScene_name;
+		m_last_level = m_playership->m_level;
 
-		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " ") + " (lvl " + to_string(m_playership->m_level) + ")");
+		m_scene_text.setString(ReplaceAll(m_last_scene_name, "_", " ") + " (lvl " + to_string(m_last_level) + ")");
 	}
 
 	//framerate
 	ostringstream ss_frame;
-	ss_frame << "fps= " << (int)(1 / (deltaTime.asMilliseconds() * 0.001));
+	float deltaSeconds = deltaTime.asSeconds();
+	ss_frame << "fps= " << (deltaSeconds > 0 ? (int)(1.f / deltaSeconds) : 0);
 	m_framerate_text.setString(ss_frame.str());
 
 	//ship global stats
@@ -480,17 +345,7 @@ void SFHUDPanel::UpdateUpgradeIcons()
 
 void SFHUDPanel::Draw(sf::RenderTexture& screen)
 {
-	sf::RectangleShape black_background;
-	black_background.setSize(this->getSize());
-	black_background.setOrigin(this->getOrigin());
-	black_background.setPosition(this->getPosition());
-	black_background.setFillColor(sf::Color(0, 0, 0, 255));
-	screen.draw(black_background);
-
-	//SFInventoryPanel::Draw(screen);
-
-	//screen.draw(m_equipment_title);
-	//screen.draw(m_inventory_title);
+	screen.draw(m_black_background);
 
 	screen.draw(m_armorBarContainer);
 	screen.draw(m_armorBar);
@@ -501,40 +356,13 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_shieldBar);
 		screen.draw(m_shield_text);
 	}
-	//if (m_playership && m_playership->m_hyperspeed_fuel_max > 0)
-	//{
-	//	screen.draw(m_fuelBarContainer);
-	//	screen.draw(m_fuelBar);
-	//	screen.draw(m_fuelBarOverblock);
-	//	screen.draw(m_fuel_text);
-	//}
 
 	screen.draw(m_money_text);
 	screen.draw(m_crystal);
 	screen.draw(m_crystals_text);
-	//screen.draw(m_graze_text);
-	//screen.draw(m_hazardscore_text);
-	//screen.draw(m_hitstaken_text);
-	//screen.draw(m_beastscore_text);
-	//screen.draw(m_xpBar);
-	//screen.draw(m_level_text);
 	screen.draw(m_scene_text);
 	screen.draw(m_framerate_text);
 	screen.draw(m_text);
-
-	//Combo
-	//screen.draw(m_comboBarContainer);
-	//screen.draw(m_comboBar);
-	//screen.draw(m_combo_text);
-	//
-	//if (m_item_stats_panel)
-	//{
-	//	m_item_stats_panel->Draw(screen);
-	//}
-	//if (m_item_stats_panel_compare)
-	//{
-	//	m_item_stats_panel_compare->Draw(screen);
-	//}
 
 	for (GameObject icon : m_upgrades_icons)
 		icon.Draw(screen);

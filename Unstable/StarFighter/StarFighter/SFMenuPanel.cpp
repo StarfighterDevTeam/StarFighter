@@ -46,7 +46,7 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playership) : SFMenu
 		m_title_text.setString(m_playership->m_targetPortal->m_display_name);
 
 		//options texts
-		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 		m_actions->SetString("Enter", ActionButton_A);
 
 		//size and position of panel
@@ -92,7 +92,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(
 		m_title_text.setString(ss_title.str());
 
 		//options texts
-		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 		m_actions->SetString("Enter", ActionButton_A);
 		m_actions->SetString("Hazard down", ActionButton_Y);
 		m_actions->SetString("Hazard up", ActionButton_X);
@@ -240,7 +240,7 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playership) : SFMenuPanel(size
 		//texts strings
 		m_title_text.setString(m_playership->m_targetShop->m_display_name);
 
-		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 		//m_actions->SetString("Buy/Sell", ActionButton_A);
 		m_actions->SetString("Buy upgrades", ActionButton_A);
 		m_actions->SetString("Stellar map", ActionButton_X);

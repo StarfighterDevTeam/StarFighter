@@ -67,11 +67,13 @@ class SFPanel : public SFRectangle
 public:
 	SFPanel(){};
 	SFPanel(sf::Vector2f size, SFPanelTypes panel_type);
-	~SFPanel();
+	virtual ~SFPanel();
 	virtual void Update(sf::Time deltaTime, sf::Vector2f inputs_directions);
 	virtual void Draw(sf::RenderTexture& screen);
 	static bool IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object);
-	
+	void SetTitleAndTextFont(sf::Font* font);
+	SFActionBox* CreateActionBox(sf::Font* font);
+
 	sf::Text m_title_text;
 	sf::Text m_text;
 	bool m_visible;

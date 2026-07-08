@@ -256,9 +256,12 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 			(*CurrentGame).m_gameloop_state = LAST_SCREEN;
 		}
 	}
-	
+
+	//NB: deliberately a plain "if" (not "else if"): when the block above just switched the state to
+	//LAST_SCREEN, we want that new state evaluated within this same frame/call rather than waiting for
+	//the next Update(). Same reasoning applies to the LAST_SCREEN -> BOSS_FIGHT cascade below.
 	if ((*CurrentGame).m_gameloop_state == LAST_SCREEN)
-	{	
+	{
 		//Optional script to skip boss procedures, for scripted missions
 		if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss] == true)
 		{
@@ -324,6 +327,8 @@ void Gameloop::GameloopStateMachineCheck(sf::Time deltaTime)
 		}
 	}
 
+	//NB: plain "if", not "else if" -- see comment above; lets a same-frame LAST_SCREEN -> BOSS_FIGHT
+	//transition be evaluated immediately (harmless here since a freshly spawned boss is never dead yet).
 	if ((*CurrentGame).m_gameloop_state == BOSS_FIGHT)
 	{
 		//is boss dead?
@@ -504,88 +509,13 @@ void Gameloop::SpawnInScene(string scene_name, Ship* playership, bool display_sc
 		(*CurrentGame).PlayMusic(Music_Hub);
 	else
 		(*CurrentGame).PlayMusic(Music_Scene);
-
-	/*
-	//cleaning layers
-	(*CurrentGame).garbageLayer(FriendlyFireLayer, false, true);
-	(*CurrentGame).garbageLayer(EnemyFireLayer, false, true);
-	(*CurrentGame).garbageLayer(EnemyObjectLayer, false, true);
-	(*CurrentGame).garbageLayer(ExplosionLayer, false, true);
-	(*CurrentGame).garbageLayer(LootLayer, false, true);
-	(*CurrentGame).garbageLayer(FeedbacksLayer, false, true);
-
-	//delete current scene <!> to do after cleaning layers, otherwise Enemy class will be left with their vector<Phase*> m_phases and FX* m_FX_Death pointing to destroyed elemnts
-	delete m_currentScene;
-	delete m_nextScene;
-
-	//set new scene
-	m_currentScene = new Scene(scene_name);
-	playership->m_currentScene_name = m_currentScene->m_name;
-	playership->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
-		
-	//direction
-	//(*CurrentGame).m_direction = m_currentScene->m_direction;
-
-	//speed
-	(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
-
-	//position
-	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_Y_RATIO);
-	if (m_currentScene->m_is_hub == true)
-	{
-		(*CurrentGame).m_playership->m_disable_fire = false;
-		(*CurrentGame).m_playership->m_disableHyperspeed = false;
-		(*CurrentGame).m_playership->m_disableSpecial = false;
-		(*CurrentGame).m_playership->m_disableSlowmotion = false;
-		(*CurrentGame).m_playership->m_disable_bots = false;
-		(*CurrentGame).m_playership->m_disableRecall = false;
-		(*CurrentGame).m_playership->SetBotsVisibility(true);
-		m_gameloop_state = SCROLLING;
-		ship_pos = sf::Vector2f(SCENE_SIZE_X * STARTSCENE_X_RATIO, SCENE_SIZE_Y * STARTSCENE_X_RATIO);
-
-		if (!m_currentScene->m_scene_music.empty())
-			(*CurrentGame).PlayMusic(Music_Scene, m_currentScene->m_scene_music);
-		else
-			(*CurrentGame).PlayMusic(Music_Scene);
-	}
-	else
-	{
-		(*CurrentGame).m_playership->m_disable_fire = true;
-		(*CurrentGame).m_playership->m_disableHyperspeed = true;
-		(*CurrentGame).m_playership->m_disableSpecial = true;
-		(*CurrentGame).m_playership->m_disableSlowmotion = true;
-		(*CurrentGame).m_playership->m_disable_bots = true;
-		(*CurrentGame).m_playership->m_disableRecall = true;
-		(*CurrentGame).m_playership->SetBotsVisibility(false);
-		m_gameloop_state = HUB_ROAMING;
-		playership->m_respawnSceneName = m_currentScene->m_name;
-
-		(*CurrentGame).resetHazard();
-		(*CurrentGame).m_playership->m_hits_taken = 0;
-
-		if (m_currentScene->m_scene_music.empty() == false)
-			(*CurrentGame).PlayMusic(Music_Hub, m_currentScene->m_scene_music);
-		else
-			(*CurrentGame).PlayMusic(Music_Hub);
-	}
-
-	m_playership->setPosition(ship_pos);
-
-	UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
-
-	for (Dialog* dialog : m_playership->m_targetDialogs)
-		delete dialog;
-	m_playership->m_targetDialogs.clear();
-
-	Ship::SavePlayerScenes(m_playership);
-	*/
 }
 
 void Gameloop::LoadAllScenes(string scenes_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all scenes scripts.");
 
-	vector<vector<string> > generalScenesConfig = *(FileLoaderUtils::FileLoader(scenes_file));
+	vector<vector<string> > generalScenesConfig = FileLoaderUtils::FileLoader(scenes_file);
 	size_t vectorSize = generalScenesConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 	{
@@ -596,7 +526,7 @@ void Gameloop::LoadAllScenes(string scenes_file)
 
 	for (size_t j = 0; j < vectorSize; j++)
 		if (!generalScenesConfig[j][SCENE_FILENAME].empty() && generalScenesConfig[j][SCENE_FILENAME].compare("0") != 0)
-			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> > >::value_type(generalScenesConfig[j][SCENE_NAME], *(FileLoaderUtils::FileLoader(generalScenesConfig[j][SCENE_FILENAME]))));
+			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> > >::value_type(generalScenesConfig[j][SCENE_NAME], FileLoaderUtils::FileLoader(generalScenesConfig[j][SCENE_FILENAME])));
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
@@ -605,7 +535,7 @@ void Gameloop::LoadAllEnemies(string enemies_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all enemies.");
 
-	vector<vector<string> > enemiesConfig = *(FileLoaderUtils::FileLoader(enemies_file));
+	vector<vector<string> > enemiesConfig = FileLoaderUtils::FileLoader(enemies_file);
 	size_t vectorSize = enemiesConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_enemiesConfig.insert(std::map<string, vector<string> >::value_type(enemiesConfig[i][ENEMY_NAME], enemiesConfig[i]));
@@ -617,7 +547,7 @@ void Gameloop::LoadAllFX(string FX_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all FX.");
 
-	vector<vector<string> > FXConfig = *(FileLoaderUtils::FileLoader(FX_file));
+	vector<vector<string> > FXConfig = FileLoaderUtils::FileLoader(FX_file);
 	size_t vectorSize = FXConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_FXConfig.insert(std::map<string, vector<string> >::value_type(FXConfig[i][FX_NAME], FXConfig[i]));
@@ -629,7 +559,7 @@ void Gameloop::LoadAllUpgrades(string upgrades_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all upgrades.");
 
-	vector<vector<string> > UpgradesConfig = *(FileLoaderUtils::FileLoader(upgrades_file));
+	vector<vector<string> > UpgradesConfig = FileLoaderUtils::FileLoader(upgrades_file);
 	size_t vectorSize = UpgradesConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_upgradesConfig.insert(std::map<string, vector<string> >::value_type(UpgradesConfig[i][UPGRADE_NAME], UpgradesConfig[i]));
@@ -641,7 +571,7 @@ void Gameloop::LoadAllWeapons(string weapons_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all weapons.");
 
-	vector<vector<string> > WeaponsConfig = *(FileLoaderUtils::FileLoader(weapons_file));
+	vector<vector<string> > WeaponsConfig = FileLoaderUtils::FileLoader(weapons_file);
 	size_t vectorSize = WeaponsConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_weaponsConfig.insert(std::map<string, vector<string> >::value_type(WeaponsConfig[i][WEAPON_NAME], WeaponsConfig[i]));
@@ -653,7 +583,7 @@ void Gameloop::LoadAllAmmunitions(string ammo_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all ammunitions.");
 
-	vector<vector<string> > AmmoConfig = *(FileLoaderUtils::FileLoader(ammo_file));
+	vector<vector<string> > AmmoConfig = FileLoaderUtils::FileLoader(ammo_file);
 	size_t vectorSize = AmmoConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_ammoConfig.insert(std::map<string, vector<string> >::value_type(AmmoConfig[i][AMMO_NAME], AmmoConfig[i]));
@@ -665,7 +595,7 @@ void Gameloop::LoadAllDialogs(string dialogs_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all dialogs.");
 
-	vector<vector<string> > DialogsConfig = *(FileLoaderUtils::FileLoader(dialogs_file));
+	vector<vector<string> > DialogsConfig = FileLoaderUtils::FileLoader(dialogs_file);
 	size_t vectorSize = DialogsConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_dialogsConfig.insert(std::map<string, vector<string> >::value_type(DialogsConfig[i][DIALOG_NAME], DialogsConfig[i]));
@@ -677,7 +607,7 @@ void Gameloop::LoadAllEnemyPhases(string phases_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all enemy phases.");
 
-	vector<vector<string> > PhasesConfig = *(FileLoaderUtils::FileLoader(phases_file));
+	vector<vector<string> > PhasesConfig = FileLoaderUtils::FileLoader(phases_file);
 	size_t vectorSize = PhasesConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_phasesConfig.insert(std::map<string, vector<string> >::value_type(PhasesConfig[i][PHASE_NAME], PhasesConfig[i]));
@@ -690,7 +620,7 @@ void Gameloop::LoadAllBots(string bots_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all bots.");
 
-	vector<vector<string> > BotsConfig = *(FileLoaderUtils::FileLoader(bots_file));
+	vector<vector<string> > BotsConfig = FileLoaderUtils::FileLoader(bots_file);
 	size_t vectorSize = BotsConfig.size();
 	for (size_t i = 0; i < vectorSize; i++)
 		(*CurrentGame).m_botsConfig.insert(std::map<string, vector<string> >::value_type(BotsConfig[i][BOT_NAME], BotsConfig[i]));
@@ -703,33 +633,33 @@ void Gameloop::PreloadAssets(FactionType faction)
 	LOGGER_WRITE(Logger::DEBUG, "Preloading assets.");
 	
 	TextureLoader* loader = TextureLoader::getInstance();
-	
-	string key;
+
+	char key = 0;
 	switch (faction)
 	{
 		case Faction_Vanguard:
-			key = "V";
+			key = 'V';
 			break;
 		case Faction_Royale:
-			key = "R";
+			key = 'R';
 			break;
 		case Faction_Corsair:
-			key = "C";
+			key = 'C';
 			break;
 		case Faction_Ancient:
-			key = "A";
+			key = 'A';
 			break;
 		case Faction_Swarm:
-			key = "S";
+			key = 'S';
 			break;
 	}
 
 	for (map<string, vector<string> >::iterator it = (*CurrentGame).m_enemiesConfig.begin(); it != (*CurrentGame).m_enemiesConfig.end(); it++)
-		if (it->first.substr(0, 1).compare(key) == 0)
+		if (!it->first.empty() && it->first[0] == key)
 			loader->loadTexture(it->second[ENEMY_IMAGE_NAME], stoi(it->second[ENEMY_WIDTH]) * stoi(it->second[ENEMY_FRAMES]), stoi(it->second[ENEMY_HEIGHT]) * stoi(it->second[ENEMY_NB_SKINS]));
 
 	for (map<string, vector<string> >::iterator it = (*CurrentGame).m_ammoConfig.begin(); it != (*CurrentGame).m_ammoConfig.end(); it++)
-		if (it->first.substr(0, 1).compare(key) == 0)
+		if (!it->first.empty() && it->first[0] == key)
 			loader->loadTexture(it->second[AMMO_IMAGE_NAME], stoi(it->second[AMMO_WIDTH]) * stoi(it->second[AMMO_FRAMES]), stoi(it->second[AMMO_HEIGHT]) * stoi(it->second[AMMO_NB_SKINS]));
 }
 

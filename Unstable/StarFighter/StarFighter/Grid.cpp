@@ -123,6 +123,11 @@ int Grid::InsertObject(GameObject* object, int index, bool force_overwrite)
 		else
 			return -1;//slot already occupied
 	}
+	else//index outside of grid range
+	{
+		printf("ERROR: asking to insert an object outside of grid range\n");
+		return -1;
+	}
 
 	//update first empty slot index
 	for (int i = 0; i <= m_nb_squares.x * m_nb_squares.y; i++)
@@ -139,9 +144,6 @@ int Grid::InsertObject(GameObject* object, int index, bool force_overwrite)
 	}
 
 	return index_returned;
-
-	printf("ERROR: asking to insert an object outside of grid range\n");
-	return -1;
 }
 
 GridElement* Grid::GetCursorCollision(GameObject& cursor)
@@ -150,7 +152,7 @@ GridElement* Grid::GetCursorCollision(GameObject& cursor)
 		return NULL;
 
 	sf::Vector2f pos = cursor.getPosition();
-	if (pos.x < m_position.x || pos.x > m_position.x + m_size.x || pos.y < m_position.y || pos.y > m_position.y + m_size.y)
+	if (pos.x < m_position.x || pos.x >= m_position.x + m_size.x || pos.y < m_position.y || pos.y >= m_position.y + m_size.y)
 		return NULL;
 	
 	pos -= m_position;

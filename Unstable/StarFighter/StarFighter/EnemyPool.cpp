@@ -16,7 +16,6 @@ EnemyPool::EnemyPool(sf::Vector2f position, int nb_lines, int nb_rows, float xsp
 	m_nb_rows = nb_rows;
 	m_xspread = xspread;
 	m_yspread = yspread;
-	m_enemyCluster = new std::vector<EnemyPoolElement*>;
 	m_enemyCluster = enemyCluster;
 
 	m_size.x = nb_rows * xspread;

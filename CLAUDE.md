@@ -18,11 +18,15 @@ Unstable/StarFighter/
   StarFighter.sln                  The one solution to open
   Tools/                           Packaging script + excluded-extensions list
   Documentation/                   Design docs, mockups, moodboards, storyboards (not code)
-  StarFighter/                     Project root (.vcxproj + .xcodeproj live here)
-    StarFighter/                   All C++ source (.h/.cpp), flat — no subfolders per module
+  StarFighter/                     Project root — .vcxproj lives here, and all real C++
+                                    source (.h/.cpp) sits directly in this folder, flat —
+                                    no subfolders per module
     Includes/                      A couple of header-only third-party utilities (e.g. SimpleCollision.hpp)
     Assets/                        Runtime assets (2D, Fonts, Music, Sounds, Icons, Scripts)
     Saves/                         Save files
+    StarFighter/                   Stale/vestigial Xcode-only copy: a 91-line main.cpp +
+                                    ResourcePath.mm/.hpp + StarFighter.xcodeproj. Not the
+                                    real source — don't edit here.
 ```
 
 ## Building
@@ -81,4 +85,4 @@ Gameplay/window constants are `#define`s in `Globals.h` (resolution, scene size,
 
 - Hungarian-ish member prefixes: `m_` for members, `NBVAL_`/`NB_` as the count sentinel at the end of every enum (used for array sizing and modulo cycling).
 - Enums live next to the system they describe (`GameObject.h`, `Ship.h`, `Game.h`, `Scene.h`, `Grid.h`, `SFPanel.h`, ...) rather than in one shared header — check the relevant class's header first when looking for a constant/enum.
-- All source is flat inside `Unstable/StarFighter/StarFighter/StarFighter/` — there's no per-feature folder structure; group by filename (e.g. all `SF*Panel` files are the UI layer).
+- All source is flat inside `Unstable/StarFighter/StarFighter/` (the project-root folder itself, not a further subfolder) — there's no per-feature folder structure; group by filename (e.g. all `SF*Panel` files are the UI layer). The nested `Unstable/StarFighter/StarFighter/StarFighter/` folder is a stale Xcode-only copy, not the real source.

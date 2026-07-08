@@ -27,22 +27,15 @@ Background::~Background()
 
 void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, newspeed;
-	newspeed = m_speed;
-
 	float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
-
-	//slowmotion
-	newspeed.y += (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed;
 
 	if (m_ghost == false && l_hyperspeedMultiplier > 1)
 		setGhost(true);
 	else if (m_ghost == true)
 		setGhost(false);
 
-	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
-
+	//slowmotion
+	sf::Vector2f newposition = ComputeHyperspeedMovement(deltaTime, hyperspeedMultiplier, (l_hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed);
 	setPosition(newposition.x, newposition.y);
 
 	//portals follow the background

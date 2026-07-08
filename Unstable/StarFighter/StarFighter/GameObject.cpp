@@ -1,5 +1,29 @@
 #include "GameObject.h"
 
+namespace
+{
+	//shared by compare_posX_withTarget_for_Direction/compare_posY_withTarget_for_Direction below
+	FloatCompare CompareGreaterIfGreater(float value, float target)
+	{
+		if (value > target)
+			return GREATER_THAN;
+		else if (value == target)
+			return EQUAL_TO;
+		else
+			return LESSER_THAN;
+	}
+
+	FloatCompare CompareGreaterIfLess(float value, float target)
+	{
+		if (value < target)
+			return GREATER_THAN;
+		else if (value == target)
+			return EQUAL_TO;
+		else
+			return LESSER_THAN;
+	}
+}
+
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber, animationNumber);
@@ -34,9 +58,11 @@ void GameObject::Draw(sf::RenderTexture& screen)
 		#ifndef NDEBUG
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8))//display hitbox on holding key
 		{
-			float x = getLocalBounds().width * cos(getRotation() * M_PI / 180) + getLocalBounds().height * sin(getRotation() * M_PI / 180);
-			float y = getLocalBounds().height * cos(getRotation() * M_PI / 180) + getLocalBounds().width * sin(getRotation() * M_PI / 180);
-			
+			const float l_cos = cos(getRotation() * M_PI / 180);
+			const float l_sin = sin(getRotation() * M_PI / 180);
+			float x = getLocalBounds().width * l_cos + getLocalBounds().height * l_sin;
+			float y = getLocalBounds().height * l_cos + getLocalBounds().width * l_sin;
+
 			sf::RectangleShape rect;
 			rect.setSize(sf::Vector2f(x, y));
 			rect.setFillColor(sf::Color(0, 0, 0, 0));
@@ -109,17 +135,29 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 		}
 	}
 
-	//now let's load the new animation
-	Animation* anim = new Animation();
-	anim->setSpriteSheet(*m_defaultAnimation.getSpriteSheet());
-	for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
+	//each animation line is built once and cached, so switching back and forth between lines
+	//(e.g. FakeShip mirroring its target's animation every frame) doesn't re-allocate/rebuild every time
+	if (m_animationLines.empty())
 	{
-		size_t n = j / m_frameNumber;
-		//when we have reached out to the correct line of animation frames, we put this line into the animation
-		if (n == animation)
+		m_animationLines.resize(m_animationNumber, NULL);
+	}
+
+	if (m_animationLines[animation] == NULL)
+	{
+		Animation* anim = new Animation();
+		anim->setSpriteSheet(*m_defaultAnimation.getSpriteSheet());
+		anim->reserve(m_frameNumber);
+		for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
 		{
-			anim->addFrame(m_defaultAnimation.getFrame(j));
+			size_t n = j / m_frameNumber;
+			//when we have reached out to the correct line of animation frames, we put this line into the animation
+			if (n == animation)
+			{
+				anim->addFrame(m_defaultAnimation.getFrame(j));
+			}
 		}
+
+		m_animationLines[animation] = anim;
 	}
 
 	if (!keep_frame_index)
@@ -127,9 +165,7 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 		m_currentFrame = 0;
 	}
 
-	if (m_currentAnimation)
- 		delete m_currentAnimation;
-	m_currentAnimation = anim;
+	m_currentAnimation = m_animationLines[animation];
 	play(*m_currentAnimation);
 	m_currentAnimationIndex = animation;
 }
@@ -191,31 +227,35 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 
 GameObject::~GameObject()
 {
-
+	for (size_t i = 0; i < m_animationLines.size(); i++)
+	{
+		if (m_animationLines[i])
+			delete m_animationLines[i];
+	}
 }
 
 void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = m_speed;
-
-	const float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
-
-	newspeed.x = m_speed.x * l_hyperspeedMultiplier;
-	newspeed.y = m_speed.y * l_hyperspeedMultiplier;
-	
 	//if (m_ghost == false && l_hyperspeedMultiplier > 1)
 	//	setGhost(true);
 	//else if (m_ghost == true)
 	//	setGhost(false);
-	
-	//Basic movement (initial vector)
-	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
+	sf::Vector2f newposition = ComputeHyperspeedMovement(deltaTime, hyperspeedMultiplier);
 	setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
+}
+
+sf::Vector2f GameObject::ComputeHyperspeedMovement(sf::Time deltaTime, float hyperspeedMultiplier, float extraYSpeed)
+{
+	const float l_hyperspeedMultiplier = hyperspeedMultiplier < 1 ? hyperspeedMultiplier : 1;
+
+	sf::Vector2f newspeed;
+	newspeed.x = m_speed.x * l_hyperspeedMultiplier;
+	newspeed.y = m_speed.y * l_hyperspeedMultiplier + extraYSpeed;
+
+	return sf::Vector2f(getPosition().x + (newspeed.x)*deltaTime.asSeconds(), getPosition().y + (newspeed.y)*deltaTime.asSeconds());
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)
@@ -322,7 +362,7 @@ bool GameObject::get_money_from(GameObject& object, int loot_value)
 
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size);
+	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x / 2, this->m_size.y / 2), this->m_frameNumber, this->m_animationNumber);
 	clone->m_display_name = this->m_display_name;
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
@@ -446,6 +486,21 @@ float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
 
 	return GetVectorLength(current_diff);
+}
+
+float GameObject::GetSquaredDistanceBetweenObjects(GameObject* object1, GameObject* object2)
+{
+	assert(object1 != NULL);
+	assert(object2 != NULL);
+
+	return GetSquaredDistanceBetweenPositions(object1->getPosition(), object2->getPosition());
+}
+
+float GameObject::GetSquaredDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
+{
+	const float dx = position1.x - position2.x;
+	const float dy = position1.y - position2.y;
+	return (dx * dx) + (dy * dy);
 }
 
 float GameObject::GetVectorLength(sf::Vector2f vector)
@@ -597,71 +652,25 @@ sf::Vector2f GameObject::ApplyScreenBordersConstraints(sf::Vector2f position, sf
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	if (direction == DIRECTION_UP)
-		if (getPosition().y > target_position.y)
-			return GREATER_THAN;
-		else if (getPosition().y == target_position.y)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
-
+		return CompareGreaterIfGreater(getPosition().y, target_position.y);
 	else if (direction == DIRECTION_DOWN)
-		if (getPosition().y < SCENE_SIZE_Y - target_position.y)
-			return GREATER_THAN;
-		else if (getPosition().y == SCENE_SIZE_Y - target_position.y)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
-
+		return CompareGreaterIfLess(getPosition().y, SCENE_SIZE_Y - target_position.y);
 	else if (direction == DIRECTION_RIGHT)
-		if (getPosition().x < SCENE_SIZE_X - target_position.x)
-			return GREATER_THAN;
-		else if (getPosition().x == SCENE_SIZE_X - target_position.x)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
-
+		return CompareGreaterIfLess(getPosition().x, SCENE_SIZE_X - target_position.x);
 	else
-		if (getPosition().x > target_position.x)
-			return GREATER_THAN;
-		else if (getPosition().x == target_position.x)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
+		return CompareGreaterIfGreater(getPosition().x, target_position.x);
 }
 
 FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	if (direction == DIRECTION_UP)
-		if (getPosition().x > target_position.x)
-			return GREATER_THAN;
-		else if (getPosition().x == target_position.x)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
-
+		return CompareGreaterIfGreater(getPosition().x, target_position.x);
 	else if (direction == DIRECTION_DOWN)
-		if (getPosition().x < SCENE_SIZE_X - target_position.x)
-			return GREATER_THAN;
-		else if (getPosition().x == SCENE_SIZE_X - target_position.x)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
-
+		return CompareGreaterIfLess(getPosition().x, SCENE_SIZE_X - target_position.x);
 	else if (direction == DIRECTION_RIGHT)
-		if (getPosition().y > target_position.y)
-			return GREATER_THAN;
-		else if (getPosition().y == target_position.y)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
-
+		return CompareGreaterIfGreater(getPosition().y, target_position.y);
 	else
-		if (getPosition().y < SCENE_SIZE_Y - target_position.y)
-			return GREATER_THAN;
-		else if (getPosition().y == SCENE_SIZE_Y - target_position.y)
-			return EQUAL_TO;
-		else
-			return LESSER_THAN;
+		return CompareGreaterIfLess(getPosition().y, SCENE_SIZE_Y - target_position.y);
 }
 
 

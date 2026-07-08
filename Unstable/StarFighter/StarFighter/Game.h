@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stack>
+#include <utility>
 #define _USE_MATH_DEFINES
 #include <math.h>
 

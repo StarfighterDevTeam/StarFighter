@@ -160,6 +160,17 @@ SFPanel::~SFPanel()
 	delete m_actions;
 }
 
+void SFPanel::SetTitleAndTextFont(sf::Font* font)
+{
+	m_title_text.setFont(*font);
+	m_text.setFont(*font);
+}
+
+SFActionBox* SFPanel::CreateActionBox(sf::Font* font)
+{
+	return new SFActionBox(font);
+}
+
 bool SFPanel::IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object)
 {
 	if (!cursor.m_visible)

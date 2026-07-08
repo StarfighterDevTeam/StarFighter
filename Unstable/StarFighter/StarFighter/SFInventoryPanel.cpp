@@ -10,8 +10,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playership, SFPanelT
 	m_item_stats_panel_compare = NULL;
 	m_has_prioritary_feedback = false;
 
-	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	SetTitleAndTextFont((*CurrentGame).m_font[Font_Arial]);
 
 	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
@@ -44,8 +43,12 @@ SFInventoryPanel::~SFInventoryPanel()
 	}
 
 	//v2
-	if (m_panel_type != SFPanel_Trade)//trade panel grids will be destroyed in ~Shop destructor
-		for (int i = 0; i < NBVAL_TradeGrids; i++)
+	//Trade_EquippedGrid and Trade_StashGrid are always owned by this panel (created fresh in CreateGrids,
+	//even for the Trade panel, where they hold a clone of the HUD panel's content).
+	//Trade_ShopGrid is only owned by this panel outside of the Trade panel case; for the Trade panel it is
+	//an alias to Shop::m_grid_v2 and will be destroyed by the Shop that owns it, so it must not be deleted here.
+	for (int i = 0; i < NBVAL_TradeGrids; i++)
+		if (i != Trade_ShopGrid || m_panel_type != SFPanel_Trade)
 			delete m_grids_v2[i];
 }
 

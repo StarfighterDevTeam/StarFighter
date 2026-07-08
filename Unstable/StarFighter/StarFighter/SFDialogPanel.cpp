@@ -11,8 +11,7 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playership) : SFPanel(size
 	if (m_dialog->m_duration == 0)
 		(*CurrentGame).m_waiting_for_dialog_validation = true;
 
-	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	SetTitleAndTextFont((*CurrentGame).m_font[Font_Arial]);
 	setOutlineThickness(2);
 
 	//is dialog displayed up or down
@@ -57,7 +56,7 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playership) : SFPanel(size
 	//actions text
 	if (m_dialog->m_duration == 0)
 	{
-		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions = CreateActionBox((*CurrentGame).m_font[Font_Arial]);
 
 		ostringstream ss;
 		if (m_dialog->m_next_dialog_name.empty() || m_dialog->m_next_dialog_name.compare("0") == 0)

@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 EnemyPool* FileLoader::LoadEnemyPool(string name)
 {
-	vector<vector<string> > enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
+	vector<vector<string> > enemypoolConfig = FileLoaderUtils::FileLoader(ENEMYPOOL_FILE);
 
 	for (std::vector<vector<string> >::iterator it = (enemypoolConfig).begin(); it != (enemypoolConfig).end(); it++)
 	{
@@ -21,7 +21,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 {
 	if ((*CurrentGame).m_enemiesConfig[name].empty())
 	{
-		LOGGER_WRITE(Logger::DEBUG, ("\n<!>Enemy name cannot be found in (*CurrentGame).m_enemiesConfig: '%s'. Please check the ENEMY config file", (char*)name.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("\n<!>Enemy name cannot be found in (*CurrentGame).m_enemiesConfig: '%s'. Please check the ENEMY config file", (char*)name.c_str()));
 		return NULL;
 	}
 

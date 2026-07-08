@@ -12,13 +12,11 @@ Stroboscopic::Stroboscopic(sf::Time decade_time, GameObject* parent, int max_alp
 	m_alpha = max_alpha;
 	m_decay_time = decade_time;
 
-	//getting a one-framed animation (the current frame and animation)
-	Animation* anim = new Animation();
-	anim->setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
-	setAnimationLine(parent->m_currentAnimationIndex);
-	anim->addFrame(m_currentAnimation->getFrame(parent->m_currentFrame));
+	//getting a one-framed animation (the current frame and animation), owned by m_frozenAnimation - no heap allocation needed
+	m_frozenAnimation.setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
+	m_frozenAnimation.addFrame(this->m_defaultAnimation.getFrame(parent->m_currentAnimationIndex * parent->m_frameNumber + parent->m_currentFrame));
 
-	m_currentAnimation = anim;
+	m_currentAnimation = &m_frozenAnimation;
 	play(*m_currentAnimation);
 
 	setRotation(parent->getRotation());

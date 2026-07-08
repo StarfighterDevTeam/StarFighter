@@ -21,27 +21,30 @@ Scene::Scene(string name)//, int hazard_level, bool reverse_scene, bool first_sc
 	int p = 0;
 	int enemy_count = 0;
 
-	//Links to other scenes
-	m_links[DIRECTION_UP] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_UP];
-	m_links[DIRECTION_DOWN] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_DOWN];
-	m_links[DIRECTION_RIGHT] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_RIGHT];
-	m_links[DIRECTION_LEFT] = (*CurrentGame).m_generalScenesConfig[name][SCENE_LINK_LEFT];
+	//caching this scene's config row: avoids repeating the same string-keyed map lookup for every field below
+	vector<string>& sceneConfig = (*CurrentGame).m_generalScenesConfig[name];
 
-	//m_canHazardBreak = ((*CurrentGame).m_generalScenesConfig[name][SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
-	m_level = (*CurrentGame).m_playership->m_level;//stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_LEVEL]);// +hazard_level;
+	//Links to other scenes
+	m_links[DIRECTION_UP] = sceneConfig[SCENE_LINK_UP];
+	m_links[DIRECTION_DOWN] = sceneConfig[SCENE_LINK_DOWN];
+	m_links[DIRECTION_RIGHT] = sceneConfig[SCENE_LINK_RIGHT];
+	m_links[DIRECTION_LEFT] = sceneConfig[SCENE_LINK_LEFT];
+
+	//m_canHazardBreak = (sceneConfig[SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
+	m_level = (*CurrentGame).m_playership->m_level;//stoi(sceneConfig[SCENE_LEVEL]);// +hazard_level;
 
 	//hub?
-	m_is_hub = (bool)stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_IS_HUB]);
+	m_is_hub = (bool)stoi(sceneConfig[SCENE_IS_HUB]);
 
 	//speed
-	m_vspeed = (float)stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_BACKGROUND_VSPEED]);
+	m_vspeed = (float)stoi(sceneConfig[SCENE_BACKGROUND_VSPEED]);
 
 	//background
-	float w = (float)stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_BACKGROUND_WIDTH]);
-	float h = (float)stoi((*CurrentGame).m_generalScenesConfig[name][SCENE_BACKGROUND_HEIGHT]);
+	float w = (float)stoi(sceneConfig[SCENE_BACKGROUND_WIDTH]);
+	float h = (float)stoi(sceneConfig[SCENE_BACKGROUND_HEIGHT]);
 
-	m_bg = new Background(sf::Vector2f(0.5 * w, -0.5 * h + SCENE_SIZE_Y), sf::Vector2f(0, m_vspeed), (*CurrentGame).m_generalScenesConfig[name][SCENE_BACKGROUND_FILENAME], sf::Vector2f(w, h));
-	m_bg->m_display_name = (*CurrentGame).m_generalScenesConfig[name][SCENE_DISPLAYNAME];
+	m_bg = new Background(sf::Vector2f(0.5 * w, -0.5 * h + SCENE_SIZE_Y), sf::Vector2f(0, m_vspeed), sceneConfig[SCENE_BACKGROUND_FILENAME], sf::Vector2f(w, h));
+	m_bg->m_display_name = sceneConfig[SCENE_DISPLAYNAME];
 	(*CurrentGame).addToScene(m_bg, false);
 
 	//Getting the display name of the scene and loading it into the scene portals
@@ -104,7 +107,7 @@ Scene::Scene(string name)//, int hazard_level, bool reverse_scene, bool first_sc
 	}
 
 	//Loading specific music
-	m_scene_music = (*CurrentGame).m_generalScenesConfig[name][SCENE_MUSIC_NAME];
+	m_scene_music = sceneConfig[SCENE_MUSIC_NAME];
 
 	//Loading enemies
 	if (m_is_hub == false)
@@ -445,7 +448,7 @@ void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multipli
 void Scene::SpawnEnemy(int enemy_class)
 {
 	Enemy* enemy = NULL;
-	//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
+	//Attention si total class probability vaut 0 ï¿½a va crasher - division par zï¿½ro oblige. du coup il faut vï¿½rifier que ce n'est pas ï¿½gal ï¿½ 0.
 	//int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;
 	int dice_roll = RandomizeIntBetweenValues(0, m_total_class_probability[enemy_class]);
 	
@@ -459,6 +462,12 @@ void Scene::SpawnEnemy(int enemy_class)
 		}
 	}
 	assert(enemy != NULL);
+	if (enemy == NULL)
+	{
+		//Should not happen (would mean m_total_class_probability[enemy_class] is 0 for a class that still has an active generator) but Release builds strip the assert above, so guard against a null-deref crash.
+		LOGGER_WRITE(Logger::LERROR, TextUtils::format("Scene::SpawnEnemy: no enemy found for class %d (total probability may be 0)", enemy_class));
+		return;
+	}
 
 	//RANDOM POSITION
 	sf::Vector2f pos = sf::Vector2f(GetRandomXSpawnPosition(enemy), - enemy->m_size.y * 0.5);

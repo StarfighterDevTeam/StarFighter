@@ -33,6 +33,7 @@ Phase* Phase::Clone()
 	for (Weapon* weapon : m_weapons_list)
 		phase->m_weapons_list.push_back(weapon->Clone());
 
+	delete phase->m_pattern;//avoid leaking the default GeometryPattern allocated by Phase's constructor
 	phase->m_pattern = new GeometryPattern(*m_pattern);
 
 	for (Modifier modifier : m_modifiers)
@@ -49,7 +50,7 @@ Phase* Phase::Clone()
 
 	phase->m_wake_up_name = m_wake_up_name;
 
-	if (phase->m_welcomeWeapon != NULL)
+	if (m_welcomeWeapon != NULL)
 		phase->m_welcomeWeapon = m_welcomeWeapon->Clone();
 	
 	for (Dialog* dialog : m_dialogs)

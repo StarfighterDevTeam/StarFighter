@@ -31,7 +31,7 @@ int Shop::SaveShopUpgrades(Shop* shop)
 	LOGGER_WRITE(Logger::DEBUG, "Saving shop upgrades in profile.\n");
 
 	ofstream data(string(getSavesPath()) + SHOP_UPGRADES_SAVE_FILE, ios::in | ios::trunc);
-	if (data)  // si l'ouverture a réussi
+	if (data)  // si l'ouverture a rï¿½ussi
 	{
 		if (shop == NULL)
 		{
@@ -49,7 +49,7 @@ int Shop::SaveShopUpgrades(Shop* shop)
 
 		data.close();  // on ferme le fichier
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "ERROR: No save file found for shop upgrades. A new file is going to be created.\n" << endl;
 	}
@@ -66,7 +66,7 @@ bool Shop::LoadShopUpgrades(Shop* shop)
 
 	std::ifstream data(string(getSavesPath()) + SHOP_UPGRADES_SAVE_FILE, ios::in);
 
-	if (data) // si ouverture du fichier réussie
+	if (data) // si ouverture du fichier rï¿½ussie
 	{
 		//load save
 		std::string line;
@@ -80,8 +80,9 @@ bool Shop::LoadShopUpgrades(Shop* shop)
 			}
 
 			string upgrade_name;
-			bool sold_out;
-			std::istringstream(line) >> upgrade_name >> (bool)sold_out;
+			int sold_out_flag = 0;
+			std::istringstream(line) >> upgrade_name >> sold_out_flag;
+			bool sold_out = sold_out_flag != 0;
 
 			if (upgrade_name.compare("-1") == 0)
 				return false;
@@ -96,7 +97,7 @@ bool Shop::LoadShopUpgrades(Shop* shop)
 
 		return true;
 	}
-	else  // si l'ouverture a échoué
+	else  // si l'ouverture a ï¿½chouï¿½
 	{
 		cerr << "No SHOP UPGRADES SAVE FILE found.\n" << endl;
 		return false;

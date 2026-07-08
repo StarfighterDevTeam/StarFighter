@@ -25,17 +25,9 @@ GeometryPattern* GeometryPattern::LoadPattern(vector<string> line_data, int inde
 		{
 			pattern->m_pattern_type = Line_;
 		}
-		else if (line_data[index].compare("circle") == 0)
+		else if (line_data[index].compare("circle") == 0 || line_data[index].compare("rectangle") == 0)
 		{
-			pattern->m_pattern_type = Circle_;
-
-			pattern->m_width = stoi(line_data[index + GEOMETRY_PATTERN_WIDTH]);
-			pattern->m_height = stoi(line_data[index + GEOMETRY_PATTERN_HEIGHT]);
-			pattern->m_starting_point = stoi(line_data[index + GEOMETRY_PATTERN_STARTING_POINT]);
-		}
-		else if (line_data[index].compare("rectangle") == 0)
-		{
-			pattern->m_pattern_type = Rectangle_;
+			pattern->m_pattern_type = line_data[index].compare("circle") == 0 ? Circle_ : Rectangle_;
 
 			pattern->m_width = stoi(line_data[index + GEOMETRY_PATTERN_WIDTH]);
 			pattern->m_height = stoi(line_data[index + GEOMETRY_PATTERN_HEIGHT]);
@@ -65,7 +57,12 @@ void GeometryPattern::setPattern_v2(PatternType pattern_type, int speed, int clo
 	{
 		if (m_clockwise == 0)
 		{
-			srand(time(NULL));
+			static bool s_randSeeded = false;//seed the RNG only once: reseeding with time(NULL) on every call made all patterns created within the same second pick the same "random" direction
+			if (s_randSeeded == false)
+			{
+				srand((unsigned int)time(NULL));
+				s_randSeeded = true;
+			}
 			clockwise = ((rand() % 2) * 2) - 1;
 		}
 		else

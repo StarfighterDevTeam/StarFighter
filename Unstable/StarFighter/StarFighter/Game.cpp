@@ -208,10 +208,10 @@ int Game::LoadSFX()
 
 	for (size_t i = 0; i < NBVAL_SFX_BANK; i++)
 	{
-		sf::Sound* new_sound = new sf::Sound;
-		new_sound->setBuffer(m_soundBuffers[i]);
-		new_sound->setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
-		m_sounds.insert(map<SFX_Bank, sf::Sound>::value_type((SFX_Bank)i, *new_sound));
+		sf::Sound new_sound;
+		new_sound.setBuffer(m_soundBuffers[i]);
+		new_sound.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+		m_sounds.insert(map<SFX_Bank, sf::Sound>::value_type((SFX_Bank)i, new_sound));
 	}
 
 	return 0;
@@ -280,9 +280,7 @@ void Game::updateScene(Time deltaTime)
 		}
 	}
 
-	m_sceneGuidedMissiles.clear();
-	for (GameObject* missile : sceneGameGuidedMissiles_tmp)
-		m_sceneGuidedMissiles.push_back(missile);
+	m_sceneGuidedMissiles = std::move(sceneGameGuidedMissiles_tmp);
 
 	//delete "garbage" objects, keep the rest in a temporary vector
 	vector<GameObject*> sceneGameObjects_tmp;
@@ -333,9 +331,7 @@ void Game::updateScene(Time deltaTime)
 		if (rect->m_garbageMe == false)//we don't delete the "garbage" ones because the pointer is a reference to a member object of class Enemy, who will destroy them in its destructor
 			sceneSFRectangles_tmp.push_back(rect);
 
-	m_sceneSFRectangles.clear();
-	for (SFRectangle* rect : sceneSFRectangles_tmp)
-		m_sceneSFRectangles.push_back(rect);
+	m_sceneSFRectangles = std::move(sceneSFRectangles_tmp);
 
 	//SFTexts
 	vector<SFText*> sceneSFTexts_tmp;
@@ -343,39 +339,35 @@ void Game::updateScene(Time deltaTime)
 		if (text->m_garbageMe == false)//we don't delete the "garbage" ones because the pointer is a reference to a member object of class Enemy, who will destroy them in its destructor
 			sceneSFTexts_tmp.push_back(text);
 
-	m_sceneSFTexts.clear();
-	for (SFText* text : sceneSFTexts_tmp)
-		m_sceneSFTexts.push_back(text);
+	m_sceneSFTexts = std::move(sceneSFTexts_tmp);
 
 	//SFPanels
 	vector<SFPanel*> sceneSFPanels_tmp;
 	for (SFPanel* panel : m_sceneSFPanels)
-		if (panel->m_garbageMe == true)
-			delete panel;
-		else
-			sceneSFPanels_tmp.push_back(panel);
-
-	m_sceneSFPanels.clear();
-	for (SFPanel* panel : sceneSFPanels_tmp)
 	{
+		if (panel->m_garbageMe == true)
+		{
+			delete panel;
+			continue;
+		}
 		panel->Update(deltaTime, InputGuy::getDirections());
-		m_sceneSFPanels.push_back(panel);
+		sceneSFPanels_tmp.push_back(panel);
 	}
-		
+	m_sceneSFPanels = std::move(sceneSFPanels_tmp);
+
 	//SFTextPops
 	vector<SFTextPop*> sceneSFTextPops_tmp;
 	for (SFTextPop* textpop : m_sceneSFTextPops)
-		if (textpop->m_garbageMe == true)
-			delete textpop;
-		else
-			sceneSFTextPops_tmp.push_back(textpop);
-
-	m_sceneSFTextPops.clear();
-	for (SFTextPop* textpop : sceneSFTextPops_tmp)
 	{
+		if (textpop->m_garbageMe == true)
+		{
+			delete textpop;
+			continue;
+		}
 		textpop->update(deltaTime, m_hyperspeedMultiplier);
-		m_sceneSFTextPops.push_back(textpop);
+		sceneSFTextPops_tmp.push_back(textpop);
 	}
+	m_sceneSFTextPops = std::move(sceneSFTextPops_tmp);
 
 	//Update music transitions
 	ManageMusicTransitions(deltaTime);

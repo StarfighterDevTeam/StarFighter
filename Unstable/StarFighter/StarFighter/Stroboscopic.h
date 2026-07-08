@@ -12,6 +12,9 @@ public :
 
 	Uint8 m_alpha;
 	sf::Time m_decay_time;
+
+private:
+	Animation m_frozenAnimation; //owns the single frozen frame shown while decaying; a value member so no manual new/delete is needed
 };
 
 #endif // STROBOSCOPIC_H_INCLUDED
